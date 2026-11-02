@@ -21,7 +21,33 @@ describe('live feed settings.json', () => {
   it('installs into a folder with no settings.json', async () => {
     const home = await tempDir();
     expect(await installLiveFeed(home, SCRIPT)).toEqual({ home, installed: true, available: true });
-    expect(await settings(home)).toEqual({ statusLine: { type: 'command', command: SCRIPT } });
+    expect(await settings(home)).toEqual({
+      statusLine: { type: 'command', command: `'${SCRIPT}'` },
+    });
+  });
+
+  // Unquoted, the shell splits the macOS path at the space and runs
+  // `.../Library/Application`, so the feed reports installed and never posts.
+  it('quotes the script path so a path with spaces still runs, and removes it again', async () => {
+    const home = await tempDir();
+    const spaced = join(await tempDir(), 'Application Support', "it's here", 'statusline.sh');
+    await installLiveFeed(home, spaced);
+    const { command } = (await settings(home)).statusLine;
+    expect(execFileSync('sh', ['-c', `printf '%s' ${command}`], { encoding: 'utf8' })).toBe(spaced);
+    expect(await uninstallLiveFeed(home, spaced)).toEqual({
+      home,
+      installed: false,
+      available: true,
+    });
+  });
+
+  it('still recognises the bare path an earlier build installed', async () => {
+    const home = await tempDir();
+    await writeFile(
+      join(home, 'settings.json'),
+      JSON.stringify({ statusLine: { type: 'command', command: SCRIPT } }),
+    );
+    expect((await liveFeedTarget(home, SCRIPT)).installed).toBe(true);
   });
 
   it('keeps every other setting when installing and uninstalling', async () => {
@@ -36,7 +62,7 @@ describe('live feed settings.json', () => {
     expect(await settings(home)).toEqual({
       model: 'opus',
       permissions: { allow: ['Bash(ls)'] },
-      statusLine: { type: 'command', command: SCRIPT },
+      statusLine: { type: 'command', command: `'${SCRIPT}'` },
     });
     expect(await uninstallLiveFeed(home, SCRIPT)).toEqual({
       home,

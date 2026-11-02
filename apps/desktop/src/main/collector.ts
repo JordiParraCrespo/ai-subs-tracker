@@ -109,7 +109,10 @@ export class Collector {
   async tokenChanged(token: string | null): Promise<CollectorStatus> {
     if (token) {
       this.failures = 0;
-      return this.inFlight ?? this.run();
+      // A run already under way read the token store before this sign-in, so
+      // it ends signed out; let it finish, then run again with the new token.
+      if (this.inFlight) return this.inFlight.then(() => this.inFlight ?? this.run());
+      return this.run();
     }
     this.clearTimer();
     this.update({ phase: 'signed_out', nextRunAt: null, lastError: null });

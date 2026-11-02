@@ -53,8 +53,22 @@ function isRecord(value: unknown): value is Json {
 }
 
 /** True when this `statusLine` value runs our script. */
+/**
+ * The status-line command for the script: single-quoted, because Claude Code
+ * runs it through a shell and the macOS path has a space in it
+ * (`~/Library/Application Support/Subtrack/statusline.sh`).
+ */
+export function statusLineCommand(scriptPath: string): string {
+  return `'${scriptPath.replaceAll("'", `'\\''`)}'`;
+}
+
+/** Ours in either form: quoted, or the bare path earlier builds wrote. */
 export function isOurStatusLine(value: unknown, scriptPath: string): boolean {
-  return isRecord(value) && value.type === 'command' && value.command === scriptPath;
+  return (
+    isRecord(value) &&
+    value.type === 'command' &&
+    (value.command === statusLineCommand(scriptPath) || value.command === scriptPath)
+  );
 }
 
 async function readSettings(home: string): Promise<{ data: Json; raw: string | null }> {
@@ -90,7 +104,7 @@ export async function installLiveFeed(home: string, scriptPath: string): Promise
   const target = await liveFeedTarget(home, scriptPath);
   if (target.installed || !target.available) return target;
   const { data, raw } = await readSettings(home);
-  const next = { ...data, statusLine: { type: 'command', command: scriptPath } };
+  const next = { ...data, statusLine: { type: 'command', command: statusLineCommand(scriptPath) } };
   await writeFile(join(home, 'settings.json'), `${JSON.stringify(next, null, indentOf(raw))}\n`);
   return { home, installed: true, available: true };
 }

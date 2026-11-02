@@ -192,6 +192,18 @@ describe('collector', () => {
     expect(h.syncs).toHaveLength(1);
   });
 
+  // The first run reads the token store before the sign-in lands; joining it
+  // would leave the app signed out until a manual refresh.
+  it('a sign-in during a run syncs once that run has finished', async () => {
+    const h = harness({ token: null });
+    const first = h.collector.start();
+    h.setToken('fresh');
+    const status = await h.collector.tokenChanged('fresh');
+    expect((await first).phase).toBe('signed_out');
+    expect(status.phase).toBe('idle');
+    expect(h.syncs).toHaveLength(1);
+  });
+
   it('skips limit fetching for a rate-limited login for 15 minutes', async () => {
     const h = harness();
     h.setNextAccount(account('rate_limited'));
