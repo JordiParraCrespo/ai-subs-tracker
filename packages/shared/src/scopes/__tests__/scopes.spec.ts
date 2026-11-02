@@ -187,14 +187,26 @@ describe('grantableScopes', () => {
     expect(grantableScopes(ability)).toEqual([...SCOPES]);
   });
 
-  it('limits a reader to the read levels they hold, plus their own profile', () => {
+  it('limits a reader to the read levels they hold, plus their own profile and accounts', () => {
     const ability = defineAbilitiesFromPermissions([{ action: 'read', subject: 'User' }]);
-    expect(grantableScopes(ability)).toEqual(['profile:read', 'profile:write', 'users:read']);
+    expect(grantableScopes(ability)).toEqual([
+      'profile:read',
+      'profile:write',
+      'accounts:read',
+      'accounts:write',
+      'users:read',
+    ]);
   });
 
-  it('always allows the profile group — it governs the caller’s own account', () => {
+  // Both govern only the caller's own data: their account, and their coding-agent accounts.
+  it('always allows the profile and accounts groups', () => {
     const ability = defineAbilitiesFromPermissions([]);
-    expect(grantableScopes(ability)).toEqual(['profile:read', 'profile:write']);
+    expect(grantableScopes(ability)).toEqual([
+      'profile:read',
+      'profile:write',
+      'accounts:read',
+      'accounts:write',
+    ]);
   });
 
   it('grants a write level when the ability satisfies any one of its rules', () => {
