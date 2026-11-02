@@ -28,6 +28,8 @@ export interface AccountProps {
   planId: string | null;
   /** What the person actually pays, over the plan's list price. */
   monthlyPriceCents: number | null;
+  /** The day of the month the plan bills, as the person told us; providers do not report it. */
+  renewalDay: number | null;
   isActive: boolean;
   activatedAt: Date | null;
   lastSyncedAt: Date | null;
@@ -46,6 +48,7 @@ export interface AccountEdit {
   label?: string | null;
   planId?: string | null;
   monthlyPriceCents?: number | null;
+  renewalDay?: number | null;
 }
 
 /**
@@ -73,6 +76,7 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
         label: null,
         planId: null,
         monthlyPriceCents: null,
+        renewalDay: null,
         isActive: false,
         activatedAt: null,
         lastSyncedAt: input.at,
@@ -114,6 +118,10 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
   }
   get monthlyPriceCents() {
     return this.props.monthlyPriceCents;
+  }
+
+  get renewalDay() {
+    return this.props.renewalDay;
   }
   get isActive() {
     return this.props.isActive;
@@ -166,6 +174,7 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
     if (change.planId !== undefined) this.props.planId = change.planId;
     if (change.monthlyPriceCents !== undefined)
       this.props.monthlyPriceCents = change.monthlyPriceCents;
+    if (change.renewalDay !== undefined) this.props.renewalDay = change.renewalDay;
     this.setUpdatedAt();
     this.validate();
   }
@@ -205,6 +214,10 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
     }
     if (this.props.monthlyPriceCents !== null && this.props.monthlyPriceCents < 0) {
       throw new ArgumentInvalidException('Account price cannot be negative');
+    }
+    const day = this.props.renewalDay;
+    if (day !== null && (!Number.isInteger(day) || day < 1 || day > 31)) {
+      throw new ArgumentInvalidException('Renewal day must be a day of the month, 1 to 31');
     }
   }
 }

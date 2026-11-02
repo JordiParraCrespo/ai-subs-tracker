@@ -76,3 +76,37 @@ test('usage shows tokens by model at API prices', async ({ page }) => {
 
   await api.dispose();
 });
+
+test('people groups the plans by the identity that holds them', async ({ page }) => {
+  const { user, api } = await provisionedUser('people');
+  await syncTwoAccounts(api);
+  await signInAs(page, user);
+
+  await page.goto('/people');
+  await expect(page.getByRole('heading', { name: 'People', level: 1 })).toBeVisible();
+  // Two logins, two identities, and a row opens to the plan it holds.
+  await expect(page.getByText('Showing 2 of 2 people')).toBeVisible();
+  await page.getByText('work@example.com', { exact: true }).click();
+  await expect(page.getByText('Claude Code · Ultra')).toBeVisible();
+
+  await api.dispose();
+});
+
+test('a renewal day puts the plan on the renewals calendar', async ({ page }) => {
+  const { user, api } = await provisionedUser('renewals');
+  await syncTwoAccounts(api);
+  await signInAs(page, user);
+
+  await page.goto('/renewals');
+  // Providers do not report a billing day, so a paid plan starts unscheduled.
+  await expect(page.getByText('No renewal day yet')).toBeVisible();
+  await page.getByRole('button', { name: 'Set day' }).first().click();
+  await page.getByLabel('Renews on day of month').fill('28');
+  await page.getByRole('button', { name: 'Save' }).click();
+
+  await reloadFromServer(page);
+  await expect(page.getByRole('heading', { name: 'Next 30 days' })).toBeVisible();
+  await expect(page.locator('.ds-cal__event').first()).toBeVisible();
+
+  await api.dispose();
+});

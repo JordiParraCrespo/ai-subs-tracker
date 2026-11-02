@@ -7,7 +7,7 @@ import type { AccountRepositoryPort } from '../../database/account.repository.po
 import { AccountErrors } from '../../domain/account.errors';
 import { UpdateAccountCommand } from './update-account.command';
 
-/** Renames an account, or sets the plan and price its owner actually has. */
+/** Renames an account, or sets the plan, price and billing day its owner actually has. */
 @CommandHandler(UpdateAccountCommand)
 export class UpdateAccountCommandHandler
   implements ICommandHandler<UpdateAccountCommand, AggregateID>
@@ -25,6 +25,7 @@ export class UpdateAccountCommandHandler
       label: command.label,
       planId: command.planId,
       monthlyPriceCents: command.monthlyPriceCents,
+      renewalDay: command.renewalDay,
     });
     await this.accounts.save(account);
     return account.id;

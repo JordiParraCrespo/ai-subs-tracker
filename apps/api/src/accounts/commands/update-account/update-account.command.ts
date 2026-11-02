@@ -6,6 +6,7 @@ export class UpdateAccountCommand extends CommandBase {
   readonly label?: string | null;
   readonly planId?: string | null;
   readonly monthlyPriceCents?: number | null;
+  readonly renewalDay?: number | null;
 
   constructor(props: CommandProps<UpdateAccountCommand>) {
     super(props);
@@ -14,5 +15,6 @@ export class UpdateAccountCommand extends CommandBase {
     this.label = props.label;
     this.planId = props.planId;
     this.monthlyPriceCents = props.monthlyPriceCents;
+    this.renewalDay = props.renewalDay;
   }
 }

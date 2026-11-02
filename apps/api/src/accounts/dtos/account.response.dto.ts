@@ -117,6 +117,13 @@ export class AccountResponseDto {
   @ApiProperty({ description: 'True when the person set the price' })
   priceOverridden!: boolean;
 
+  @ApiProperty({
+    type: Number,
+    nullable: true,
+    description: 'Day of the month the plan bills (1–31), when the person set it',
+  })
+  renewalDay!: number | null;
+
   @ApiProperty()
   isActive!: boolean;
 

@@ -47,6 +47,9 @@ export class AccountOrmEntity {
   @Column({ type: 'integer', nullable: true })
   monthlyPriceCents!: number | null;
 
+  @Column({ type: 'smallint', nullable: true })
+  renewalDay!: number | null;
+
   @Column({ type: 'boolean', default: false })
   isActive!: boolean;
 

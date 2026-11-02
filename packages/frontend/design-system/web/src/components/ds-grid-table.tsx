@@ -20,6 +20,7 @@ function DsGridTable<TRow>({
   rows,
   rowKey,
   onRowClick,
+  expanded,
   footer,
   page,
   pages = 1,
@@ -33,6 +34,8 @@ function DsGridTable<TRow>({
   rows: readonly TRow[];
   rowKey: (row: TRow) => string;
   onRowClick?: (row: TRow) => void;
+  /** What opens under a row (the design's people detail); null keeps it closed. */
+  expanded?: (row: TRow) => React.ReactNode;
   footer?: React.ReactNode;
   page?: number;
   pages?: number;
@@ -54,23 +57,28 @@ function DsGridTable<TRow>({
           ))}
         </div>
         <div className="ds-gtable__body">
-          {rows.map((row) => (
-            // biome-ignore lint/a11y/noStaticElementInteractions: the row's own controls are its accessible actions; the click is a shortcut
-            // biome-ignore lint/a11y/useKeyWithClickEvents: as above
-            <div
-              key={rowKey(row)}
-              className="ds-gtable__row"
-              style={grid}
-              data-clickable={onRowClick ? '' : undefined}
-              onClick={onRowClick ? () => onRowClick(row) : undefined}
-            >
-              {columns.map((column) => (
-                <div key={column.key} className="ds-gtable__cell" data-align={column.align}>
-                  {column.render(row)}
+          {rows.map((row) => {
+            const detail = expanded?.(row) ?? null;
+            return (
+              <div key={rowKey(row)} className="ds-gtable__group">
+                {/* biome-ignore lint/a11y/noStaticElementInteractions: the row's own controls are its accessible actions; the click is a shortcut */}
+                {/* biome-ignore lint/a11y/useKeyWithClickEvents: as above */}
+                <div
+                  className="ds-gtable__row"
+                  style={grid}
+                  data-clickable={onRowClick ? '' : undefined}
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                >
+                  {columns.map((column) => (
+                    <div key={column.key} className="ds-gtable__cell" data-align={column.align}>
+                      {column.render(row)}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          ))}
+                {detail !== null && <div className="ds-gtable__expand">{detail}</div>}
+              </div>
+            );
+          })}
         </div>
         {(footer || pages > 1) && (
           <div className="ds-gtable__foot">

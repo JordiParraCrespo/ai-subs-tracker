@@ -251,7 +251,7 @@ export const archiveAccount = <ThrowOnError extends boolean = false>(options: Op
 });
 
 /**
- * Rename an account or set its plan and price
+ * Rename an account or set its plan, price and renewal day
  */
 export const updateAccount = <ThrowOnError extends boolean = false>(options: Options<UpdateAccountData, ThrowOnError>): RequestResult<UpdateAccountResponses, UpdateAccountErrors, ThrowOnError> => (options.client ?? client).patch<UpdateAccountResponses, UpdateAccountErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],

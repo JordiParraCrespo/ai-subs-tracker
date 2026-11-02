@@ -31,6 +31,19 @@ describe('AccountEntity', () => {
   });
 
   // A Codex plan on a Claude login would price it wrongly and silently.
+  // Renewals draws a plan on this day of every month; a 0 or a 32 would put
+  // it on no day at all, or roll it into the next month.
+  it('takes a renewal day of the month and refuses one outside 1 to 31', () => {
+    const entity = account();
+    entity.edit({ renewalDay: 14 });
+    expect(entity.renewalDay).toBe(14);
+    expect(() => account().edit({ renewalDay: 0 })).toThrow();
+    expect(() => account().edit({ renewalDay: 32 })).toThrow();
+    expect(() => account().edit({ renewalDay: 2.5 })).toThrow();
+    entity.edit({ renewalDay: null });
+    expect(entity.renewalDay).toBeNull();
+  });
+
   it('refuses a plan from another provider', () => {
     expect(() => account().edit({ planId: 'codex-plus' })).toThrow();
   });

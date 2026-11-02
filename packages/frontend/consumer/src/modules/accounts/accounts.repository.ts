@@ -21,6 +21,7 @@ function toAccount(data: AccountResponseDto): AccountEntity {
     data.planOverridden,
     data.monthlyPriceCents,
     data.priceOverridden,
+    data.renewalDay,
     data.isActive,
     data.lastSyncedAt ? new Date(data.lastSyncedAt) : null,
     new Date(data.createdAt),

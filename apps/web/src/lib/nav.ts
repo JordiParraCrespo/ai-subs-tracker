@@ -1,10 +1,12 @@
 import {
   Activity,
+  CalendarDays,
   CreditCard,
   Flame,
   LayoutDashboard,
   Settings,
   UserRound,
+  Users,
 } from '@flama/design-system-web/icons';
 import type { NavItem, NavLink } from '@flama/frontend-web';
 
@@ -24,8 +26,10 @@ import type { NavItem, NavLink } from '@flama/frontend-web';
 export const NAV = [
   { to: '/dashboard', icon: LayoutDashboard, labelKey: 'dashboard', policies: [] },
   { to: '/accounts', icon: CreditCard, labelKey: 'accounts', policies: [] },
+  { to: '/people', icon: Users, labelKey: 'people', policies: [] },
   { to: '/usage', icon: Activity, labelKey: 'usage', policies: [] },
   { to: '/tokenmaxx', icon: Flame, labelKey: 'tokenmaxx', policies: [] },
+  { to: '/renewals', icon: CalendarDays, labelKey: 'renewals', policies: [] },
 ] as const satisfies readonly NavItem[];
 
 /** The account menu's own destinations, above the language list. */

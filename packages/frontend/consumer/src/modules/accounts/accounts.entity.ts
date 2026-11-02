@@ -41,6 +41,8 @@ export class AccountEntity implements RankableAccount {
     public readonly planOverridden: boolean,
     public readonly monthlyPriceCents: number,
     public readonly priceOverridden: boolean,
+    /** The day of the month the plan bills, when the person set it. */
+    public readonly renewalDay: number | null,
     public readonly isActive: boolean,
     public readonly lastSyncedAt: Date | null,
     public readonly createdAt: Date,

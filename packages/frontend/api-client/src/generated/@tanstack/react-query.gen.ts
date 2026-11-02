@@ -484,7 +484,7 @@ export const archiveAccountMutation = (options?: Partial<Options<ArchiveAccountD
 };
 
 /**
- * Rename an account or set its plan and price
+ * Rename an account or set its plan, price and renewal day
  */
 export const updateAccountMutation = (options?: Partial<Options<UpdateAccountData>>): UseMutationOptions<UpdateAccountResponse, UpdateAccountError, Options<UpdateAccountData>> => {
     const mutationOptions: UseMutationOptions<UpdateAccountResponse, UpdateAccountError, Options<UpdateAccountData>> = {

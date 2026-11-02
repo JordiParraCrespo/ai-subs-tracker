@@ -60,6 +60,7 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
     record.label = props.label;
     record.planId = props.planId;
     record.monthlyPriceCents = props.monthlyPriceCents;
+    record.renewalDay = props.renewalDay;
     record.isActive = props.isActive;
     record.activatedAt = props.activatedAt;
     record.lastSyncedAt = props.lastSyncedAt;
@@ -85,6 +86,7 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
         label: record.label,
         planId: record.planId,
         monthlyPriceCents: record.monthlyPriceCents,
+        renewalDay: record.renewalDay,
         isActive: record.isActive,
         activatedAt: record.activatedAt,
         lastSyncedAt: record.lastSyncedAt,
@@ -118,6 +120,7 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
     dto.planOverridden = entity.planId !== null;
     dto.monthlyPriceCents = entity.effectivePriceCents;
     dto.priceOverridden = entity.monthlyPriceCents !== null;
+    dto.renewalDay = entity.renewalDay;
     dto.isActive = entity.isActive;
     dto.lastSyncedAt = entity.lastSyncedAt?.toISOString() ?? null;
     dto.createdAt = entity.createdAt.toISOString();

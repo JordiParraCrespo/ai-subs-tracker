@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 const AUTO_PLAN = '';
 
 /**
- * An account's own name, plan and price. The dialog renders the submit
+ * An account's own name, plan, price and billing day. The dialog renders the submit
  * button and points it at `id`.
  */
 export function EditAccountForm({
@@ -48,6 +48,7 @@ export function EditAccountForm({
       label: account.label ?? '',
       planId: account.planOverridden ? (account.planId ?? AUTO_PLAN) : AUTO_PLAN,
       price: account.priceOverridden ? (account.monthlyPriceCents / 100).toFixed(2) : '',
+      renewalDay: account.renewalDay === null ? '' : String(account.renewalDay),
     },
   });
   const planLabels: Record<string, string> = {
@@ -106,6 +107,18 @@ export function EditAccountForm({
             disabled={isPending}
           />
           <FieldError errors={[errors.price]} />
+        </Field>
+        <Field data-invalid={Boolean(errors.renewalDay)}>
+          <FieldLabel htmlFor={`${id}-renewal`}>{t('accounts.edit.renewalDay')}</FieldLabel>
+          <Input
+            {...register('renewalDay')}
+            id={`${id}-renewal`}
+            inputMode="numeric"
+            placeholder={t('accounts.edit.renewalPlaceholder')}
+            aria-invalid={Boolean(errors.renewalDay)}
+            disabled={isPending}
+          />
+          <FieldError errors={[errors.renewalDay]} />
         </Field>
       </FieldGroup>
     </form>

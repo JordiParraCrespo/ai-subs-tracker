@@ -293,6 +293,10 @@ export type AccountResponseDto = {
      * True when the person set the price
      */
     priceOverridden: boolean;
+    /**
+     * Day of the month the plan bills (1–31), when the person set it
+     */
+    renewalDay: number | null;
     isActive: boolean;
     lastSyncedAt: string | null;
     createdAt: string;
@@ -435,6 +439,7 @@ export type UpdateAccountRequest = {
     label?: string | null;
     planId?: string | null;
     monthlyPriceCents?: number | null;
+    renewalDay?: number | null;
 };
 
 export type RoleResponseDto = {

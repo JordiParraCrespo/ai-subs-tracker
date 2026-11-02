@@ -284,13 +284,15 @@
       "refresh": "Refresh"
     },
     "edit": {
-      "description": "Name it, and set the plan and price you actually pay.",
+      "description": "Name it, and set the plan, price and billing day you actually have.",
       "label": "Name",
       "plan": "Plan",
       "planAuto": "As reported ({{plan}})",
       "price": "Monthly price (USD)",
       "pricePlaceholder": "The plan's list price",
-      "title": "Edit account"
+      "title": "Edit account",
+      "renewalDay": "Renews on day of month",
+      "renewalPlaceholder": "1 to 31, from your receipt"
     },
     "list": {
       "title": "Subscriptions",
@@ -554,6 +556,48 @@
         "hotSubAlone": "Slow down until it resets {{when}}",
         "none": "Every account is on track. Nothing to move this week."
       }
+    },
+    "people": {
+      "title": "People",
+      "sub_one": "{{count}} identity · who holds which plan, and what it costs · {{cost}}/mo",
+      "sub_other": "{{count}} identities · who holds which plan, and what it costs · {{cost}}/mo",
+      "search": "Search people",
+      "status": {
+        "all": "Any status",
+        "idle": "Has idle plans"
+      },
+      "sort": {
+        "cost": "Highest cost",
+        "name": "Name A–Z"
+      },
+      "result": "Showing {{shown}} of {{total}} people",
+      "clear": "Clear filters",
+      "person": "Person",
+      "tools": "Plans",
+      "idle": "Idle plans",
+      "cost": "Monthly cost",
+      "planCount_one": "{{count}} plan",
+      "planCount_other": "{{count}} plans",
+      "weekUsed": "{{used}} of the week used",
+      "resets": "resets {{when}}",
+      "noReading": "No reading yet",
+      "idleTag": "Idle this week",
+      "noMatch": "Nothing matches these filters. Clear them to see everyone."
+    },
+    "renewals": {
+      "title": "Renewals",
+      "sub": "When each plan bills, by date",
+      "monthTotal": "{{value}} in renewals",
+      "previous": "Previous month",
+      "next": "Next month",
+      "today": "Today",
+      "next30": "Next 30 days",
+      "due_one": "{{value}} due · {{count}} renewal",
+      "due_other": "{{value}} due · {{count}} renewals",
+      "none": "No paid plans to renew.",
+      "missingTitle": "No renewal day yet",
+      "missingSub": "Providers do not report when a plan bills. Set the day from your receipt to put it on the calendar.",
+      "setDay": "Set day"
     }
   },
   "home": {
@@ -598,7 +642,9 @@
     "viewProfile": "View profile",
     "accounts": "Subscriptions",
     "tokenmaxx": "Tokenmaxx",
-    "usage": "Usage & tokens"
+    "usage": "Usage & tokens",
+    "people": "People",
+    "renewals": "Renewals"
   },
   "control": {
     "accessDeniedTitle": "Control plane access required",

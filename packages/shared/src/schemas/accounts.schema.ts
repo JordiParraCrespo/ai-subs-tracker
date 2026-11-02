@@ -100,6 +100,7 @@ export const updateAccountSchema = z.object({
   label: z.string().trim().min(1).max(80).nullable().optional(),
   planId: z.string().min(1).max(60).nullable().optional(),
   monthlyPriceCents: z.number().int().min(0).max(1_000_000).nullable().optional(),
+  renewalDay: z.number().int().min(1).max(31).nullable().optional(),
 });
 export type UpdateAccountInput = z.infer<typeof updateAccountSchema>;
 
@@ -110,7 +111,8 @@ export type UsageSummaryQuery = z.infer<typeof usageSummaryQuerySchema>;
 
 /**
  * The account editor's fields as typed: an empty label or plan means "use what
- * the provider reports", an empty price means "the plan's list price". The
+ * the provider reports", an empty price means "the plan's list price", an
+ * empty renewal day means "not set". The
  * form maps these onto `updateAccountSchema`.
  */
 export const editAccountFormSchema = z.object({
@@ -120,5 +122,10 @@ export const editAccountFormSchema = z.object({
     .string()
     .trim()
     .regex(/^(\d{1,5}(\.\d{1,2})?)?$/),
+  /** Empty, or a day of the month: 1 to 31. */
+  renewalDay: z
+    .string()
+    .trim()
+    .regex(/^([1-9]|[12]\d|3[01])?$/),
 });
 export type EditAccountFormValues = z.infer<typeof editAccountFormSchema>;

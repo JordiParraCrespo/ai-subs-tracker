@@ -19,7 +19,7 @@ import { EditAccountForm } from '../forms/edit-account-form';
 
 const FORM = 'edit-account';
 
-/** Renames an account and sets the plan and price it really has; owns the save. */
+/** Renames an account and sets the plan, price and billing day it really has; owns the save. */
 export function EditAccountDialog({
   account,
   onClose,
@@ -43,6 +43,7 @@ export function EditAccountDialog({
         label: values.label === '' ? null : values.label,
         planId: values.planId === '' ? null : values.planId,
         monthlyPriceCents: values.price === '' ? null : Math.round(Number(values.price) * 100),
+        renewalDay: values.renewalDay === '' ? null : Number(values.renewalDay),
       },
     });
   }

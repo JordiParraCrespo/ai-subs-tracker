@@ -25,7 +25,14 @@ test('an owner sees every route', async ({ page }) => {
   await signInAs(page, owner.user);
 
   const nav = primaryNav(page);
-  for (const label of ['Overview', 'Subscriptions', 'Usage & tokens', 'Tokenmaxx']) {
+  for (const label of [
+    'Overview',
+    'Subscriptions',
+    'People',
+    'Usage & tokens',
+    'Tokenmaxx',
+    'Renewals',
+  ]) {
     await expect(nav.getByRole('link', { name: label, exact: true })).toBeVisible();
   }
 
@@ -42,7 +49,14 @@ test('the command palette offers the same destinations as the sidebar', async ({
   await page.getByRole('button', { name: 'Search' }).click();
   const dialog = page.getByRole('dialog');
   await expect(dialog).toBeVisible();
-  for (const label of ['Overview', 'Subscriptions', 'Usage & tokens', 'Tokenmaxx']) {
+  for (const label of [
+    'Overview',
+    'Subscriptions',
+    'People',
+    'Usage & tokens',
+    'Tokenmaxx',
+    'Renewals',
+  ]) {
     await expect(dialog.getByRole('option', { name: label })).toBeVisible();
   }
 

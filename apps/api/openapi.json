@@ -1238,7 +1238,7 @@
             "bearer": []
           }
         ],
-        "summary": "Rename an account or set its plan and price",
+        "summary": "Rename an account or set its plan, price and renewal day",
         "tags": ["Accounts"]
       },
       "delete": {
@@ -2689,6 +2689,11 @@
             "type": "boolean",
             "description": "True when the person set the price"
           },
+          "renewalDay": {
+            "type": "number",
+            "nullable": true,
+            "description": "Day of the month the plan bills (1–31), when the person set it"
+          },
           "isActive": {
             "type": "boolean"
           },
@@ -2733,6 +2738,7 @@
           "planOverridden",
           "monthlyPriceCents",
           "priceOverridden",
+          "renewalDay",
           "isActive",
           "lastSyncedAt",
           "createdAt",
@@ -3219,6 +3225,12 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 1000000,
+            "nullable": true
+          },
+          "renewalDay": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 31,
             "nullable": true
           }
         }

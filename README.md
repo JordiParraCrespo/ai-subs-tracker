@@ -13,10 +13,12 @@ The screens follow the designs in [`designs/`](designs/).
 | Screen | What it answers |
 | --- | --- |
 | **Overview** | What the plans cost a month, their value at API prices, how much allowance expired unused in the last month, what needs attention and which weeks reset next |
-| **Accounts** | Every login with its session and weekly usage, plan and price, and which one your terminals use |
+| **Subscriptions** | Every login with its session and weekly usage, plan and price, and which one your terminals use |
+| **People** | The identities (emails) holding the plans, which plans sat idle this week, and what each costs |
 | **Tokenmaxx** | The account to use next (the most headroom per hour before its reset), and the queue against an even pace through the week |
 | **Usage & tokens** | Tokens by day, account and model, and what the same usage would cost on the API |
-| **Settings → This computer** | The terminal integration and the opt-in live feed from Claude Code |
+| **Renewals** | A month calendar of when each plan bills, and the next 30 days (the billing day is yours to set: providers do not report it) |
+| **Settings** | The terminal integration and the opt-in live feed from Claude Code |
 
 ## How it works
 

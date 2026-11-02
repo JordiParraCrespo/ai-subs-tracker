@@ -284,13 +284,15 @@
       "refresh": "Actualizar"
     },
     "edit": {
-      "description": "Ponle nombre e indica el plan y el precio que pagas de verdad.",
+      "description": "Ponle nombre e indica el plan, el precio y el día de cobro que tienes.",
       "label": "Nombre",
       "plan": "Plan",
       "planAuto": "El informado ({{plan}})",
       "price": "Precio mensual (USD)",
       "pricePlaceholder": "El precio de lista del plan",
-      "title": "Editar cuenta"
+      "title": "Editar cuenta",
+      "renewalDay": "Se renueva el día del mes",
+      "renewalPlaceholder": "Del 1 al 31, según tu recibo"
     },
     "list": {
       "title": "Suscripciones",
@@ -554,6 +556,48 @@
         "hotSubAlone": "Baja el ritmo hasta que se reinicie {{when}}",
         "none": "Todas las cuentas van al ritmo. Nada que mover esta semana."
       }
+    },
+    "people": {
+      "title": "Personas",
+      "sub_one": "{{count}} identidad · quién tiene cada plan y cuánto cuesta · {{cost}}/mes",
+      "sub_other": "{{count}} identidades · quién tiene cada plan y cuánto cuesta · {{cost}}/mes",
+      "search": "Buscar personas",
+      "status": {
+        "all": "Cualquier estado",
+        "idle": "Con planes sin uso"
+      },
+      "sort": {
+        "cost": "Mayor coste",
+        "name": "Nombre A–Z"
+      },
+      "result": "Mostrando {{shown}} de {{total}} personas",
+      "clear": "Limpiar filtros",
+      "person": "Persona",
+      "tools": "Planes",
+      "idle": "Planes sin uso",
+      "cost": "Coste mensual",
+      "planCount_one": "{{count}} plan",
+      "planCount_other": "{{count}} planes",
+      "weekUsed": "{{used}} de la semana usado",
+      "resets": "se reinicia {{when}}",
+      "noReading": "Aún sin lectura",
+      "idleTag": "Sin uso esta semana",
+      "noMatch": "Nada coincide con estos filtros. Límpialos para ver a todos."
+    },
+    "renewals": {
+      "title": "Renovaciones",
+      "sub": "Cuándo se cobra cada plan, por fecha",
+      "monthTotal": "{{value}} en renovaciones",
+      "previous": "Mes anterior",
+      "next": "Mes siguiente",
+      "today": "Hoy",
+      "next30": "Próximos 30 días",
+      "due_one": "{{value}} a pagar · {{count}} renovación",
+      "due_other": "{{value}} a pagar · {{count}} renovaciones",
+      "none": "No hay planes de pago que renovar.",
+      "missingTitle": "Sin día de renovación",
+      "missingSub": "Los proveedores no indican cuándo se cobra un plan. Pon el día de tu recibo para verlo en el calendario.",
+      "setDay": "Poner día"
     }
   },
   "home": {
@@ -598,7 +642,9 @@
     "viewProfile": "Ver perfil",
     "accounts": "Suscripciones",
     "tokenmaxx": "Tokenmaxx",
-    "usage": "Uso y tokens"
+    "usage": "Uso y tokens",
+    "people": "Personas",
+    "renewals": "Renovaciones"
   },
   "control": {
     "accessDeniedTitle": "Se necesita acceso al panel de control",

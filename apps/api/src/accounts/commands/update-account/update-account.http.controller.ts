@@ -32,7 +32,7 @@ export class UpdateAccountHttpController {
   @RequireScopes('accounts:write')
   @ApiOperation({
     operationId: 'updateAccount',
-    summary: 'Rename an account or set its plan and price',
+    summary: 'Rename an account or set its plan, price and renewal day',
   })
   @ApiResponse({ status: 200, type: AccountResponseDto })
   @ApiProblemResponse({ status: 404, description: 'Account not found', code: 'ACCOUNT_001' })
