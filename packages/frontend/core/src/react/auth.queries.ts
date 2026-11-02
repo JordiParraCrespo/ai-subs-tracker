@@ -1,0 +1,181 @@
+'use client';
+
+import type { LoginDto } from '@flama/shared';
+import {
+  type UseMutationOptions,
+  type UseQueryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
+import type { SocialAuthIntent, VerifyTwoFactorParams } from '../modules/auth/auth.client';
+import { useDeploymentCapabilities } from './capabilities.queries';
+import { useFlamaApp } from './context';
+import { withCacheOnSuccess } from './mutations';
+import { reconcileCacheOwner } from './persistence';
+import { authKeys } from './query-keys';
+import { usersKeys } from './users.queries';
+
+export { authKeys };
+
+export function useSessionRestore(
+  options?: Omit<UseQueryOptions<string | null, Error>, 'queryKey' | 'queryFn'>,
+) {
+  const app = useFlamaApp();
+  const queryClient = useQueryClient();
+
+  return useQuery({
+    queryKey: authKeys.session(),
+    queryFn: async () => {
+      const userId = await app.auth.restoreSession();
+
+      // A persisted cache can outlive the session it was written under, so
+      // check it still belongs to whoever is signed in now — before this
+      // resolves and either app's gate renders anything from it.
+      reconcileCacheOwner(queryClient, userId);
+
+      return userId;
+    },
+    // Retry transient failures on startup. `restoreSession()` only rejects when
+    // the session lookup itself fails (network/server error) — a genuinely
+    // unauthenticated user resolves successfully, so retries never fire for
+    // them. Without this a single network blip masquerades as "logged out" and
+    // silently bounces the user to /login.
+    retry: 2,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 5000),
+    staleTime: Infinity,
+    ...options,
+  });
+}
+
+/**
+ * What a social button hands the mutation. The `intent` is what separates the
+ * login screen's button from the register screen's: the API refuses a provider
+ * identity it has never seen unless the caller asked for a sign-up.
+ */
+export interface SocialLoginVariables {
+  /** The provider's id, as Better Auth knows it. */
+  provider: string;
+  /** Defaults to `'sign-in'`, which refuses an identity with no account here. */
+  intent?: SocialAuthIntent;
+}
+
+export function useSocialLogin(
+  options?: Omit<UseMutationOptions<void, Error, SocialLoginVariables>, 'mutationFn'>,
+) {
+  const app = useFlamaApp();
+
+  return useMutation<void, Error, SocialLoginVariables>({
+    mutationFn: ({ provider, intent }) => app.auth.socialLogin(provider, intent),
+    ...options,
+  });
+}
+
+/**
+ * The social sign-in providers to draw a button for: the ones the app offers
+ * (`FlamaApp.create({ socialProviders })`) that this deployment has
+ * configured, by the capability each names.
+ *
+ * `offered` empty means the app has no social sign-in, and the screens have no
+ * social section. Until the capability read succeeds every offered provider
+ * counts as `available`, because an unreachable API is not a missing
+ * configuration. TanStack Query keeps the last good data after a failed
+ * refetch, so that data can be stale (read before an operator configured a
+ * provider and restarted the API): it is trusted only while the latest read
+ * succeeded.
+ */
+export function useSocialProviders() {
+  const app = useFlamaApp();
+  const offered = app.socialProviders;
+  // An app that offers no provider has nothing to ask the deployment about.
+  const { data, error } = useDeploymentCapabilities({ enabled: offered.length > 0 });
+  const capabilities = error == null ? data : undefined;
+
+  return {
+    offered,
+    available: offered.filter((provider) => capabilities?.[provider.capability] ?? true),
+  };
+}
+
+export function useLogin(options?: Omit<UseMutationOptions<void, Error, LoginDto>, 'mutationFn'>) {
+  const app = useFlamaApp();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (dto: LoginDto) => app.auth.login(dto),
+    ...withCacheOnSuccess(options, () => {
+      queryClient.invalidateQueries({ queryKey: usersKeys.me() });
+    }),
+  });
+}
+
+/**
+ * Answer the two-factor challenge `useLogin` rejected with (see
+ * `isTwoFactorRequired`). Succeeds with the session in place, so the caller
+ * navigates exactly as it would after `useLogin`.
+ */
+export function useVerifyTwoFactor(
+  options?: Omit<UseMutationOptions<void, Error, VerifyTwoFactorParams>, 'mutationFn'>,
+) {
+  const app = useFlamaApp();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (params: VerifyTwoFactorParams) => app.auth.verifyTwoFactor(params),
+    ...withCacheOnSuccess(options, () => {
+      queryClient.invalidateQueries({ queryKey: usersKeys.me() });
+    }),
+  });
+}
+
+export function useLogout(options?: Omit<UseMutationOptions<void, Error, void>, 'mutationFn'>) {
+  const app = useFlamaApp();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => app.auth.logout(),
+    ...withCacheOnSuccess(options, () => {
+      queryClient.clear();
+    }),
+  });
+}
+
+export function useForgotPassword(
+  options?: Omit<UseMutationOptions<void, Error, string>, 'mutationFn'>,
+) {
+  const app = useFlamaApp();
+
+  return useMutation({
+    mutationFn: (email: string) => app.auth.forgotPassword(email),
+    ...options,
+  });
+}
+
+export function useResetPassword(
+  options?: Omit<
+    UseMutationOptions<void, Error, { token: string; password: string }>,
+    'mutationFn'
+  >,
+) {
+  const app = useFlamaApp();
+
+  return useMutation({
+    mutationFn: ({ token, password }) => app.auth.resetPassword(token, password),
+    ...options,
+  });
+}
+
+export function useChangePassword(
+  options?: Omit<
+    UseMutationOptions<void, Error, { currentPassword: string; newPassword: string }>,
+    'mutationFn'
+  >,
+) {
+  const app = useFlamaApp();
+
+  return useMutation({
+    mutationFn: ({ currentPassword, newPassword }) =>
+      app.auth.changePassword(currentPassword, newPassword),
+    ...options,
+  });
+}

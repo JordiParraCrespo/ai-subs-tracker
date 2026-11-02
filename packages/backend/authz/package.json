@@ -1,0 +1,40 @@
+{
+  "name": "@flama/backend-authz",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "clean": "rm -rf dist",
+    "lint": "biome check src/",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@casl/ability": "^7.0.2",
+    "@flama/backend-core": "workspace:*",
+    "@flama/shared": "workspace:*",
+    "@nestjs/common": "^12.2.0",
+    "@nestjs/core": "^12.2.0"
+  },
+  "peerDependencies": {
+    "typeorm": "^1.1.2"
+  },
+  "devDependencies": {
+    "@flama/tsconfig": "workspace:^",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "typeorm": "^1.1.2",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5"
+  }
+}

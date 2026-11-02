@@ -1,0 +1,43 @@
+# @flama/backend-cache
+
+Redis cache abstraction for the NestJS API, backed by
+[`ioredis`](https://github.com/redis/ioredis).
+
+## What's inside
+
+- `CacheService` — abstract cache contract (the DI token consumers depend on).
+- `RedisCacheService` — the concrete `ioredis`-backed implementation. It
+  creates its client on the first command rather than in its constructor,
+  and quits it on shutdown (`onModuleDestroy`), so the app boots without
+  Redis for `generate:openapi`.
+- `CacheModule` — NestJS module that binds `CacheService` to `RedisCacheService`
+  and reads connection config from `@nestjs/config`.
+
+This follows the project's **pluggable service** pattern: depend on the abstract
+`CacheService`, and the module decides the implementation.
+
+## Usage
+
+```ts
+// module
+import { CacheModule } from '@flama/backend-cache';
+
+@Module({ imports: [CacheModule] })
+export class AppModule {}
+
+// service
+import { CacheService } from '@flama/backend-cache';
+
+constructor(private readonly cache: CacheService) {}
+```
+
+## Scripts
+
+```bash
+pnpm build   # tsc -> dist
+pnpm dev     # tsc --watch
+```
+
+## Consumed by
+
+`apps/api`.

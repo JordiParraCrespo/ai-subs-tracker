@@ -1,0 +1,254 @@
+{
+  "$comment": "Read by scripts/starter/prune.mjs, scripts/plugins/plugin.mjs and pnpm starter:init. Every optional piece of the starter is a feature here; the paths are what goes when it is dropped, and every other place that mentions it is wrapped in `flama:begin <id>` / `flama:end <id>` markers. `pnpm starter:check` (CI) fails when a feature is referenced outside its paths and markers, so this file cannot go stale silently. A `json` edit's `set` value is a copy of the file it edits — the version an install writes back — so bumping that dependency means bumping it here too; `starter:check` names both values until they agree. `keeps` names what a feature deliberately leaves behind when it goes, and why.",
+  "features": {
+    "web": {
+      "title": "Consumer web app",
+      "summary": "apps/web — Vite + TanStack Router SPA for end users",
+      "identifiers": ["apps/web", "@flama/web", "flama-web"],
+      "paths": [
+        "apps/web",
+        "e2e/tests/web",
+        "scripts/check-singletons.test.mjs",
+        ".agents/skills/shadcn/evals/evals.json",
+        ".agents/skills/scaffold-feature/evals"
+      ],
+      "slots": {
+        ".agents/hooks/arch-check.sh": ["admin-web"],
+        ".env.example": ["admin-web", "web-env"],
+        ".github/workflows/ci.yml": [
+          "admin-web",
+          "bundle-budgets",
+          "design-lint",
+          "frontend-structure"
+        ],
+        "docker/docker-compose.prod.yml": ["services"],
+        "scripts/check-bundle-size.mjs": ["admin-web"],
+        "scripts/check-frontend-structure.mjs": ["admin-web", "web-kits"],
+        "scripts/check-react-compiler.baseline.mjs": ["compiler-baseline"],
+        "scripts/check-react-compiler.mjs": ["compiler-targets"],
+        "scripts/scaffold-feature.mjs": ["admin-web", "web-templates"]
+      }
+    },
+    "mobile": {
+      "title": "Consumer mobile app",
+      "summary": "apps/mobile — Expo app for end users (NativeWind, expo-router)",
+      "identifiers": ["apps/mobile", "@flama/mobile"],
+      "paths": ["apps/mobile"],
+      "slots": {
+        ".agents/hooks/arch-check.sh": ["admin-web"],
+        ".env.example": ["admin-mobile", "mobile-env"],
+        ".github/workflows/ci.yml": ["design-lint", "frontend-structure"],
+        ".gitignore": ["docs"],
+        "apps/api/src/auth/infrastructure/better-auth.config.ts": [
+          "auth-consts",
+          "auth-imports",
+          "auth-plugins",
+          "trusted-origins"
+        ],
+        "apps/api/src/config/app.config.ts": ["config-env", "config-schema"],
+        "packages/tsconfig/depcruise/frontend-domain.cjs": ["native-modules"],
+        "scripts/check-frontend-structure.mjs": ["admin-mobile", "mobile-kits"],
+        "scripts/scaffold-feature.mjs": ["admin-mobile", "mobile-templates"]
+      }
+    },
+    "e2e": {
+      "title": "End-to-end tests",
+      "summary": "e2e/ — Playwright suites against the running API and web app",
+      "identifiers": ["@flama/e2e", "e2e/"],
+      "paths": ["e2e"],
+      "slots": {
+        "pnpm-workspace.yaml": ["qa"]
+      },
+      "scripts": ["test:e2e"]
+    },
+    "organizations": {
+      "title": "Organizations (teams)",
+      "summary": "Multi-tenancy: organizations, members, invitations, workspaces and access grants, and the onboarding that creates the first organization",
+      "identifiers": [
+        "apps/api/src/organizations",
+        "OrganizationsModule",
+        "features/organizations",
+        "@flama/frontend-consumer/organizations"
+      ],
+      "paths": [
+        "apps/api/src/organizations",
+        "apps/api/src/auth/infrastructure/organization-plugin.config.ts",
+        "apps/api/src/auth/infrastructure/invitation-url.util.ts",
+        "apps/api/src/auth/__tests__/invitation-url.util.spec.ts",
+        "apps/api/src/authz/application",
+        "apps/api/src/authz/commands",
+        "apps/api/src/authz/database",
+        "apps/api/src/authz/decorators",
+        "apps/api/src/authz/interceptors",
+        "apps/api/src/authz/queries/find-access-grant",
+        "apps/api/src/authz/queries/find-access-grants",
+        "apps/api/src/authz/domain/access-grant.entity.ts",
+        "apps/api/src/authz/domain/access-grant.errors.ts",
+        "apps/api/src/authz/dtos/access-grant.response.dto.ts",
+        "apps/api/src/authz/authz.di-tokens.ts",
+        "apps/api/src/authz/access-grant.mapper.ts",
+        "apps/api/src/database/seed-organization.ts",
+        "apps/api/test/access-grants.integration.spec.ts",
+        "apps/api/test/organization-access.integration.spec.ts",
+        "apps/mobile/app/onboarding.tsx",
+        "apps/mobile/features/organizations",
+        "apps/web/src/features/organizations",
+        "apps/web/src/routes/_auth/accept-invitation.tsx",
+        "apps/web/src/routes/_auth/onboarding.tsx",
+        "e2e/support/organizations.ts",
+        "e2e/tests/api/organization-membership.spec.ts",
+        "e2e/tests/web/invitation-acceptance.spec.ts",
+        "e2e/tests/web/onboarding.spec.ts",
+        "e2e/tests/web/organization-settings.spec.ts",
+        "packages/auth/src/organization-client.ts",
+        "packages/auth/src/organization-options.ts",
+        "packages/frontend/api-client/src/data-access/api/openapi/services/AccessGrantsApi.ts",
+        "packages/frontend/api-client/src/data-access/api/openapi/services/InvitationsApi.ts",
+        "packages/frontend/api-client/src/data-access/api/openapi/services/OrganizationInvitationsApi.ts",
+        "packages/frontend/api-client/src/data-access/api/openapi/services/OrganizationMembersApi.ts",
+        "packages/frontend/api-client/src/data-access/api/openapi/services/OrganizationsApi.ts",
+        "packages/frontend/api-client/src/data-access/api/openapi/services/WorkspacesApi.ts",
+        "packages/frontend/consumer/src/modules/organizations",
+        "packages/frontend/consumer/src/organizations"
+      ],
+      "slots": {
+        "apps/api/src/app.module.ts": ["api-modules"]
+      },
+      "keeps": {
+        "apps/api/src/migrations": "the schema history is one line: later migrations build on these tables, so a project without organizations keeps them, empty"
+      },
+      "json": [
+        {
+          "file": "packages/frontend/consumer/package.json",
+          "path": ["exports"],
+          "set": {
+            "./organizations": {
+              "types": "./dist/organizations/organizations.queries.d.ts",
+              "import": "./dist/organizations/organizations.queries.js"
+            }
+          },
+          "needs": "packages/frontend/consumer"
+        }
+      ],
+      "regenerate": ["generate:api-client", "generate:openapi"]
+    }
+  },
+  "shared": {
+    "packages/frontend/design-system/web": {
+      "identifiers": ["packages/frontend/design-system/web", "@flama/design-system-web"],
+      "neededBy": ["web"]
+    },
+    "packages/frontend/design-system/mobile": {
+      "identifiers": ["packages/frontend/design-system/mobile", "@flama/design-system-mobile"],
+      "neededBy": ["mobile"]
+    },
+    "packages/frontend/core": {
+      "identifiers": ["packages/frontend/core", "@flama/frontend-core"],
+      "neededBy": ["web", "mobile"]
+    },
+    "packages/frontend/consumer": {
+      "identifiers": ["packages/frontend/consumer", "@flama/frontend-consumer"],
+      "neededBy": ["web", "mobile"]
+    },
+    "packages/frontend/react-hooks": {
+      "identifiers": ["packages/frontend/react-hooks", "@flama/react-hooks"],
+      "neededBy": ["web", "mobile"]
+    },
+    "packages/frontend/web": {
+      "identifiers": ["packages/frontend/web", "@flama/frontend-web"],
+      "neededBy": ["web"]
+    },
+    "packages/frontend/mobile": {
+      "identifiers": ["packages/frontend/mobile", "@flama/frontend-mobile"],
+      "neededBy": ["mobile"]
+    },
+    "packages/frontend/api-client": {
+      "identifiers": ["packages/frontend/api-client", "@flama/api-client"],
+      "neededBy": ["web", "mobile"],
+      "scripts": ["generate:api-client"]
+    },
+    "scripts/check-bundle-size.mjs": {
+      "identifiers": ["check-bundle-size", "check:bundle"],
+      "neededBy": ["web"],
+      "scripts": ["check:bundle"]
+    },
+    "scripts/check-singletons.mjs": {
+      "identifiers": ["check-singletons", "check:singletons"],
+      "neededBy": ["web"],
+      "scripts": ["check:singletons"]
+    },
+    "packages/tsconfig/tsconfig.expo.json": {
+      "$comment": "Everything Expo leaves in the kept apps: the Better Auth expo plugin in apps/api, the EXPO_PUBLIC_* pass-through in turbo.json, the react-native override.",
+      "identifiers": ["tsconfig.expo", "EXPO_PUBLIC_", "@better-auth/expo", "react-native"],
+      "neededBy": ["mobile"],
+      "json": [
+        {
+          "file": "turbo.json",
+          "path": ["tasks", "build", "env"],
+          "remove": ["EXPO_PUBLIC_*"]
+        },
+        {
+          "file": "package.json",
+          "path": ["pnpm", "overrides"],
+          "set": {
+            "react-native": "0.88.0"
+          }
+        },
+        {
+          "file": "apps/api/package.json",
+          "path": ["dependencies"],
+          "set": {
+            "@better-auth/expo": "^1.7.12"
+          }
+        },
+        {
+          "file": "biome.json",
+          "path": ["files", "includes"],
+          "remove": ["!**/.expo"]
+        }
+      ]
+    },
+    "scripts/check-frontend-structure.mjs": {
+      "identifiers": ["check-frontend-structure", "check:structure"],
+      "neededBy": ["web", "mobile"],
+      "scripts": ["check:structure"]
+    },
+    "scripts/check-react-compiler.mjs": {
+      "identifiers": ["check-react-compiler", "check:compiler"],
+      "neededBy": ["web", "mobile"],
+      "scripts": ["check:compiler"]
+    },
+    "scripts/check-react-compiler.baseline.mjs": {
+      "identifiers": [],
+      "neededBy": ["web", "mobile"]
+    },
+    "scripts/check-react-compiler.test.mjs": {
+      "identifiers": [],
+      "neededBy": ["web", "mobile"]
+    },
+    ".agents/skills/tanstack-routing": {
+      "identifiers": [".agents/skills/tanstack-routing", "/tanstack-routing"],
+      "neededBy": ["web"]
+    },
+    "scripts/scaffold-feature.mjs": {
+      "identifiers": ["scaffold-feature.mjs"],
+      "neededBy": ["web", "mobile"]
+    },
+    ".agents/skills/design-export-port": {
+      "identifiers": [".agents/skills/design-export-port", "/design-export-port"],
+      "neededBy": ["web"]
+    },
+    ".agents/skills/scaffold-feature": {
+      "identifiers": [".agents/skills/scaffold-feature", "/scaffold-feature"],
+      "neededBy": ["web", "mobile"]
+    },
+    "packages/tsconfig/depcruise/frontend-app.cjs": {
+      "identifiers": ["depcruise/frontend-app"],
+      "neededBy": ["web", "mobile"]
+    },
+    "packages/tsconfig/depcruise/frontend-kit.cjs": {
+      "identifiers": ["depcruise/frontend-kit"],
+      "neededBy": ["web", "mobile"]
+    }
+  }
+}

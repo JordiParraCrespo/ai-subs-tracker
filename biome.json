@@ -1,0 +1,127 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.6.2/schema.json",
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "complexity": {
+        "noForEach": "warn",
+        "noStaticOnlyClass": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "warn",
+        "useConst": "error",
+        "useImportType": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noUnknownAtRules": "off"
+      },
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error",
+        "noUnusedFunctionParameters": "error",
+        "noNestedComponentDefinitions": "error"
+      }
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "all"
+    },
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  },
+  "files": {
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/build",
+      "!**/.next",
+      "!**/.expo",
+      "!**/.turbo",
+      "!**/.docusaurus",
+      "!**/coverage",
+      "!**/playwright-report",
+      "!**/blob-report",
+      "!**/test-results",
+      "!**/node-compile-cache",
+      "!!**/.claude/worktrees",
+      "!**/.agents",
+      "!**/*.md",
+      "!**/*.css",
+      "!**/*.gen.ts",
+      "!pnpm-lock.yaml",
+      "!**/packages/frontend/api-client/src/data-access",
+      "!**/packages/frontend/design-system/*/src/components"
+    ]
+  },
+  "overrides": [
+    {
+      "includes": [
+        "packages/frontend/*/src/**",
+        "apps/*/src/**",
+        "apps/*/app/**",
+        "apps/*/features/**",
+        "!apps/api/**",
+        "biome-plugins/fixtures/**"
+      ],
+      "plugins": [
+        "./biome-plugins/mutation-on-success.grit",
+        "./biome-plugins/query-key-factory.grit",
+        "./biome-plugins/query-skip-token.grit"
+      ]
+    },
+    {
+      "includes": [
+        "apps/*/src/**",
+        "apps/*/app/**",
+        "apps/*/features/**",
+        "apps/*/lib/**",
+        "packages/frontend/*/src/**",
+        "!**/hooks/**",
+        "!packages/frontend/*/src/react/**"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "react": {
+                    "importNames": [
+                      "useEffect",
+                      "useLayoutEffect",
+                      "useMemo",
+                      "useCallback",
+                      "memo"
+                    ],
+                    "message": "An effect synchronises with something outside React and lives in a hooks/ file (features/<module>/hooks/ or a kit concern's hooks/), with a comment naming that system. Deriving state, resetting on a prop change, chaining updates or fetching are never effects. Manual memo is the compiler's job. See .agents/rules/frontend-architecture.md."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

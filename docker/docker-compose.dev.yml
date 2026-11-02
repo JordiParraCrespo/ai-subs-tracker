@@ -1,0 +1,34 @@
+# A project name of its own. Both compose files live in docker/, so without it
+# they share the default name "docker" — and with it the same containers and
+# the same postgres_data volume: `pnpm docker:prod` on a machine running this
+# file would take over the development database.
+name: flama-dev
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: flama
+      POSTGRES_PASSWORD: flama
+      POSTGRES_DB: flama
+    ports:
+      - "5432:5432"
+    # Postgres 18 images keep data in a versioned directory under
+    # /var/lib/postgresql (here /var/lib/postgresql/18/docker), so the volume
+    # mounts the parent. A volume written by an older major version is not
+    # read by this one: move it over with pg_dump/pg_restore or pg_upgrade.
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:

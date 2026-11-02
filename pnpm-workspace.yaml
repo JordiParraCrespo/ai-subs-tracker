@@ -1,0 +1,15 @@
+# The @gorhom/bottom-sheet fork depends on the @gorhom/portal fork by git
+# commit. pnpm 9+ refuses git-hosted subdependencies unless this is off.
+blockExoticSubdeps: false
+
+packages:
+  # flama:begin e2e
+  - "e2e"
+  # flama:end e2e
+  # flama:plugins qa
+  - "apps/*"
+  - "packages/*"
+  - "packages/go/*"
+  - "packages/backend/*"
+  - "packages/frontend/*"
+  - "packages/frontend/design-system/*"

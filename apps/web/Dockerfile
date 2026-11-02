@@ -1,0 +1,44 @@
+FROM node:26-alpine AS base
+# Node 25+ no longer bundles corepack, so pnpm is installed from npm.
+RUN npm install -g pnpm@9.15.4
+
+FROM base AS deps
+WORKDIR /app
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY apps/web/package.json ./apps/web/
+COPY packages/auth/package.json ./packages/auth/
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/tsconfig/package.json ./packages/tsconfig/
+COPY packages/frontend/design-system/web/package.json ./packages/frontend/design-system/web/
+COPY packages/frontend/react-hooks/package.json ./packages/frontend/react-hooks/
+COPY packages/frontend/core/package.json ./packages/frontend/core/
+COPY packages/frontend/consumer/package.json ./packages/frontend/consumer/
+COPY packages/frontend/api-client/package.json ./packages/frontend/api-client/
+COPY packages/frontend/web/package.json ./packages/frontend/web/
+COPY packages/translations/package.json ./packages/translations/
+RUN pnpm install --frozen-lockfile --filter @flama/web...
+
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app ./
+COPY . .
+RUN pnpm --filter @flama/web... build
+
+FROM nginx:alpine AS runner
+COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
+# Precompress every text asset once, at level 9, so `gzip_static` can serve a
+# ready-made .gz instead of compressing the same bytes on every request. woff2
+# is already compressed and is deliberately skipped.
+RUN find /usr/share/nginx/html -type f \
+      \( -name '*.js' -o -name '*.css' -o -name '*.svg' -o -name '*.json' \
+         -o -name '*.html' -o -name '*.txt' \) \
+      -exec sh -c 'gzip -9c "$1" > "$1.gz"' _ {} \;
+ENV API_UPSTREAM=api:3001
+# Origins the Content-Security-Policy in nginx.conf admits beyond 'self'. None
+# by default: the container's environment sets them, for a third-party service
+# the app talks to or a VITE_API_URL on a different origin.
+ENV CSP_EXTRA_ORIGINS=""
+ENV NGINX_ENVSUBST_FILTER='(API_UPSTREAM|CSP_EXTRA_ORIGINS)'
+COPY apps/web/nginx.conf /etc/nginx/templates/default.conf.template
+EXPOSE 3000
+CMD ["nginx", "-g", "daemon off;"]

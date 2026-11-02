@@ -1,0 +1,71 @@
+import { useSocialProviders } from '@flama/frontend-core/react';
+import { useTranslation } from 'react-i18next';
+import { LegalSection } from '@/features/public/components/legal-section';
+import { LegalPage } from '@/features/public/sections/legal-page';
+
+export function PrivacyScreen() {
+  const { t } = useTranslation();
+  // What a social sign-in shares is only this policy's business when the app
+  // offers one.
+  const socialSignIn = useSocialProviders().offered.length > 0;
+
+  return (
+    <LegalPage
+      eyebrow={t('public.privacy.eyebrow')}
+      title={t('public.privacy.title')}
+      summary={t('public.privacy.summary')}
+    >
+      <LegalSection title={t('public.privacy.controller.title')}>
+        <p>{t('public.privacy.controller.body')}</p>
+        <p>{t('public.privacy.contactLabel')}</p>
+      </LegalSection>
+
+      <LegalSection title={t('public.privacy.data.title')}>
+        <p>{t('public.privacy.data.intro')}</p>
+        <ul className="list-disc space-y-2 pl-6">
+          <li>{t('public.privacy.data.account')}</li>
+          {socialSignIn && <li>{t('public.privacy.data.socialSignIn')}</li>}
+          <li>{t('public.privacy.data.workspace')}</li>
+          <li>{t('public.privacy.data.content')}</li>
+          <li>{t('public.privacy.data.integrations')}</li>
+          <li>{t('public.privacy.data.technical')}</li>
+        </ul>
+        {socialSignIn && <p>{t('public.privacy.data.socialSignInConsent')}</p>}
+      </LegalSection>
+
+      <LegalSection title={t('public.privacy.purposes.title')}>
+        <p>{t('public.privacy.purposes.body')}</p>
+      </LegalSection>
+
+      <LegalSection title={t('public.privacy.sharing.title')}>
+        <p>{t('public.privacy.sharing.body')}</p>
+      </LegalSection>
+
+      <LegalSection title={t('public.privacy.retention.title')}>
+        <p>{t('public.privacy.retention.body')}</p>
+      </LegalSection>
+
+      <LegalSection title={t('public.privacy.cookies.title')}>
+        <p>{t('public.privacy.cookies.body')}</p>
+      </LegalSection>
+
+      <LegalSection title={t('public.privacy.security.title')}>
+        <p>{t('public.privacy.security.body')}</p>
+      </LegalSection>
+
+      <LegalSection title={t('public.privacy.rights.title')}>
+        <p>{t('public.privacy.rights.body')}</p>
+        <p>{t('public.privacy.rights.authority')}</p>
+      </LegalSection>
+
+      <LegalSection title={t('public.privacy.children.title')}>
+        <p>{t('public.privacy.children.body')}</p>
+      </LegalSection>
+
+      <LegalSection title={t('public.privacy.changes.title')}>
+        <p>{t('public.privacy.changes.body')}</p>
+        <p>{t('public.privacy.lastUpdated')}</p>
+      </LegalSection>
+    </LegalPage>
+  );
+}
