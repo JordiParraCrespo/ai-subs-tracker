@@ -25,6 +25,7 @@ describe('ProfileAuthGateway', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    changePassword.mockResolvedValue({ headers: new Headers(), response: { token: null } });
     delegatedSessions = {
       invalidateForUser: vi.fn().mockResolvedValue(undefined),
     };
@@ -47,6 +48,27 @@ describe('ProfileAuthGateway', () => {
       );
 
       expect(delegatedSessions.invalidateForUser).toHaveBeenCalledWith('user-1');
+    });
+
+    // Revoking the others revokes the caller's session too; the one Better Auth
+    // issues in its place is only in its response headers, and dropping them
+    // signed the caller out of the device that changed the password.
+    it('hands back the replacement session Better Auth issued', async () => {
+      const issued = new Headers();
+      issued.append('set-cookie', 'better-auth.session_token=new; Path=/; HttpOnly');
+      issued.set('set-auth-token', 'new-bearer');
+      changePassword.mockResolvedValue({ headers: issued, response: { token: 'new' } });
+
+      const session = await facade.changePassword(
+        {},
+        { userId: 'user-1', currentPassword: 'old', newPassword: 'new', revokeOtherSessions: true },
+      );
+
+      expect(changePassword).toHaveBeenCalledWith(expect.objectContaining({ returnHeaders: true }));
+      expect(session).toEqual({
+        cookies: ['better-auth.session_token=new; Path=/; HttpOnly'],
+        bearerToken: 'new-bearer',
+      });
     });
 
     it('evicts nothing when the other sessions were kept', async () => {

@@ -9,6 +9,17 @@ export interface ChangePasswordInput {
 }
 
 /**
+ * The session a password change leaves the caller in. Revoking the other
+ * sessions revokes the caller's too and issues a new one; these are what the
+ * caller's client needs to hold it: the `Set-Cookie` values a browser keeps,
+ * and the bearer token a client without cookies (the desktop app) sends.
+ */
+export interface ReplacementSession {
+  cookies: string[];
+  bearerToken: string | null;
+}
+
+/**
  * What the profile use cases need done to the caller's own credentials.
  *
  * The application's vocabulary is "change this person's password" and "revoke
@@ -18,7 +29,10 @@ export interface ChangePasswordInput {
  */
 export interface ProfileAuthPort {
   /** Change the caller's password, verifying the current one first. */
-  changePassword(headers: IncomingHttpHeaders, input: ChangePasswordInput): Promise<void>;
+  changePassword(
+    headers: IncomingHttpHeaders,
+    input: ChangePasswordInput,
+  ): Promise<ReplacementSession>;
 
   /**
    * Revoke one session by its token. The token is never accepted from a

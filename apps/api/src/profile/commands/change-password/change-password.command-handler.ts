@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
-import type { ProfileAuthPort } from '../../infrastructure/profile-auth.port';
+import type { ProfileAuthPort, ReplacementSession } from '../../infrastructure/profile-auth.port';
 import { PROFILE_AUTH } from '../../profile.di-tokens';
 import { ChangePasswordCommand } from './change-password.command';
 
@@ -11,16 +11,23 @@ import { ChangePasswordCommand } from './change-password.command';
  * the hashing scheme, the account record, and invalidating the sessions the old
  * password minted. The handler exists so the operation is dispatched, guarded
  * and documented like every other write, not to add logic of its own.
+ *
+ * It answers with the session the caller is left in, not an aggregate id:
+ * revoking the other sessions revokes the caller's too, and the replacement
+ * exists only in this answer. The session that could have asked for it
+ * afterwards is the one that was revoked.
  */
 @CommandHandler(ChangePasswordCommand)
-export class ChangePasswordCommandHandler implements ICommandHandler<ChangePasswordCommand, void> {
+export class ChangePasswordCommandHandler
+  implements ICommandHandler<ChangePasswordCommand, ReplacementSession>
+{
   constructor(
     @Inject(PROFILE_AUTH)
     private readonly profileAuth: ProfileAuthPort,
   ) {}
 
-  async execute(command: ChangePasswordCommand): Promise<void> {
-    await this.profileAuth.changePassword(command.headers, {
+  async execute(command: ChangePasswordCommand): Promise<ReplacementSession> {
+    return this.profileAuth.changePassword(command.headers, {
       userId: command.userId,
       currentPassword: command.currentPassword,
       newPassword: command.newPassword,

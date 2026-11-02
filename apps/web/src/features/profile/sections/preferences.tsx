@@ -1,6 +1,7 @@
 import { Alert, AlertDescription, Skeleton } from '@flama/design-system-web';
 import { useUpdateUserSettings, useUserSettings } from '@flama/frontend-core/react';
 import {
+  chooseLocale,
   SectionCard,
   SectionHead,
   useErrorMessage,
@@ -17,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { PreferencesForm } from '@/features/profile/forms/preferences-form';
 
 export function PreferencesSection() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const resolveError = useErrorMessage();
   const settings = useUserSettings();
   const update = useUpdateUserSettings();
@@ -35,7 +36,7 @@ export function PreferencesSection() {
    */
   const onSubmit = (values: UpdateUserSettingsDto) => {
     if (values.theme !== theme && values.theme !== 'system') setTheme(values.theme);
-    if (values.locale !== locale) void i18n.changeLanguage(values.locale);
+    if (values.locale !== locale) void chooseLocale(values.locale);
     update.mutate(values);
   };
 

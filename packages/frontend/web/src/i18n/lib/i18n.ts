@@ -53,11 +53,28 @@ export const i18nReady = i18n
       // React already escapes values, so i18next must not double-escape.
       escapeValue: false,
     },
+    // Read the device's own choice first, but never write what was merely
+    // detected: a cached browser language looked like a choice, so the
+    // account's saved language never applied on a new device
+    // (`useApplyUserSettings`). A choice is stored by `chooseLocale`.
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
-      caches: ['localStorage'],
+      caches: [],
       lookupLocalStorage: LOCALE_STORAGE_KEY,
     },
   });
+
+/**
+ * The reader picked a language on this device: show it, and keep it as the
+ * device's own choice, which wins over the account's saved default.
+ */
+export async function chooseLocale(locale: string): Promise<void> {
+  try {
+    localStorage.setItem(LOCALE_STORAGE_KEY, locale);
+  } catch {
+    // No storage: the choice lasts for this page.
+  }
+  await i18n.changeLanguage(locale);
+}
 
 export default i18n;

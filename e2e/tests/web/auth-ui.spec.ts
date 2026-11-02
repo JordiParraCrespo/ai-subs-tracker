@@ -35,7 +35,7 @@ test.describe('web auth UI', () => {
 
     await loginThroughUi(page, user.email, 'DefinitelyWrong123!');
 
-    await expect(page.getByRole('alert').first()).toContainText(/invalid email or password/i, {
+    await expect(page.getByRole('alert').first()).toContainText(/incorrect email or password/i, {
       timeout: 20_000,
     });
     await expect(page).toHaveURL(/\/login/);
@@ -167,7 +167,7 @@ test.describe('web auth UI', () => {
 
     await loginThroughUi(page, user.email, VALID_PASSWORD);
 
-    await expect(page.getByRole('alert').first()).toContainText(/invalid email or password/i, {
+    await expect(page.getByRole('alert').first()).toContainText(/incorrect email or password/i, {
       timeout: 20_000,
     });
   });

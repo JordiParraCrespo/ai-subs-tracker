@@ -363,6 +363,8 @@ test.describe('the sessions pane', () => {
 
     // The API context that provisioned the account holds a session too, so
     // there are at least three rows before anything is revoked.
+    // `count()` does not wait: let the list load before reading it.
+    await expect(sessionRows(page).first()).toBeVisible();
     const before = await sessionRows(page).count();
     expect(before).toBeGreaterThan(1);
 

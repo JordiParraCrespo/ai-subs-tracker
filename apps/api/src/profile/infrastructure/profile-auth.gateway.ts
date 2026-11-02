@@ -5,7 +5,7 @@ import { auth } from '../../auth/infrastructure/better-auth.config';
 import { betterAuthHeaders } from '../../auth/infrastructure/better-auth.util';
 import type { DelegatedSessionPort } from '../../auth/infrastructure/delegated-session.port';
 import { invokeProfileApi } from '../profile-error.mapper';
-import type { ChangePasswordInput, ProfileAuthPort } from './profile-auth.port';
+import type { ChangePasswordInput, ProfileAuthPort, ReplacementSession } from './profile-auth.port';
 
 /**
  * Delegating façade over the Better Auth operations that act on the caller's
@@ -30,8 +30,15 @@ export class ProfileAuthGateway implements ProfileAuthPort {
     private readonly delegatedSessions: DelegatedSessionPort,
   ) {}
 
-  async changePassword(headers: IncomingHttpHeaders, input: ChangePasswordInput): Promise<void> {
-    await invokeProfileApi(() =>
+  async changePassword(
+    headers: IncomingHttpHeaders,
+    input: ChangePasswordInput,
+  ): Promise<ReplacementSession> {
+    // `returnHeaders`: revoking the other sessions revokes the caller's as
+    // well, and the session Better Auth issues in its place travels only in
+    // its response headers. Dropping them signed the caller out of the very
+    // device that changed the password.
+    const result = await invokeProfileApi(() =>
       auth.api.changePassword({
         body: {
           currentPassword: input.currentPassword,
@@ -39,14 +46,20 @@ export class ProfileAuthGateway implements ProfileAuthPort {
           revokeOtherSessions: input.revokeOtherSessions,
         },
         headers: betterAuthHeaders(headers),
+        returnHeaders: true,
       }),
     );
+    const replacement: ReplacementSession = {
+      cookies: result.headers.getSetCookie(),
+      bearerToken: result.headers.get('set-auth-token'),
+    };
 
     // Only when the call actually swept the other sessions — a password change
     // that keeps them has nothing to evict.
     if (input.revokeOtherSessions) {
       await this.delegatedSessions.invalidateForUser(input.userId);
     }
+    return replacement;
   }
 
   /**

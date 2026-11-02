@@ -134,7 +134,11 @@ export function DetailsForm({
             variant="ghost"
             size="lg"
             disabled={!isDirty || isPending}
-            onClick={() => reset(values)}
+            // `keepFieldsRef` writes the saved values into the inputs it
+            // already holds. Without it `reset` forgets them and waits for a
+            // re-render to register them again, which the React Compiler has
+            // memoised away: the form's state went back, the text did not.
+            onClick={() => reset(values, { keepFieldsRef: true })}
           >
             {t('profile.details.cancel')}
           </Button>

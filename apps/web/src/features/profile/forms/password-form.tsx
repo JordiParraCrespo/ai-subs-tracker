@@ -57,7 +57,10 @@ export function PasswordForm({
     }
     // The fields are cleared, not left filled: the card is done, and a
     // password sitting in a form is a password sitting in the DOM.
-    reset(EMPTY_FORM);
+    // `keepFieldsRef` writes the empty values into the inputs it holds;
+    // without it `reset` waits for a re-render to re-register them, which the
+    // React Compiler memoises away, and the typed password stayed on screen.
+    reset(EMPTY_FORM, { keepFieldsRef: true });
   });
 
   return (

@@ -1,5 +1,11 @@
 import { type ArgumentMetadata, Injectable, type PipeTransform } from '@nestjs/common';
 
+/**
+ * Strips HTML from every string a request hands a route, walking arrays and
+ * plain objects. Anything else passes through untouched: an uploaded file's
+ * `Buffer`, a `Date`, a class instance. Rebuilding those as plain objects
+ * turned multer's buffer into `{ 0: …, 1: … }`, and every upload failed.
+ */
 @Injectable()
 export class SanitizePipe implements PipeTransform {
   transform(value: unknown, _metadata: ArgumentMetadata): unknown {
@@ -15,7 +21,7 @@ export class SanitizePipe implements PipeTransform {
       return value.map((item) => this.sanitize(item));
     }
 
-    if (value !== null && typeof value === 'object') {
+    if (isPlainObject(value)) {
       const sanitized: Record<string, unknown> = {};
       for (const [key, val] of Object.entries(value)) {
         sanitized[key] = this.sanitize(val);
@@ -29,4 +35,10 @@ export class SanitizePipe implements PipeTransform {
   private stripHtml(input: string): string {
     return input.replace(/<[^>]*>/g, '').replace(/[<>]/g, '');
   }
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  if (value === null || typeof value !== 'object') return false;
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
 }

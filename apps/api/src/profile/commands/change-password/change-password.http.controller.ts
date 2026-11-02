@@ -1,12 +1,13 @@
 import { ApiAuthProblemResponses, ApiProblemResponse } from '@flama/backend-core';
-import { Body, Controller, HttpCode, Post, Req, UseGuards, Version } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post, Req, Res, UseGuards, Version } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import { NoPolicy } from '../../../auth/decorators/check-policies.decorator';
 import { CurrentUser } from '../../../auth/decorators/current-user.decorator';
 import { ApiAuthGuard } from '../../../auth/guards/api-auth.guard';
+import type { ReplacementSession } from '../../infrastructure/profile-auth.port';
 import { ChangePasswordCommand } from './change-password.command';
 import { ChangePasswordRequest } from './change-password.request.dto';
 
@@ -48,10 +49,11 @@ export class ChangePasswordHttpController {
   @ApiProblemResponse({ status: 429, description: 'Rate limit reached', code: 'RATE_001' })
   async changePassword(
     @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
     @CurrentUser('id') userId: string,
     @Body() body: ChangePasswordRequest,
   ): Promise<void> {
-    await this.commandBus.execute(
+    const session = await this.commandBus.execute<ChangePasswordCommand, ReplacementSession>(
       new ChangePasswordCommand({
         headers: request.headers,
         userId,
@@ -60,5 +62,9 @@ export class ChangePasswordHttpController {
         revokeOtherSessions: body.revokeOtherSessions ?? true,
       }),
     );
+    // The caller's replacement session: a browser keeps the cookie, a client
+    // without cookies reads the token, as it does from sign-in.
+    if (session.cookies.length) response.append('Set-Cookie', session.cookies);
+    if (session.bearerToken) response.setHeader('set-auth-token', session.bearerToken);
   }
 }

@@ -8,6 +8,7 @@ import {
 import { Languages } from '@flama/design-system-web/icons';
 import { locales } from '@flama/translations/locales';
 import { useTranslation } from 'react-i18next';
+import { chooseLocale } from '../lib/i18n';
 
 export function LanguageSwitcher({ className }: { className?: string }) {
   const { t, i18n } = useTranslation();
@@ -32,7 +33,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
           <DropdownMenuItem
             key={locale}
             data-active={current === locale}
-            onClick={() => i18n.changeLanguage(locale)}
+            onClick={() => void chooseLocale(locale)}
           >
             {t(`language.${locale}`)}
           </DropdownMenuItem>
