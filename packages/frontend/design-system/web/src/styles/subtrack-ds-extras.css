@@ -45,3 +45,47 @@
 .ds-page-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .ds-page-head h1{margin:0;font:var(--ds-type-page-title);letter-spacing:var(--ds-tracking-tight)}
 .ds-page-head p{margin:0;font:var(--ds-type-label);color:var(--ds-text-muted)}
+
+/* The list table on the grid (Subscriptions, the Tokenmaxx queue). */
+.ds-gtable-scroll{overflow-x:auto;overflow-y:hidden}
+.ds-gtable{border-radius:16px;background:var(--ds-fill-table-head);overflow:hidden}
+.ds-gtable__head{display:grid;gap:12px;padding:10px 24px;font:var(--ds-type-label);color:var(--ds-text-secondary)}
+.ds-gtable__body{border:1px solid var(--ds-table-border);border-radius:16px;background:var(--ds-surface-nested);overflow:hidden}
+.ds-gtable__body>.ds-gtable__row:last-child{border-bottom:0}
+.ds-gtable__row{display:grid;gap:12px;align-items:center;padding:12px 24px;border-bottom:1px solid var(--ds-table-border);transition:background-color 150ms}
+.ds-gtable__row[data-clickable]{cursor:pointer}
+.ds-gtable__row[data-clickable]:hover{background:var(--ds-surface-hover)}
+.ds-gtable__cell{min-width:0;display:flex;flex-direction:column;gap:2px}
+.ds-gtable [data-align="right"]{text-align:right;align-items:flex-end}
+.ds-gtable__foot{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:10px 16px 10px 24px;box-sizing:border-box;font:var(--ds-type-label);color:var(--ds-text-secondary)}
+.ds-pager{display:flex;align-items:center;gap:2px}
+.ds-pager button{all:unset;box-sizing:border-box;min-width:32px;height:32px;padding:0 8px;border-radius:8px;display:grid;place-items:center;cursor:pointer;font:500 14px/20px var(--ds-font-sans);color:var(--ds-text-muted);transition:background-color 150ms}
+.ds-pager button:hover:not(:disabled){background:var(--ds-fill-hover);color:var(--ds-text)}
+.ds-pager button[data-current]{background:var(--ds-fill);color:var(--ds-text)}
+.ds-pager button:disabled{opacity:.4;cursor:default}
+
+/* Text bits of the table cells. */
+.ds-cell-strong{font:var(--ds-type-label-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-cell{font:var(--ds-type-label)}
+.ds-cell-money{font:500 14px/20px var(--ds-font-sans);letter-spacing:var(--ds-tracking-tighter)}
+.ds-cell-sub{font:500 14px/20px var(--ds-font-sans);color:var(--ds-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-review-pill{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:6px;background:var(--ds-review-wash);color:var(--ds-review);font:var(--ds-type-badge)}
+.ds-negative-pill{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:6px;background:rgba(255,102,127,.12);color:var(--ds-negative);font:var(--ds-type-badge)}
+.ds-info-pill{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:8px;background:var(--ds-info-badge);color:var(--ds-info-text);font:var(--ds-type-badge)}
+.ds-result{display:flex;align-items:center;gap:8px;min-height:28px;font:var(--ds-type-label);color:var(--ds-text-muted)}
+.ds-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* Type helpers the pages use inline in the export. */
+.ds-eyebrow{font:var(--ds-type-eyebrow);letter-spacing:var(--ds-tracking-eyebrow);text-transform:uppercase}
+.ds-title-lg{font:var(--ds-type-title-lg);letter-spacing:var(--ds-tracking-tight)}
+.ds-body-lg{font:var(--ds-type-body-lg)}
+.ds-label{font:var(--ds-type-label)}
+.ds-label-strong{font:var(--ds-type-label-strong)}
+.ds-card-title{font:var(--ds-type-card-title)}
+.ds-muted{color:var(--ds-text-muted)}
+/* The shared-accounts meter: an 8px track, the fill, the average mark. */
+.ds-meter{position:relative;height:8px;border-radius:999px;background:var(--ds-fill)}
+.ds-meter__fill{height:100%;border-radius:999px;background:var(--ds-chart-up)}
+.ds-meter__fill[data-hot]{background:var(--ds-negative)}
+.ds-meter__mark{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;border-radius:1px;background:var(--ds-text-muted)}
+.ds-disc--review{background:var(--ds-review-wash);color:var(--ds-review)}

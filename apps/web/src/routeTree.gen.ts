@@ -16,7 +16,6 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthPublicRouteImport } from './routes/_auth/_public'
-import { Route as AuthenticatedAccountsRouteImport } from './routes/_authenticated/accounts'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedTokenmaxxRouteImport } from './routes/_authenticated/tokenmaxx'
@@ -25,6 +24,8 @@ import { Route as AuthPublicForgotPasswordRouteImport } from './routes/_auth/_pu
 import { Route as AuthPublicLoginRouteImport } from './routes/_auth/_public/login'
 import { Route as AuthPublicRegisterRouteImport } from './routes/_auth/_public/register'
 import { Route as AuthPublicResetPasswordRouteImport } from './routes/_auth/_public/reset-password'
+import { Route as AuthenticatedAccountsIndexRouteImport } from './routes/_authenticated/accounts/index'
+import { Route as AuthenticatedAccountsProviderRouteImport } from './routes/_authenticated/accounts/$provider'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -58,11 +59,6 @@ const TermsRoute = TermsRouteImport.update({
 const AuthPublicRoute = AuthPublicRouteImport.update({
   id: '/_public',
   getParentRoute: () => AuthRoute,
-} as any)
-const AuthenticatedAccountsRoute = AuthenticatedAccountsRouteImport.update({
-  id: '/accounts',
-  path: '/accounts',
-  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
@@ -105,6 +101,18 @@ const AuthPublicResetPasswordRoute = AuthPublicResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => AuthPublicRoute,
 } as any)
+const AuthenticatedAccountsIndexRoute =
+  AuthenticatedAccountsIndexRouteImport.update({
+    id: '/accounts/',
+    path: '/accounts/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAccountsProviderRoute =
+  AuthenticatedAccountsProviderRouteImport.update({
+    id: '/accounts/$provider',
+    path: '/accounts/$provider',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedSettingsIndexRoute =
   AuthenticatedSettingsIndexRouteImport.update({
     id: '/settings/',
@@ -117,7 +125,6 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
-  '/accounts': typeof AuthenticatedAccountsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/tokenmaxx': typeof AuthenticatedTokenmaxxRoute
@@ -126,6 +133,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthPublicLoginRoute
   '/register': typeof AuthPublicRegisterRoute
   '/reset-password': typeof AuthPublicResetPasswordRoute
+  '/accounts/$provider': typeof AuthenticatedAccountsProviderRoute
+  '/accounts/': typeof AuthenticatedAccountsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -133,7 +142,6 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
-  '/accounts': typeof AuthenticatedAccountsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/tokenmaxx': typeof AuthenticatedTokenmaxxRoute
@@ -142,6 +150,8 @@ export interface FileRoutesByTo {
   '/login': typeof AuthPublicLoginRoute
   '/register': typeof AuthPublicRegisterRoute
   '/reset-password': typeof AuthPublicResetPasswordRoute
+  '/accounts/$provider': typeof AuthenticatedAccountsProviderRoute
+  '/accounts': typeof AuthenticatedAccountsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
 }
 export interface FileRoutesById {
@@ -153,7 +163,6 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/_auth/_public': typeof AuthPublicRouteWithChildren
-  '/_authenticated/accounts': typeof AuthenticatedAccountsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/tokenmaxx': typeof AuthenticatedTokenmaxxRoute
@@ -162,6 +171,8 @@ export interface FileRoutesById {
   '/_auth/_public/login': typeof AuthPublicLoginRoute
   '/_auth/_public/register': typeof AuthPublicRegisterRoute
   '/_auth/_public/reset-password': typeof AuthPublicResetPasswordRoute
+  '/_authenticated/accounts/$provider': typeof AuthenticatedAccountsProviderRoute
+  '/_authenticated/accounts/': typeof AuthenticatedAccountsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
 }
 export interface FileRouteTypes {
@@ -171,7 +182,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/privacy'
     | '/terms'
-    | '/accounts'
     | '/dashboard'
     | '/profile'
     | '/tokenmaxx'
@@ -180,6 +190,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/accounts/$provider'
+    | '/accounts/'
     | '/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -187,7 +199,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/privacy'
     | '/terms'
-    | '/accounts'
     | '/dashboard'
     | '/profile'
     | '/tokenmaxx'
@@ -196,6 +207,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/accounts/$provider'
+    | '/accounts'
     | '/settings'
   id:
     | '__root__'
@@ -206,7 +219,6 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/_auth/_public'
-    | '/_authenticated/accounts'
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
     | '/_authenticated/tokenmaxx'
@@ -215,6 +227,8 @@ export interface FileRouteTypes {
     | '/_auth/_public/login'
     | '/_auth/_public/register'
     | '/_auth/_public/reset-password'
+    | '/_authenticated/accounts/$provider'
+    | '/_authenticated/accounts/'
     | '/_authenticated/settings/'
   fileRoutesById: FileRoutesById
 }
@@ -278,13 +292,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthPublicRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_authenticated/accounts': {
-      id: '/_authenticated/accounts'
-      path: '/accounts'
-      fullPath: '/accounts'
-      preLoaderRoute: typeof AuthenticatedAccountsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -341,6 +348,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthPublicResetPasswordRouteImport
       parentRoute: typeof AuthPublicRoute
     }
+    '/_authenticated/accounts/': {
+      id: '/_authenticated/accounts/'
+      path: '/accounts'
+      fullPath: '/accounts/'
+      preLoaderRoute: typeof AuthenticatedAccountsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/accounts/$provider': {
+      id: '/_authenticated/accounts/$provider'
+      path: '/accounts/$provider'
+      fullPath: '/accounts/$provider'
+      preLoaderRoute: typeof AuthenticatedAccountsProviderRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/settings/': {
       id: '/_authenticated/settings/'
       path: '/settings'
@@ -380,20 +401,22 @@ const AuthRouteChildren: AuthRouteChildren = {
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedAccountsRoute: typeof AuthenticatedAccountsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedTokenmaxxRoute: typeof AuthenticatedTokenmaxxRoute
   AuthenticatedUsageRoute: typeof AuthenticatedUsageRoute
+  AuthenticatedAccountsProviderRoute: typeof AuthenticatedAccountsProviderRoute
+  AuthenticatedAccountsIndexRoute: typeof AuthenticatedAccountsIndexRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAccountsRoute: AuthenticatedAccountsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedTokenmaxxRoute: AuthenticatedTokenmaxxRoute,
   AuthenticatedUsageRoute: AuthenticatedUsageRoute,
+  AuthenticatedAccountsProviderRoute: AuthenticatedAccountsProviderRoute,
+  AuthenticatedAccountsIndexRoute: AuthenticatedAccountsIndexRoute,
   AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
 }
 

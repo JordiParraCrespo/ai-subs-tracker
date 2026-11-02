@@ -9,6 +9,7 @@ import {
 } from '@flama/frontend-web';
 import { useTranslation } from 'react-i18next';
 import { useDesktopSetup } from '../hooks/use-desktop-setup';
+import { DesktopStatus } from './desktop-status';
 
 /**
  * Settings that act on this computer. In a browser it says where they live
@@ -33,6 +34,7 @@ export function DesktopSettings() {
 
   return (
     <>
+      <DesktopStatus />
       <GroupHeading description={t('accounts.settings.shellDescription')}>
         {t('accounts.settings.shellTitle')}
       </GroupHeading>

@@ -294,8 +294,10 @@
       "title": "Edit account"
     },
     "list": {
-      "sub": "Every login Subtrack tracks, and which one your terminals use.",
-      "title": "Accounts"
+      "title": "Subscriptions",
+      "sub_one": "{{count}} account · {{spend}}/mo",
+      "sub_other": "{{count}} accounts · {{spend}}/mo",
+      "add": "Add account"
     },
     "models": {
       "cacheRead": "Cache read",
@@ -370,7 +372,7 @@
     },
     "table": {
       "account": "Account",
-      "cost": "Monthly",
+      "cost": "Monthly cost",
       "edit": "Edit",
       "empty": "No accounts yet. Open the desktop app to find the logins on your computer.",
       "inUse": "In use",
@@ -379,7 +381,14 @@
       "session": "Session",
       "status": "Status",
       "useAccount": "Use {{name}} in terminals",
-      "weekly": "Weekly"
+      "weekly": "Used this week",
+      "weeklySub": "of the weekly limit",
+      "sessionSub": "5-hour window",
+      "noSession": "weekly only",
+      "yourPrice": "your price",
+      "listPrice": "list price",
+      "resets": "Resets",
+      "range": "{{from}}–{{to}} of {{total}}"
     },
     "tokenmaxx": {
       "atLimit": "At their limit",
@@ -414,6 +423,52 @@
     "value": {
       "bar": "Value of {{name}}",
       "title": "What you'd pay at API prices"
+    },
+    "status": {
+      "active": "Active",
+      "review": "Needs review",
+      "limit": "At limit",
+      "signin": "Sign in again"
+    },
+    "toolbar": {
+      "search": "Search accounts",
+      "status": {
+        "all": "Any status",
+        "active": "Active",
+        "review": "Needs review",
+        "limit": "At limit"
+      },
+      "allProviders": "All providers",
+      "sort": {
+        "cost": "Highest cost",
+        "reset": "Next reset",
+        "left": "Most left",
+        "name": "Name A–Z"
+      },
+      "result": "Showing {{shown}} of {{total}} accounts",
+      "clear": "Clear filters"
+    },
+    "group": {
+      "title": "{{provider}} accounts",
+      "sub": "Every login of this provider, and how evenly the week is spread across them",
+      "pickNext": "Pick next",
+      "used": "{{used}} used",
+      "headroom": "{{left}} headroom this week · resets {{reset}}",
+      "weeklyTitle": "Weekly limit used, this week",
+      "busiest": "Busiest {{name}} at {{used}} · average {{average}}",
+      "weeklyHint": "The marker on each bar is the average. Aim to keep every account near it.",
+      "next": "Next",
+      "resets": "Resets {{at}}",
+      "terminals": "Terminals",
+      "inUse": "In use",
+      "use": "Use",
+      "moves": "Suggested moves",
+      "apply": "Apply",
+      "switchTitle": "Switch your terminals to {{name}}",
+      "switchSub": "{{left}} of its week is left before it resets",
+      "hotTitle": "{{name}} is at {{used}} on its own",
+      "hotSub": "Spreading work won’t help an account used alone. A higher plan would.",
+      "noMoves": "Nothing to move: your accounts are evenly used."
     }
   },
   "home": {

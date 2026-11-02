@@ -40,8 +40,10 @@
     "title": "Editar cuenta"
   },
   "list": {
-    "sub": "Todas las sesiones que sigue Subtrack y cuál usa tu terminal.",
-    "title": "Cuentas"
+    "title": "Suscripciones",
+    "sub_one": "{{count}} cuenta · {{spend}}/mes",
+    "sub_other": "{{count}} cuentas · {{spend}}/mes",
+    "add": "Añadir cuenta"
   },
   "models": {
     "cacheRead": "Lectura de caché",
@@ -116,7 +118,7 @@
   },
   "table": {
     "account": "Cuenta",
-    "cost": "Mensual",
+    "cost": "Coste mensual",
     "edit": "Editar",
     "empty": "Aún no hay cuentas. Abre la app de escritorio para encontrar las sesiones de tu ordenador.",
     "inUse": "En uso",
@@ -125,7 +127,14 @@
     "session": "Sesión",
     "status": "Estado",
     "useAccount": "Usar {{name}} en las terminales",
-    "weekly": "Semanal"
+    "weekly": "Usado esta semana",
+    "weeklySub": "del límite semanal",
+    "sessionSub": "ventana de 5 horas",
+    "noSession": "solo semanal",
+    "yourPrice": "tu precio",
+    "listPrice": "precio de lista",
+    "resets": "Se renueva",
+    "range": "{{from}}–{{to}} de {{total}}"
   },
   "tokenmaxx": {
     "atLimit": "En su límite",
@@ -160,5 +169,51 @@
   "value": {
     "bar": "Valor de {{name}}",
     "title": "Lo que pagarías a precio de API"
+  },
+  "status": {
+    "active": "Activa",
+    "review": "Revisar",
+    "limit": "En el límite",
+    "signin": "Vuelve a entrar"
+  },
+  "toolbar": {
+    "search": "Buscar cuentas",
+    "status": {
+      "all": "Cualquier estado",
+      "active": "Activa",
+      "review": "Revisar",
+      "limit": "En el límite"
+    },
+    "allProviders": "Todos los proveedores",
+    "sort": {
+      "cost": "Mayor coste",
+      "reset": "Próxima renovación",
+      "left": "Más margen",
+      "name": "Nombre A–Z"
+    },
+    "result": "Mostrando {{shown}} de {{total}} cuentas",
+    "clear": "Quitar filtros"
+  },
+  "group": {
+    "title": "Cuentas de {{provider}}",
+    "sub": "Todas las sesiones de este proveedor y cómo se reparte la semana entre ellas",
+    "pickNext": "Elige la siguiente",
+    "used": "{{used}} usado",
+    "headroom": "{{left}} de margen esta semana · se renueva {{reset}}",
+    "weeklyTitle": "Límite semanal usado, esta semana",
+    "busiest": "La más usada: {{name}} al {{used}} · media {{average}}",
+    "weeklyHint": "La marca de cada barra es la media. Intenta mantener cada cuenta cerca de ella.",
+    "next": "Siguiente",
+    "resets": "Se renueva {{at}}",
+    "terminals": "Terminales",
+    "inUse": "En uso",
+    "use": "Usar",
+    "moves": "Movimientos sugeridos",
+    "apply": "Aplicar",
+    "switchTitle": "Cambia tus terminales a {{name}}",
+    "switchSub": "Le queda un {{left}} de la semana antes de renovarse",
+    "hotTitle": "{{name}} está al {{used}} por sí sola",
+    "hotSub": "Repartir trabajo no ayuda a una cuenta que se usa sola. Un plan superior sí.",
+    "noMoves": "Nada que mover: tus cuentas se usan por igual."
   }
 }

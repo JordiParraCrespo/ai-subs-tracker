@@ -154,6 +154,8 @@ export { DsButton } from './components/ds-button';
 export { DsCard, DsCardHeader, DsCardRow } from './components/ds-card';
 export { DsChipGroup, DsSegmented } from './components/ds-chips';
 export { type DsFilterOption, DsFilterSelect } from './components/ds-filter-select';
+export { type DsGridColumn, DsGridTable } from './components/ds-grid-table';
+export { DsInput } from './components/ds-input';
 export { type DsStat, DsStatGrid } from './components/ds-stat-grid';
 export { DsTable, type DsTableColumn } from './components/ds-table';
 export {

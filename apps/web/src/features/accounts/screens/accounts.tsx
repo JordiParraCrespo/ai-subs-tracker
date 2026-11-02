@@ -1,17 +1,19 @@
-import { PageHead } from '@flama/frontend-web';
-import { useTranslation } from 'react-i18next';
-import { AccountsTable } from '../sections/accounts-table';
-import { DesktopStatus } from '../sections/desktop-status';
+import type { SubscriptionsQuery } from '../lib/subscriptions';
+import { SubscriptionsHead } from '../sections/subscriptions-head';
+import { SubscriptionsTable } from '../sections/subscriptions-table';
 
-/** Every tracked account, its windows and cost, and which one terminals use. */
-export function AccountsScreen() {
-  const { t } = useTranslation();
-
+/** The design's Subscriptions page, over the person's accounts. */
+export function AccountsScreen({
+  query,
+  onQuery,
+}: {
+  query: SubscriptionsQuery;
+  onQuery: (next: SubscriptionsQuery) => void;
+}) {
   return (
-    <>
-      <PageHead title={t('accounts.list.title')} sub={t('accounts.list.sub')} />
-      <DesktopStatus />
-      <AccountsTable />
-    </>
+    <div className="flex flex-col gap-6">
+      <SubscriptionsHead />
+      <SubscriptionsTable query={query} onQuery={onQuery} />
+    </div>
   );
 }
