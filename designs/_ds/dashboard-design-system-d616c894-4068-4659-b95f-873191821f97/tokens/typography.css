@@ -1,0 +1,58 @@
+:root{
+--font-sans:Figtree,system-ui,-apple-system,"Segoe UI",sans-serif;
+--font-mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+--weight-body:500;--weight-title:600;--weight-amount:700;
+--tracking-tight:-0.025em;--tracking-tighter:-0.05em;--tracking-eyebrow:0.12em;
+/* font shorthands: weight size/line family */
+--type-display-xl:600 60px/60px var(--font-sans);
+--type-display:600 48px/52.8px var(--font-sans);
+--type-amount-xl:700 46px/46px var(--font-sans);
+--type-marketing:600 40px/40px var(--font-sans);
+--type-balance:500 36px/40px var(--font-sans);
+--type-price:500 30px/36px var(--font-sans);
+--type-amount:500 30px/32px var(--font-sans);
+--type-title-lg:500 24px/32px var(--font-sans);
+--type-page-title:500 20px/28px var(--font-sans);
+--type-section:500 20px/24px var(--font-sans);
+--type-card-title:600 18px/24px var(--font-sans);
+--type-stat-lg:500 18px/28px var(--font-sans);
+--type-sheet-title:500 16px/20px var(--font-sans);
+--type-body-lg:500 16px/24px var(--font-sans);
+--type-body:500 16px/20px var(--font-sans);
+--type-body-strong:600 16px/20px var(--font-sans);
+--type-money:500 16px/24px var(--font-sans);
+--type-button-lg:500 16px/16px var(--font-sans);
+--type-label:500 14px/20px var(--font-sans);
+--type-label-strong:600 14px/20px var(--font-sans);
+--type-button:500 14px/14px var(--font-sans);
+--type-caption:500 14px/16px var(--font-sans);
+--type-kbd:500 12px/20px var(--font-sans);
+--type-badge:600 12px/12px var(--font-sans);
+--type-eyebrow:600 11px/16px var(--font-sans);
+--type-micro:500 10px/10px var(--font-sans);
+}
+.t-display-xl{font:var(--type-display-xl);letter-spacing:var(--tracking-tight)}
+.t-display{font:var(--type-display);letter-spacing:var(--tracking-tight)}
+.t-amount-xl{font:var(--type-amount-xl);letter-spacing:-1.15px}
+.t-marketing{font:var(--type-marketing);letter-spacing:var(--tracking-tight)}
+.t-balance{font:var(--type-balance);letter-spacing:var(--tracking-tight)}
+.t-price{font:var(--type-price);letter-spacing:var(--tracking-tight)}
+.t-amount{font:var(--type-amount);letter-spacing:var(--tracking-tight)}
+.t-title-lg{font:var(--type-title-lg);letter-spacing:var(--tracking-tight)}
+.t-page-title{font:var(--type-page-title);letter-spacing:var(--tracking-tight)}
+.t-section{font:var(--type-section);letter-spacing:var(--tracking-tight)}
+.t-card-title{font:var(--type-card-title);letter-spacing:var(--tracking-tight)}
+.t-stat-lg{font:var(--type-stat-lg)}
+.t-sheet-title{font:var(--type-sheet-title);letter-spacing:var(--tracking-tight)}
+.t-body-lg{font:var(--type-body-lg);letter-spacing:var(--tracking-tight)}
+.t-body{font:var(--type-body)}
+.t-body-strong{font:var(--type-body-strong)}
+.t-money{font:var(--type-money);letter-spacing:var(--tracking-tighter)}
+.t-label{font:var(--type-label)}
+.t-label-strong{font:var(--type-label-strong)}
+.t-caption{font:var(--type-caption)}
+.t-kbd{font:var(--type-kbd)}
+.t-badge{font:var(--type-badge)}
+.t-eyebrow{font:var(--type-eyebrow);letter-spacing:var(--tracking-eyebrow);text-transform:uppercase}
+.t-micro{font:var(--type-micro)}
+.t-muted{color:var(--text-muted)}.t-subtle{color:var(--text-subtle)}.t-up{color:var(--positive)}.t-down{color:var(--negative)}

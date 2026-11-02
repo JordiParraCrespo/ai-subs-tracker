@@ -1,0 +1,16 @@
+/* Green variant (the original source look): data-accent="green".
+   Swaps brand + signal tokens back to green; neutrals, radii, heights, inversions stay. */
+[data-accent="green"]{
+--brand:#00ec97;--on-brand:#171717;--brand-soft:rgba(0,236,151,0.10);
+--accent:#00ec97;--accent-soft:rgba(0,236,151,0.10);--positive:#00ec97;
+--chart-up:#00ec97;--chart-area-top:rgba(0,236,151,0.25);--chart-area-bottom:rgba(0,236,151,0.04);
+--success-badge:rgba(0,236,151,0.15);--success-text:#00ec97;--success-dot:#00ec97;
+--promo-ground:#003724;
+--shadow-glow:0 8px 28px rgba(0,236,151,0.30);
+}
+[data-theme="light"][data-accent="green"],[data-theme="light"] [data-accent="green"]{
+--brand:#00ec97;--on-brand:#171717;--brand-soft:#171717;--promo-ground:#00ec97;
+--accent:#009660;--accent-soft:rgba(0,150,96,0.10);--positive:#009660;
+--chart-up:#059669;--chart-area-top:rgba(5,150,105,0.25);--chart-area-bottom:rgba(5,150,105,0.04);
+--success-badge:rgba(0,192,118,0.15);--success-text:#06754e;--success-dot:#009660;
+}

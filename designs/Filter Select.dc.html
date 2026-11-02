@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/dashboard-design-system-d616c894-4068-4659-b95f-873191821f97/styles.css">
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script src="_ds/dashboard-design-system-d616c894-4068-4659-b95f-873191821f97/_ds_bundle.js"></script>
+</helmet>
+<div ref="{{ rootRef }}" style="position:relative;display:inline-flex;font-family:var(--font-sans)">
+  <button onClick="{{ toggle }}" style="all:unset;box-sizing:border-box;height:36px;padding:0 8px 0 10px;border-radius:8px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;font:500 14px/20px var(--font-sans);white-space:nowrap;transition:background-color 150ms;background:{{ triggerBg }};color:{{ triggerFg }};outline:1px solid {{ triggerOutline }};outline-offset:-1px" style-hover="background:var(--fill-hover)">
+    <sc-if value="{{ hasIcon }}" hint-placeholder-val="{{ false }}">
+      <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="{{ icon }}" size="{{ 16 }}" style="color:var(--text-muted)" hint-size="16px,16px"></x-import>
+    </sc-if>
+    <sc-if value="{{ hasPrefix }}" hint-placeholder-val="{{ false }}">
+      <span style="color:var(--text-muted)">{{ prefix }}</span>
+    </sc-if>
+    <span>{{ label }}</span>
+    <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="{{ chevron }}" size="{{ 16 }}" style="color:var(--text-subtle)" hint-size="16px,16px"></x-import>
+  </button>
+  <sc-if value="{{ open }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ close }}" style="position:fixed;inset:0;z-index:60"></div>
+    <div style="position:absolute;top:calc(100% + 6px);left:{{ menuLeft }};right:{{ menuRight }};z-index:61;min-width:max(100%,200px);width:max-content;max-width:300px;background:var(--surface-overlay);color:var(--text);border-radius:12px;outline:1px solid var(--outline-card);box-shadow:var(--shadow-float);overflow:hidden;display:flex;flex-direction:column">
+      <sc-if value="{{ searchable }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-bottom:1px solid var(--divider);color:var(--text-subtle)">
+          <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="search" size="{{ 16 }}" hint-size="16px,16px"></x-import>
+          <input ref="{{ searchRef }}" placeholder="{{ searchPh }}" value="{{ q }}" onChange="{{ setQ }}" style="all:unset;flex:1;min-width:0;font:500 14px/20px var(--font-sans);color:var(--text)">
+        </div>
+      </sc-if>
+      <div class="ds-scroll" style="max-height:320px;padding:4px;display:flex;flex-direction:column;gap:0;scrollbar-gutter:auto">
+        <sc-for list="{{ items }}" as="o" hint-placeholder-count="4">
+          <sc-if value="{{ o.divider }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:none;height:1px;background:var(--divider);margin:4px 4px"></div>
+          </sc-if>
+          <button onClick="{{ o.pick }}" style="all:unset;box-sizing:border-box;flex:none;height:32px;padding:0 8px 0 10px;border-radius:6px;display:flex;align-items:center;gap:12px;cursor:pointer;font:500 14px/20px var(--font-sans);white-space:nowrap;color:{{ o.fg }};transition:background-color 150ms" style-hover="background:var(--fill-ghost-hover);color:var(--text)">
+            <sc-if value="{{ o.initials }}" hint-placeholder-val="{{ false }}">
+              <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Avatar" kind="entity" initials="{{ o.initials }}" color="{{ o.color }}" size="{{ 20 }}" hint-size="20px,20px"></x-import>
+            </sc-if>
+            <span style="flex:1">{{ o.label }}</span>
+            <span style="width:16px;display:flex;color:var(--accent)">
+              <sc-if value="{{ o.selected }}" hint-placeholder-val="{{ false }}">
+                <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="check" size="{{ 16 }}" hint-size="16px,16px"></x-import>
+              </sc-if>
+            </span>
+          </button>
+        </sc-for>
+        <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+          <span style="padding:8px 10px;font:var(--type-label);color:var(--text-muted)">No matches</span>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:320,&quot;height&quot;:360},&quot;options&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Array&lt;string | {value:string,label:string}&gt;&quot;,&quot;default&quot;:[&quot;All categories&quot;,&quot;Coding&quot;,&quot;Chat assistants&quot;]},&quot;value&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;onChange&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(v:string)=&gt;void&quot;},&quot;icon&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;prefix&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;align&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;left&quot;,&quot;right&quot;],&quot;default&quot;:&quot;left&quot;,&quot;tsType&quot;:&quot;'left' | 'right'&quot;},&quot;neutral&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { open: false, q: '' };
+  searchRef = React.createRef();
+  rootRef = React.createRef();
+  openMenu() {
+    let right = this.props.align === 'right';
+    const el = this.rootRef.current;
+    if (!right && el) { const r = el.getBoundingClientRect(), panel = el.closest('.ds-panel'), edge = panel ? panel.getBoundingClientRect().right : window.innerWidth; right = r.left + 300 > edge - 8; }
+    this.setState({ open:true, q:'', flip:right });
+  }
+  componentDidUpdate(_, prev) { if (this.state.open && !prev.open && this.searchRef.current) this.searchRef.current.focus(); }
+  renderVals() {
+    const p = this.props, opts = (p.options || []).map(o => typeof o === 'string' ? { value:o, label:o } : o);
+    const value = p.value ?? '', cur = opts.find(o => o.value === value) || opts[0] || { label:'' };
+    const isDefault = opts.length && value === opts[0].value;
+    const q = this.state.q.trim().toLowerCase();
+    const first = opts[0] && opts[0].value;
+    const items = opts.filter(o => !q || o.label.toLowerCase().includes(q)).map((o, i) => ({ ...o, selected: o.value === value, fg: o.value === value ? 'var(--text)' : 'var(--text-secondary)', color: o.color || '#404040',
+      divider: !q && !p.neutral && i === 1 && first === '' || (!q && !p.neutral && i === 1 && first === 'all'),
+      pick: () => { this.setState({ open:false, q:'' }); p.onChange && p.onChange(o.value); } }));
+    const active = !isDefault && !p.neutral;
+    return {
+      open: this.state.open, toggle: () => this.state.open ? this.setState({ open:false, q:'' }) : this.openMenu(), rootRef: this.rootRef, close: () => this.setState({ open:false, q:'' }),
+      label: cur.label, icon: p.icon, hasIcon: !!p.icon, prefix: p.prefix, hasPrefix: !!p.prefix,
+      chevron: this.state.open ? 'chevron-up' : 'chevron-down',
+      triggerBg: active ? 'var(--fill-hover)' : 'var(--fill)', triggerFg: 'var(--text)', triggerOutline: active ? 'var(--outline-focus)' : 'transparent',
+      menuLeft: this.state.flip ? 'auto' : '0', menuRight: this.state.flip ? '0' : 'auto',
+      searchable: opts.length > 8, searchPh: p.searchPlaceholder || 'Search', searchRef: this.searchRef, q: this.state.q, setQ: e => this.setState({ q: e.target.value }),
+      items, empty: items.length === 0,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+:root,[data-theme="dark"]{
+--shadow-float:0 4px 6px -1px rgba(0,0,0,0.3),0 2px 4px -2px rgba(0,0,0,0.3);
+--shadow-overlay:none;
+--shadow-glow:0 8px 28px rgba(119,100,216,0.35);
+--duration-fast:150ms /* @kind other */;--ease-standard:cubic-bezier(.4,0,.2,1) /* @kind other */;
+--hatch-tile:url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z' fill='%23fff' fill-rule='evenodd'/%3E%3C/svg%3E") /* @kind other */;
+}
+[data-theme="light"]{
+--shadow-float:0 4px 6px -1px rgba(0,0,0,0.2),0 2px 4px -2px rgba(0,0,0,0.2);
+--shadow-overlay:0 20px 25px -5px rgba(0,0,0,0.1),0 8px 10px -6px rgba(0,0,0,0.1);
+}
