@@ -47,6 +47,13 @@
       "require": "./dist/schemas/role.schema.js",
       "default": "./dist/schemas/role.schema.js"
     },
+    "./schemas/accounts": {
+      "types": "./dist/schemas/accounts.schema.d.ts",
+      "flama-source": "./src/schemas/accounts.schema.ts",
+      "import": "./dist/schemas/accounts.schema.js",
+      "require": "./dist/schemas/accounts.schema.js",
+      "default": "./dist/schemas/accounts.schema.js"
+    },
     "./types": {
       "types": "./dist/types/index.d.ts",
       "flama-source": "./src/types/index.ts",
@@ -74,6 +81,13 @@
       "import": "./dist/scopes/index.js",
       "require": "./dist/scopes/index.js",
       "default": "./dist/scopes/index.js"
+    },
+    "./subscriptions": {
+      "types": "./dist/subscriptions/index.d.ts",
+      "flama-source": "./src/subscriptions/index.ts",
+      "import": "./dist/subscriptions/index.js",
+      "require": "./dist/subscriptions/index.js",
+      "default": "./dist/subscriptions/index.js"
     }
   },
   "scripts": {
