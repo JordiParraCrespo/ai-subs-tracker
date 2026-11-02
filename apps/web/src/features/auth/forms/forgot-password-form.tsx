@@ -1,11 +1,5 @@
-import { Button, FieldGroup, Input } from '@flama/design-system-web';
-import {
-  AuthField,
-  AuthFormError,
-  authControlClass,
-  authInputClass,
-  useZodResolver,
-} from '@flama/frontend-web';
+import { DsButton, FieldGroup, Input } from '@flama/design-system-web';
+import { AuthField, AuthFormError, authInputClass, useZodResolver } from '@flama/frontend-web';
 import { type ForgotPasswordDto, forgotPasswordSchema } from '@flama/shared/schemas/auth';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -49,9 +43,9 @@ export function ForgotPasswordForm({
           />
         </AuthField>
 
-        <Button type="submit" disabled={isPending} className={authControlClass}>
+        <DsButton type="submit" variant="primary" size="md" block disabled={isPending}>
           {isPending ? t('auth.forgotPassword.submitting') : t('auth.forgotPassword.submit')}
-        </Button>
+        </DsButton>
       </FieldGroup>
     </form>
   );

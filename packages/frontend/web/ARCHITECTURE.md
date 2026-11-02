@@ -24,7 +24,7 @@ importing it configures i18next; everything else is pure and may be dropped.
 | `layout` | `PageHead`, `SectionNav` (the side nav of a paned page), the section primitives (`SectionCard`, `SectionRow`, `FieldRow`, …), `ConfirmDialog` | middle |
 | `roles` | `RolePill` | middle |
 | `shell` | `AppShell`, `AppSidebar`, `TopBar`, `UserMenu`, `CommandPalette`, `ShellProvider`/`useShell`, `useAuthorizedNav`, `useLandingRoute`, the nav types, and `useAbility` re-exported from the kernel | top |
-| `auth` | `AuthLayout`, `AuthArtPanel`, `BrandLogo`, the auth primitives, `PasswordInput`, `PasswordChecklist` (subscribes to the password field itself), `SocialLoginButtons`, `OAuthCallbackNotice`, `redirectSignedIn`, `redirectSignedOut` | top |
+| `auth` | `AuthLayout`, `BrandLogo`, the auth primitives, `PasswordInput`, `PasswordChecklist` (subscribes to the password field itself), `SocialLoginButtons`, `OAuthCallbackNotice`, `redirectSignedIn`, `redirectSignedOut` | top |
 
 The lists live in [`.dependency-cruiser.cjs`](.dependency-cruiser.cjs), which
 passes them to `packages/tsconfig/depcruise/frontend-kit.cjs`.
@@ -87,12 +87,12 @@ language list, and `workspace` is what the sidebar header names.
 
 ## How an app configures the auth layout
 
-`AuthLayout` (`src/auth/components/auth-layout.tsx`) is the auth split: form
-on the left, `AuthArtPanel` on the right, the panel dropped below 900px. It
-takes `brandLabel` (the wordmark, defaulting to the product name), `links`
-(footer links, typed `NavTo`) and `copy` (`'consumer' | 'control'`, which
-product's words the art panel shows). An app's `_auth` route mounts it around
-its `Outlet` — `apps/web/src/routes/_auth.tsx`.
+`AuthLayout` (`src/auth/components/auth-layout.tsx`) is the design's auth
+frame: the wordmark and one action in a top bar, and a single 440px column
+centred below. It takes `brandLabel` (the wordmark, defaulting to the product
+name) and `action` (the top bar's right side, which the app picks per page:
+"New here? Create account" on sign-in). An app's `_auth` route mounts it
+around its `Outlet` — `apps/web/src/routes/_auth.tsx`.
 
 The guard is not the layout's. In `apps/web` the layout covers routes that
 want opposite answers, so each child carries its own `beforeLoad` and `_auth`

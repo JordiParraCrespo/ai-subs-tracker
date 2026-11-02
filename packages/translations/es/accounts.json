@@ -93,7 +93,9 @@
     "shellInstall": "Añadir a mi shell",
     "shellInstalled": "Instalado en {{file}}",
     "shellNotInstalled": "No instalado",
-    "shellTitle": "Integración con la terminal"
+    "shellTitle": "Integración con la terminal",
+    "title": "Este ordenador",
+    "description": "Cómo trabaja Subtrack con las herramientas de programación de este equipo. Cada cambio es opcional y reversible."
   },
   "table": {
     "account": "Cuenta",

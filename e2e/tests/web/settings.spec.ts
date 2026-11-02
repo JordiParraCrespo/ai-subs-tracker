@@ -9,16 +9,6 @@ import { provisionedUser, signInAs } from '../../support/web';
  * the component state that wrote it.
  */
 
-/** The settings sub-nav, addressed by its accessible name. */
-function sectionNav(page: Page) {
-  return page.getByRole('navigation', { name: 'Settings sections' });
-}
-
-async function openSection(page: Page, label: string) {
-  await sectionNav(page).getByRole('button', { name: label, exact: true }).click();
-  await expect(page).toHaveURL(/section=/);
-}
-
 async function openSettings(page: Page) {
   await page.goto('/settings');
   await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible();
@@ -29,10 +19,11 @@ test('lists every section', async ({ page }) => {
   await signInAs(page, user);
   await openSettings(page);
 
-  const nav = sectionNav(page);
+  // Every section is a card on the one page, in the design's single column.
   // flama:begin organizations
   // flama:end organizations
-  await expect(nav.getByRole('button', { name: 'Security', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'This computer', level: 2 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Security', level: 2 })).toBeVisible();
 
   await api.dispose();
 });
@@ -73,7 +64,6 @@ test('Security shows this device among the account’s sessions', async ({ page 
   const { user, api } = await provisionedUser('settingssec');
   await signInAs(page, user);
   await openSettings(page);
-  await openSection(page, 'Security');
 
   await expect(page.getByRole('heading', { name: 'Active sessions', level: 3 })).toBeVisible();
   await expect(page.getByText('This device')).toBeVisible();

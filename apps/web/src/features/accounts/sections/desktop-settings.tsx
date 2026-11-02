@@ -5,6 +5,7 @@ import {
   RowControl,
   RowMeta,
   SectionCard,
+  SectionHead,
   SectionRow,
 } from '@flama/frontend-web';
 import { useTranslation } from 'react-i18next';
@@ -19,21 +20,33 @@ export function DesktopSettings() {
   const { t } = useTranslation();
   const setup = useDesktopSetup();
 
+  const head = (
+    <SectionHead
+      size="card"
+      title={t('accounts.settings.title')}
+      sub={t('accounts.settings.description')}
+    />
+  );
+
   if (!desktop) {
     return (
-      <SectionCard>
-        <SectionRow>
-          <RowMeta
-            name={t('accounts.settings.browserTitle')}
-            description={t('accounts.settings.browserDescription')}
-          />
-        </SectionRow>
-      </SectionCard>
+      <>
+        {head}
+        <SectionCard>
+          <SectionRow>
+            <RowMeta
+              name={t('accounts.settings.browserTitle')}
+              description={t('accounts.settings.browserDescription')}
+            />
+          </SectionRow>
+        </SectionCard>
+      </>
     );
   }
 
   return (
     <>
+      {head}
       <DesktopStatus />
       <GroupHeading description={t('accounts.settings.shellDescription')}>
         {t('accounts.settings.shellTitle')}

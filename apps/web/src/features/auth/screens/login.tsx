@@ -64,6 +64,8 @@ export function LoginScreen({
 
       <OAuthCallbackNotice code={oauthError} className="mb-4" />
 
+      <SocialLoginButtons disabled={login.isPending} />
+
       <LoginForm
         defaultEmail={email}
         isPending={login.isPending}
@@ -73,17 +75,12 @@ export function LoginScreen({
             : undefined
         }
         forgotPasswordLink={
-          <Link
-            to="/forgot-password"
-            className="text-sm text-accent-blue transition-opacity hover:opacity-80"
-          >
+          <Link to="/forgot-password" className="ds-btn ds-btn--text">
             {t('auth.login.forgotPassword')}
           </Link>
         }
         onSubmit={onSubmit}
       />
-
-      <SocialLoginButtons disabled={login.isPending} />
     </>
   );
 }

@@ -1,8 +1,7 @@
-import { Button, FieldGroup } from '@flama/design-system-web';
+import { DsButton, FieldGroup } from '@flama/design-system-web';
 import {
   AuthField,
   AuthFormError,
-  authControlClass,
   PasswordChecklist,
   PasswordInput,
   type PasswordRule,
@@ -87,9 +86,15 @@ export function ResetPasswordForm({
           className="-mt-1.5 mb-1.5"
         >
           {(satisfied) => (
-            <Button type="submit" disabled={isPending || !satisfied} className={authControlClass}>
+            <DsButton
+              type="submit"
+              variant="primary"
+              size="md"
+              block
+              disabled={isPending || !satisfied}
+            >
               {isPending ? t('auth.resetPassword.submitting') : t('auth.resetPassword.submit')}
-            </Button>
+            </DsButton>
           )}
         </PasswordChecklist>
       </FieldGroup>

@@ -114,3 +114,16 @@
 .ds-swatch[data-faint]{background:var(--ds-text-faint)}
 .ds-share{flex:1;height:6px;border-radius:999px;background:var(--ds-fill);overflow:hidden}
 .ds-share__fill{height:100%;border-radius:999px;background:var(--ds-accent);width:var(--ds-w,0%)}
+/* A bare <input> drawn as the design's text field (`.ds-input`), for forms that register() the element itself. */
+.ds-text-field{width:100%;height:var(--ds-control-md);padding:0 var(--ds-space-3);border:0;border-radius:var(--ds-radius-field);background:var(--ds-field);outline:1px solid var(--ds-outline-field);outline-offset:-1px;box-shadow:none;font:500 16px/20px var(--ds-font-sans);color:var(--ds-text);box-sizing:border-box}
+.ds-text-field::placeholder{color:var(--ds-text-subtle)}
+.ds-text-field:focus,.ds-text-field:focus-visible{outline:2px solid var(--ds-outline-focus);outline-offset:-2px;box-shadow:none}
+.ds-text-field[aria-invalid="true"]{outline-color:var(--ds-error-outline)}
+.ds-text-field:disabled{opacity:.6}
+.ds-subtle{color:var(--ds-text-subtle)}
+.ds-hairline{flex:1;height:1px;background:var(--ds-divider)}
+.ds-text-field--trailing{padding-right:44px}
+.ds-wordmark{font:700 20px/28px var(--ds-font-sans);letter-spacing:var(--ds-tracking-tight);color:var(--ds-text)}
+/* A primary action waiting on its form: the quiet fill, not a faded white. */
+.ds-btn--primary:disabled{opacity:1;background:var(--ds-fill);color:var(--ds-text-subtle)}
+.ds-disc--lg{width:52px;height:52px}

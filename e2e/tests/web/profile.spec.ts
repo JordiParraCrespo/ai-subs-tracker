@@ -490,7 +490,7 @@ test.describe('the preferences pane', () => {
     if (fresh) {
       const other = await fresh.newPage();
       await signInAs(other, user);
-      await expect(other.getByRole('link', { name: 'Ajustes', exact: true })).toBeVisible();
+      await expect(other.getByRole('link', { name: 'Resumen', exact: true })).toBeVisible();
       await fresh.close();
     }
 

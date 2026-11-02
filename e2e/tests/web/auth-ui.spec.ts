@@ -50,7 +50,10 @@ test.describe('web auth UI', () => {
     page.on('request', (request) => {
       if (request.url().includes('/api/auth/sign-in')) apiCalled = true;
     });
-    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+    // The button names what is missing and refuses until the form can go.
+    const submit = page.getByRole('button', { name: 'Enter a valid email', exact: true });
+    await expect(submit).toBeDisabled();
+    await page.locator('form').evaluate((form: HTMLFormElement) => form.requestSubmit());
 
     await expect(page.locator('[data-invalid="true"]').first()).toBeVisible();
     expect(apiCalled, 'client-side validation short-circuits the request').toBe(false);

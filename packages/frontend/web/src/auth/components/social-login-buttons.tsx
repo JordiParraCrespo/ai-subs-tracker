@@ -1,15 +1,16 @@
-import { Alert, AlertDescription, AppIcon, Button, cn } from '@flama/design-system-web';
+import { Alert, AlertDescription, AppIcon, DsButton } from '@flama/design-system-web';
 import type { SocialAuthIntent } from '@flama/frontend-core';
 import { useErrorMessage, useSocialLogin, useSocialProviders } from '@flama/frontend-core/react';
 import { useTranslation } from 'react-i18next';
-import { AuthDivider, authControlClass } from './auth-primitives';
+import { AuthDivider } from './auth-primitives';
 
 /**
  * Social sign-in section of the login and register screens: a button for each
  * provider the app offers (`FlamaApp.create({ socialProviders })`) that the
  * deployment's capability read reports configured, drawn with the provider's
  * name and its mark from the design system's brand set. With none to offer it
- * renders nothing.
+ * renders nothing. It sits above the form, as the design draws it, and closes
+ * with the "or" rule that leads into the fields.
  *
  * `intent` is what separates the two screens that render this. The API refuses
  * a provider identity it has never seen unless the caller asks for a sign-up,
@@ -30,11 +31,8 @@ export function SocialLoginButtons({
 
   if (available.length === 0) return null;
 
-  const providerButton = cn(authControlClass, 'gap-2.5');
-
   return (
     <>
-      <AuthDivider label={t('common.or')} />
       {/* Starting the round-trip can fail before the redirect ever happens —
           the API unreachable, the provider rejected server-side. It used to
           fail silently: the button simply stopped spinning. */}
@@ -47,21 +45,21 @@ export function SocialLoginButtons({
       )}
       <div className="flex flex-col gap-2.5">
         {available.map(({ id, name, icon }) => (
-          <Button
+          <DsButton
             key={id}
-            variant="outline"
-            type="button"
+            size="md"
+            block
             disabled={disabled || social.isPending}
             onClick={() => social.mutate({ provider: id, intent })}
-            className={providerButton}
           >
             {/* A bare mark: the tile's box keeps the 17px logo centred, and
                 the negative margin gives the label back the box's padding. */}
             <AppIcon app={icon} label={name} size={34} className="-mx-2 bg-transparent" />
             {t('auth.login.continueWith', { provider: name })}
-          </Button>
+          </DsButton>
         ))}
       </div>
+      <AuthDivider label={t('common.or')} />
     </>
   );
 }

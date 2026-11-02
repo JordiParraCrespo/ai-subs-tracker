@@ -1,15 +1,10 @@
-import { Button, FieldGroup, Input } from '@flama/design-system-web';
-import {
-  AuthField,
-  AuthFormError,
-  authControlClass,
-  authInputClass,
-  useZodResolver,
-} from '@flama/frontend-web';
+import { FieldGroup, Input } from '@flama/design-system-web';
+import { AuthField, AuthFormError, authInputClass, useZodResolver } from '@flama/frontend-web';
 import { type LoginDto, loginSchema } from '@flama/shared/schemas/auth';
 import type { ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { LoginSubmit } from '@/features/auth/components/login-submit';
 
 export function LoginForm({
   defaultEmail,
@@ -30,6 +25,7 @@ export function LoginForm({
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginDto>({
@@ -72,9 +68,7 @@ export function LoginForm({
             "keep me signed in" box: session lifetime is the API's to decide. */}
         <div className="mb-2 flex h-5.25 items-center justify-end">{forgotPasswordLink}</div>
 
-        <Button type="submit" disabled={isPending} className={authControlClass}>
-          {isPending ? t('auth.login.submitting') : t('auth.login.submit')}
-        </Button>
+        <LoginSubmit control={control} isPending={isPending} />
       </FieldGroup>
     </form>
   );

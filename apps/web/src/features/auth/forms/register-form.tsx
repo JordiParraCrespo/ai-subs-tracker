@@ -1,8 +1,7 @@
-import { Button, FieldGroup, Input } from '@flama/design-system-web';
+import { DsButton, FieldGroup, Input } from '@flama/design-system-web';
 import {
   AuthField,
   AuthFormError,
-  authControlClass,
   authInputClass,
   PasswordChecklist,
   PasswordInput,
@@ -102,9 +101,15 @@ export function RegisterForm({
           className="-mt-1.5 mb-1.5"
         >
           {(satisfied) => (
-            <Button type="submit" disabled={isPending || !satisfied} className={authControlClass}>
+            <DsButton
+              type="submit"
+              variant="primary"
+              size="md"
+              block
+              disabled={isPending || !satisfied}
+            >
               {isPending ? t('auth.register.submitting') : t('auth.register.submit')}
-            </Button>
+            </DsButton>
           )}
         </PasswordChecklist>
       </FieldGroup>

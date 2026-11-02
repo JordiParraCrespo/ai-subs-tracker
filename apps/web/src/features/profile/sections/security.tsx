@@ -14,7 +14,11 @@ export function SecuritySection() {
 
   return (
     <>
-      <SectionHead title={t('settings.security.title')} sub={t('settings.security.description')} />
+      <SectionHead
+        size="card"
+        title={t('settings.security.title')}
+        sub={t('settings.security.description')}
+      />
       <GroupHeading>{t('settings.security.sessions')}</GroupHeading>
       <SessionList />
     </>

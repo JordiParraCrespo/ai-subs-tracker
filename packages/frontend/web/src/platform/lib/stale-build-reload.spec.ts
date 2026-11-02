@@ -18,8 +18,8 @@ function fakeWindow({ storageRefused = false } = {}) {
     sessionStorage: storageRefused
       ? { getItem: refuse, setItem: refuse }
       : {
-          getItem: (key) => stored.get(key) ?? null,
-          setItem: (key, value) => void stored.set(key, value),
+          getItem: (key: string) => stored.get(key) ?? null,
+          setItem: (key: string, value: string) => void stored.set(key, value),
         },
     location: { reload },
   };

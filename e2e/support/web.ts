@@ -1,4 +1,4 @@
-import { expect, type Locator, type Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 import { signedUpContext, type TestUser } from './auth';
 
 // flama:begin organizations
@@ -55,32 +55,4 @@ export async function provisionedUser(prefix = 'user') {
 export async function reloadFromServer(page: Page): Promise<void> {
   await page.evaluate(() => window.localStorage.clear());
   await page.reload();
-}
-
-/**
- * Opens a table row's action menu and clicks one item, surviving a re-render.
- *
- * The two-line version — click the trigger, click the item — is flaky, and not
- * for a reason a longer timeout fixes. The list refetches in the background (a
- * mutation settling, the query cache revalidating), the `<tr>` is replaced, and
- * the open menu goes with it. The only thing that recovers is opening the menu
- * again, which is what this does.
- */
-export async function clickRowAction(
-  page: Page,
-  row: Locator,
-  action: string | RegExp,
-): Promise<void> {
-  const attempts = 2;
-
-  for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    try {
-      await row.getByRole('button', { name: 'Row actions' }).click();
-      await page.getByRole('menuitem', { name: action }).click({ timeout: 10_000 });
-      return;
-    } catch (error) {
-      if (attempt === attempts) throw error;
-      await page.keyboard.press('Escape').catch(() => {});
-    }
-  }
 }

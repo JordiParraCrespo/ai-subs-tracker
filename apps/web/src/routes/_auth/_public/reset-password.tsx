@@ -10,7 +10,6 @@ export const Route = createFileRoute('/_auth/_public/reset-password')({
     email: (search.email as string) || undefined,
   }),
   component: ResetPasswordPage,
-  staticData: { legalNoteKey: 'auth.resetPassword.legal' },
 });
 
 function ResetPasswordPage() {

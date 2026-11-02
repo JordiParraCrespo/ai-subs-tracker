@@ -13,8 +13,27 @@ import { useCopy } from '../../platform';
  * of them.
  */
 
-/** `.setHead` — the 24px title and its line of secondary copy. */
-export function SectionHead({ title, sub }: { title: string; sub: string }) {
+/**
+ * `.setHead` — the 24px title and its line of secondary copy. `size="card"`
+ * is the dashboard design's card head instead (16px title, 14px muted line),
+ * for a pane drawn as one card in a column of them.
+ */
+export function SectionHead({
+  title,
+  sub,
+  size = 'pane',
+}: {
+  title: string;
+  sub: string;
+  size?: 'pane' | 'card';
+}) {
+  if (size === 'card')
+    return (
+      <div className="mb-5 flex flex-col gap-1">
+        <h2 className="ds-body-strong m-0">{title}</h2>
+        <p className="ds-text-label ds-muted m-0 text-pretty">{sub}</p>
+      </div>
+    );
   return (
     <div className="mb-[22px]">
       <h2 className="font-sans text-2xl font-medium text-ink-900">{title}</h2>

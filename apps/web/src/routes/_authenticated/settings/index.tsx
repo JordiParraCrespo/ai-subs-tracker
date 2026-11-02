@@ -1,6 +1,5 @@
-import { Monitor, ShieldCheck } from '@flama/design-system-web/icons';
-import { PageHead, SectionNav } from '@flama/frontend-web';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { PageHead } from '@flama/frontend-web';
+import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 // flama:begin organizations
 // flama:end organizations
@@ -8,14 +7,15 @@ import { DesktopSettings } from '@/features/accounts/sections/desktop-settings';
 import { SecuritySection } from '@/features/profile/sections/security';
 
 /**
- * The sub-nav's sections, in the design's order, each with the pane it opens:
- * a module that adds a pane adds its row here and nothing else.
+ * The sections, in the order the page stacks them, each a card in the
+ * design's single 720px column: a module that adds a pane adds its row here
+ * and nothing else.
  */
 const SECTIONS = [
   // flama:begin organizations
   // flama:end organizations
-  { key: 'security', icon: ShieldCheck, Pane: SecuritySection },
-  { key: 'desktop', icon: Monitor, Pane: DesktopSettings },
+  { key: 'desktop', Pane: DesktopSettings },
+  { key: 'security', Pane: SecuritySection },
 ] as const;
 
 type SectionKey = (typeof SECTIONS)[number]['key'];
@@ -23,10 +23,8 @@ type SectionKey = (typeof SECTIONS)[number]['key'];
 const PANES: readonly SectionKey[] = SECTIONS.map((section) => section.key);
 
 /**
- * The section lives in the URL rather than in component state.
- *
- * It costs nothing and buys a settings link someone can send to a colleague —
- * and a back button that steps between panes instead of leaving the screen.
+ * `?section=` is still accepted, so links into settings keep working: the
+ * page carries every section, so a link that names one lands on it.
  *
  * Everything else in the search string is carried through untouched. What
  * `validateSearch` returns *becomes* the search, so narrowing it to `section`
@@ -48,26 +46,15 @@ export const Route = createFileRoute('/_authenticated/settings/')({
 
 function SettingsPage() {
   const { t } = useTranslation();
-  const { section = SECTIONS[0].key } = Route.useSearch();
-  const { Pane } = SECTIONS.find((entry) => entry.key === section) ?? SECTIONS[0];
-  const navigate = useNavigate({ from: Route.fullPath });
-
-  // Replaces the search rather than merging into it, so a table's own state
-  // does not follow the reader into a pane that has no table.
-  const go = (next: SectionKey) => navigate({ search: { section: next } });
 
   return (
-    <>
-      <PageHead title={t('settings.title')} sub={t('settings.subtitle')} />
-
-      <SectionNav
-        label={t('settings.nav.label')}
-        items={SECTIONS.map(({ key, icon }) => ({ key, icon, label: t(`settings.nav.${key}`) }))}
-        active={section}
-        onSelect={go}
-      >
-        <Pane />
-      </SectionNav>
-    </>
+    <div className="flex max-w-180 flex-col gap-6">
+      <PageHead className="mb-0" title={t('settings.title')} sub={t('settings.subtitle')} />
+      {SECTIONS.map(({ key, Pane }) => (
+        <section key={key} id={key} className="ds-card flex scroll-mt-6 flex-col p-6">
+          <Pane />
+        </section>
+      ))}
+    </div>
   );
 }

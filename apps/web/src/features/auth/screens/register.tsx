@@ -1,6 +1,5 @@
 import { useRegister } from '@flama/frontend-consumer/react';
 import {
-  AuthFooterNote,
   AuthSubtitle,
   AuthTitle,
   OAuthCallbackNotice,
@@ -8,7 +7,7 @@ import {
   useErrorMessage,
 } from '@flama/frontend-web';
 import type { RegisterDto } from '@flama/shared/schemas/auth';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { RegisterForm } from '@/features/auth/forms/register-form';
 
@@ -47,25 +46,17 @@ export function RegisterScreen({
       <AuthSubtitle>{t('auth.register.description')}</AuthSubtitle>
 
       <OAuthCallbackNotice code={oauthError} className="mb-4" />
-
-      <RegisterForm
-        isPending={isPending}
-        error={error ? resolveError(error, t('auth.register.failed')).message : undefined}
-        onSubmit={onSubmit}
-      />
-
       {/* The one place a provider identity may become an account: these pass
           `sign-up`, which is what lifts the API's refusal. Without them the
           person the login screen sent here has no way to finish with the
           provider they started with. */}
       <SocialLoginButtons disabled={isPending} intent="sign-up" />
 
-      <AuthFooterNote>
-        {t('auth.register.hasAccount')}{' '}
-        <Link to="/login" className="text-accent-blue transition-opacity hover:opacity-80">
-          {t('auth.register.signIn')}
-        </Link>
-      </AuthFooterNote>
+      <RegisterForm
+        isPending={isPending}
+        error={error ? resolveError(error, t('auth.register.failed')).message : undefined}
+        onSubmit={onSubmit}
+      />
     </>
   );
 }

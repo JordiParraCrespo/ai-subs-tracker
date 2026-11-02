@@ -93,7 +93,9 @@
     "shellInstall": "Add to my shell",
     "shellInstalled": "Installed in {{file}}",
     "shellNotInstalled": "Not installed",
-    "shellTitle": "Terminal integration"
+    "shellTitle": "Terminal integration",
+    "title": "This computer",
+    "description": "How Subtrack works with the coding tools on this machine. Each change is opt-in and can be undone."
   },
   "table": {
     "account": "Account",

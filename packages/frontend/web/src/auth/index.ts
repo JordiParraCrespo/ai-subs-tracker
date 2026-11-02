@@ -1,4 +1,3 @@
-export { AuthArtPanel } from './components/auth-art-panel';
 export { AuthLayout, type AuthLayoutProps } from './components/auth-layout';
 export * from './components/auth-primitives';
 export { BrandLogo } from './components/brand-logo';

@@ -22,7 +22,7 @@ Everything is re-exported from the package root (`src/index.ts`):
   `CommandPalette`, `ShellProvider`, `useShell`, `useAbility`,
   `useAbilityState`, `useAuthorizedNav`, `useLandingRoute`, `useHotkey`, and
   the nav types `NavItem`, `NavLink`, `NavPolicy`, `NavTo`, `ShellWorkspace`.
-- **auth** — `AuthLayout`, `AuthArtPanel`, `BrandLogo`, `PasswordInput`,
+- **auth** — `AuthLayout`, `BrandLogo`, `PasswordInput`,
   `SocialLoginButtons`, `OAuthCallbackNotice`, the auth primitives, the
   password-requirement helpers, `redirectSignedIn` / `redirectSignedOut`.
 - **table** — `DataTable`, `DataTableColumn`, `useTableQuery`,

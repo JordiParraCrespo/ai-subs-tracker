@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { syncTwoAccounts } from '../../support/accounts';
-import { clickRowAction, provisionedUser, reloadFromServer, signInAs } from '../../support/web';
+import { provisionedUser, reloadFromServer, signInAs } from '../../support/web';
 
 /**
  * The Subtrack screens over what a desktop collector synced. Every check reads
@@ -14,9 +14,11 @@ test('the overview prices the plans the providers reported', async ({ page }) =>
   await signInAs(page, user);
 
   // Ultra ($200, the renamed Max 20x) + Plus ($20).
-  await expect(page.getByText('$220', { exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: /Hello/ })).toBeVisible();
-  await expect(page.getByText('Use it before it resets')).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: /^Good (morning|afternoon|evening)/ }),
+  ).toBeVisible();
+  await expect(page.getByText('$220', { exact: true }).first()).toBeVisible();
+  await expect(page.getByRole('link', { name: /Use Codex · Plus before it resets/ })).toBeVisible();
 
   await api.dispose();
 });
@@ -27,18 +29,18 @@ test('tokenmaxx picks the headroom that expires first and switches to it', async
   await signInAs(page, user);
 
   await page.goto('/tokenmaxx');
+  // Codex Plus resets in hours with most of its week left: use it or lose it.
   await expect(page.getByText('Use next')).toBeVisible();
-  await expect(page.getByText('home@example.com').first()).toBeVisible();
-  await page.getByRole('button', { name: 'Use this account' }).click();
+  await expect(page.getByText('Codex · Plus').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Switch to it' }).click();
   await expect(page.getByRole('button', { name: 'In use' })).toBeVisible();
 
+  // The switch came back from the server, and only for that account.
   await reloadFromServer(page);
-  await expect(
-    page.getByRole('switch', { name: 'Use home@example.com in terminals' }),
-  ).toBeChecked();
-  await expect(
-    page.getByRole('switch', { name: 'Use work@example.com in terminals' }),
-  ).not.toBeChecked();
+  await page.goto('/accounts/codex');
+  await expect(page.getByText('In use').first()).toBeVisible();
+  await page.goto('/accounts/claude-code');
+  await expect(page.getByRole('button', { name: 'Use', exact: true }).first()).toBeVisible();
 
   await api.dispose();
 });
@@ -48,16 +50,17 @@ test('an account can be renamed and priced', async ({ page }) => {
   await syncTwoAccounts(api);
   await signInAs(page, user);
 
-  await page.goto('/accounts');
-  const row = page.getByRole('row').filter({ hasText: 'work@example.com' });
-  await clickRowAction(page, row, 'Edit');
+  // The Claude Code page holds the one Claude login, work@example.com.
+  await page.goto('/accounts/claude-code');
+  await page.getByRole('button', { name: 'Edit', exact: true }).first().click();
   await page.getByLabel('Name').fill('Work');
   await page.getByLabel('Monthly price (USD)').fill('180');
   await page.getByRole('button', { name: 'Save' }).click();
 
   await reloadFromServer(page);
-  const renamed = page.getByRole('row').filter({ hasText: 'Work' });
-  await expect(renamed).toContainText('$180');
+  await page.goto('/accounts');
+  await expect(page.getByText('Work', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('$180').first()).toBeVisible();
 
   await api.dispose();
 });

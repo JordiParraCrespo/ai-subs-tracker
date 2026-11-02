@@ -22,7 +22,7 @@ export function PasswordInput({
       <Input
         {...props}
         type={visible ? 'text' : 'password'}
-        className={cn(authInputClass, 'pr-11', className)}
+        className={cn(authInputClass, 'ds-text-field--trailing', className)}
       />
       <IconButton
         type="button"

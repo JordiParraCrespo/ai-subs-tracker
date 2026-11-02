@@ -1,16 +1,11 @@
-import { Button, Checkbox, FieldGroup, Input, Label } from '@flama/design-system-web';
+import { Checkbox, DsButton, FieldGroup, Input, Label } from '@flama/design-system-web';
 import type { TwoFactorMethod, VerifyTwoFactorParams } from '@flama/frontend-core';
 import { type TwoFactorChallengeDto, twoFactorChallengeSchema } from '@flama/shared/schemas/auth';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useZodResolver } from '../../forms';
-import {
-  AuthField,
-  AuthFormError,
-  authControlClass,
-  authInputClass,
-} from '../components/auth-primitives';
+import { AuthField, AuthFormError, authInputClass } from '../components/auth-primitives';
 
 /**
  * The second step of a password sign-in on an account with two-factor on: a
@@ -106,9 +101,9 @@ export function TwoFactorChallengeForm({
           )}
         />
 
-        <Button type="submit" disabled={isPending} className={authControlClass}>
+        <DsButton type="submit" variant="primary" size="md" block disabled={isPending}>
           {isPending ? t('auth.twoFactor.verifying') : t('auth.twoFactor.verify')}
-        </Button>
+        </DsButton>
 
         <div className="flex items-center justify-between text-sm">
           <button

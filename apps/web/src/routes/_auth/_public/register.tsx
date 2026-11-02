@@ -8,6 +8,7 @@ export const Route = createFileRoute('/_auth/_public/register')({
     // fails comes straight back with its own code.
     error: typeof search.error === 'string' ? search.error : undefined,
   }),
+  staticData: { legalNoteKey: 'auth.register.legal' },
   component: RegisterPage,
 });
 
