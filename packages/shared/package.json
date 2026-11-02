@@ -88,6 +88,13 @@
       "import": "./dist/subscriptions/index.js",
       "require": "./dist/subscriptions/index.js",
       "default": "./dist/subscriptions/index.js"
+    },
+    "./desktop": {
+      "types": "./dist/desktop/index.d.ts",
+      "flama-source": "./src/desktop/index.ts",
+      "import": "./dist/desktop/index.js",
+      "require": "./dist/desktop/index.js",
+      "default": "./dist/desktop/index.js"
     }
   },
   "scripts": {
