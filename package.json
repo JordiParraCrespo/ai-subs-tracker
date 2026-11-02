@@ -47,7 +47,9 @@
     "generate:api-client": "pnpm generate:openapi && pnpm --filter @flama/api-client generate",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "screens": "node scripts/stack/screens.mjs",
+    "stack": "node scripts/stack/stack.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.2",

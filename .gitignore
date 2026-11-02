@@ -63,3 +63,11 @@ dump.rdb
 
 # Local storage (STORAGE_PROVIDER=local, UPLOAD_DIR=./uploads): files the API and the e2e suite write
 uploads/
+
+# The local stack (scripts/stack/stack.mjs), its screenshots and the local CI report
+.stack/
+.screenshots/
+.ci-local/
+# flama:begin e2e
+e2e/tests/screens/local/
+# flama:end e2e

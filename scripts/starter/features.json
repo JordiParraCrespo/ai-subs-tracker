@@ -8,6 +8,7 @@
       "paths": [
         "apps/web",
         "e2e/tests/web",
+        "e2e/tests/screens",
         "scripts/check-singletons.test.mjs",
         ".agents/skills/shadcn/evals/evals.json",
         ".agents/skills/scaffold-feature/evals"
@@ -70,6 +71,11 @@
       "identifiers": ["check-bundle-size", "check:bundle"],
       "neededBy": ["web"],
       "scripts": ["check:bundle"]
+    },
+    "scripts/stack/screens.mjs": {
+      "identifiers": ["stack/screens", "pnpm screens"],
+      "neededBy": ["web"],
+      "scripts": ["screens"]
     },
     "scripts/check-singletons.mjs": {
       "identifiers": ["check-singletons", "check:singletons"],

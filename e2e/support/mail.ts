@@ -1,4 +1,6 @@
 import { readFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 /**
  * Reads the transactional emails the API "sent".
@@ -6,9 +8,13 @@ import { readFile } from 'node:fs/promises';
  * With `EMAIL_PROVIDER=console` the API's `ConsoleEmailService` logs each
  * message instead of delivering it, so the API log *is* the mailbox. That is
  * what lets these tests follow a verification link end to end without a mail
- * server: point `API_LOG` at the file the API's stdout is captured to.
+ * server. The stack (`scripts/stack/stack.mjs up`) captures the API's output
+ * to `.stack/api.log`, which is read by default; point `API_LOG` at another
+ * file when the API runs some other way.
  */
-const API_LOG = process.env.API_LOG ?? '/tmp/api.log';
+const API_LOG =
+  process.env.API_LOG ??
+  resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '.stack', 'api.log');
 
 /**
  * SGR colour sequences, stripped before anything is matched.

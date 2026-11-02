@@ -14,6 +14,11 @@ import { defineConfig, devices } from '@playwright/test';
  * read reset/verification tokens straight out of the database and the API log
  * rather than needing a mailbox.
  */
+import { chromiumPath } from '../scripts/chromium.mjs';
+
+/** The machine's own Chromium where it ships one (`scripts/chromium.mjs`), else Playwright's. */
+const CHROMIUM_PATH = chromiumPath();
+
 export const API_URL = process.env.API_URL ?? 'http://localhost:3001';
 export const WEB_URL = process.env.WEB_URL ?? 'http://localhost:3000';
 
@@ -41,7 +46,10 @@ export default defineConfig({
   use: {
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    // Recording needs the ffmpeg Playwright downloads beside its own Chromium;
+    // a machine's shipped Chromium comes without it.
+    video: CHROMIUM_PATH ? 'off' : 'retain-on-failure',
+    launchOptions: CHROMIUM_PATH ? { executablePath: CHROMIUM_PATH } : undefined,
   },
   projects: [
     {
@@ -60,6 +68,16 @@ export default defineConfig({
         // session cookie stays same-origin exactly as it does in production.
         ignoreHTTPSErrors: true,
       },
+    },
+    // flama:end web
+    // flama:begin web
+    // `pnpm screens` (scripts/stack/screens.mjs): the routes it names, light
+    // and dark, into `.screenshots/`. Throwaway specs for one state live in
+    // `tests/screens/local/` (git-ignored) and run here too.
+    {
+      name: 'screens',
+      testDir: './tests/screens',
+      use: { ...devices['Desktop Chrome'], baseURL: WEB_URL, ignoreHTTPSErrors: true },
     },
     // flama:end web
   ],
