@@ -1,6 +1,6 @@
 {
   "menu": "Menú",
-  "dashboard": "Panel",
+  "dashboard": "Resumen",
   "logOut": "Cerrar sesión",
   "commandEmpty": "Sin resultados.",
   "commandPlaceholder": "Busca páginas y acciones…",
@@ -13,5 +13,8 @@
   "users": "Usuarios",
   "roles": "Roles",
   "toggleSidebar": "Mostrar u ocultar el menú",
-  "viewProfile": "Ver perfil"
+  "viewProfile": "Ver perfil",
+  "accounts": "Cuentas",
+  "tokenmaxx": "Tokenmaxx",
+  "usage": "Uso y tokens"
 }

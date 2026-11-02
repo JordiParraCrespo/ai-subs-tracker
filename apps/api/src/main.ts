@@ -2,6 +2,7 @@ import '@flama/env/load';
 import type { ServerResponse } from 'node:http';
 import { resolve } from 'node:path';
 import { ProblemDetailsDto, SanitizePipe } from '@flama/backend-core';
+import { DESKTOP_RENDERER_ORIGIN } from '@flama/shared/desktop';
 import { VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
@@ -60,6 +61,8 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       configService.getOrThrow<string>('app.frontendUrl'),
+      // The desktop app's screens, served by Electron from its own scheme.
+      DESKTOP_RENDERER_ORIGIN,
       // flama:plugins cors-origins
     ],
     credentials: true,

@@ -16,8 +16,11 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthPublicRouteImport } from './routes/_auth/_public'
+import { Route as AuthenticatedAccountsRouteImport } from './routes/_authenticated/accounts'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedTokenmaxxRouteImport } from './routes/_authenticated/tokenmaxx'
+import { Route as AuthenticatedUsageRouteImport } from './routes/_authenticated/usage'
 import { Route as AuthPublicForgotPasswordRouteImport } from './routes/_auth/_public/forgot-password'
 import { Route as AuthPublicLoginRouteImport } from './routes/_auth/_public/login'
 import { Route as AuthPublicRegisterRouteImport } from './routes/_auth/_public/register'
@@ -56,6 +59,11 @@ const AuthPublicRoute = AuthPublicRouteImport.update({
   id: '/_public',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthenticatedAccountsRoute = AuthenticatedAccountsRouteImport.update({
+  id: '/accounts',
+  path: '/accounts',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -64,6 +72,16 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTokenmaxxRoute = AuthenticatedTokenmaxxRouteImport.update({
+  id: '/tokenmaxx',
+  path: '/tokenmaxx',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedUsageRoute = AuthenticatedUsageRouteImport.update({
+  id: '/usage',
+  path: '/usage',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthPublicForgotPasswordRoute =
@@ -99,8 +117,11 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/accounts': typeof AuthenticatedAccountsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/tokenmaxx': typeof AuthenticatedTokenmaxxRoute
+  '/usage': typeof AuthenticatedUsageRoute
   '/forgot-password': typeof AuthPublicForgotPasswordRoute
   '/login': typeof AuthPublicLoginRoute
   '/register': typeof AuthPublicRegisterRoute
@@ -112,8 +133,11 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/accounts': typeof AuthenticatedAccountsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/tokenmaxx': typeof AuthenticatedTokenmaxxRoute
+  '/usage': typeof AuthenticatedUsageRoute
   '/forgot-password': typeof AuthPublicForgotPasswordRoute
   '/login': typeof AuthPublicLoginRoute
   '/register': typeof AuthPublicRegisterRoute
@@ -129,8 +153,11 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/_auth/_public': typeof AuthPublicRouteWithChildren
+  '/_authenticated/accounts': typeof AuthenticatedAccountsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/tokenmaxx': typeof AuthenticatedTokenmaxxRoute
+  '/_authenticated/usage': typeof AuthenticatedUsageRoute
   '/_auth/_public/forgot-password': typeof AuthPublicForgotPasswordRoute
   '/_auth/_public/login': typeof AuthPublicLoginRoute
   '/_auth/_public/register': typeof AuthPublicRegisterRoute
@@ -144,8 +171,11 @@ export interface FileRouteTypes {
     | '/about'
     | '/privacy'
     | '/terms'
+    | '/accounts'
     | '/dashboard'
     | '/profile'
+    | '/tokenmaxx'
+    | '/usage'
     | '/forgot-password'
     | '/login'
     | '/register'
@@ -157,8 +187,11 @@ export interface FileRouteTypes {
     | '/about'
     | '/privacy'
     | '/terms'
+    | '/accounts'
     | '/dashboard'
     | '/profile'
+    | '/tokenmaxx'
+    | '/usage'
     | '/forgot-password'
     | '/login'
     | '/register'
@@ -173,8 +206,11 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/_auth/_public'
+    | '/_authenticated/accounts'
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
+    | '/_authenticated/tokenmaxx'
+    | '/_authenticated/usage'
     | '/_auth/_public/forgot-password'
     | '/_auth/_public/login'
     | '/_auth/_public/register'
@@ -242,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthPublicRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_authenticated/accounts': {
+      id: '/_authenticated/accounts'
+      path: '/accounts'
+      fullPath: '/accounts'
+      preLoaderRoute: typeof AuthenticatedAccountsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -254,6 +297,20 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/tokenmaxx': {
+      id: '/_authenticated/tokenmaxx'
+      path: '/tokenmaxx'
+      fullPath: '/tokenmaxx'
+      preLoaderRoute: typeof AuthenticatedTokenmaxxRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/usage': {
+      id: '/_authenticated/usage'
+      path: '/usage'
+      fullPath: '/usage'
+      preLoaderRoute: typeof AuthenticatedUsageRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_auth/_public/forgot-password': {
@@ -323,14 +380,20 @@ const AuthRouteChildren: AuthRouteChildren = {
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAccountsRoute: typeof AuthenticatedAccountsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedTokenmaxxRoute: typeof AuthenticatedTokenmaxxRoute
+  AuthenticatedUsageRoute: typeof AuthenticatedUsageRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAccountsRoute: AuthenticatedAccountsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedTokenmaxxRoute: AuthenticatedTokenmaxxRoute,
+  AuthenticatedUsageRoute: AuthenticatedUsageRoute,
   AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
 }
 

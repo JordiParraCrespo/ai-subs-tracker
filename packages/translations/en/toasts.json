@@ -4,5 +4,7 @@
   "membersInvited": "Invitations sent.",
   "passwordChanged": "Password updated. Your other devices have been signed out.",
   "twoFactorEnabled": "Two-factor authentication is on.",
-  "twoFactorDisabled": "Two-factor authentication is off."
+  "twoFactorDisabled": "Two-factor authentication is off.",
+  "accountAdded": "Account added",
+  "accountSaved": "Account saved"
 }

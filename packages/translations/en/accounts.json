@@ -1,0 +1,151 @@
+{
+  "attention": {
+    "behind": "Behind pace",
+    "detail": "{{left}} left · resets {{reset}}",
+    "empty": "Nothing needs you right now.",
+    "expiring": "Use it before it resets",
+    "limit": "At its limit",
+    "signin": "Sign in again",
+    "signinHint": "This login stopped reporting.",
+    "title": "Needs attention"
+  },
+  "desktop": {
+    "add": "Add {{provider}}",
+    "addFailed": "The sign-in did not finish.",
+    "lastSync": "Last synced {{when}}",
+    "never": "never",
+    "phase": {
+      "collecting": "Reading the logins on this computer…",
+      "error": "The last sync failed",
+      "idle_one": "{{count}} login on this computer",
+      "idle_other": "{{count}} logins on this computer",
+      "signed_out": "Sign in again to keep syncing",
+      "syncing": "Syncing…"
+    },
+    "refresh": "Refresh"
+  },
+  "edit": {
+    "description": "Name it, and set the plan and price you actually pay.",
+    "label": "Name",
+    "plan": "Plan",
+    "planAuto": "As reported ({{plan}})",
+    "price": "Monthly price (USD)",
+    "pricePlaceholder": "The plan's list price",
+    "title": "Edit account"
+  },
+  "list": {
+    "sub": "Every login Subtrack tracks, and which one your terminals use.",
+    "title": "Accounts"
+  },
+  "models": {
+    "cacheRead": "Cache read",
+    "cost": "At API prices",
+    "empty": "No tokens recorded in this period.",
+    "input": "Input",
+    "model": "Model",
+    "output": "Output",
+    "share": "Share",
+    "title": "By model"
+  },
+  "overview": {
+    "accountCount_one": "{{count}} account",
+    "accountCount_other": "{{count}} accounts",
+    "accounts": "Accounts",
+    "apiValue": "{{value}} at API prices, 30 days",
+    "greeting": "Hello, {{name}}",
+    "monthlySpend": "Monthly spend",
+    "runRate": "Annual run rate",
+    "sub": "Where your AI plans stand",
+    "valuePerDollar": "Value per dollar",
+    "wasted": "Expired unused",
+    "wastedHint": "Weekly allowance left at reset, last 30 days"
+  },
+  "pace": {
+    "ahead": "Ahead",
+    "behind": "Behind pace",
+    "expiring": "Expiring",
+    "limit": "At limit",
+    "on_pace": "On pace",
+    "unknown": "No data"
+  },
+  "queue": {
+    "description": "Use them top to bottom. The mark is where an even pace through the week would be.",
+    "left": "Left",
+    "neededPace": "Needed pace",
+    "perDay": "{{value}}%/day",
+    "resets": "Resets",
+    "title": "Queue",
+    "usage": "Used this week"
+  },
+  "remove": {
+    "confirm": "Remove",
+    "description": "Subtrack stops tracking it and ignores it on later syncs. The login itself is not touched.",
+    "title": "Remove {{name}}?"
+  },
+  "resets": {
+    "empty": "No weekly resets reported yet.",
+    "left": "{{left}} left",
+    "title": "Next resets"
+  },
+  "settings": {
+    "browserDescription": "Switching the terminal's account and the live feed act on your computer, so they live in the Subtrack desktop app.",
+    "browserTitle": "Open the desktop app",
+    "liveDescription": "Claude Code reports your limits to Subtrack as you work, through its status line. Off by default, and never replaces a status line you already have.",
+    "liveNone": "No Claude Code folders found on this computer.",
+    "liveTaken": "This folder already has a status line of its own.",
+    "liveTitle": "Live limits from Claude Code",
+    "liveToggle": "Live limits for {{home}}",
+    "shellDescription": "Makes claude and codex in your terminal use whichever account is switched on.",
+    "shellInstall": "Add to my shell",
+    "shellInstalled": "Installed in {{file}}",
+    "shellNotInstalled": "Not installed",
+    "shellTitle": "Terminal integration"
+  },
+  "table": {
+    "account": "Account",
+    "cost": "Monthly",
+    "edit": "Edit",
+    "empty": "No accounts yet. Open the desktop app to find the logins on your computer.",
+    "inUse": "In use",
+    "provider": "Provider",
+    "remove": "Remove",
+    "session": "Session",
+    "status": "Status",
+    "useAccount": "Use {{name}} in terminals",
+    "weekly": "Weekly"
+  },
+  "tokenmaxx": {
+    "atLimit": "At their limit",
+    "averageUsed": "Average used this week",
+    "expiringHint": "Headroom on accounts that reset within a day",
+    "expiringSoon": "Expiring within 24 h",
+    "inUse": "In use",
+    "nothingUsable": "Every account is at a limit or needs a sign-in.",
+    "pickLine": "{{left}} left · resets {{reset}}",
+    "reason": {
+      "expiring_soon": "Its week resets soon with plenty left: use it or lose it.",
+      "most_headroom": "The most headroom for the time left before its reset.",
+      "only_available": "The only account not at a limit right now."
+    },
+    "sub": "Use what you pay for before it resets.",
+    "title": "Tokenmaxx",
+    "usable": "Usable now",
+    "useNext": "Use next",
+    "useThis": "Use this account"
+  },
+  "usage": {
+    "apiValue": "At API prices",
+    "dailyValue": "Daily value at API prices",
+    "messages": "Messages",
+    "notEnough": "Not enough days recorded to draw a trend yet.",
+    "paid": "Plans cost {{value}} for these days",
+    "period": "{{days}} days",
+    "sub": "Tokens across every account, last {{days}} days",
+    "title": "Usage & tokens",
+    "tokens": "Tokens"
+  },
+  "value": {
+    "bar": "Value of {{name}}",
+    "title": "What you'd pay at API prices"
+  }
+}

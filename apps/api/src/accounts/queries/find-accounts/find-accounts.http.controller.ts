@@ -26,7 +26,10 @@ export class FindAccountsHttpController {
   @NoPolicy('lists the caller’s own accounts')
   @Version('1')
   @RequireScopes('accounts:read')
-  @ApiOperation({ summary: 'List my coding-agent accounts with their latest limits' })
+  @ApiOperation({
+    operationId: 'listAccounts',
+    summary: 'List my coding-agent accounts with their latest limits',
+  })
   @ApiResponse({ status: 200, type: [AccountResponseDto] })
   async findAll(@CurrentUser('id') userId: string): Promise<AccountResponseDto[]> {
     const views = await this.queryBus.execute<FindAccountsQuery, AccountView[]>(

@@ -43,7 +43,7 @@
 }
 
 /* =============================================================================
-   Flama design tokens — Alpaca Labs brand
+   Flama design tokens — Subtrack (ported from designs/_ds, the dashboard design system)
    =============================================================================
    Monochrome-first, flat productivity aesthetic:
      · three neutral inks over white/warm off-white surfaces
@@ -61,20 +61,20 @@
 @layer base {
   :root {
     /* ---- Inks — the whole text hierarchy ------------------------------- */
-    --ink-900: #292929; /* primary text, dark CTAs */
-    --ink-600: #5d5d5d; /* secondary text */
-    --ink-400: #9e9e9e; /* tertiary text, placeholders, muted icons */
+    --ink-900: #171717; /* primary text, dark CTAs */
+    --ink-600: #737373; /* secondary text */
+    --ink-400: #a1a1a1; /* tertiary text, placeholders, muted icons */
 
     /* ---- Surfaces ------------------------------------------------------ */
-    --surface-canvas: #f6f5f3; /* warm off-white canvas */
+    --surface-canvas: #fafafa; /* warm off-white canvas */
     --surface-card: #ffffff; /* cards, panels, sheets */
-    --surface-sunken: #f1f0ee; /* inset wells */
-    --surface-hover: #f4f3f1; /* nav / list hover */
-    --surface-inverse: #2a2926; /* dark CTA / dark cards (warm near-black) */
+    --surface-sunken: #f5f5f5; /* inset wells */
+    --surface-hover: #f5f5f5; /* nav / list hover */
+    --surface-inverse: #171717; /* dark CTA / dark cards (warm near-black) */
 
     /* App shell — the product runs on white, chrome separated by hairlines */
     --app-bg: #ffffff;
-    --chrome-bg: #ffffff;
+    --chrome-bg: #fafafa;
 
     /* The email body frame — surface, and the little chrome the frame supplies
        around a sender's own markup.
@@ -113,32 +113,32 @@
     --theme-toggle-icon-idle: rgba(85, 90, 99, 0.5);
 
     /* ---- Hairlines ----------------------------------------------------- */
-    --border-subtle: rgba(0, 0, 0, 0.06);
-    --border-default: rgba(0, 0, 0, 0.1);
-    --border-strong: rgba(0, 0, 0, 0.16);
+    --border-subtle: #ededed;
+    --border-default: #e5e5e5;
+    --border-strong: #d4d4d4;
 
     /* ---- Accents — status only, never decoration ----------------------- */
-    --accent-blue: #2f80f6; /* counts, toggles-on, primary status */
+    --accent-blue: #155dfc; /* counts, toggles-on, primary status */
     --accent-cyan: #12b5ce; /* live / active indicator */
     --accent-pink: #ef3a6b; /* "New" marker, attention */
-    --accent-purple: #7a5cff; /* avatar / gradient anchor */
+    --accent-purple: #7764d8; /* avatar / gradient anchor */
 
     /* ---- Data & status ------------------------------------------------- */
-    --data-up: #1f9d57;
-    --data-down: #e5484d;
-    --data-line: #2f80f6;
-    --data-line-compare: #9bc2ff;
+    --data-up: #5f4cc2;
+    --data-down: #ff2357;
+    --data-line: #7764d8;
+    --data-line-compare: #b9b0f0;
     --data-grid: rgba(0, 0, 0, 0.05);
-    --data-track: #ecebe8;
+    --data-track: #ededed;
 
-    --status-active: #1f9d57;
-    --status-active-bg: rgba(31, 157, 87, 0.12);
+    --status-active: #5f4cc2;
+    --status-active-bg: rgba(119, 100, 216, 0.15);
     --status-paused: #c77a16;
     --status-paused-bg: rgba(199, 122, 22, 0.13);
-    --status-ended: #e5484d;
-    --status-ended-bg: rgba(229, 72, 77, 0.12);
-    --status-draft: #2f80f6;
-    --status-draft-bg: rgba(47, 128, 246, 0.12);
+    --status-ended: #e70044;
+    --status-ended-bg: rgba(255, 35, 87, 0.1);
+    --status-draft: #1447e6;
+    --status-draft-bg: rgba(48, 128, 255, 0.15);
 
     --on-inverse: #ffffff;
     --on-inverse-muted: rgba(255, 255, 255, 0.62);
@@ -151,7 +151,7 @@
        Alpha rather than a flat tint so it reads the same over the card white
        and the sunken well; carried over from the handoff's token set, where
        the dark theme needs more of it to register against the near-black. */
-    --focus-ring: rgba(47, 128, 246, 0.35);
+    --focus-ring: rgba(119, 100, 216, 0.35);
 
     /* The dot of the `dotted-ground` pattern — the assistant rail's floor.
        Not a surface colour: it has to sit a hair above whatever surface it is
@@ -242,32 +242,32 @@
      ------------------------------------------------------------------ */
   .dark,
   [data-theme="dark"] {
-    --ink-900: #f1f0ed;
-    --ink-600: #a6a5a1;
-    --ink-400: #6f6e6a;
+    --ink-900: #ffffff;
+    --ink-600: #a1a1a1;
+    --ink-400: #737373;
 
-    --surface-canvas: #161513;
-    --surface-card: #1e1d1b;
-    --surface-sunken: #262523;
-    --surface-hover: #2a2825;
-    --surface-inverse: #f1f0ed;
+    --surface-canvas: #171717;
+    --surface-card: #262626;
+    --surface-sunken: #1b1b1b;
+    --surface-hover: #2e2e2e;
+    --surface-inverse: #ffffff;
 
-    --app-bg: #161513;
-    --chrome-bg: #1b1a18;
+    --app-bg: #1f1f1f;
+    --chrome-bg: #171717;
 
     /* Knob and active icon deliberately unchanged — see the light block. */
     --theme-toggle-icon-idle: rgba(201, 201, 205, 0.7);
 
-    --border-subtle: rgba(255, 255, 255, 0.08);
-    --border-default: rgba(255, 255, 255, 0.13);
-    --border-strong: rgba(255, 255, 255, 0.22);
+    --border-subtle: rgba(255, 255, 255, 0.05);
+    --border-default: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
 
     --data-grid: rgba(255, 255, 255, 0.07);
-    --data-track: #2c2a27;
+    --data-track: rgba(255, 255, 255, 0.08);
     --track-off: #3a3835;
-    --focus-ring: rgba(47, 128, 246, 0.45);
+    --focus-ring: rgba(157, 145, 232, 0.45);
 
-    --on-inverse: #161513;
+    --on-inverse: #171717;
     --on-inverse-muted: rgba(0, 0, 0, 0.55);
 
     --elevation-menu: 0 8px 28px rgba(0, 0, 0, 0.55);
@@ -277,12 +277,23 @@
     --scrim: rgba(0, 0, 0, 0.6);
     --dot-ground: rgba(255, 255, 255, 0.045);
 
-    --status-active-bg: rgba(31, 157, 87, 0.18);
+    --status-active-bg: rgba(119, 100, 216, 0.2);
     --status-paused-bg: rgba(199, 122, 22, 0.2);
-    --status-ended-bg: rgba(229, 72, 77, 0.18);
-    --status-draft-bg: rgba(47, 128, 246, 0.18);
+    --status-ended-bg: rgba(255, 102, 127, 0.16);
+    --status-draft-bg: rgba(48, 128, 255, 0.15);
 
-    --destructive-foreground: #161513;
+
+    /* Subtrack: signals restated for the dark ground (purple up, coral down). */
+    --data-up: #9d91e8;
+    --data-down: #ff667f;
+    --data-line: #9d91e8;
+    --data-line-compare: #4d3ba3;
+    --accent-blue: #54a2ff;
+    --status-active: #b9b0f0;
+    --status-ended: #ff667f;
+    --status-draft: #90c5ff;
+
+    --destructive-foreground: #171717;
 
     color-scheme: dark;
   }

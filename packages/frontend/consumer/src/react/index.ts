@@ -1,6 +1,14 @@
 // flama:begin api-tokens
 // flama:end api-tokens
 export {
+  accountsKeys,
+  useAccounts,
+  useActivateAccount,
+  useArchiveAccount,
+  useUpdateAccount,
+  useUsageSummary,
+} from './accounts.queries';
+export {
   useConfirmTwoFactor,
   useDisableTwoFactor,
   useEnableTwoFactor,

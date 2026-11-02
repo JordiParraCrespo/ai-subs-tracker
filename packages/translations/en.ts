@@ -1,8 +1,8 @@
+import accounts from './en/accounts.json';
 import auth from './en/auth.json';
 import common from './en/common.json';
 import consent from './en/consent.json';
 import control from './en/control.json';
-import dashboard from './en/dashboard.json';
 import emails from './en/emails.json';
 import errors from './en/errors.json';
 import extension from './en/extension.json';
@@ -25,7 +25,7 @@ const en = {
   validation,
   errors,
   auth,
-  dashboard,
+  accounts,
   home,
   nav,
   control,

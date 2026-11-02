@@ -107,3 +107,18 @@ export const usageSummaryQuerySchema = z.object({
   days: z.coerce.number().int().min(1).max(90).default(30),
 });
 export type UsageSummaryQuery = z.infer<typeof usageSummaryQuerySchema>;
+
+/**
+ * The account editor's fields as typed: an empty label or plan means "use what
+ * the provider reports", an empty price means "the plan's list price". The
+ * form maps these onto `updateAccountSchema`.
+ */
+export const editAccountFormSchema = z.object({
+  label: z.string().trim().max(80),
+  planId: z.string().max(60),
+  price: z
+    .string()
+    .trim()
+    .regex(/^(\d{1,5}(\.\d{1,2})?)?$/),
+});
+export type EditAccountFormValues = z.infer<typeof editAccountFormSchema>;

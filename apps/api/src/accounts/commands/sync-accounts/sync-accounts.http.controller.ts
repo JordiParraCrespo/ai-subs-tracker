@@ -31,6 +31,7 @@ export class SyncAccountsHttpController {
   @Version('1')
   @RequireScopes('accounts:write')
   @ApiOperation({
+    operationId: 'syncAccounts',
     summary: 'Report the logins, limits and token counts a desktop app read',
     description: 'Never carries a credential. Answers with every tracked account.',
   })

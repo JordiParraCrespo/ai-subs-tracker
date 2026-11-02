@@ -74,6 +74,11 @@
     "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "An account with that email already exists.",
     "USER_EMAIL_NOT_FOUND": "No account was found for that email.",
     "USER_NOT_FOUND": "No account was found for that email.",
-    "VALIDATION_FAILED": "Some of the details you entered are not valid."
+    "VALIDATION_FAILED": "Some of the details you entered are not valid.",
+    "ACCOUNTS_CLIENT_001": "We couldn't load your accounts.",
+    "ACCOUNTS_CLIENT_002": "We couldn't save the account.",
+    "ACCOUNTS_CLIENT_003": "We couldn't switch accounts.",
+    "ACCOUNTS_CLIENT_004": "We couldn't remove the account.",
+    "ACCOUNTS_CLIENT_005": "We couldn't load token usage."
   }
 }

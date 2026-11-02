@@ -1,8 +1,8 @@
+import accounts from './es/accounts.json';
 import auth from './es/auth.json';
 import common from './es/common.json';
 import consent from './es/consent.json';
 import control from './es/control.json';
-import dashboard from './es/dashboard.json';
 import emails from './es/emails.json';
 import errors from './es/errors.json';
 import extension from './es/extension.json';
@@ -24,7 +24,7 @@ const es = {
   validation,
   errors,
   auth,
-  dashboard,
+  accounts,
   home,
   nav,
   control,

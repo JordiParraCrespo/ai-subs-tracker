@@ -1,4 +1,4 @@
-import { ApiAuthProblemResponses, ApiProblemResponse } from '@flama/backend-core';
+import { ApiAuthProblemResponses, ApiProblemResponse, AppError } from '@flama/backend-core';
 import { Body, Controller, Param, ParseUUIDPipe, Patch, UseGuards, Version } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -7,6 +7,7 @@ import { CurrentUser } from '../../../auth/decorators/current-user.decorator';
 import { RequireScopes } from '../../../auth/decorators/require-scopes.decorator';
 import { ApiAuthGuard } from '../../../auth/guards/api-auth.guard';
 import { AccountMapper } from '../../account.mapper';
+import { AccountErrors } from '../../domain/account.errors';
 import type { AccountView } from '../../domain/account.types';
 import { AccountResponseDto } from '../../dtos/account.response.dto';
 import { FindAccountsQuery } from '../../queries/find-accounts/find-accounts.query';
@@ -29,7 +30,10 @@ export class UpdateAccountHttpController {
   @NoPolicy('edits one of the caller’s own accounts; ownership is checked on load')
   @Version('1')
   @RequireScopes('accounts:write')
-  @ApiOperation({ summary: 'Rename an account or set its plan and price' })
+  @ApiOperation({
+    operationId: 'updateAccount',
+    summary: 'Rename an account or set its plan and price',
+  })
   @ApiResponse({ status: 200, type: AccountResponseDto })
   @ApiProblemResponse({ status: 404, description: 'Account not found', code: 'ACCOUNT_001' })
   async update(
@@ -42,6 +46,8 @@ export class UpdateAccountHttpController {
       new FindAccountsQuery(userId),
     );
     const view = views.find((candidate) => candidate.account.id === accountId);
-    return this.mapper.toAccountResponse(view!.account, view?.latest, view?.weeklyPeaks ?? []);
+    // The command just saved it; only a concurrent removal leaves nothing to show.
+    if (!view) throw new AppError(AccountErrors.NOT_FOUND);
+    return this.mapper.toAccountResponse(view.account, view.latest, view.weeklyPeaks);
   }
 }

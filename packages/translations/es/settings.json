@@ -16,7 +16,8 @@
     "integrations": "Integraciones",
     "label": "Secciones de configuración",
     "notifications": "Notificaciones",
-    "security": "Seguridad"
+    "security": "Seguridad",
+    "desktop": "Este ordenador"
   },
   "security": {
     "description": "Todos los dispositivos con sesión iniciada en tu cuenta, y una forma de cerrar cualquiera de ellas.",

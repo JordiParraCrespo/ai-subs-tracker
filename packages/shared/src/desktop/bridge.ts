@@ -92,6 +92,13 @@ export interface DesktopBridge {
   openExternal(url: string): Promise<void>;
 }
 
+/**
+ * The origin the desktop app serves its screens from (`app://subtrack/`). The
+ * API admits it for CORS and as a trusted auth origin, so this one value is
+ * what both sides must agree on.
+ */
+export const DESKTOP_RENDERER_ORIGIN = 'app://subtrack';
+
 /** IPC channel names, `subtrack:<area>:<verb>`. */
 export const DESKTOP_CHANNELS = {
   authGetToken: 'subtrack:auth:get-token',

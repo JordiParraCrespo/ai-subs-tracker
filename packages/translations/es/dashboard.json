@@ -1,9 +1,0 @@
-{
-  "title": "Panel",
-  "welcome": "Bienvenido de nuevo, {{name}}.",
-  "gettingStarted": "Primeros pasos",
-  "gettingStartedDescription": "Este es un panel de ejemplo. Conecta tus datos y personalízalo.",
-  "accountStatus": "Tu rol es <role>{{role}}</role> y tu cuenta está <status>{{status}}</status>.",
-  "active": "activa",
-  "inactive": "inactiva"
-}

@@ -1,4 +1,11 @@
-import { LayoutDashboard, Settings, UserRound } from '@flama/design-system-web/icons';
+import {
+  Activity,
+  Flame,
+  Layers,
+  LayoutDashboard,
+  Settings,
+  UserRound,
+} from '@flama/design-system-web/icons';
 import type { NavItem, NavLink } from '@flama/frontend-web';
 
 /**
@@ -7,8 +14,8 @@ import type { NavItem, NavLink } from '@flama/frontend-web';
  * model, read by both the sidebar and the command palette, so a page can never
  * appear in one and not the other.
  *
- * Both rows are ungated: the dashboard reads only the caller's own profile,
- * and every user's Settings are their own. A row that does
+ * Every row is ungated: each screen reads only the caller's own profile and
+ * accounts, and every user's Settings are their own. A row that does
  * need a permission takes its `policies` from `ENDPOINT_POLICIES` in
  * `@flama/shared/permissions`, keyed by the endpoint its screen reads
  * (`ENDPOINT_POLICIES['/roles']`), never a rule list written out here — the
@@ -16,6 +23,9 @@ import type { NavItem, NavLink } from '@flama/frontend-web';
  */
 export const NAV = [
   { to: '/dashboard', icon: LayoutDashboard, labelKey: 'dashboard', policies: [] },
+  { to: '/accounts', icon: Layers, labelKey: 'accounts', policies: [] },
+  { to: '/tokenmaxx', icon: Flame, labelKey: 'tokenmaxx', policies: [] },
+  { to: '/usage', icon: Activity, labelKey: 'usage', policies: [] },
   { to: '/settings', icon: Settings, labelKey: 'settings', policies: [] },
 ] as const satisfies readonly NavItem[];
 

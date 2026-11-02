@@ -1,6 +1,6 @@
 import { consumerModules } from '@flama/frontend-consumer';
 import { FlamaApp } from '@flama/frontend-core/di';
-import { LocalStorageService } from '@flama/frontend-web';
+import { desktopBridge as desktop, LocalStorageService } from '@flama/frontend-web';
 import { webAuthClient } from './auth-client';
 // flama:plugins app-imports
 
@@ -9,7 +9,7 @@ export const app = FlamaApp.create({
   // the session cookie is sent with every request. Set VITE_API_URL only when
   // the API is served from a different origin behind a shared domain in
   // production.
-  apiBaseUrl: import.meta.env.VITE_API_URL ?? '',
+  apiBaseUrl: desktop?.apiUrl ?? import.meta.env.VITE_API_URL ?? '',
   storage: new LocalStorageService(),
   authClient: webAuthClient,
   // flama:plugins app-config

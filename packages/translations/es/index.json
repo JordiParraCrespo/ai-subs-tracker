@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Flama",
+    "appName": "Subtrack",
     "controlAppName": "Flama Control",
     "loading": "Cargando...",
     "error": "Algo salió mal",
@@ -119,7 +119,12 @@
       "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "Ya existe una cuenta con ese correo electrónico.",
       "USER_EMAIL_NOT_FOUND": "No se ha encontrado ninguna cuenta con ese correo electrónico.",
       "USER_NOT_FOUND": "No se ha encontrado ninguna cuenta con ese correo electrónico.",
-      "VALIDATION_FAILED": "Algunos de los datos introducidos no son válidos."
+      "VALIDATION_FAILED": "Algunos de los datos introducidos no son válidos.",
+      "ACCOUNTS_CLIENT_001": "No hemos podido cargar tus cuentas.",
+      "ACCOUNTS_CLIENT_002": "No hemos podido guardar la cuenta.",
+      "ACCOUNTS_CLIENT_003": "No hemos podido cambiar de cuenta.",
+      "ACCOUNTS_CLIENT_004": "No hemos podido quitar la cuenta.",
+      "ACCOUNTS_CLIENT_005": "No hemos podido cargar el uso de tokens."
     }
   },
   "auth": {
@@ -247,14 +252,156 @@
       "invalidCode": "Ese código no es correcto."
     }
   },
-  "dashboard": {
-    "title": "Panel",
-    "welcome": "Bienvenido de nuevo, {{name}}.",
-    "gettingStarted": "Primeros pasos",
-    "gettingStartedDescription": "Este es un panel de ejemplo. Conecta tus datos y personalízalo.",
-    "accountStatus": "Tu rol es <role>{{role}}</role> y tu cuenta está <status>{{status}}</status>.",
-    "active": "activa",
-    "inactive": "inactiva"
+  "accounts": {
+    "attention": {
+      "behind": "Por debajo del ritmo",
+      "detail": "Queda {{left}} · se renueva {{reset}}",
+      "empty": "Nada requiere tu atención ahora.",
+      "expiring": "Úsala antes de que se renueve",
+      "limit": "En su límite",
+      "signin": "Vuelve a iniciar sesión",
+      "signinHint": "Esta sesión dejó de informar.",
+      "title": "Requiere atención"
+    },
+    "desktop": {
+      "add": "Añadir {{provider}}",
+      "addFailed": "El inicio de sesión no terminó.",
+      "lastSync": "Última sincronización {{when}}",
+      "never": "nunca",
+      "phase": {
+        "collecting": "Leyendo las sesiones de este ordenador…",
+        "error": "La última sincronización falló",
+        "idle_one": "{{count}} sesión en este ordenador",
+        "idle_other": "{{count}} sesiones en este ordenador",
+        "signed_out": "Vuelve a iniciar sesión para seguir sincronizando",
+        "syncing": "Sincronizando…"
+      },
+      "refresh": "Actualizar"
+    },
+    "edit": {
+      "description": "Ponle nombre e indica el plan y el precio que pagas de verdad.",
+      "label": "Nombre",
+      "plan": "Plan",
+      "planAuto": "El informado ({{plan}})",
+      "price": "Precio mensual (USD)",
+      "pricePlaceholder": "El precio de lista del plan",
+      "title": "Editar cuenta"
+    },
+    "list": {
+      "sub": "Todas las sesiones que sigue Subtrack y cuál usa tu terminal.",
+      "title": "Cuentas"
+    },
+    "models": {
+      "cacheRead": "Lectura de caché",
+      "cost": "A precio de API",
+      "empty": "No hay tokens en este periodo.",
+      "input": "Entrada",
+      "model": "Modelo",
+      "output": "Salida",
+      "share": "Proporción",
+      "title": "Por modelo"
+    },
+    "overview": {
+      "accountCount_one": "{{count}} cuenta",
+      "accountCount_other": "{{count}} cuentas",
+      "accounts": "Cuentas",
+      "apiValue": "{{value}} a precio de API, 30 días",
+      "greeting": "Hola, {{name}}",
+      "monthlySpend": "Gasto mensual",
+      "runRate": "Gasto anual",
+      "sub": "Cómo van tus planes de IA",
+      "valuePerDollar": "Valor por dólar",
+      "wasted": "Caducado sin usar",
+      "wastedHint": "Cuota semanal sobrante al renovarse, últimos 30 días"
+    },
+    "pace": {
+      "ahead": "Por delante",
+      "behind": "Por debajo",
+      "expiring": "Caduca pronto",
+      "limit": "En el límite",
+      "on_pace": "Al ritmo",
+      "unknown": "Sin datos"
+    },
+    "queue": {
+      "description": "Úsalas de arriba abajo. La marca indica dónde estaría un ritmo uniforme durante la semana.",
+      "left": "Queda",
+      "neededPace": "Ritmo necesario",
+      "perDay": "{{value}} %/día",
+      "resets": "Se renueva",
+      "title": "Cola",
+      "usage": "Usado esta semana"
+    },
+    "remove": {
+      "confirm": "Quitar",
+      "description": "Subtrack deja de seguirla y la ignora en las próximas sincronizaciones. La sesión en sí no se toca.",
+      "title": "¿Quitar {{name}}?"
+    },
+    "resets": {
+      "empty": "Aún no se ha informado de ninguna renovación semanal.",
+      "left": "Queda {{left}}",
+      "title": "Próximas renovaciones"
+    },
+    "settings": {
+      "browserDescription": "Cambiar la cuenta de la terminal y los límites en directo actúan sobre tu ordenador, así que están en la app de escritorio de Subtrack.",
+      "browserTitle": "Abre la app de escritorio",
+      "liveDescription": "Claude Code informa de tus límites a Subtrack mientras trabajas, mediante su línea de estado. Desactivado por defecto y nunca sustituye una línea de estado que ya tengas.",
+      "liveNone": "No se han encontrado carpetas de Claude Code en este ordenador.",
+      "liveTaken": "Esta carpeta ya tiene su propia línea de estado.",
+      "liveTitle": "Límites en directo de Claude Code",
+      "liveToggle": "Límites en directo para {{home}}",
+      "shellDescription": "Hace que claude y codex en tu terminal usen la cuenta que esté activada.",
+      "shellInstall": "Añadir a mi shell",
+      "shellInstalled": "Instalado en {{file}}",
+      "shellNotInstalled": "No instalado",
+      "shellTitle": "Integración con la terminal"
+    },
+    "table": {
+      "account": "Cuenta",
+      "cost": "Mensual",
+      "edit": "Editar",
+      "empty": "Aún no hay cuentas. Abre la app de escritorio para encontrar las sesiones de tu ordenador.",
+      "inUse": "En uso",
+      "provider": "Proveedor",
+      "remove": "Quitar",
+      "session": "Sesión",
+      "status": "Estado",
+      "useAccount": "Usar {{name}} en las terminales",
+      "weekly": "Semanal"
+    },
+    "tokenmaxx": {
+      "atLimit": "En su límite",
+      "averageUsed": "Media usada esta semana",
+      "expiringHint": "Margen en cuentas que se renuevan en menos de un día",
+      "expiringSoon": "Caduca en 24 h",
+      "inUse": "En uso",
+      "nothingUsable": "Todas las cuentas están en un límite o necesitan iniciar sesión.",
+      "pickLine": "Queda {{left}} · se renueva {{reset}}",
+      "reason": {
+        "expiring_soon": "Su semana se renueva pronto con mucho margen: úsala o piérdela.",
+        "most_headroom": "El mayor margen para el tiempo que queda hasta renovarse.",
+        "only_available": "La única cuenta que no está en un límite ahora."
+      },
+      "sub": "Usa lo que pagas antes de que se renueve.",
+      "title": "Tokenmaxx",
+      "usable": "Disponibles ahora",
+      "useNext": "Usar a continuación",
+      "useThis": "Usar esta cuenta"
+    },
+    "usage": {
+      "apiValue": "A precio de API",
+      "dailyValue": "Valor diario a precio de API",
+      "messages": "Mensajes",
+      "notEnough": "Aún no hay días suficientes para dibujar una tendencia.",
+      "paid": "Los planes costaron {{value}} en estos días",
+      "period": "{{days}} días",
+      "sub": "Tokens de todas las cuentas, últimos {{days}} días",
+      "title": "Uso y tokens",
+      "tokens": "Tokens"
+    },
+    "value": {
+      "bar": "Valor de {{name}}",
+      "title": "Lo que pagarías a precio de API"
+    }
   },
   "home": {
     "greeting": "Hola de nuevo, {{name}}",
@@ -282,7 +429,7 @@
   },
   "nav": {
     "menu": "Menú",
-    "dashboard": "Panel",
+    "dashboard": "Resumen",
     "logOut": "Cerrar sesión",
     "commandEmpty": "Sin resultados.",
     "commandPlaceholder": "Busca páginas y acciones…",
@@ -295,7 +442,10 @@
     "users": "Usuarios",
     "roles": "Roles",
     "toggleSidebar": "Mostrar u ocultar el menú",
-    "viewProfile": "Ver perfil"
+    "viewProfile": "Ver perfil",
+    "accounts": "Cuentas",
+    "tokenmaxx": "Tokenmaxx",
+    "usage": "Uso y tokens"
   },
   "control": {
     "accessDeniedTitle": "Se necesita acceso al panel de control",
@@ -863,7 +1013,8 @@
       "integrations": "Integraciones",
       "label": "Secciones de configuración",
       "notifications": "Notificaciones",
-      "security": "Seguridad"
+      "security": "Seguridad",
+      "desktop": "Este ordenador"
     },
     "security": {
       "description": "Todos los dispositivos con sesión iniciada en tu cuenta, y una forma de cerrar cualquiera de ellas.",
@@ -895,7 +1046,9 @@
     "membersInvited": "Invitaciones enviadas.",
     "passwordChanged": "Contraseña actualizada. Se ha cerrado la sesión en tus otros dispositivos.",
     "twoFactorEnabled": "La verificación en dos pasos está activada.",
-    "twoFactorDisabled": "La verificación en dos pasos está desactivada."
+    "twoFactorDisabled": "La verificación en dos pasos está desactivada.",
+    "accountAdded": "Cuenta añadida",
+    "accountSaved": "Cuenta guardada"
   },
   "emails": {
     "common": {

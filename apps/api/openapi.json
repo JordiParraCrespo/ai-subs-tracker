@@ -1006,7 +1006,7 @@
     },
     "/api/v1/accounts": {
       "get": {
-        "operationId": "findAll",
+        "operationId": "listAccounts",
         "parameters": [],
         "responses": {
           "200": {
@@ -1054,7 +1054,7 @@
     },
     "/api/v1/accounts/usage": {
       "get": {
-        "operationId": "summary",
+        "operationId": "getUsageSummary",
         "parameters": [
           {
             "name": "days",
@@ -1112,7 +1112,7 @@
     "/api/v1/accounts/sync": {
       "post": {
         "description": "Never carries a credential. Answers with every tracked account.",
-        "operationId": "sync",
+        "operationId": "syncAccounts",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -1170,7 +1170,7 @@
     },
     "/api/v1/accounts/{id}": {
       "patch": {
-        "operationId": "update",
+        "operationId": "updateAccount",
         "parameters": [
           {
             "name": "id",
@@ -1242,7 +1242,7 @@
         "tags": ["Accounts"]
       },
       "delete": {
-        "operationId": "archive",
+        "operationId": "archiveAccount",
         "parameters": [
           {
             "name": "id",
@@ -1300,7 +1300,7 @@
     "/api/v1/accounts/{id}/activate": {
       "post": {
         "description": "Deactivates the owner’s other accounts of the same provider. Answers with every account.",
-        "operationId": "activate",
+        "operationId": "activateAccount",
         "parameters": [
           {
             "name": "id",

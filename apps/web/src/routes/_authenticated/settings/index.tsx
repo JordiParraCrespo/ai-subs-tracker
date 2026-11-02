@@ -1,9 +1,10 @@
-import { ShieldCheck } from '@flama/design-system-web/icons';
+import { Monitor, ShieldCheck } from '@flama/design-system-web/icons';
 import { PageHead, SectionNav } from '@flama/frontend-web';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 // flama:begin organizations
 // flama:end organizations
+import { DesktopSettings } from '@/features/accounts/sections/desktop-settings';
 import { SecuritySection } from '@/features/profile/sections/security';
 
 /**
@@ -14,6 +15,7 @@ const SECTIONS = [
   // flama:begin organizations
   // flama:end organizations
   { key: 'security', icon: ShieldCheck, Pane: SecuritySection },
+  { key: 'desktop', icon: Monitor, Pane: DesktopSettings },
 ] as const;
 
 type SectionKey = (typeof SECTIONS)[number]['key'];

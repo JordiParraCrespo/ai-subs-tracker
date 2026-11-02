@@ -1,6 +1,6 @@
 {
   "menu": "Menu",
-  "dashboard": "Dashboard",
+  "dashboard": "Overview",
   "logOut": "Log out",
   "commandEmpty": "No matches.",
   "commandPlaceholder": "Search pages and actions…",
@@ -13,5 +13,8 @@
   "users": "Users",
   "roles": "Roles",
   "toggleSidebar": "Toggle sidebar",
-  "viewProfile": "View profile"
+  "viewProfile": "View profile",
+  "accounts": "Accounts",
+  "tokenmaxx": "Tokenmaxx",
+  "usage": "Usage & tokens"
 }

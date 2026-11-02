@@ -29,7 +29,10 @@ export class ArchiveAccountHttpController {
   @NoPolicy('removes one of the caller’s own accounts; ownership is checked on load')
   @Version('1')
   @RequireScopes('accounts:write')
-  @ApiOperation({ summary: 'Stop tracking an account' })
+  @ApiOperation({
+    operationId: 'archiveAccount',
+    summary: 'Stop tracking an account',
+  })
   @ApiResponse({ status: 204 })
   @ApiProblemResponse({ status: 404, description: 'Account not found', code: 'ACCOUNT_001' })
   async archive(

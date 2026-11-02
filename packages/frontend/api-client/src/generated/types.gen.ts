@@ -1065,14 +1065,14 @@ export type CatalogResponses = {
 
 export type CatalogResponse = CatalogResponses[keyof CatalogResponses];
 
-export type FindAll2Data = {
+export type ListAccountsData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/api/v1/accounts';
 };
 
-export type FindAll2Errors = {
+export type ListAccountsErrors = {
     /**
      * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
      */
@@ -1083,15 +1083,15 @@ export type FindAll2Errors = {
     403: ProblemDetailsDto;
 };
 
-export type FindAll2Error = FindAll2Errors[keyof FindAll2Errors];
+export type ListAccountsError = ListAccountsErrors[keyof ListAccountsErrors];
 
-export type FindAll2Responses = {
+export type ListAccountsResponses = {
     200: Array<AccountResponseDto>;
 };
 
-export type FindAll2Response = FindAll2Responses[keyof FindAll2Responses];
+export type ListAccountsResponse = ListAccountsResponses[keyof ListAccountsResponses];
 
-export type SummaryData = {
+export type GetUsageSummaryData = {
     body?: never;
     path?: never;
     query?: {
@@ -1100,7 +1100,7 @@ export type SummaryData = {
     url: '/api/v1/accounts/usage';
 };
 
-export type SummaryErrors = {
+export type GetUsageSummaryErrors = {
     /**
      * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
      */
@@ -1111,22 +1111,22 @@ export type SummaryErrors = {
     403: ProblemDetailsDto;
 };
 
-export type SummaryError = SummaryErrors[keyof SummaryErrors];
+export type GetUsageSummaryError = GetUsageSummaryErrors[keyof GetUsageSummaryErrors];
 
-export type SummaryResponses = {
+export type GetUsageSummaryResponses = {
     200: UsageSummaryResponseDto;
 };
 
-export type SummaryResponse = SummaryResponses[keyof SummaryResponses];
+export type GetUsageSummaryResponse = GetUsageSummaryResponses[keyof GetUsageSummaryResponses];
 
-export type SyncData = {
+export type SyncAccountsData = {
     body: SyncAccountsRequest;
     path?: never;
     query?: never;
     url: '/api/v1/accounts/sync';
 };
 
-export type SyncErrors = {
+export type SyncAccountsErrors = {
     /**
      * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
      */
@@ -1137,15 +1137,15 @@ export type SyncErrors = {
     403: ProblemDetailsDto;
 };
 
-export type SyncError = SyncErrors[keyof SyncErrors];
+export type SyncAccountsError = SyncAccountsErrors[keyof SyncAccountsErrors];
 
-export type SyncResponses = {
+export type SyncAccountsResponses = {
     200: Array<AccountResponseDto>;
 };
 
-export type SyncResponse = SyncResponses[keyof SyncResponses];
+export type SyncAccountsResponse = SyncAccountsResponses[keyof SyncAccountsResponses];
 
-export type ArchiveData = {
+export type ArchiveAccountData = {
     body?: never;
     path: {
         id: string;
@@ -1154,7 +1154,7 @@ export type ArchiveData = {
     url: '/api/v1/accounts/{id}';
 };
 
-export type ArchiveErrors = {
+export type ArchiveAccountErrors = {
     /**
      * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
      */
@@ -1169,15 +1169,15 @@ export type ArchiveErrors = {
     404: ProblemDetailsDto;
 };
 
-export type ArchiveError = ArchiveErrors[keyof ArchiveErrors];
+export type ArchiveAccountError = ArchiveAccountErrors[keyof ArchiveAccountErrors];
 
-export type ArchiveResponses = {
+export type ArchiveAccountResponses = {
     204: void;
 };
 
-export type ArchiveResponse = ArchiveResponses[keyof ArchiveResponses];
+export type ArchiveAccountResponse = ArchiveAccountResponses[keyof ArchiveAccountResponses];
 
-export type Update2Data = {
+export type UpdateAccountData = {
     body: UpdateAccountRequest;
     path: {
         id: string;
@@ -1186,7 +1186,7 @@ export type Update2Data = {
     url: '/api/v1/accounts/{id}';
 };
 
-export type Update2Errors = {
+export type UpdateAccountErrors = {
     /**
      * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
      */
@@ -1201,15 +1201,15 @@ export type Update2Errors = {
     404: ProblemDetailsDto;
 };
 
-export type Update2Error = Update2Errors[keyof Update2Errors];
+export type UpdateAccountError = UpdateAccountErrors[keyof UpdateAccountErrors];
 
-export type Update2Responses = {
+export type UpdateAccountResponses = {
     200: AccountResponseDto;
 };
 
-export type Update2Response = Update2Responses[keyof Update2Responses];
+export type UpdateAccountResponse = UpdateAccountResponses[keyof UpdateAccountResponses];
 
-export type ActivateData = {
+export type ActivateAccountData = {
     body?: never;
     path: {
         id: string;
@@ -1218,7 +1218,7 @@ export type ActivateData = {
     url: '/api/v1/accounts/{id}/activate';
 };
 
-export type ActivateErrors = {
+export type ActivateAccountErrors = {
     /**
      * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
      */
@@ -1233,15 +1233,15 @@ export type ActivateErrors = {
     404: ProblemDetailsDto;
 };
 
-export type ActivateError = ActivateErrors[keyof ActivateErrors];
+export type ActivateAccountError = ActivateAccountErrors[keyof ActivateAccountErrors];
 
-export type ActivateResponses = {
+export type ActivateAccountResponses = {
     200: Array<AccountResponseDto>;
 };
 
-export type ActivateResponse = ActivateResponses[keyof ActivateResponses];
+export type ActivateAccountResponse = ActivateAccountResponses[keyof ActivateAccountResponses];
 
-export type FindAll3Data = {
+export type FindAll2Data = {
     body?: never;
     path?: never;
     query?: {
@@ -1261,7 +1261,7 @@ export type FindAll3Data = {
     url: '/api/v1/roles';
 };
 
-export type FindAll3Errors = {
+export type FindAll2Errors = {
     /**
      * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
      */
@@ -1272,13 +1272,13 @@ export type FindAll3Errors = {
     403: ProblemDetailsDto;
 };
 
-export type FindAll3Error = FindAll3Errors[keyof FindAll3Errors];
+export type FindAll2Error = FindAll2Errors[keyof FindAll2Errors];
 
-export type FindAll3Responses = {
+export type FindAll2Responses = {
     200: PaginatedRolesResponseDto;
 };
 
-export type FindAll3Response = FindAll3Responses[keyof FindAll3Responses];
+export type FindAll2Response = FindAll2Responses[keyof FindAll2Responses];
 
 export type CreateData = {
     body: CreateRoleRequest;
@@ -1376,7 +1376,7 @@ export type FindOne2Responses = {
 
 export type FindOne2Response = FindOne2Responses[keyof FindOne2Responses];
 
-export type Update3Data = {
+export type Update2Data = {
     body: UpdateRoleRequest;
     path: {
         id: string;
@@ -1385,7 +1385,7 @@ export type Update3Data = {
     url: '/api/v1/roles/{id}';
 };
 
-export type Update3Errors = {
+export type Update2Errors = {
     /**
      * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
      */
@@ -1400,13 +1400,13 @@ export type Update3Errors = {
     404: ProblemDetailsDto;
 };
 
-export type Update3Error = Update3Errors[keyof Update3Errors];
+export type Update2Error = Update2Errors[keyof Update2Errors];
 
-export type Update3Responses = {
+export type Update2Responses = {
     200: RoleResponseDto;
 };
 
-export type Update3Response = Update3Responses[keyof Update3Responses];
+export type Update2Response = Update2Responses[keyof Update2Responses];
 
 export type UpdatePermissionsData = {
     body: UpdateRolePermissionsRequest;

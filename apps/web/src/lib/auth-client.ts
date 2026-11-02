@@ -6,6 +6,7 @@ import {
 } from '@flama/auth/client';
 import type { IAuthClient } from '@flama/frontend-core';
 import { TwoFactorRequiredError } from '@flama/frontend-core/react';
+import { desktopBridge as desktop } from '@flama/frontend-web';
 import { createAuthClient } from 'better-auth/react';
 
 /**
@@ -15,7 +16,28 @@ import { createAuthClient } from 'better-auth/react';
  * API, keeping web and API same-origin so the cookie is sent without
  * cross-site restrictions.
  */
-const apiBaseUrl = import.meta.env.VITE_API_URL ?? '';
+const apiBaseUrl = desktop?.apiUrl ?? import.meta.env.VITE_API_URL ?? '';
+
+/**
+ * Inside the desktop app the screens are served from `app://subtrack`, a
+ * different origin from the API, so the session is a bearer token instead of
+ * a cookie: the API hands it back in `set-auth-token` on sign-in, and the
+ * desktop shell keeps it encrypted (`DesktopBridge.auth`). This holds the one
+ * copy the page reads per request.
+ */
+let desktopToken: string | null | undefined;
+
+async function currentDesktopToken(): Promise<string | null> {
+  if (!desktop) return null;
+  if (desktopToken === undefined) desktopToken = await desktop.auth.getToken();
+  return desktopToken;
+}
+
+async function rememberDesktopToken(token: string | null): Promise<void> {
+  if (!desktop) return;
+  desktopToken = token;
+  await desktop.auth.setToken(token);
+}
 
 /**
  * Better Auth rejects a relative `baseURL`, but same-origin is this app's
@@ -32,6 +54,15 @@ export const authClient = createAuthClient({
   // The shared plugin set (additional user fields, admin, organizations) comes
   // from @flama/auth so the client types stay in lockstep with the server.
   plugins: [...sharedClientPlugins()],
+  fetchOptions: desktop
+    ? {
+        auth: { type: 'Bearer', token: async () => (await currentDesktopToken()) ?? undefined },
+        onSuccess: async (context) => {
+          const token = context.response.headers.get('set-auth-token');
+          if (token) await rememberDesktopToken(token);
+        },
+      }
+    : undefined,
 });
 
 export const webAuthClient: IAuthClient = {
@@ -111,6 +142,7 @@ export const webAuthClient: IAuthClient = {
 
   async signOut() {
     await authClient.signOut();
+    await rememberDesktopToken(null);
   },
 
   async forgotPassword(email) {
@@ -143,8 +175,10 @@ export const webAuthClient: IAuthClient = {
     return toAuthSession(await authClient.getSession());
   },
 
-  // On web the browser sends the session cookie automatically.
-  async getAuthHeaders() {
-    return {};
+  // On web the browser sends the session cookie automatically; the desktop
+  // app sends its bearer token.
+  async getAuthHeaders(): Promise<Record<string, string>> {
+    const token = await currentDesktopToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
   },
 };

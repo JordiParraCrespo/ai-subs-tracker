@@ -28,6 +28,7 @@ export class GetUsageSummaryHttpController {
   @Version('1')
   @RequireScopes('accounts:read')
   @ApiOperation({
+    operationId: 'getUsageSummary',
     summary: 'Tokens used across my accounts, by model, account and day, priced at API rates',
   })
   @ApiResponse({ status: 200, type: UsageSummaryResponseDto })

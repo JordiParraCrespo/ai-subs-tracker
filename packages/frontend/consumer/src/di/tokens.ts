@@ -11,6 +11,8 @@ export const TOKENS = {
   // flama:end api-tokens
   // flama:begin organizations
   // flama:end organizations
+  AccountsRepository: Symbol.for('AccountsRepository'),
+  AccountsService: Symbol.for('AccountsService'),
   ProfileRepository: Symbol.for('ProfileRepository'),
   ProfileService: Symbol.for('ProfileService'),
 } as const;

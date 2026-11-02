@@ -1,10 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { DashboardScreen } from '@/features/dashboard/screens/dashboard';
+import { OverviewScreen } from '@/features/accounts/screens/overview';
 
 export const Route = createFileRoute('/_authenticated/dashboard')({
-  component: DashboardPage,
+  component: OverviewScreen,
 });
-
-function DashboardPage() {
-  return <DashboardScreen />;
-}

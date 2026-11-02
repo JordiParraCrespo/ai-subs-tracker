@@ -38,6 +38,7 @@ export class ActivateAccountHttpController {
   @Version('1')
   @RequireScopes('accounts:write')
   @ApiOperation({
+    operationId: 'activateAccount',
     summary: 'Make this the account terminals use for its provider',
     description:
       'Deactivates the owner’s other accounts of the same provider. Answers with every account.',

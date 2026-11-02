@@ -74,6 +74,11 @@
     "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "Ya existe una cuenta con ese correo electrónico.",
     "USER_EMAIL_NOT_FOUND": "No se ha encontrado ninguna cuenta con ese correo electrónico.",
     "USER_NOT_FOUND": "No se ha encontrado ninguna cuenta con ese correo electrónico.",
-    "VALIDATION_FAILED": "Algunos de los datos introducidos no son válidos."
+    "VALIDATION_FAILED": "Algunos de los datos introducidos no son válidos.",
+    "ACCOUNTS_CLIENT_001": "No hemos podido cargar tus cuentas.",
+    "ACCOUNTS_CLIENT_002": "No hemos podido guardar la cuenta.",
+    "ACCOUNTS_CLIENT_003": "No hemos podido cambiar de cuenta.",
+    "ACCOUNTS_CLIENT_004": "No hemos podido quitar la cuenta.",
+    "ACCOUNTS_CLIENT_005": "No hemos podido cargar el uso de tokens."
   }
 }

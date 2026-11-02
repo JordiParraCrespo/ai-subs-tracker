@@ -2,6 +2,7 @@ import '@flama/env/load';
 import { randomUUID } from 'node:crypto';
 // flama:plugins auth-imports
 import { userAdditionalFields } from '@flama/auth';
+import { DESKTOP_RENDERER_ORIGIN } from '@flama/shared/desktop';
 import { Logger } from '@nestjs/common';
 import { betterAuth } from 'better-auth';
 import { admin, bearer, twoFactor } from 'better-auth/plugins';
@@ -10,6 +11,7 @@ import { Pool } from 'pg';
 import { orUndefined } from '../../config/env';
 import { emailQueue, enqueueEmailBestEffort } from './email-queue.util';
 import { accountLinking, socialProviders } from './oauth-providers.config';
+
 // flama:plugins auth-plugin-imports
 
 // flama:begin organizations
@@ -78,6 +80,8 @@ export const auth = betterAuth({
   database: pool,
   trustedOrigins: [
     frontendUrl,
+    // The desktop app signs in from its own scheme, with a bearer token.
+    DESKTOP_RENDERER_ORIGIN,
     // flama:plugins trusted-origins
   ],
   // Brute-force protection on the auth surface. `/api/auth/*` is mounted on the

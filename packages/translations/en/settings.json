@@ -16,7 +16,8 @@
     "integrations": "Integrations",
     "label": "Settings sections",
     "notifications": "Notifications",
-    "security": "Security"
+    "security": "Security",
+    "desktop": "This computer"
   },
   "security": {
     "description": "Every device signed in to your account, and a way to end any of them.",
