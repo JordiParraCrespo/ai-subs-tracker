@@ -1,8 +1,8 @@
 import { cn } from '@flama/design-system-web';
 
 /**
- * The heading block every workspace page opens with: 24px title, a line of
- * secondary copy, and an optional action parked on the right.
+ * The heading every page opens with (the design's page header): a 20px title,
+ * a 14px muted line under it, and an optional action on the right.
  */
 export function PageHead({
   title,
@@ -16,12 +16,12 @@ export function PageHead({
   className?: string;
 }) {
   return (
-    <div className={cn('mb-8 flex flex-wrap items-start justify-between gap-4', className)}>
-      <div className="min-w-60 flex-[1_1_320px]">
-        <h1 className="mb-1.5 font-sans text-2xl font-medium text-ink-900">{title}</h1>
-        {sub && <p className="text-base text-pretty text-ink-600">{sub}</p>}
+    <header className={cn('mb-6 flex flex-wrap items-center justify-between gap-4', className)}>
+      <div className="flex min-w-60 flex-[1_1_320px] flex-col gap-1">
+        <h1 className="text-xl font-medium tracking-tight text-ink-900">{title}</h1>
+        {sub && <p className="text-sm text-pretty text-ink-600">{sub}</p>}
       </div>
       {action && <div className="flex-none">{action}</div>}
-    </div>
+    </header>
   );
 }

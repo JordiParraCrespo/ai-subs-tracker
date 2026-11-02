@@ -1,7 +1,7 @@
 import {
   Activity,
+  CreditCard,
   Flame,
-  Layers,
   LayoutDashboard,
   Settings,
   UserRound,
@@ -23,10 +23,9 @@ import type { NavItem, NavLink } from '@flama/frontend-web';
  */
 export const NAV = [
   { to: '/dashboard', icon: LayoutDashboard, labelKey: 'dashboard', policies: [] },
-  { to: '/accounts', icon: Layers, labelKey: 'accounts', policies: [] },
-  { to: '/tokenmaxx', icon: Flame, labelKey: 'tokenmaxx', policies: [] },
+  { to: '/accounts', icon: CreditCard, labelKey: 'accounts', policies: [] },
   { to: '/usage', icon: Activity, labelKey: 'usage', policies: [] },
-  { to: '/settings', icon: Settings, labelKey: 'settings', policies: [] },
+  { to: '/tokenmaxx', icon: Flame, labelKey: 'tokenmaxx', policies: [] },
 ] as const satisfies readonly NavItem[];
 
 /** The account menu's own destinations, above the language list. */

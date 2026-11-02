@@ -443,7 +443,7 @@
     "roles": "Roles",
     "toggleSidebar": "Mostrar u ocultar el menú",
     "viewProfile": "Ver perfil",
-    "accounts": "Cuentas",
+    "accounts": "Suscripciones",
     "tokenmaxx": "Tokenmaxx",
     "usage": "Uso y tokens"
   },
@@ -1038,7 +1038,9 @@
     "selected_other": "{{count}} seleccionados"
   },
   "theme": {
-    "toggle": "Cambiar tema"
+    "toggle": "Cambiar tema",
+    "switchToLight": "Cambiar al tema claro",
+    "switchToDark": "Cambiar al tema oscuro"
   },
   "toasts": {
     "copied": "Copiado al portapapeles.",

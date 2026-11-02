@@ -183,7 +183,7 @@ test.describe('the profile form', () => {
       hero(page).getByRole('heading', { name: `Renamed ${user.lastName}` }),
     ).toBeVisible();
     await expect(
-      page.locator('[data-sidebar=menu-button]').getByText(`Renamed ${user.lastName}`),
+      page.getByRole('button', { name: 'Profile' }).getByText(`Renamed ${user.lastName}`),
     ).toBeVisible();
 
     // A cleared optional field is `null` over the wire, not `""` — the API

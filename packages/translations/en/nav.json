@@ -1,7 +1,7 @@
 {
   "menu": "Menu",
   "dashboard": "Overview",
-  "logOut": "Log out",
+  "logOut": "Sign out",
   "commandEmpty": "No matches.",
   "commandPlaceholder": "Search pages and actions…",
   "goTo": "Go to",
@@ -14,7 +14,7 @@
   "roles": "Roles",
   "toggleSidebar": "Toggle sidebar",
   "viewProfile": "View profile",
-  "accounts": "Accounts",
+  "accounts": "Subscriptions",
   "tokenmaxx": "Tokenmaxx",
   "usage": "Usage & tokens"
 }

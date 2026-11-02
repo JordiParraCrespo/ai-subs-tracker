@@ -6,7 +6,6 @@ export {
 export { AppShell } from './components/app-shell';
 export { AppSidebar } from './components/app-sidebar';
 export { CommandPalette } from './components/command-palette';
-export { TopBar } from './components/top-bar';
 export { UserMenu } from './components/user-menu';
 export { useAuthorizedNav, useLandingRoute } from './hooks/use-authorized-nav';
 export { useHotkey } from './hooks/use-hotkey';

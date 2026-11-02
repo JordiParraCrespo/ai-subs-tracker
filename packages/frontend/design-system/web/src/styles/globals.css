@@ -42,6 +42,17 @@
   src: url("./fonts/SF-Pro-Display-Medium.woff2") format("woff2");
 }
 
+/* Figtree — the Subtrack design's typeface (designs/_ds), self-hosted.
+   One variable file covers every weight the design uses (500/600/700); Latin
+   subset from Google Fonts. Licence: SIL Open Font License 1.1. */
+@font-face {
+  font-family: "Figtree";
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url("./fonts/Figtree-Variable.woff2") format("woff2");
+}
+
 /* =============================================================================
    Flama design tokens — Subtrack (ported from designs/_ds, the dashboard design system)
    =============================================================================
@@ -75,6 +86,23 @@
     /* App shell — the product runs on white, chrome separated by hairlines */
     --app-bg: #ffffff;
     --chrome-bg: #fafafa;
+
+    /* The app frame (designs/_ds): the sidebar sits on the frame, the page in
+       a rounded panel inset from it. The sidebar stays dark in both themes,
+       so its inks are fixed rather than aliased onto the inverting ones. */
+    --frame-bg: #262626;
+    --panel-bg: #ffffff;
+    --panel-outline: #e5e5e5;
+    --sidebar-ink: #d4d4d4;
+    --sidebar-ink-active: #ffffff;
+    --sidebar-ink-muted: #a1a1a1;
+    --sidebar-fill: rgba(255, 255, 255, 0.06);
+    --sidebar-field: rgba(255, 255, 255, 0.02);
+    --sidebar-outline: rgba(255, 255, 255, 0.05);
+    --sidebar-tile: rgba(255, 255, 255, 0.03);
+    --sidebar-tile-outline: rgba(255, 255, 255, 0.06);
+    --brand: #7764d8;
+    --on-brand: #ffffff;
 
     /* The email body frame — surface, and the little chrome the frame supplies
        around a sender's own markup.
@@ -174,13 +202,11 @@
     /* The self-hosted faces lead; the system stack is the fallback while they
        load and on anything that cannot fetch them. */
     --font-brand:
-      "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue",
-      "Segoe UI", system-ui, sans-serif;
+      "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
+      sans-serif;
     /* The display cut, for 24px and up. */
-    --font-brand-display:
-      "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont,
-      system-ui, sans-serif;
-    --tracking-brand: -0.15px;
+    --font-brand-display: var(--font-brand);
+    --tracking-brand: 0;
 
     /* The brand names its four sizes by their pixel value. These are the same
        values the Tailwind scale exposes as text-xs/sm/base/2xl — kept because
@@ -255,6 +281,11 @@
     --app-bg: #1f1f1f;
     --chrome-bg: #171717;
 
+    --frame-bg: #171717;
+    --panel-bg: #1f1f1f;
+    --panel-outline: rgba(255, 255, 255, 0.05);
+    --sidebar-fill: rgba(255, 255, 255, 0.03);
+
     /* Knob and active icon deliberately unchanged — see the light block. */
     --theme-toggle-icon-idle: rgba(201, 201, 205, 0.7);
 
@@ -307,36 +338,37 @@
   /* ---- Fonts --------------------------------------------------------- */
   --font-sans: var(--font-brand);
 
-  /* ---- Type scale — the brand lives in 12 / 13 / 14 / 24 --------------
-     Sizes only: no paired line-height. In this system a size does not imply a
-     leading — most UI text is a single line and wants the font's natural
-     `normal`, while prose opts in with `leading-normal` (1.5). Pairing them
-     would silently inflate every control and list row by a few pixels.       */
+  /* ---- Type scale — the design's (designs/_ds/tokens/typography.css) --
+     Each size carries the line height the design pairs with it: captions
+     12/16, labels 14/20, body 16/24, page titles 20/28, card titles 18/24
+     use lg with a leading override where they differ.                      */
   --text-xs: 12px;
-  --text-xs--line-height: initial;
-  --text-sm: 13px;
-  --text-sm--line-height: initial;
-  --text-base: 14px;
-  --text-base--line-height: initial;
-  --text-lg: 16px;
-  --text-lg--line-height: initial;
+  --text-xs--line-height: 16px;
+  --text-sm: 14px;
+  --text-sm--line-height: 20px;
+  --text-base: 16px;
+  --text-base--line-height: 24px;
+  --text-lg: 18px;
+  --text-lg--line-height: 28px;
   --text-xl: 20px;
-  --text-xl--line-height: initial;
+  --text-xl--line-height: 28px;
   --text-2xl: 24px;
-  --text-2xl--line-height: initial;
+  --text-2xl--line-height: 32px;
   --text-3xl: 30px;
-  --text-3xl--line-height: initial;
+  --text-3xl--line-height: 36px;
+  --text-4xl: 36px;
+  --text-4xl--line-height: 40px;
 
   /* ---- Leading — applied deliberately, never implied by a size --------- */
   --leading-tight: 1.25;
   --leading-snug: 1.35;
   --leading-normal: 1.5;
 
-  /* ---- Weights — the brand only ships 400 and 500 --------------------- */
+  /* ---- Weights — Figtree: running text 500, titles 600, amounts 700 ----- */
   --font-weight-normal: 400;
   --font-weight-medium: 500;
-  --font-weight-semibold: 500;
-  --font-weight-bold: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
   /* ---- Tracking ------------------------------------------------------- */
   --tracking-normal: var(--tracking-brand);
@@ -371,6 +403,19 @@
   --shadow-2xl: var(--elevation-modal);
 
   /* ---- Brand colours as utilities (bg-ink-900, text-accent-blue, …) --- */
+  --color-frame: var(--frame-bg);
+  --color-panel: var(--panel-bg);
+  --color-panel-outline: var(--panel-outline);
+  --color-sidebar-ink: var(--sidebar-ink);
+  --color-sidebar-ink-active: var(--sidebar-ink-active);
+  --color-sidebar-ink-muted: var(--sidebar-ink-muted);
+  --color-sidebar-fill: var(--sidebar-fill);
+  --color-sidebar-field: var(--sidebar-field);
+  --color-sidebar-outline: var(--sidebar-outline);
+  --color-sidebar-tile: var(--sidebar-tile);
+  --color-sidebar-tile-outline: var(--sidebar-tile-outline);
+  --color-brand: var(--brand);
+  --color-on-brand: var(--on-brand);
   --color-ink-900: var(--ink-900);
   --color-ink-600: var(--ink-600);
   --color-ink-400: var(--ink-400);
@@ -498,8 +543,9 @@
        overwhelmingly single-line, so the default is the font's natural
        leading; prose opts in with `leading-normal`. */
     line-height: normal;
-    font-size: var(--text-base, 14px);
-    font-weight: 400;
+    font-size: var(--text-sm, 14px);
+    /* The design's running text is 500; titles 600. */
+    font-weight: 500;
     letter-spacing: var(--tracking-brand);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

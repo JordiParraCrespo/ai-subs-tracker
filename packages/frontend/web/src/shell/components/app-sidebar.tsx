@@ -1,96 +1,99 @@
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from '@flama/design-system-web';
+import { cn, Kbd } from '@flama/design-system-web';
+import { PanelLeft, Search } from '@flama/design-system-web/icons';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useAuthorizedNav } from '../hooks/use-authorized-nav';
-import { useShell } from '../hooks/use-shell';
 import { UserMenu } from './user-menu';
 
-function workspaceInitial(name: string): string {
-  return name.trim().charAt(0).toUpperCase() || '—';
-}
-
 /**
- * The workspace sidebar: brand row, the nav, and the user menu pinned to the
- * bottom. 244px and the hairline against the canvas both come from the design
- * system's `Sidebar`, which is already cut to this brand.
+ * The design's sidebar (`designs/_ds`, `.ds-sidebar`): 272px on the frame,
+ * dark in both themes. Brand and collapse button, the ⌘K search field, the
+ * 44px nav rows, and the account card pinned to the foot. Collapsed, it is a
+ * rail of icons.
  */
-export function AppSidebar() {
+export function AppSidebar({
+  collapsed,
+  onCollapse,
+  onSearch,
+  onNavigate,
+  className,
+}: {
+  collapsed: boolean;
+  onCollapse: () => void;
+  onSearch: () => void;
+  onNavigate?: () => void;
+  className?: string;
+}) {
   const { t } = useTranslation();
-  const { workspace } = useShell();
-  const pathname = useRouterState({
-    select: (state) => state.location.pathname,
-  });
-
-  // Only the routes this user's permissions actually reach — a restricted user
-  // never sees a row that would answer with "No tienes permiso para hacer eso".
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const entries = useAuthorizedNav();
-  // What the app calls the workspace: the consumer app passes the caller's
-  // organization (from the same query General Settings reads, so a saved name
-  // or logo shows here at once); the control plane passes its own label.
-  const workspaceName = workspace?.name ?? t('common.appName');
 
   return (
-    <Sidebar className="border-r border-border-subtle">
-      <SidebarHeader className="p-3">
-        <div className="flex min-w-0 items-center gap-2.5 px-2 py-2">
-          {workspace?.icon ?? (
-            <Avatar size={24} className="rounded-md after:rounded-md">
-              {workspace?.logo && (
-                <AvatarImage src={workspace.logo} alt="" className="rounded-md object-contain" />
-              )}
-              <AvatarFallback className="rounded-md bg-surface-sunken font-medium text-ink-600">
-                {workspaceInitial(workspaceName)}
-              </AvatarFallback>
-            </Avatar>
-          )}
-          <span className="truncate text-base font-medium text-ink-900">{workspaceName}</span>
-        </div>
-      </SidebarHeader>
-
-      <SidebarContent>
-        <SidebarGroup
-          className="px-3 py-0"
-          role="navigation"
-          aria-label={t('nav.primaryNavigation')}
+    <aside
+      className={cn(
+        'flex-none flex-col gap-3 bg-frame p-3 text-sidebar-ink-active',
+        collapsed ? 'w-17' : 'w-68',
+        className,
+      )}
+    >
+      <div className={cn('flex items-center justify-between', !collapsed && 'pl-3')}>
+        {!collapsed && (
+          <span className="text-base leading-none font-bold tracking-tighter">
+            {t('common.appName')}
+          </span>
+        )}
+        <button
+          type="button"
+          aria-label={t('nav.toggleSidebar')}
+          onClick={onCollapse}
+          className="grid size-11 place-items-center rounded-xl text-sidebar-ink-active transition-colors hover:bg-sidebar-fill"
         >
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-px">
-              {entries.map((entry) => {
-                const Icon = entry.icon;
-                // A page below `/settings` should still light up Settings, so
-                // match on the prefix rather than the exact path.
-                const active = pathname === entry.to || pathname.startsWith(`${entry.to}/`);
+          <PanelLeft className="size-5" strokeWidth={1.5} />
+        </button>
+      </div>
 
-                return (
-                  <SidebarMenuItem key={entry.to}>
-                    <SidebarMenuButton isActive={active} render={<Link to={entry.to} />}>
-                      <Icon />
-                      <span>{t(`nav.${entry.labelKey}`)}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
+      <button
+        type="button"
+        onClick={onSearch}
+        aria-label={t('nav.search')}
+        className="flex h-10 w-full flex-none items-center gap-3 rounded-xl bg-sidebar-field px-3 text-sm font-medium text-sidebar-ink-muted outline-1 -outline-offset-1 outline-sidebar-outline transition-colors hover:bg-sidebar-fill"
+      >
+        <Search className="size-5 flex-none" strokeWidth={1.5} />
+        {!collapsed && (
+          <>
+            <span className="flex-1 text-left">{t('nav.search')}</span>
+            <Kbd className="h-5 rounded-sm bg-transparent px-1.5 text-xs text-ink-400 outline-1 -outline-offset-1 outline-sidebar-tile-outline">
+              ⌘K
+            </Kbd>
+          </>
+        )}
+      </button>
 
-      <SidebarFooter className="p-3">
-        <UserMenu />
-      </SidebarFooter>
-    </Sidebar>
+      <nav
+        aria-label={t('nav.primaryNavigation')}
+        className="flex flex-1 flex-col gap-0.5 overflow-auto"
+      >
+        {entries.map((entry) => {
+          const Icon = entry.icon;
+          const active = pathname === entry.to || pathname.startsWith(`${entry.to}/`);
+          const label = t(`nav.${entry.labelKey}`);
+          return (
+            <Link
+              key={entry.to}
+              to={entry.to}
+              onClick={onNavigate}
+              aria-label={collapsed ? label : undefined}
+              data-active={active || undefined}
+              className="flex h-11 w-full flex-none items-center gap-3 rounded-xl px-3 text-sm font-semibold text-sidebar-ink transition-colors hover:bg-sidebar-fill hover:text-sidebar-ink-active data-active:bg-sidebar-fill data-active:text-sidebar-ink-active"
+            >
+              <Icon className="size-5 flex-none" strokeWidth={1.5} />
+              {!collapsed && <span className="flex-1 truncate">{label}</span>}
+            </Link>
+          );
+        })}
+      </nav>
+
+      <UserMenu collapsed={collapsed} />
+    </aside>
   );
 }
