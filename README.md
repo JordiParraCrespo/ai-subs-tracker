@@ -1,163 +1,114 @@
-# Flama
+# Subtrack
 
-Full-stack monorepo boilerplate for bootstrapping applications fast. Every app
-below is optional except the API — keep what you're building, prune the rest
-(see [Starting your own project](#starting-your-own-project)).
+Use up the AI coding plans you pay for.
 
-## What's included
+Subtrack is a desktop app for people who run several personal **Claude Code**
+and **Codex** subscriptions. It finds the logins on your computer, shows how
+much of each plan's 5-hour and weekly allowance is left, and tells you which
+account to use next so nothing you paid for expires unused ("tokenmaxxing").
+It also prices your usage at API rates, so you can see what each plan is worth.
 
-### Apps
+The screens follow the designs in [`designs/`](designs/).
 
-| App                    | Description                                                              |
-| ----------------------- | -------------------------------------------------------------------------- |
-| `apps/api`              | NestJS REST API — Domain-Driven Hexagon architecture, DB-backed RBAC, queues, caching, storage, email |
-| `apps/web`               | Consumer Vite + TanStack Router SPA                                       |
-| `apps/mobile`            | Consumer Expo app — NativeWind, i18next, SecureStore                     |
+| Screen | What it answers |
+| --- | --- |
+| **Overview** | What the plans cost a month, their value at API prices, how much allowance expired unused in the last month, what needs attention and which weeks reset next |
+| **Accounts** | Every login with its session and weekly usage, plan and price, and which one your terminals use |
+| **Tokenmaxx** | The account to use next (the most headroom per hour before its reset), and the queue against an even pace through the week |
+| **Usage & tokens** | Tokens by day, account and model, and what the same usage would cost on the API |
+| **Settings → This computer** | The terminal integration and the opt-in live feed from Claude Code |
 
-### Plugins
+## How it works
 
-Not everything ships in the box. These are packaged in
-[`flama-ai-plugins`](https://github.com/JordiParraCrespo/flama-ai-plugins) and
-added when a project wants them, with `pnpm plugin:add <id>`.
-`pnpm plugin:list` shows what is on offer and marks what is already installed, and
-`pnpm plugin:remove <id>` takes one back out — see
-[Starting your own project](#starting-your-own-project).
+```
+ your computer                                          Subtrack API
+┌───────────────────────────────────────────────┐     ┌──────────────────┐
+│ apps/desktop (Electron)                       │     │ apps/api         │
+│  main: collector ── @flama/usage-providers ───┼──┐  │ /v1/accounts/*   │
+│        reads ~/.claude*, ~/.codex, Keychain   │  │  │ provider_account │
+│        tray: "use next"                       │  └─▶│ usage_snapshot   │
+│  renderer: apps/web build on app://subtrack   │────▶│ token_usage_daily│
+└───────────────────────────────────────────────┘     └──────────────────┘
+```
 
-### Packages
+- **Plans and limits.** For each login the collector reads the plan and asks
+  the provider for its limit windows: Claude Code's OAuth usage endpoint, and
+  Codex's ChatGPT usage endpoint, falling back to the rate limits Codex writes
+  in its session logs. It sends an honest `subtrack-desktop/<version>` client
+  name. Every 10 minutes, with back-off, and a 15-minute pause after a 429.
+- **Tokens.** Counted from the CLIs' own transcripts (`~/.claude/projects`,
+  `~/.codex/sessions`), per model and day, and priced with
+  `packages/shared/src/subscriptions/model-prices.ts`.
+- **Plans** are data in `packages/shared/src/subscriptions/plans.ts`, with the
+  names providers used before (Max 20x is now **Ultra**). You can override an
+  account's plan and price in the app.
+- **Switching is a toggle.** Marking an account "in use" writes
+  `~/.subtrack/active/<provider>`. The opt-in shell snippet makes `claude` and
+  `codex` in your terminal follow it. **Add account** signs a new login into its
+  own folder with the provider's CLI (`claude auth login`, `codex login`).
 
-| Package                          | Description                                                        |
-| --------------------------------- | -------------------------------------------------------------------- |
-| `packages/shared`                 | Zod schemas, types, CASL permissions, scope catalog                |
-| `packages/auth`                   | Shared Better Auth config — user fields, plugins, client helpers   |
-| `packages/env`                    | Root `.env` loader shared by the Node apps                         |
-| `packages/frontend/core`          | Kernel every app loads: session, users, user settings, capabilities, analytics, InversifyJS DI |
-| `packages/frontend/consumer`      | Consumer product domain: organizations, profile                    |
-| `packages/frontend/web`           | What both Vite apps share below their routes, by concern           |
-| `packages/frontend/mobile`        | What both Expo apps share below their routes                       |
-| `packages/backend/*`              | Cross-cutting NestJS toolkit: errors/filters (`core`), DDD building blocks (`ddd`), authorization kernel (`authz`), Redis cache (`cache`), queues (`queue`), file storage (`storage`), email (`email`), i18n (`i18n`) |
-| `packages/frontend/design-system/web`      | shadcn/ui + Base UI + Tailwind v4 components                       |
-| `packages/frontend/design-system/mobile`   | NativeWind + rn-primitives React Native components                 |
-| `packages/frontend/api-client`    | Auto-generated typed client from Swagger                           |
-| `packages/translations`           | Shared i18n (en/es)                                                |
-| `packages/tsconfig`               | Shared TypeScript configs                                          |
+**What it never does:** refresh a provider's token, send a provider credential
+anywhere but that provider, or replace a status line you already have. Only
+identity, limit percentages, reset times and token counts reach the API.
 
-### Testing
+## Repository
 
-| Workspace | Description                                                                |
-| --------- | ---------------------------------------------------------------------------- |
-| `e2e`     | Playwright suites against the running API and web app                       |
+Built on the [Flama](https://github.com/JordiParraCrespo/flama-ai) boilerplate
+(Turborepo + pnpm). The conventions are in [`AGENTS.md`](AGENTS.md).
 
-`pnpm plugin:add qa` adds `qa/`, the scenario-driven pack with maturity
-tracking and screenshots, and `pnpm plugin:add helm` the Kubernetes chart.
+| Path | What it is |
+| --- | --- |
+| `apps/desktop` | Electron shell: hosts the web build, collector, tray, token store, shell integration, live feed |
+| `apps/web` | The screens (Vite + TanStack Router). One build serves the desktop app and, later, the web |
+| `apps/api` | NestJS API (Domain-Driven Hexagon): auth, and the `accounts` module |
+| `packages/usage-providers` | One `CodingAgentProvider` interface; Claude Code and Codex readers |
+| `packages/shared` | Wire contracts (`schemas/accounts`), plan catalog, model prices, Tokenmaxx ranking, desktop bridge types |
+| `packages/frontend/*` | Kernel, the consumer product package (accounts, profile), web kit, design system |
+| `packages/backend/*` | The API's toolkit |
+| `e2e` | Playwright suites for the API and the screens |
+| `designs` | The Claude Design export the screens are built from |
+
+Adding a provider (Grok, Z.ai and others) means a folder in
+`packages/usage-providers`, its id in `PROVIDER_IDS`, and its plans in
+`plans.ts`.
 
 ## Quick start
 
 ```bash
-# Install dependencies
 pnpm install
-
-# Start infrastructure (Postgres + Redis)
-pnpm docker:dev
-
-# Copy the environment file (one .env at the repo root serves every app)
-cp .env.example .env
-
-# Start all apps in dev mode
-pnpm dev
+cp .env.example .env            # one .env at the repo root
+pnpm docker:dev                 # Postgres + Redis
+pnpm --filter @flama/api migration:run
+pnpm exec turbo run dev --filter=@flama/api --filter=@flama/web
+pnpm desktop:dev                # Electron over the web dev server
 ```
 
-## Starting your own project
-
-The starter ships every app it knows how to build; a real project keeps a few.
-On a fresh clone:
+To run the desktop app on the bundled screens, or to package it:
 
 ```bash
-pnpm starter:init
+pnpm --filter @flama/web build
+pnpm --filter @flama/desktop build
+pnpm --filter @flama/desktop start      # app://subtrack over the built screens
+pnpm --filter @flama/desktop package    # dmg/zip, nsis, AppImage in apps/desktop/release
 ```
 
-It asks which apps to keep (the API always stays) and which plugins to add,
-shows the plan, and carries it out: removes what goes, installs what comes in
-the order they need each other, refreshes the lockfile and checks the result.
-Last, it lists the lines of prose that still mention what was removed, file by
-file, for you (or your agent) to reword.
-
-It is all or nothing: the work happens in a throwaway git worktree and reaches
-your checkout as one patch, only once every step has passed there, so a plugin
-that fails to install leaves the project as it was. (That is why it wants
-committed work: the worktree is your last commit.)
-
-Unattended, or from an agent — no `--add` means the same default the questions
-offer (`docs`), and `--add ''` means none:
-
-```bash
-pnpm starter:init --keep web,e2e,organizations --yes
-```
-
-The same two directions stay available afterwards, one feature at a time:
-
-```bash
-pnpm starter:prune --without mobile         # take out something the starter shipped
-pnpm plugin:list                            # what is on offer, and what you already have
-pnpm plugin:add admin-web                   # the control plane, back in your project
-pnpm plugin:remove admin-web
-```
-
-Both run on one mechanism. Every optional app is a feature in
-`scripts/starter/features.json`, every file that mentions one wraps those
-lines in `flama:begin`/`flama:end` markers, and an installed plugin becomes a
-feature too — so `pnpm starter:check` (run in CI) fails when a reference
-escapes them either way, and removing a plugin *is* the pruner rather than a
-second implementation of it.
-
-## Services
-
-| App                | URL                            |
-| ------------------ | ------------------------------ |
-| Web                | http://localhost:3000          |
-| API                | http://localhost:3001          |
-| API Docs (Swagger) | http://localhost:3001/api/docs |
-
-`pnpm plugin:add admin-web` serves the control plane on `:3003`, and
-`pnpm plugin:add docs` the Docusaurus site on `:3002`. `pnpm plugin:add
-extension` adds a Chrome extension over the consumer product, which you load
-from `apps/extension/dist` in `chrome://extensions`.
-
-## Tech stack
-
-- **Monorepo**: Turborepo + pnpm
-- **Backend**: NestJS (Domain-Driven Hexagon architecture), TypeORM, PostgreSQL, Redis, BullMQ
-- **Web**: Vite + TanStack Router, Tailwind v4, shadcn/ui
-- **Mobile**: Expo, NativeWind + rn-primitives
-- **Auth**: Better Auth (email/password), cookie sessions, Expo plugin for mobile
-- **Authorization**: Database-backed RBAC — roles and permissions managed through the API, enforced with CASL
-- **Scoped credentials**: one shared scope catalog — a credential's effective access is the intersection of its scopes and the user's roles
-- **Validation**: Zod
-- **State**: Zustand + TanStack Query
-- **DI**: InversifyJS (frontend), NestJS (backend)
-- **Testing**: Vitest, Testcontainers, Playwright (`e2e`; the `qa` pack is a plugin)
-- **Linting/formatting**: Biome, plus a design-system usage linter (oxlint) for `apps/web` and `apps/mobile`
-- **CI/CD**: GitHub Actions (`.github/workflows/ci.yml`) over the packages a change affects; `pnpm ci:local` runs the same checks before a push
-- **Deployment**: Docker Compose
+| Service | URL |
+| --- | --- |
+| Web | http://localhost:3000 |
+| API | http://localhost:3001 |
+| API docs (Swagger) | http://localhost:3001/api/docs |
 
 ## Scripts
 
 ```bash
-pnpm dev                 # Start all apps in dev mode
-pnpm build                # Build all apps and packages
-pnpm test                 # Run unit tests
-pnpm test:integration     # Run integration tests
-pnpm test:e2e             # Run the Playwright e2e suite
-pnpm lint                 # Lint all code
-pnpm arch                 # Check architecture boundaries (apps/api and the frontend, via dependency-cruiser)
-pnpm check                # Biome check + fix
-pnpm ci:local             # Pull request CI's checks, locally, over what this branch affects
-pnpm docker:dev           # Start dev infrastructure
-pnpm monitoring:up        # Prometheus + Grafana over the local API (needs METRICS_TOKEN)
-pnpm docker:dev:down      # Stop dev infrastructure
-pnpm docker:prod          # Start production stack (requires the root .env and BETTER_AUTH_SECRET)
-pnpm docker:prod:down     # Stop production stack, keeping its volumes
-pnpm changeset            # Create a changeset
-pnpm generate:api-client  # Regenerate API client from Swagger
+pnpm build                # Build everything
+pnpm test                 # Unit tests
+pnpm test:e2e             # Playwright suites (API and web running)
+pnpm arch                 # Architecture boundaries
+pnpm check:structure      # Frontend layout contract
+pnpm ci:local             # Pull request CI's checks over what this branch changes
+pnpm generate:api-client  # Regenerate the typed client after an API change
+pnpm starter:check        # Feature markers (the Flama starter's pruning stays available)
 ```
 
 ## License

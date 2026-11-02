@@ -1,19 +1,47 @@
-# Flama — Agent Instructions
+# Subtrack — Agent Instructions
 
 ## Project overview
 
-Flama is a full-stack monorepo boilerplate built with Turborepo + pnpm. The
-tree below is what it ships; more apps and Stripe billing are available as
-plugins (see [Plugins](#plugins)).
+Subtrack is a desktop app that tracks several personal Claude Code and Codex
+subscriptions on one computer: what each plan's limits have left, which
+account to use next so nothing paid for expires unused, and what the usage is
+worth at API prices. `README.md` describes the product and how the data flows.
+
+The repository is built on the Flama boilerplate (Turborepo + pnpm). The
+starter was pruned to `api`, `web` and `e2e`; `apps/desktop` and
+`packages/usage-providers` are this project's own. More apps and Stripe
+billing are available as Flama plugins (see [Plugins](#plugins)).
+
+### Subtrack's own rules
+
+- **Provider credentials never leave the machine** except to their own
+  provider, and are never refreshed: Claude Code's refresh tokens rotate, so a
+  refresh here would sign the CLI out. Only identity, limit windows and token
+  counts reach the API (`packages/shared/src/schemas/accounts.schema.ts`).
+- **Name ourselves honestly** to every vendor (`subtrack-desktop/<version>`);
+  never pose as Claude Code or Codex.
+- **Plans are data.** Names and prices live in
+  `packages/shared/src/subscriptions/plans.ts` with the old names as aliases;
+  model prices in `model-prices.ts`. Check the vendors' pricing pages when
+  touching them.
+- **A new provider** is a folder in `packages/usage-providers` implementing
+  `CodingAgentProvider`, its id in `PROVIDER_IDS`, its plans, and a line in the
+  registry. Nothing in the API or the screens should need to change.
+- **The desktop bridge** (`window.subtrack`, typed in
+  `packages/shared/src/desktop/bridge.ts`) is the only way the screens reach
+  the machine; in a browser it is absent and local features are not offered.
+- Anything that changes the user's machine (shell rc file, Claude's
+  `settings.json` status line) is opt-in, reversible and never overwrites what
+  the user already has.
 
 ## Monorepo structure
 
 ```
-flama/
+subtrack/
 ├── apps/
-│   ├── api/              # NestJS REST API
-│   ├── mobile/           # Consumer Expo app
-│   └── web/              # Consumer Vite + TanStack Router SPA
+│   ├── api/              # NestJS REST API (accounts module: sync, limits, tokens)
+│   ├── desktop/          # Electron shell: collector, tray, bridge (@flama/desktop)
+│   └── web/              # The screens, a Vite + TanStack Router SPA
 ├── packages/
 │   ├── auth/             # Shared Better Auth config + client helpers (@flama/auth)
 │   ├── backend/
@@ -26,17 +54,16 @@ flama/
 │   │   ├── queue/        # BullMQ job queues (@flama/backend-queue)
 │   │   └── storage/      # Pluggable file storage (@flama/backend-storage)
 │   ├── tsconfig/         # Shared TypeScript configs
+│   ├── usage-providers/  # Claude Code and Codex readers behind one interface (@flama/usage-providers)
 │   ├── env/              # Root .env loader (@flama/env)
 │   ├── frontend/         # The React tier: logic split by product, glue split by platform
 │   │   ├── core/         # Kernel every app loads: session, users, settings, DI (@flama/frontend-core)
-│   │   ├── consumer/     # The consumer product's domain: organizations, profile (@flama/frontend-consumer)
+│   │   ├── consumer/     # The product's domain: accounts, profile (@flama/frontend-consumer)
 │   │   ├── api-client/   # Auto-generated typed client from Swagger (@flama/api-client)
 │   │   ├── web/          # What both Vite apps share: shell, auth chrome, table, i18n… (@flama/frontend-web)
-│   │   ├── mobile/       # What both Expo apps share: config, storage, analytics… (@flama/frontend-mobile)
 │   │   ├── react-hooks/  # Generic React hooks below both design systems: useControlled, useNow… (@flama/react-hooks)
 │   │   └── design-system/
-│   │       ├── web/      # shadcn/ui + Base UI + Tailwind v4 (@flama/design-system-web)
-│   │       └── mobile/   # NativeWind + rn-primitives (@flama/design-system-mobile)
+│   │       └── web/      # shadcn/ui + Base UI + Tailwind v4 (@flama/design-system-web)
 │   ├── shared/           # Zod schemas, types, CASL permissions
 │   └── translations/     # Shared i18n JSON files
 ├── docker/               # Docker Compose (dev + prod)
@@ -303,14 +330,6 @@ Manifest V3 Chrome extension over the consumer product.
   `chrome-extension://<id>` for each id in `EXTENSION_IDS`
 - Its `AGENTS.md` and `ARCHITECTURE.md` hold the rules for each context
 
-### Mobile (apps/mobile)
-
-- Expo with expo-router
-- NativeWind + `@flama/design-system-mobile` components for UI
-- i18next for i18n (translations from `packages/translations`)
-- React Hook Form + `zodResolver` for forms (`Controller` per field)
-- expo-secure-store for secure token storage
-
 #### Forms (both apps)
 
 React Hook Form over a Zod schema from `@flama/shared`, resolver wired through
@@ -318,19 +337,19 @@ the app's `useZodResolver`. The convention is `.agents/rules/forms.md`.
 
 ### Design system (packages/frontend/design-system)
 
-Two independently versioned packages with a mirrored component API:
 `@flama/design-system-web` (Base UI + Tailwind v4, tokens in
-`src/styles/globals.css`) for `apps/web`, and `@flama/design-system-mobile`
-(NativeWind + `@rn-primitives`) for `apps/mobile`. Usage rules are
+`src/styles/globals.css`, ported from the dashboard design system in
+`designs/_ds`) for `apps/web`. Usage rules are
 `.agents/rules/frontend-ui.md`.
 
 ## Dependency flow
 
 ```
 packages/tsconfig         → used by all apps and packages (tsconfig extends)
-packages/env              → used by api, mobile (root .env loader)
-packages/shared           → used by api, frontend, api-client, backend/core (wire types)
-packages/auth             → used by api, web, mobile (shared Better Auth config)
+packages/env              → used by api (root .env loader)
+packages/shared           → used by api, frontend, api-client, backend/core, usage-providers, desktop (wire types)
+packages/usage-providers  → used by desktop (reads local Claude Code / Codex logins)
+packages/auth             → used by api, web (shared Better Auth config)
 packages/backend/core     → used by api, other backend packages
 packages/backend/ddd      → used by api, backend/core (depends on nothing in the workspace)
 packages/backend/email    → used by api
@@ -338,15 +357,13 @@ packages/backend/i18n     → used by api (bundles from packages/translations)
 packages/backend/cache    → used by api
 packages/backend/storage  → used by api
 packages/backend/queue    → used by api
-packages/translations        → used by web, mobile, api (email copy via backend/i18n)
+packages/translations        → used by web, api (email copy via backend/i18n)
 packages/frontend/react-hooks          → used by both design systems, frontend/web, web (React only)
 packages/frontend/design-system/web    → used by web, frontend/web
-packages/frontend/design-system/mobile → used by mobile, frontend/mobile
 packages/frontend/api-client  → used by frontend/core, frontend/consumer
 packages/frontend/core        → used by every frontend package and app
-packages/frontend/consumer    → used by web, mobile
+packages/frontend/consumer    → used by web
 packages/frontend/web         → used by web
-packages/frontend/mobile      → used by mobile
 ```
 
 ## Commands
@@ -380,15 +397,17 @@ process, and `nest start --watch` does not restart after that crash until a
 file changes. The web dev server answers on `http://localhost:3000` (IPv6);
 `http://127.0.0.1:3001/api/v1/health` and `/api/v1/ready` are the API probes.
 Sign-up is `POST /api/auth/sign-up/email` and needs `Origin: http://localhost:3000`.
-`pnpm dev` also starts the Expo app, which needs a device; a headless session
-can use `pnpm exec turbo run dev --filter=!@flama/mobile --concurrency=20`
-(Turbo wants one slot per persistent task).
+`pnpm dev` also starts the desktop app, which needs a display; a headless
+session can use `pnpm exec turbo run dev --filter=!@flama/desktop --concurrency=20`
+(Turbo wants one slot per persistent task), and runs Electron under
+`xvfb-run -a` with `--no-sandbox` (see `apps/desktop/README.md`).
 
 ## Deployment
 
 - Docker Compose (`docker/`) for the API, Postgres and Redis
 - Docker images built in CI (GitHub Actions), pushed to GHCR
-- Mobile: EAS Build (Expo)
+- Desktop: `pnpm --filter @flama/desktop package` (electron-builder; signing and
+  notarization are still to be set up)
 
 ## When modifying code
 
