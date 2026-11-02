@@ -52,3 +52,9 @@ pnpm exec biome check apps/desktop
 pnpm --filter @flama/web build && xvfb-run -a pnpm --filter @flama/desktop exec electron . --no-sandbox --smoke
 # flama:end web
 ```
+
+Rules this app follows: [`provider-integrations.md`](../../.agents/rules/provider-integrations.md)
+(an honest client name; credentials stay where they live) and
+[`integrations.md`](../../.agents/rules/integrations.md) (back off when a
+provider rate-limits). The screens it hosts follow
+[`frontend-architecture.md`](../../.agents/rules/frontend-architecture.md).
