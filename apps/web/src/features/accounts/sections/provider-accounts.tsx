@@ -48,7 +48,7 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
                   {t('accounts.group.used', { used: formatPercent(group.pick.pace.weeklyUsed) })}
                 </span>
               </div>
-              <span className="ds-label">
+              <span className="ds-text-label">
                 {t('accounts.group.headroom', {
                   left: formatPercent(group.pick.pace.left),
                   reset: reset(group.pick.pace.weeklyResetsAt),
@@ -56,11 +56,11 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
               </span>
             </>
           ) : (
-            <span className="ds-label">{t('accounts.tokenmaxx.nothingUsable')}</span>
+            <span className="ds-text-label">{t('accounts.tokenmaxx.nothingUsable')}</span>
           )}
         </div>
         <DsCard className="flex min-w-0 flex-[2_1_420px] flex-col justify-center gap-2 p-6">
-          <span className="ds-label ds-muted">{t('accounts.group.weeklyTitle')}</span>
+          <span className="ds-text-label ds-muted">{t('accounts.group.weeklyTitle')}</span>
           <span className="ds-card-title">
             {group.busiest
               ? t('accounts.group.busiest', {
@@ -70,7 +70,7 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
                 })
               : '—'}
           </span>
-          <span className="ds-label ds-muted">{t('accounts.group.weeklyHint')}</span>
+          <span className="ds-text-label ds-muted">{t('accounts.group.weeklyHint')}</span>
         </DsCard>
       </div>
 
@@ -101,21 +101,21 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
               </span>
               <div className="flex flex-col gap-2 border-t border-border-default pt-3">
                 <div className="flex items-center gap-2">
-                  <span className="ds-label min-w-0 flex-1 truncate">
+                  <span className="ds-text-label min-w-0 flex-1 truncate">
                     {t('accounts.table.session')}
                   </span>
-                  <span className="ds-label ds-muted">
+                  <span className="ds-text-label ds-muted">
                     {pace.sessionUsed === null
                       ? t('accounts.table.noSession')
                       : formatPercent(pace.sessionUsed)}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="ds-label min-w-0 flex-1 truncate">
+                  <span className="ds-text-label min-w-0 flex-1 truncate">
                     {t('accounts.group.terminals')}
                   </span>
                   {account.isActive ? (
-                    <span className="ds-label ds-muted">{t('accounts.group.inUse')}</span>
+                    <span className="ds-text-label ds-muted">{t('accounts.group.inUse')}</span>
                   ) : (
                     <DsButton size="text" onClick={() => switcher.switchTo(account)}>
                       {t('accounts.group.use')}

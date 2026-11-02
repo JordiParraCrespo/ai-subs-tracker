@@ -79,7 +79,7 @@
 .ds-eyebrow{font:var(--ds-type-eyebrow);letter-spacing:var(--ds-tracking-eyebrow);text-transform:uppercase}
 .ds-title-lg{font:var(--ds-type-title-lg);letter-spacing:var(--ds-tracking-tight)}
 .ds-body-lg{font:var(--ds-type-body-lg)}
-.ds-label{font:var(--ds-type-label)}
+.ds-text-label{font:var(--ds-type-label)}
 .ds-label-strong{font:var(--ds-type-label-strong)}
 .ds-card-title{font:var(--ds-type-card-title)}
 .ds-muted{color:var(--ds-text-muted)}
@@ -89,3 +89,16 @@
 .ds-meter__fill[data-hot]{background:var(--ds-negative)}
 .ds-meter__mark{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;border-radius:1px;background:var(--ds-text-muted)}
 .ds-disc--review{background:var(--ds-review-wash);color:var(--ds-review)}
+
+/* Tokenmaxx: the queue's statuses, its pace mark and legend, "In use". */
+.ds-review{color:var(--ds-review)}
+.ds-secondary{color:var(--ds-text-secondary)}
+.ds-meter__fill--accent{background:var(--ds-accent)}
+.ds-meter__mark--pace{background:var(--ds-text)}
+.ds-tm-status{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:6px;font:var(--ds-type-badge);white-space:nowrap;background:var(--ds-fill);color:var(--ds-positive)}
+.ds-tm-status[data-status="limit"]{background:var(--ds-fill);color:var(--ds-negative)}
+.ds-tm-status[data-status="expiring"],.ds-tm-status[data-status="under"]{background:var(--ds-review-wash);color:var(--ds-review)}
+.ds-tm-status[data-status="hot"]{background:var(--ds-info-badge);color:var(--ds-info-text)}
+.ds-in-use{display:inline-flex;align-items:center;gap:6px;font:var(--ds-type-label-strong);color:var(--ds-positive)}
+.ds-legend-used{width:10px;height:10px;border-radius:3px;background:var(--ds-accent)}
+.ds-legend-pace{width:2px;height:12px;border-radius:1px;background:var(--ds-text)}

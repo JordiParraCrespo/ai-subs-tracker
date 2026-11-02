@@ -72,23 +72,6 @@
     "runRate": "Annual run rate",
     "valuePerDollar": "Value per dollar"
   },
-  "pace": {
-    "ahead": "Ahead",
-    "behind": "Behind pace",
-    "expiring": "Expiring",
-    "limit": "At limit",
-    "on_pace": "On pace",
-    "unknown": "No data"
-  },
-  "queue": {
-    "description": "Use them top to bottom. The mark is where an even pace through the week would be.",
-    "left": "Left",
-    "neededPace": "Needed pace",
-    "perDay": "{{value}}%/day",
-    "resets": "Resets",
-    "title": "Queue",
-    "usage": "Used this week"
-  },
   "remove": {
     "confirm": "Remove",
     "description": "Subtrack stops tracking it and ignores it on later syncs. The login itself is not touched.",
@@ -137,23 +120,9 @@
     "range": "{{from}}–{{to}} of {{total}}"
   },
   "tokenmaxx": {
-    "atLimit": "At their limit",
-    "averageUsed": "Average used this week",
-    "expiringHint": "Headroom on accounts that reset within a day",
-    "expiringSoon": "Expiring within 24 h",
-    "inUse": "In use",
-    "nothingUsable": "Every account is at a limit or needs a sign-in.",
-    "pickLine": "{{left}} left · resets {{reset}}",
-    "reason": {
-      "expiring_soon": "Its week resets soon with plenty left: use it or lose it.",
-      "most_headroom": "The most headroom for the time left before its reset.",
-      "only_available": "The only account not at a limit right now."
-    },
-    "sub": "Use what you pay for before it resets.",
     "title": "Tokenmaxx",
-    "usable": "Usable now",
-    "useNext": "Use next",
-    "useThis": "Use this account"
+    "sub": "Use every plan to its limit before it resets",
+    "nothingUsable": "Every account is at a limit or needs a sign-in."
   },
   "usage": {
     "apiValue": "At API prices",
@@ -215,5 +184,81 @@
     "hotTitle": "{{name}} is at {{used}} on its own",
     "hotSub": "Spreading work won’t help an account used alone. A higher plan would.",
     "noMoves": "Nothing to move: your accounts are evenly used."
+  },
+  "tm": {
+    "pickFor": "Pick next for",
+    "anyTool": "Any tool",
+    "allTools": "All tools",
+    "goal": {
+      "expiring": "Use it or lose it",
+      "headroom": "Most headroom",
+      "value": "Most $ unused",
+      "pace": "Safest pace"
+    },
+    "min": {
+      "0": "Any amount left",
+      "20": "20%+ left",
+      "40": "40%+ left",
+      "60": "60%+ left"
+    },
+    "reset": "Reset",
+    "matching": "{{index}} of {{count}} matching",
+    "noneMatching": "None matching",
+    "useNext": "Use next",
+    "noneName": "Nothing to pick",
+    "pickLine": "{{left}} left · resets {{when}}",
+    "loosen": "No account matches these filters. Loosen them to see a pick.",
+    "why": {
+      "headroom": "The most room left: {{left}}% of its week is still unused.",
+      "value": "About {{value}} of what you paid for this week is still unused here.",
+      "pace": "The calmest pace to use it up: {{need}}% an hour until it resets.",
+      "expiring": "{{left}}% left and it resets {{when}}. Use it or lose it.",
+      "need": "Needs {{need}}%/h to use it all; about {{waste}}% is on track to expire unused."
+    },
+    "inMinutes_one": "in {{count}}m",
+    "inMinutes_other": "in {{count}}m",
+    "inHours_one": "in {{count}}h",
+    "inHours_other": "in {{count}}h",
+    "inDays_one": "in {{count}} day",
+    "inDays_other": "in {{count}} days",
+    "inUse": "In use",
+    "switch": "Switch to it",
+    "skip": "Skip",
+    "stats": {
+      "risk": "Capacity at risk",
+      "riskSub": "Projected to expire unused",
+      "util": "Average utilization",
+      "utilSub_one": "Across {{count}} account",
+      "utilSub_other": "Across {{count}} accounts",
+      "limit": "Accounts at limit",
+      "limitSub": "Waiting for a reset",
+      "soon": "Resetting in 24h",
+      "soonSub": "Use these first"
+    },
+    "usageWindow": "Usage this window",
+    "left": "Left",
+    "weeklyLimit": "Weekly limit",
+    "neededPace": "Needed pace",
+    "perHour": "{{value}}%/h",
+    "status": {
+      "limit": "At limit",
+      "expiring": "Use now",
+      "under": "Underused",
+      "hot": "Running hot",
+      "track": "On track"
+    },
+    "queue": "Queue",
+    "used": "Used",
+    "paceMark": "On-pace mark",
+    "moves": {
+      "title": "Moves to max out this week",
+      "wasteTitle": "Use {{name}}: about {{waste}}% would expire unused",
+      "wasteSub": "Resets {{when}} · {{value}} of the plan at stake",
+      "limitTitle": "{{name}} is at its limit",
+      "hotTitle": "{{name}} is running hot",
+      "hotSub": "Move work to {{other}} until it resets {{when}}",
+      "hotSubAlone": "Slow down until it resets {{when}}",
+      "none": "Every account is on track. Nothing to move this week."
+    }
   }
 }

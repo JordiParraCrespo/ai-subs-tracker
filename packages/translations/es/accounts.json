@@ -72,23 +72,6 @@
     "runRate": "Gasto anual",
     "valuePerDollar": "Valor por dólar"
   },
-  "pace": {
-    "ahead": "Por delante",
-    "behind": "Por debajo",
-    "expiring": "Caduca pronto",
-    "limit": "En el límite",
-    "on_pace": "Al ritmo",
-    "unknown": "Sin datos"
-  },
-  "queue": {
-    "description": "Úsalas de arriba abajo. La marca indica dónde estaría un ritmo uniforme durante la semana.",
-    "left": "Queda",
-    "neededPace": "Ritmo necesario",
-    "perDay": "{{value}} %/día",
-    "resets": "Se renueva",
-    "title": "Cola",
-    "usage": "Usado esta semana"
-  },
   "remove": {
     "confirm": "Quitar",
     "description": "Subtrack deja de seguirla y la ignora en las próximas sincronizaciones. La sesión en sí no se toca.",
@@ -137,23 +120,9 @@
     "range": "{{from}}–{{to}} de {{total}}"
   },
   "tokenmaxx": {
-    "atLimit": "En su límite",
-    "averageUsed": "Media usada esta semana",
-    "expiringHint": "Margen en cuentas que se renuevan en menos de un día",
-    "expiringSoon": "Caduca en 24 h",
-    "inUse": "En uso",
-    "nothingUsable": "Todas las cuentas están en un límite o necesitan iniciar sesión.",
-    "pickLine": "Queda {{left}} · se renueva {{reset}}",
-    "reason": {
-      "expiring_soon": "Su semana se renueva pronto con mucho margen: úsala o piérdela.",
-      "most_headroom": "El mayor margen para el tiempo que queda hasta renovarse.",
-      "only_available": "La única cuenta que no está en un límite ahora."
-    },
-    "sub": "Usa lo que pagas antes de que se renueve.",
     "title": "Tokenmaxx",
-    "usable": "Disponibles ahora",
-    "useNext": "Usar a continuación",
-    "useThis": "Usar esta cuenta"
+    "sub": "Lleva cada plan a su límite antes de que se reinicie.",
+    "nothingUsable": "Todas las cuentas están en un límite o necesitan iniciar sesión."
   },
   "usage": {
     "apiValue": "A precio de API",
@@ -215,5 +184,81 @@
     "hotTitle": "{{name}} está al {{used}} por sí sola",
     "hotSub": "Repartir trabajo no ayuda a una cuenta que se usa sola. Un plan superior sí.",
     "noMoves": "Nada que mover: tus cuentas se usan por igual."
+  },
+  "tm": {
+    "pickFor": "Elegir siguiente para",
+    "anyTool": "Cualquier herramienta",
+    "allTools": "Todas las herramientas",
+    "goal": {
+      "expiring": "Úsalo o piérdelo",
+      "headroom": "Más margen",
+      "value": "Más $ sin usar",
+      "pace": "Ritmo más seguro"
+    },
+    "min": {
+      "0": "Cualquier cantidad",
+      "20": "20%+ libre",
+      "40": "40%+ libre",
+      "60": "60%+ libre"
+    },
+    "reset": "Restablecer",
+    "matching": "{{index}} de {{count}} coincidencias",
+    "noneMatching": "Ninguna coincidencia",
+    "useNext": "Usar a continuación",
+    "noneName": "Nada que elegir",
+    "pickLine": "{{left}} libre · se reinicia {{when}}",
+    "loosen": "Ninguna cuenta cumple estos filtros. Amplíalos para ver una sugerencia.",
+    "why": {
+      "headroom": "La que más margen tiene: {{left}}% de su semana sigue sin usar.",
+      "value": "Unos {{value}} de lo que pagaste esta semana siguen sin usar aquí.",
+      "pace": "El ritmo más tranquilo para agotarla: {{need}}% por hora hasta que se reinicie.",
+      "expiring": "Le queda {{left}}% y se reinicia {{when}}. Úsalo o piérdelo.",
+      "need": "Necesita {{need}}%/h para agotarla; cerca de {{waste}}% caducará sin usar."
+    },
+    "inMinutes_one": "en {{count}} min",
+    "inMinutes_other": "en {{count}} min",
+    "inHours_one": "en {{count}} h",
+    "inHours_other": "en {{count}} h",
+    "inDays_one": "en {{count}} día",
+    "inDays_other": "en {{count}} días",
+    "inUse": "En uso",
+    "switch": "Cambiar a esta",
+    "skip": "Saltar",
+    "stats": {
+      "risk": "Capacidad en riesgo",
+      "riskSub": "Caducará sin usar",
+      "util": "Uso medio",
+      "utilSub_one": "En {{count}} cuenta",
+      "utilSub_other": "En {{count}} cuentas",
+      "limit": "Cuentas en el límite",
+      "limitSub": "Esperando un reinicio",
+      "soon": "Se reinician en 24 h",
+      "soonSub": "Úsalas primero"
+    },
+    "usageWindow": "Uso en esta ventana",
+    "left": "Libre",
+    "weeklyLimit": "Límite semanal",
+    "neededPace": "Ritmo necesario",
+    "perHour": "{{value}}%/h",
+    "status": {
+      "limit": "En el límite",
+      "expiring": "Usar ya",
+      "under": "Infrautilizada",
+      "hot": "Va rápida",
+      "track": "Al ritmo"
+    },
+    "queue": "Cola",
+    "used": "Usado",
+    "paceMark": "Marca de ritmo",
+    "moves": {
+      "title": "Movimientos para aprovechar esta semana",
+      "wasteTitle": "Usa {{name}}: cerca de {{waste}}% caducaría sin usar",
+      "wasteSub": "Se reinicia {{when}} · {{value}} del plan en juego",
+      "limitTitle": "{{name}} está en su límite",
+      "hotTitle": "{{name}} va demasiado rápida",
+      "hotSub": "Pasa trabajo a {{other}} hasta que se reinicie {{when}}",
+      "hotSubAlone": "Baja el ritmo hasta que se reinicie {{when}}",
+      "none": "Todas las cuentas van al ritmo. Nada que mover esta semana."
+    }
   }
 }

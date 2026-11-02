@@ -1,118 +1,185 @@
-import { Switch } from '@flama/design-system-web';
-import type { AccountEntity } from '@flama/frontend-consumer';
-import { useAccounts } from '@flama/frontend-consumer/react';
 import {
-  DataTable,
-  type DataTableColumn,
-  GroupHeading,
-  paginateRows,
-  useLocale,
-  useTableQuery,
-} from '@flama/frontend-web';
+  DsAvatar,
+  DsButton,
+  DsFilterSelect,
+  type DsGridColumn,
+  DsGridTable,
+} from '@flama/design-system-web';
+import { CircleDot, Flame, Layers } from '@flama/design-system-web/icons';
+import { useAccounts } from '@flama/frontend-consumer/react';
 import { useNow } from '@flama/react-hooks';
-import { type AccountPace, rankAccounts } from '@flama/shared/subscriptions';
+import { PROVIDER_IDS, type ProviderId } from '@flama/shared/subscriptions';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AccountIdentity } from '../components/account-identity';
-import { PaceBadge } from '../components/pace-badge';
-import { UsageBar } from '../components/usage-bar';
+import { useResetIn } from '../hooks/use-reset-in';
 import { useSwitchAccount } from '../hooks/use-switch-account';
-import { formatPercent, formatResetIn } from '../lib/format';
+import { PROVIDER_NAMES } from '../lib/providers';
+import { type TokenmaxxRow, type TokenmaxxStatus, tokenmaxxRows } from '../lib/tokenmaxx-model';
 
-interface QueueRow {
-  rank: number;
-  account: AccountEntity;
-  pace: AccountPace;
-}
+const ICON = { className: 'size-4', strokeWidth: 1.5 } as const;
+const TEMPLATE = '40px minmax(200px,1.6fr) minmax(180px,1.4fr) 80px 100px 100px 120px 76px';
+const STATUSES: TokenmaxxStatus[] = ['expiring', 'under', 'track', 'hot', 'limit'];
 
-/** Every account in the order to use them, with how far each is from an even pace. */
+/** The design's queue: every account in the order to use it, against an even pace. */
 export function TokenmaxxQueue() {
   const { t } = useTranslation();
-  const locale = useLocale();
   const now = useNow(60_000);
-  const accounts = useAccounts();
+  const { data: accounts = [] } = useAccounts();
   const switcher = useSwitchAccount();
-  const query = useTableQuery({ prefix: 'queue' });
-
-  const byId = new Map((accounts.data ?? []).map((account) => [account.id, account]));
-  const queue: QueueRow[] = rankAccounts(accounts.data ?? [], new Date(now)).queue.flatMap(
-    (pace, index) => {
-      const account = byId.get(pace.id);
-      return account ? [{ rank: index + 1, account, pace }] : [];
-    },
+  const [provider, setProvider] = useState<ProviderId | 'all'>('all');
+  const [status, setStatus] = useState<TokenmaxxStatus | 'all'>('all');
+  const all = tokenmaxxRows(accounts, new Date(now));
+  const rows = all.filter(
+    (row) =>
+      (provider === 'all' || row.account.provider === provider) &&
+      (status === 'all' || row.status === status),
   );
-  const { rows, pagination } = paginateRows(queue, 20, query);
 
-  const columns: DataTableColumn<QueueRow>[] = [
-    { key: 'rank', label: '#', width: 48, render: (row) => row.rank },
+  const hours = useResetIn();
+
+  const columns: DsGridColumn<TokenmaxxRow>[] = [
+    {
+      key: 'rank',
+      label: '#',
+      render: (row) => <span className="ds-label-strong ds-muted">{all.indexOf(row) + 1}</span>,
+    },
     {
       key: 'account',
       label: t('accounts.table.account'),
-      render: (row) => <AccountIdentity account={row.account} />,
+      render: (row) => (
+        <div className="flex min-w-0 flex-row items-center gap-3">
+          <DsAvatar initials={row.initials} color={row.color} size={32} />
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <span className="ds-cell-strong">{row.name}</span>
+            <span className="ds-cell-sub">{row.account.displayName}</span>
+          </div>
+        </div>
+      ),
     },
     {
       key: 'usage',
-      label: t('accounts.queue.usage'),
+      label: t('accounts.tm.usageWindow'),
       render: (row) => (
-        <UsageBar
-          value={row.pace.weeklyUsed}
-          marker={row.pace.onPaceMark}
-          label={t('accounts.queue.usage')}
-        />
+        <div className="flex flex-row items-center gap-2.5">
+          <div className="ds-meter flex-1">
+            <div
+              className="ds-meter__fill ds-meter__fill--accent"
+              data-hot={row.status === 'limit' ? '' : undefined}
+              // oxlint-disable-next-line no-inline-styles -- the fill is the reading
+              style={{ width: `${row.used.toFixed(1)}%` }}
+            />
+            <div
+              className="ds-meter__mark ds-meter__mark--pace"
+              // oxlint-disable-next-line no-inline-styles -- the even-pace mark is data
+              style={{ left: `${Math.min(100, row.expected).toFixed(1)}%` }}
+            />
+          </div>
+          <span className="ds-text-label w-9 text-right">{Math.round(row.used)}%</span>
+        </div>
       ),
     },
     {
       key: 'left',
-      label: t('accounts.queue.left'),
+      label: t('accounts.tm.left'),
       align: 'right',
-      render: (row) => formatPercent(row.pace.left),
+      render: (row) => <span className="ds-label-strong">{Math.round(row.left)}%</span>,
     },
     {
       key: 'resets',
-      label: t('accounts.queue.resets'),
-      render: (row) => formatResetIn(row.pace.weeklyResetsAt, now, locale) ?? '—',
+      label: t('accounts.table.resets'),
+      render: (row) => (
+        <>
+          <span className="ds-cell">{hours(row.hours)}</span>
+          <span className="ds-cell-sub">{t('accounts.tm.weeklyLimit')}</span>
+        </>
+      ),
     },
     {
-      key: 'pace',
-      label: t('accounts.queue.neededPace'),
+      key: 'need',
+      label: t('accounts.tm.neededPace'),
       align: 'right',
-      render: (row) =>
-        row.pace.neededPerDay === null
-          ? '—'
-          : t('accounts.queue.perDay', { value: Math.round(row.pace.neededPerDay) }),
+      render: (row) => (
+        <span className={row.need > 2 ? 'ds-text-label ds-review' : 'ds-text-label ds-secondary'}>
+          {row.status === 'limit' ? '—' : t('accounts.tm.perHour', { value: row.need.toFixed(1) })}
+        </span>
+      ),
     },
     {
       key: 'status',
       label: t('accounts.table.status'),
-      render: (row) => <PaceBadge status={row.pace.status} />,
+      render: (row) => (
+        <div className="flex">
+          <span className="ds-tm-status" data-status={row.status}>
+            {t(`accounts.tm.status.${row.status}`)}
+          </span>
+        </div>
+      ),
     },
     {
-      key: 'active',
-      label: t('accounts.table.inUse'),
+      key: 'use',
+      label: '',
       render: (row) => (
-        <Switch
-          checked={row.account.isActive}
-          disabled={row.account.isActive || switcher.isPending}
-          onCheckedChange={() => switcher.switchTo(row.account)}
-          aria-label={t('accounts.table.useAccount', { name: row.account.displayName })}
-        />
+        <div className="flex flex-row justify-end">
+          {row.account.isActive ? (
+            <span className="ds-in-use">
+              <Flame className="size-3.5" strokeWidth={1.5} />
+              {t('accounts.tm.inUse')}
+            </span>
+          ) : row.status !== 'limit' ? (
+            <DsButton
+              size="xs"
+              disabled={switcher.isPending}
+              onClick={() => switcher.switchTo(row.account)}
+            >
+              {t('accounts.group.use')}
+            </DsButton>
+          ) : null}
+        </div>
       ),
     },
   ];
 
   return (
-    <section>
-      <GroupHeading description={t('accounts.queue.description')}>
-        {t('accounts.queue.title')}
-      </GroupHeading>
-      <DataTable
+    <div className="flex flex-col gap-3">
+      <div className="ds-toolbar">
+        <h2 className="ds-card-header__title mr-2">{t('accounts.tm.queue')}</h2>
+        <DsFilterSelect<ProviderId | 'all'>
+          icon={<Layers {...ICON} />}
+          options={[
+            { value: 'all', label: t('accounts.tm.allTools') },
+            ...PROVIDER_IDS.map((value) => ({ value, label: PROVIDER_NAMES[value] })),
+          ]}
+          value={provider}
+          onChange={setProvider}
+        />
+        <DsFilterSelect<TokenmaxxStatus | 'all'>
+          icon={<CircleDot {...ICON} />}
+          options={[
+            { value: 'all', label: t('accounts.toolbar.status.all') },
+            ...STATUSES.map((value) => ({ value, label: t(`accounts.tm.status.${value}`) })),
+          ]}
+          value={status}
+          onChange={setStatus}
+        />
+        <div className="flex-1" />
+        <div className="ds-text-label ds-muted flex items-center gap-4">
+          <span className="flex items-center gap-1.5">
+            <span className="ds-legend-used" />
+            {t('accounts.tm.used')}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="ds-legend-pace" />
+            {t('accounts.tm.paceMark')}
+          </span>
+        </div>
+      </div>
+      <DsGridTable
         columns={columns}
+        template={TEMPLATE}
         rows={rows}
-        getKey={(row) => row.account.id}
-        pagination={pagination}
-        selectable={false}
-        isLoading={accounts.isLoading}
-        emptyLabel={t('accounts.table.empty')}
+        rowKey={(row) => row.account.id}
+        minWidth={940}
       />
-    </section>
+    </div>
   );
 }
