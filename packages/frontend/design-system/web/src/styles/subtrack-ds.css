@@ -156,11 +156,16 @@ color-scheme:light;
 
 /* ---- components/components.css ---- */
 /* Component recipes. Every value comes from tokens. Prefix: ds- */
+/* The element defaults sit in the base layer, under Tailwind's utilities: left
+   unlayered, `a { color }` beat every `text-*` class on a link, and the
+   sidebar's light ink went dark on its dark frame in the light theme. */
+@layer base {
 html,body{margin:0}
 body{background:var(--ds-bg-app);color:var(--ds-text);font-family:var(--ds-font-sans);font-weight:500;-webkit-font-smoothing:antialiased}
 ::selection{background:var(--ds-brand);color:var(--ds-on-brand)}
 a{color:var(--ds-text);text-decoration-color:var(--ds-text-subtle);text-underline-offset:3px}
 a:hover{color:var(--ds-text-secondary)}
+}
 .ds-ico{flex:none;stroke:currentColor;fill:none}
 
 /* Button */
