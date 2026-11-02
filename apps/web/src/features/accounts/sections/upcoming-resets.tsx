@@ -1,48 +1,63 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@flama/design-system-web';
+import { DsButton, DsCard, DsCardHeader, DsCardRow } from '@flama/design-system-web';
 import { useAccounts } from '@flama/frontend-consumer/react';
-import { useLocale } from '@flama/frontend-web';
+import { dateFormatter, useLocale } from '@flama/frontend-web';
 import { useNow } from '@flama/react-hooks';
+import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { AccountIdentity } from '../components/account-identity';
 import { formatPercent, formatResetIn } from '../lib/format';
 import { upcomingResets } from '../lib/insights';
+import { accountTitle } from '../lib/marks';
 
-/** Weekly resets coming up: what is left on each account before it rolls over. */
+/** The design's "Next up" card: each account's next weekly reset as a date block. */
 export function UpcomingResets() {
   const { t } = useTranslation();
   const locale = useLocale();
   const now = useNow(60_000);
+  const navigate = useNavigate();
   const { data: accounts = [] } = useAccounts();
   const byId = new Map(accounts.map((account) => [account.id, account]));
-  const resets = upcomingResets(accounts, new Date(now)).slice(0, 5);
+  const resets = upcomingResets(accounts, new Date(now)).slice(0, 4);
+  const month = dateFormatter(locale, { month: 'short' });
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t('accounts.resets.title')}</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col divide-y divide-border-subtle">
-        {resets.length === 0 && (
-          <p className="py-3 text-sm text-ink-600">{t('accounts.resets.empty')}</p>
-        )}
-        {resets.map((pace) => {
-          const account = byId.get(pace.id);
-          if (!account) return null;
-          return (
-            <div key={pace.id} className="flex items-center justify-between gap-4 py-3">
-              <AccountIdentity account={account} />
-              <div className="text-right text-sm">
-                <div className="font-medium text-ink-900">
-                  {t('accounts.resets.left', { left: formatPercent(pace.left) })}
-                </div>
-                <div className="text-ink-600">
-                  {formatResetIn(pace.weeklyResetsAt, now, locale)}
-                </div>
+    <DsCard>
+      <DsCardHeader
+        title={t('accounts.resets.title')}
+        action={
+          <DsButton size="text" onClick={() => navigate({ to: '/tokenmaxx' })}>
+            {t('accounts.resets.viewAll')}
+          </DsButton>
+        }
+      />
+      {resets.map((pace) => {
+        const account = byId.get(pace.id);
+        if (!account || !pace.weeklyResetsAt) return null;
+        const at = new Date(pace.weeklyResetsAt);
+        return (
+          <DsCardRow
+            key={pace.id}
+            leading={
+              <div className="flex w-8 flex-none flex-col items-center">
+                <span className="text-[11px] leading-4 font-semibold tracking-[0.12em] text-ink-400 uppercase">
+                  {month.format(at)}
+                </span>
+                <span className="text-base leading-5 font-semibold">{at.getDate()}</span>
               </div>
-            </div>
-          );
-        })}
-      </CardContent>
-    </Card>
+            }
+            title={accountTitle(account)}
+            subtitle={t('accounts.resets.when', {
+              when: formatResetIn(pace.weeklyResetsAt, now, locale),
+            })}
+            value={formatPercent(pace.left)}
+            subvalue={t('accounts.resets.leftLabel')}
+          />
+        );
+      })}
+      {resets.length === 0 && (
+        <p className="border-t border-border-default px-6 py-4 text-sm text-ink-600">
+          {t('accounts.resets.empty')}
+        </p>
+      )}
+    </DsCard>
   );
 }

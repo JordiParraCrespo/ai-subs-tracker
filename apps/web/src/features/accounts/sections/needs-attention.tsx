@@ -1,46 +1,78 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@flama/design-system-web';
+import { DsAvatar, DsButton, DsCard, DsCardHeader, DsCardRow } from '@flama/design-system-web';
 import { useAccounts } from '@flama/frontend-consumer/react';
 import { useLocale } from '@flama/frontend-web';
 import { useNow } from '@flama/react-hooks';
+import { Link } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AccountIdentity } from '../components/account-identity';
-import { formatPercent, formatResetIn } from '../lib/format';
-import { attentionItems } from '../lib/insights';
+import { formatMoney, formatPercent, formatResetIn } from '../lib/format';
+import { attentionItems, wastedLastMonthCents } from '../lib/insights';
+import { accountMark, accountTitle } from '../lib/marks';
 
-/** The accounts that want something from you now, most urgent first. */
+const SHOWN = 4;
+
+/** The design's "Needs attention" card: what wants something from you now, and what it saves. */
 export function NeedsAttention() {
   const { t } = useTranslation();
   const locale = useLocale();
   const now = useNow(60_000);
+  const [all, setAll] = useState(false);
   const { data: accounts = [] } = useAccounts();
-  const items = attentionItems(accounts, new Date(now)).slice(0, 5);
+  const items = attentionItems(accounts, new Date(now));
+  const shown = all ? items : items.slice(0, SHOWN);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t('accounts.attention.title')}</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col divide-y divide-border-subtle">
-        {items.length === 0 && (
-          <p className="py-3 text-sm text-ink-600">{t('accounts.attention.empty')}</p>
-        )}
-        {items.map(({ account, pace, kind }) => (
-          <div key={account.id} className="flex items-center justify-between gap-4 py-3">
-            <AccountIdentity account={account} />
-            <div className="min-w-0 max-w-1/2 text-right text-sm">
-              <div className="font-medium text-ink-900">{t(`accounts.attention.${kind}`)}</div>
-              <div className="line-clamp-2 break-words text-ink-600">
-                {kind === 'signin'
-                  ? (account.latest?.message ?? t('accounts.attention.signinHint'))
+    <DsCard>
+      <DsCardHeader
+        title={t('accounts.attention.title')}
+        action={
+          <span className="text-sm text-data-up">
+            {t('accounts.attention.toSave', {
+              value: formatMoney(wastedLastMonthCents(accounts), locale),
+            })}
+          </span>
+        }
+      />
+      {shown.map(({ account, pace, kind }) => {
+        const mark = accountMark(account);
+        const weeklyValue = (account.monthlyPriceCents * 7) / 30.44;
+        return (
+          <Link key={account.id} to="/tokenmaxx" className="contents">
+            <DsCardRow
+              leading={<DsAvatar initials={mark.initials} color={mark.color} size={32} />}
+              title={t(`accounts.attention.${kind}Title`, { name: accountTitle(account) })}
+              subtitle={
+                kind === 'signin'
+                  ? account.displayName
                   : t('accounts.attention.detail', {
                       left: formatPercent(pace.left),
                       reset: formatResetIn(pace.weeklyResetsAt, now, locale) ?? '—',
-                    })}
-              </div>
-            </div>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
+                    })
+              }
+              value={
+                kind === 'signin' || pace.left === null
+                  ? '—'
+                  : formatMoney((pace.left / 100) * weeklyValue, locale)
+              }
+              subvalue={t(`accounts.attention.${kind}End`)}
+            />
+          </Link>
+        );
+      })}
+      {items.length === 0 && (
+        <p className="border-t border-border-default px-6 py-4 text-sm text-ink-600">
+          {t('accounts.attention.empty')}
+        </p>
+      )}
+      {items.length > SHOWN && (
+        <div className="border-t border-border-default px-4 py-2.5">
+          <DsButton size="text" onClick={() => setAll((was) => !was)}>
+            {all
+              ? t('accounts.attention.showLess')
+              : t('accounts.attention.showAll', { count: items.length })}
+          </DsButton>
+        </div>
+      )}
+    </DsCard>
   );
 }

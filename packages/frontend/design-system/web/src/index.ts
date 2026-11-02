@@ -147,6 +147,15 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from './components/dropdown-menu';
+export { DsAreaChart } from './components/ds-area-chart';
+export { DsAvatar } from './components/ds-avatar';
+export { DsBadge, DsStatusBadge } from './components/ds-badge';
+export { DsButton } from './components/ds-button';
+export { DsCard, DsCardHeader, DsCardRow } from './components/ds-card';
+export { DsChipGroup, DsSegmented } from './components/ds-chips';
+export { type DsFilterOption, DsFilterSelect } from './components/ds-filter-select';
+export { type DsStat, DsStatGrid } from './components/ds-stat-grid';
+export { DsTable, type DsTableColumn } from './components/ds-table';
 export {
   Empty,
   EmptyContent,

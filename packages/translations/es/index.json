@@ -254,14 +254,20 @@
   },
   "accounts": {
     "attention": {
-      "behind": "Por debajo del ritmo",
-      "detail": "Queda {{left}} · se renueva {{reset}}",
+      "title": "Requiere atención",
+      "toSave": "{{value}}/mes por ahorrar",
       "empty": "Nada requiere tu atención ahora.",
-      "expiring": "Úsala antes de que se renueve",
-      "limit": "En su límite",
-      "signin": "Vuelve a iniciar sesión",
-      "signinHint": "Esta sesión dejó de informar.",
-      "title": "Requiere atención"
+      "detail": "Queda {{left}} · se renueva {{reset}}",
+      "signinTitle": "Vuelve a iniciar sesión en {{name}}",
+      "signinEnd": "sin sincronizar",
+      "expiringTitle": "Usa {{name}} antes de que se renueve",
+      "expiringEnd": "en riesgo",
+      "behindTitle": "{{name}} va por debajo del ritmo",
+      "behindEnd": "sin usar",
+      "limitTitle": "{{name}} está en su límite",
+      "limitEnd": "queda",
+      "showAll": "Ver las {{count}}",
+      "showLess": "Ver menos"
     },
     "desktop": {
       "add": "Añadir {{provider}}",
@@ -302,17 +308,21 @@
       "title": "Por modelo"
     },
     "overview": {
+      "greeting": {
+        "morning": "Buenos días, {{name}}",
+        "afternoon": "Buenas tardes, {{name}}",
+        "evening": "Buenas noches, {{name}}"
+      },
+      "sub": "Así va tu gasto en IA",
+      "past12": "Últimos 12 meses",
+      "subscriptions": "Suscripciones",
+      "savings": "Ahorro posible",
+      "perMonth": "{{value}}/mes",
       "accountCount_one": "{{count}} cuenta",
       "accountCount_other": "{{count}} cuentas",
-      "accounts": "Cuentas",
-      "apiValue": "{{value}} a precio de API, 30 días",
-      "greeting": "Hola, {{name}}",
       "monthlySpend": "Gasto mensual",
       "runRate": "Gasto anual",
-      "sub": "Cómo van tus planes de IA",
-      "valuePerDollar": "Valor por dólar",
-      "wasted": "Caducado sin usar",
-      "wastedHint": "Cuota semanal sobrante al renovarse, últimos 30 días"
+      "valuePerDollar": "Valor por dólar"
     },
     "pace": {
       "ahead": "Por delante",
@@ -337,9 +347,12 @@
       "title": "¿Quitar {{name}}?"
     },
     "resets": {
+      "title": "Próximas",
+      "viewAll": "Ver todas",
+      "when": "Se renueva {{when}}",
+      "leftLabel": "queda",
       "empty": "Aún no se ha informado de ninguna renovación semanal.",
-      "left": "Queda {{left}}",
-      "title": "Próximas renovaciones"
+      "left": "Queda {{left}}"
     },
     "settings": {
       "browserDescription": "Cambiar la cuenta de la terminal y los límites en directo actúan sobre tu ordenador, así que están en la app de escritorio de Subtrack.",

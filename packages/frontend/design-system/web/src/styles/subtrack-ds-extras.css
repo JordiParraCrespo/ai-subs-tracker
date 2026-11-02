@@ -1,0 +1,47 @@
+/* =============================================================================
+   Subtrack design system — the markup the export writes inline
+   =============================================================================
+   The Claude Design export styles some recurring pieces inline in its pages
+   (the card header, the Filter Select, the up/down tone of a figure). The
+   React components name them with classes instead; the values are the
+   export's, copied from `designs/AI Subscription Tracker.dc.html` and
+   `designs/Filter Select.dc.html`.                                             */
+
+.ds-t-up{color:var(--ds-positive)}
+.ds-t-down{color:var(--ds-negative)}
+.ds-chart__crosshair{stroke:var(--ds-chart-crosshair)}
+.ds-chart__dot{stroke:var(--ds-bg-app)}
+
+/* Badges by tone: info is the default `.ds-badge`. */
+.ds-badge[data-tone="review"]{background:var(--ds-review-wash);color:var(--ds-review)}
+.ds-badge[data-tone="negative"]{background:rgba(255,102,127,.12);color:var(--ds-negative)}
+.ds-badge[data-tone="neutral"]{background:var(--ds-fill);color:var(--ds-text-muted)}
+
+/* Card header: 56px, title at body-strong, an action on the right. */
+.ds-card-header{display:flex;align-items:center;justify-content:space-between;gap:12px;height:56px;padding:0 16px 0 24px;box-sizing:border-box}
+.ds-card-header__title{margin:0;font:var(--ds-type-body-strong);letter-spacing:var(--ds-tracking-tight)}
+.ds-card-row{padding:16px 24px;border-top:1px solid var(--ds-divider)}
+.ds-card-row__title{font:var(--ds-type-label-strong)}
+.ds-card-row__value{font:500 14px/20px var(--ds-font-sans);letter-spacing:var(--ds-tracking-tighter)}
+
+/* Filter Select: the toolbar's 36px dropdown. */
+.ds-fselect{position:relative;display:inline-flex;font-family:var(--ds-font-sans)}
+.ds-fselect__trigger{all:unset;box-sizing:border-box;height:36px;padding:0 8px 0 10px;border-radius:8px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;font:500 14px/20px var(--ds-font-sans);white-space:nowrap;transition:background-color 150ms;background:var(--ds-fill);color:var(--ds-text);outline:1px solid transparent;outline-offset:-1px}
+.ds-fselect__trigger:hover{background:var(--ds-fill-hover)}
+.ds-fselect__trigger[data-active]{background:var(--ds-fill-hover);outline-color:var(--ds-outline-focus)}
+.ds-fselect__icon{display:flex;color:var(--ds-text-muted)}
+.ds-fselect__icon svg{width:16px;height:16px;stroke-width:1.5}
+.ds-fselect__chevron{width:16px;height:16px;color:var(--ds-text-subtle);stroke-width:1.5}
+.ds-fselect__scrim{all:unset;position:fixed;inset:0;z-index:60}
+.ds-fselect__menu{position:absolute;top:calc(100% + 6px);left:0;z-index:61;min-width:max(100%,200px);width:max-content;max-width:300px;background:var(--ds-surface-overlay);color:var(--ds-text);border-radius:12px;outline:1px solid var(--ds-outline-card);box-shadow:var(--ds-shadow-float);overflow:hidden;display:flex;flex-direction:column;padding:4px}
+.ds-fselect__menu[data-align="right"]{left:auto;right:0}
+.ds-fselect__divider{flex:none;height:1px;background:var(--ds-divider);margin:4px}
+.ds-fselect__item{all:unset;box-sizing:border-box;flex:none;height:32px;padding:0 8px 0 10px;border-radius:6px;display:flex;align-items:center;gap:12px;cursor:pointer;font:500 14px/20px var(--ds-font-sans);white-space:nowrap;color:var(--ds-text-secondary);transition:background-color 150ms}
+.ds-fselect__item:hover,.ds-fselect__item[data-selected]{color:var(--ds-text)}
+.ds-fselect__item:hover{background:var(--ds-fill-ghost-hover)}
+.ds-fselect__check{width:16px;display:flex;color:var(--ds-accent)}
+
+/* Page header (the panel's first block). */
+.ds-page-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.ds-page-head h1{margin:0;font:var(--ds-type-page-title);letter-spacing:var(--ds-tracking-tight)}
+.ds-page-head p{margin:0;font:var(--ds-type-label);color:var(--ds-text-muted)}

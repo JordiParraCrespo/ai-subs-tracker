@@ -1,13 +1,19 @@
 {
   "attention": {
-    "behind": "Behind pace",
-    "detail": "{{left}} left · resets {{reset}}",
+    "title": "Needs attention",
+    "toSave": "{{value}}/mo to save",
     "empty": "Nothing needs you right now.",
-    "expiring": "Use it before it resets",
-    "limit": "At its limit",
-    "signin": "Sign in again",
-    "signinHint": "This login stopped reporting.",
-    "title": "Needs attention"
+    "detail": "{{left}} left · resets {{reset}}",
+    "signinTitle": "Sign in again to {{name}}",
+    "signinEnd": "not syncing",
+    "expiringTitle": "Use {{name}} before it resets",
+    "expiringEnd": "at risk",
+    "behindTitle": "{{name}} is behind pace",
+    "behindEnd": "unused so far",
+    "limitTitle": "{{name}} is at its limit",
+    "limitEnd": "left",
+    "showAll": "Show all {{count}}",
+    "showLess": "Show less"
   },
   "desktop": {
     "add": "Add {{provider}}",
@@ -48,17 +54,21 @@
     "title": "By model"
   },
   "overview": {
+    "greeting": {
+      "morning": "Good morning, {{name}}",
+      "afternoon": "Good afternoon, {{name}}",
+      "evening": "Good evening, {{name}}"
+    },
+    "sub": "Here’s where your AI spend stands",
+    "past12": "Past 12 months",
+    "subscriptions": "Subscriptions",
+    "savings": "Potential savings",
+    "perMonth": "{{value}}/mo",
     "accountCount_one": "{{count}} account",
     "accountCount_other": "{{count}} accounts",
-    "accounts": "Accounts",
-    "apiValue": "{{value}} at API prices, 30 days",
-    "greeting": "Hello, {{name}}",
     "monthlySpend": "Monthly spend",
     "runRate": "Annual run rate",
-    "sub": "Where your AI plans stand",
-    "valuePerDollar": "Value per dollar",
-    "wasted": "Expired unused",
-    "wastedHint": "Weekly allowance left at reset, last 30 days"
+    "valuePerDollar": "Value per dollar"
   },
   "pace": {
     "ahead": "Ahead",
@@ -83,9 +93,12 @@
     "title": "Remove {{name}}?"
   },
   "resets": {
+    "title": "Next up",
+    "viewAll": "View all",
+    "when": "Resets {{when}}",
+    "leftLabel": "left",
     "empty": "No weekly resets reported yet.",
-    "left": "{{left}} left",
-    "title": "Next resets"
+    "left": "{{left}} left"
   },
   "settings": {
     "browserDescription": "Switching the terminal's account and the live feed act on your computer, so they live in the Subtrack desktop app.",
