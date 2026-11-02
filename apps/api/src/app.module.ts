@@ -26,6 +26,7 @@ import { AuthModule as BetterAuthModule } from '@thallesp/nestjs-better-auth';
 // flama:end admin-api
 // flama:begin api-tokens
 // flama:end api-tokens
+import { AccountsModule } from './accounts/accounts.module';
 import { AuthModule } from './auth/auth.module';
 import { ScopesGuard } from './auth/guards/scopes.guard';
 import { auth } from './auth/infrastructure/better-auth.config';
@@ -166,6 +167,7 @@ import { UsersModule } from './users/user.module';
     // flama:end api-tokens
     UsersModule,
     ProfileModule,
+    AccountsModule,
     RolesModule,
     // flama:begin admin-api
     // flama:end admin-api

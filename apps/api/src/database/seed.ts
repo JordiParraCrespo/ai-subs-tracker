@@ -4,6 +4,9 @@ import type { Role } from '@flama/shared';
 import { DataSource, IsNull } from 'typeorm';
 // flama:begin api-tokens
 // flama:end api-tokens
+import { AccountOrmEntity } from '../accounts/database/account.orm-entity';
+import { TokenUsageDailyOrmEntity } from '../accounts/database/token-usage-daily.orm-entity';
+import { UsageSnapshotOrmEntity } from '../accounts/database/usage-snapshot.orm-entity';
 import { Account } from '../auth/database/account.orm-entity';
 import { Session } from '../auth/database/session.orm-entity';
 import { TwoFactor } from '../auth/database/two-factor.orm-entity';
@@ -17,6 +20,7 @@ import { UserSettingsOrmEntity } from '../profile/database/user-settings.orm-ent
 import { RoleOrmEntity } from '../roles/database/role.orm-entity';
 import { UserRoleOrmEntity } from '../roles/database/user-role.orm-entity';
 import { UserOrmEntity } from '../users/database/user.orm-entity';
+
 // flama:plugins entity-imports
 
 // flama:begin organizations
@@ -32,6 +36,9 @@ const dataSource = new DataSource({
   entities: [
     UserOrmEntity,
     UserSettingsOrmEntity,
+    AccountOrmEntity,
+    UsageSnapshotOrmEntity,
+    TokenUsageDailyOrmEntity,
     Session,
     TwoFactor,
     Account,

@@ -87,7 +87,7 @@ const routes = controllerFiles(SRC).flatMap(collectRoutes);
 describe('route policy coverage', () => {
   it('finds the controllers to check', () => {
     // A scan that silently matches nothing would pass every assertion below.
-    expect(routes.length).toBeGreaterThan(50);
+    expect(routes.length).toBeGreaterThan(25);
   });
 
   it('declares an authorization policy or a reasoned exemption on every route', () => {

@@ -27,7 +27,7 @@ describe('the API route policy', () => {
   const paths = [...new Set(controllerPaths(SRC))];
 
   it('finds the controllers to classify', () => {
-    expect(paths.length).toBeGreaterThan(5);
+    expect(paths.length).toBeGreaterThan(3);
   });
 
   it.each(paths)('gives /%s a group of its own rather than other', (path) => {

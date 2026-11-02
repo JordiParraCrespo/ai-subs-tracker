@@ -25,7 +25,7 @@ import inventory from './route-scopes.inventory.json';
 const { routes, unreadable } = scanRoutes();
 const declared = Object.fromEntries(routes.map((route) => [route.route, route.scopes]));
 const expected = inventory as Record<string, ScopeDeclaration>;
-const catalog = new Set(
+const catalog = new Set<string>(
   PERMISSION_GROUPS.flatMap((group) => Object.values(group.levels).map((level) => level.scope)),
 );
 
@@ -42,12 +42,7 @@ const ANY_SCOPE: Record<string, string> = {
  * Writes (by verb) that a read scope is enough for, and why they change
  * nothing the scope would protect.
  */
-const WRITE_ON_READ: Record<string, string> = {
-  'POST /v1/organizations/check-slug': 'asks whether a slug is free; a read with a body',
-  'POST /v1/organizations/:id/set-active':
-    "switches the caller's own session, not the organization",
-  'POST /v1/workspaces/:id/set-active': "switches the caller's own session, not the workspace",
-};
+const WRITE_ON_READ: Record<string, string> = {};
 
 describe('route scope coverage', () => {
   it('finds the routes to check', () => {

@@ -13,6 +13,7 @@ export type ScopeAccessLevel = (typeof SCOPE_ACCESS_LEVELS)[number];
  */
 export const SCOPE_RESOURCES = [
   'profile',
+  'accounts',
   'users',
   // flama:begin admin-api
   // flama:end admin-api
@@ -87,6 +88,25 @@ export const PERMISSION_GROUPS: readonly PermissionGroup[] = [
         scope: 'profile:write',
         label: 'Edit',
         description: "Update the owner's own profile.",
+        policies: [],
+      },
+    },
+  },
+  {
+    resource: 'accounts',
+    label: 'AI accounts',
+    description: "The owner's own coding-agent accounts: their plans, limits and token usage.",
+    levels: {
+      read: {
+        scope: 'accounts:read',
+        label: 'Read',
+        description: "Read the owner's accounts, their limits and token usage.",
+        policies: [],
+      },
+      write: {
+        scope: 'accounts:write',
+        label: 'Edit',
+        description: "Sync, edit, activate and remove the owner's accounts.",
         policies: [],
       },
     },

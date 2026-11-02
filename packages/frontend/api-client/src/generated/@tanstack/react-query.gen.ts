@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { assign, catalog, changePassword, check, create, deleteAvatar, deploymentCapabilities, findAll, findAll2, findOne, findOne2, findSessions, findUserRoles, getProfile, getSettings, me, type Options, permissions, readiness, remove, remove2, revokeOtherSessions, revokeSession, update, update2, updatePermissions, updateProfile, updateSettings, uploadAvatar } from '../sdk.gen';
-import type { AssignData, AssignError, AssignResponse, CatalogData, CatalogError, CatalogResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, CheckData, CheckResponse, CreateData, CreateError, CreateResponse, DeleteAvatarData, DeleteAvatarError, DeleteAvatarResponse, DeploymentCapabilitiesData, DeploymentCapabilitiesResponse, FindAll2Data, FindAll2Error, FindAll2Response, FindAllData, FindAllError, FindAllResponse, FindOne2Data, FindOne2Error, FindOne2Response, FindOneData, FindOneError, FindOneResponse, FindSessionsData, FindSessionsError, FindSessionsResponse, FindUserRolesData, FindUserRolesError, FindUserRolesResponse, GetProfileData, GetProfileError, GetProfileResponse, GetSettingsData, GetSettingsError, GetSettingsResponse, MeData, MeError, MeResponse, PermissionsData, PermissionsError, PermissionsResponse, ReadinessData, ReadinessError, ReadinessResponse, Remove2Data, Remove2Error, RemoveData, RemoveError, RevokeOtherSessionsData, RevokeOtherSessionsError, RevokeOtherSessionsResponse, RevokeSessionData, RevokeSessionError, RevokeSessionResponse, Update2Data, Update2Error, Update2Response, UpdateData, UpdateError, UpdatePermissionsData, UpdatePermissionsError, UpdatePermissionsResponse, UpdateProfileData, UpdateProfileError, UpdateProfileResponse, UpdateResponse, UpdateSettingsData, UpdateSettingsError, UpdateSettingsResponse, UploadAvatarData, UploadAvatarError, UploadAvatarResponse } from '../types.gen';
+import { activate, archive, assign, catalog, changePassword, check, create, deleteAvatar, deploymentCapabilities, findAll, findAll2, findAll3, findOne, findOne2, findSessions, findUserRoles, getProfile, getSettings, me, type Options, permissions, readiness, remove, remove2, revokeOtherSessions, revokeSession, summary, sync, update, update2, update3, updatePermissions, updateProfile, updateSettings, uploadAvatar } from '../sdk.gen';
+import type { ActivateData, ActivateError, ActivateResponse, ArchiveData, ArchiveError, ArchiveResponse, AssignData, AssignError, AssignResponse, CatalogData, CatalogError, CatalogResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, CheckData, CheckResponse, CreateData, CreateError, CreateResponse, DeleteAvatarData, DeleteAvatarError, DeleteAvatarResponse, DeploymentCapabilitiesData, DeploymentCapabilitiesResponse, FindAll2Data, FindAll2Error, FindAll2Response, FindAll3Data, FindAll3Error, FindAll3Response, FindAllData, FindAllError, FindAllResponse, FindOne2Data, FindOne2Error, FindOne2Response, FindOneData, FindOneError, FindOneResponse, FindSessionsData, FindSessionsError, FindSessionsResponse, FindUserRolesData, FindUserRolesError, FindUserRolesResponse, GetProfileData, GetProfileError, GetProfileResponse, GetSettingsData, GetSettingsError, GetSettingsResponse, MeData, MeError, MeResponse, PermissionsData, PermissionsError, PermissionsResponse, ReadinessData, ReadinessError, ReadinessResponse, Remove2Data, Remove2Error, RemoveData, RemoveError, RevokeOtherSessionsData, RevokeOtherSessionsError, RevokeOtherSessionsResponse, RevokeSessionData, RevokeSessionError, RevokeSessionResponse, SummaryData, SummaryError, SummaryResponse, SyncData, SyncError, SyncResponse, Update2Data, Update2Error, Update2Response, Update3Data, Update3Error, Update3Response, UpdateData, UpdateError, UpdatePermissionsData, UpdatePermissionsError, UpdatePermissionsResponse, UpdateProfileData, UpdateProfileError, UpdateProfileResponse, UpdateResponse, UpdateSettingsData, UpdateSettingsError, UpdateSettingsResponse, UploadAvatarData, UploadAvatarError, UploadAvatarResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -414,7 +414,7 @@ export const catalogOptions = (options?: Options<CatalogData>) => queryOptions<C
 export const findAll2QueryKey = (options?: Options<FindAll2Data>) => createQueryKey('findAll2', options);
 
 /**
- * List all roles
+ * List my coding-agent accounts with their latest limits
  */
 export const findAll2Options = (options?: Options<FindAll2Data>) => queryOptions<FindAll2Response, FindAll2Error, FindAll2Response, ReturnType<typeof findAll2QueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -429,24 +429,132 @@ export const findAll2Options = (options?: Options<FindAll2Data>) => queryOptions
     queryKey: findAll2QueryKey(options)
 });
 
-export const findAll2InfiniteQueryKey = (options?: Options<FindAll2Data>): QueryKey<Options<FindAll2Data>> => createQueryKey('findAll2', options, true);
+export const summaryQueryKey = (options?: Options<SummaryData>) => createQueryKey('summary', options);
+
+/**
+ * Tokens used across my accounts, by model, account and day, priced at API rates
+ */
+export const summaryOptions = (options?: Options<SummaryData>) => queryOptions<SummaryResponse, SummaryError, SummaryResponse, ReturnType<typeof summaryQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await summary({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: summaryQueryKey(options)
+});
+
+/**
+ * Report the logins, limits and token counts a desktop app read
+ *
+ * Never carries a credential. Answers with every tracked account.
+ */
+export const syncMutation = (options?: Partial<Options<SyncData>>): UseMutationOptions<SyncResponse, SyncError, Options<SyncData>> => {
+    const mutationOptions: UseMutationOptions<SyncResponse, SyncError, Options<SyncData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await sync({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Stop tracking an account
+ */
+export const archiveMutation = (options?: Partial<Options<ArchiveData>>): UseMutationOptions<ArchiveResponse, ArchiveError, Options<ArchiveData>> => {
+    const mutationOptions: UseMutationOptions<ArchiveResponse, ArchiveError, Options<ArchiveData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await archive({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Rename an account or set its plan and price
+ */
+export const update2Mutation = (options?: Partial<Options<Update2Data>>): UseMutationOptions<Update2Response, Update2Error, Options<Update2Data>> => {
+    const mutationOptions: UseMutationOptions<Update2Response, Update2Error, Options<Update2Data>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await update2({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Make this the account terminals use for its provider
+ *
+ * Deactivates the owner’s other accounts of the same provider. Answers with every account.
+ */
+export const activateMutation = (options?: Partial<Options<ActivateData>>): UseMutationOptions<ActivateResponse, ActivateError, Options<ActivateData>> => {
+    const mutationOptions: UseMutationOptions<ActivateResponse, ActivateError, Options<ActivateData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await activate({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const findAll3QueryKey = (options?: Options<FindAll3Data>) => createQueryKey('findAll3', options);
 
 /**
  * List all roles
  */
-export const findAll2InfiniteOptions = (options?: Options<FindAll2Data>) => {
-    const opts = infiniteQueryOptions<FindAll2Response, FindAll2Error, InfiniteData<FindAll2Response>, QueryKey<Options<FindAll2Data>>, number | Pick<QueryKey<Options<FindAll2Data>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+export const findAll3Options = (options?: Options<FindAll3Data>) => queryOptions<FindAll3Response, FindAll3Error, FindAll3Response, ReturnType<typeof findAll3QueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await findAll3({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: findAll3QueryKey(options)
+});
+
+export const findAll3InfiniteQueryKey = (options?: Options<FindAll3Data>): QueryKey<Options<FindAll3Data>> => createQueryKey('findAll3', options, true);
+
+/**
+ * List all roles
+ */
+export const findAll3InfiniteOptions = (options?: Options<FindAll3Data>) => {
+    const opts = infiniteQueryOptions<FindAll3Response, FindAll3Error, InfiniteData<FindAll3Response>, QueryKey<Options<FindAll3Data>>, number | Pick<QueryKey<Options<FindAll3Data>>[0], 'body' | 'headers' | 'path' | 'query'>>(
     // @ts-ignore
     {
         queryFn: async ({ pageParam, queryKey, signal }) => {
             // @ts-ignore
-            const page: Pick<QueryKey<Options<FindAll2Data>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+            const page: Pick<QueryKey<Options<FindAll3Data>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
                 query: {
                     page: pageParam
                 }
             };
             const params = createInfiniteParams(queryKey, page);
-            const { data } = await findAll2({
+            const { data } = await findAll3({
                 ...options,
                 ...params,
                 signal,
@@ -454,7 +562,7 @@ export const findAll2InfiniteOptions = (options?: Options<FindAll2Data>) => {
             });
             return data;
         },
-        queryKey: findAll2InfiniteQueryKey(options)
+        queryKey: findAll3InfiniteQueryKey(options)
     });
     return opts as Omit<typeof opts, 'initialData'>;
 };
@@ -514,10 +622,10 @@ export const findOne2Options = (options: Options<FindOne2Data>) => queryOptions<
 /**
  * Update a role (description and/or permissions)
  */
-export const update2Mutation = (options?: Partial<Options<Update2Data>>): UseMutationOptions<Update2Response, Update2Error, Options<Update2Data>> => {
-    const mutationOptions: UseMutationOptions<Update2Response, Update2Error, Options<Update2Data>> = {
+export const update3Mutation = (options?: Partial<Options<Update3Data>>): UseMutationOptions<Update3Response, Update3Error, Options<Update3Data>> => {
+    const mutationOptions: UseMutationOptions<Update3Response, Update3Error, Options<Update3Data>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await update2({
+            const { data } = await update3({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

@@ -220,6 +220,204 @@ export type AuthzCatalogResponseDto = {
     grantable: Array<AuthzRuleDto>;
 };
 
+export type LimitWindowResponseDto = {
+    /**
+     * The provider's own key, e.g. five_hour
+     */
+    key: string;
+    kind: 'session' | 'weekly' | 'weekly_model' | 'monthly' | 'other';
+    label: string;
+    /**
+     * Percent used, 0–100+
+     */
+    utilization: number | null;
+    resetsAt: string | null;
+    windowMinutes: number | null;
+};
+
+export type ExtraUsageResponseDto = {
+    enabled: boolean;
+    monthlyLimit: number | null;
+    usedCredits: number | null;
+    utilization: number | null;
+    currency: string | null;
+};
+
+export type UsageSnapshotResponseDto = {
+    capturedAt: string;
+    source: 'poll' | 'live';
+    status: 'ok' | 'auth_expired' | 'no_credentials' | 'rate_limited' | 'error';
+    message: string | null;
+    windows: Array<LimitWindowResponseDto>;
+    extraUsage: ExtraUsageResponseDto | null;
+};
+
+export type WeeklyPeakResponseDto = {
+    resetsAt: string;
+    /**
+     * Highest percent of the weekly allowance used before it reset
+     */
+    peakUtilization: number;
+};
+
+export type AccountResponseDto = {
+    id: string;
+    provider: 'claude-code' | 'codex';
+    externalId: string;
+    /**
+     * The person's label, else the email
+     */
+    displayName: string;
+    label: string | null;
+    email: string | null;
+    organization: string | null;
+    location: string | null;
+    /**
+     * Plan as the provider names it
+     */
+    reportedPlan: string | null;
+    /**
+     * Catalog plan id in effect
+     */
+    planId: string | null;
+    planName: string | null;
+    /**
+     * True when the person chose the plan
+     */
+    planOverridden: boolean;
+    /**
+     * Monthly cost in effect, US cents
+     */
+    monthlyPriceCents: number;
+    /**
+     * True when the person set the price
+     */
+    priceOverridden: boolean;
+    isActive: boolean;
+    lastSyncedAt: string | null;
+    createdAt: string;
+    latest: UsageSnapshotResponseDto | null;
+    /**
+     * Weeks that reset in the last 30 days
+     */
+    weeklyPeaks: Array<WeeklyPeakResponseDto>;
+};
+
+export type TokenTotalsResponseDto = {
+    input: number;
+    output: number;
+    cacheWrite: number;
+    cacheRead: number;
+    messages: number;
+    /**
+     * What these tokens would cost at API prices, US cents
+     */
+    apiCostCents: number;
+};
+
+export type ModelUsageResponseDto = {
+    input: number;
+    output: number;
+    cacheWrite: number;
+    cacheRead: number;
+    messages: number;
+    /**
+     * What these tokens would cost at API prices, US cents
+     */
+    apiCostCents: number;
+    model: string;
+    /**
+     * Readable name when the model is priced
+     */
+    label: string | null;
+};
+
+export type AccountUsageResponseDto = {
+    input: number;
+    output: number;
+    cacheWrite: number;
+    cacheRead: number;
+    messages: number;
+    /**
+     * What these tokens would cost at API prices, US cents
+     */
+    apiCostCents: number;
+    accountId: string;
+};
+
+export type DailyUsageResponseDto = {
+    input: number;
+    output: number;
+    cacheWrite: number;
+    cacheRead: number;
+    messages: number;
+    /**
+     * What these tokens would cost at API prices, US cents
+     */
+    apiCostCents: number;
+    day: string;
+};
+
+export type UsageSummaryResponseDto = {
+    days: number;
+    since: string;
+    totals: TokenTotalsResponseDto;
+    byModel: Array<ModelUsageResponseDto>;
+    byAccount: Array<AccountUsageResponseDto>;
+    daily: Array<DailyUsageResponseDto>;
+};
+
+export type SyncAccountsRequest = {
+    device: {
+        name: string;
+        platform: string;
+    };
+    accounts: Array<{
+        provider: 'claude-code' | 'codex';
+        externalId: string;
+        email: string | null;
+        organization: string | null;
+        reportedPlan: string | null;
+        location: string | null;
+        snapshot: {
+            capturedAt: string;
+            source: 'poll' | 'live';
+            status: 'ok' | 'auth_expired' | 'no_credentials' | 'rate_limited' | 'error';
+            message: string | null;
+            windows: Array<{
+                key: string;
+                kind: 'session' | 'weekly' | 'weekly_model' | 'monthly' | 'other';
+                label: string;
+                utilization: number | null;
+                resetsAt: string | null;
+                windowMinutes: number | null;
+            }>;
+            extraUsage: {
+                enabled: boolean;
+                monthlyLimit: unknown;
+                usedCredits: unknown;
+                utilization: unknown;
+                currency: string | null;
+            } | null;
+        } | null;
+        dailyTokens: Array<{
+            day: string;
+            model: string;
+            input: number;
+            output: number;
+            cacheWrite: number;
+            cacheRead: number;
+            messages: number;
+        }>;
+    }>;
+};
+
+export type UpdateAccountRequest = {
+    label?: string | null;
+    planId?: string | null;
+    monthlyPriceCents?: number | null;
+};
+
 export type RoleResponseDto = {
     id: string;
     name: string;
@@ -870,6 +1068,182 @@ export type CatalogResponse = CatalogResponses[keyof CatalogResponses];
 export type FindAll2Data = {
     body?: never;
     path?: never;
+    query?: never;
+    url: '/api/v1/accounts';
+};
+
+export type FindAll2Errors = {
+    /**
+     * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
+     */
+    401: ProblemDetailsDto;
+    /**
+     * AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this
+     */
+    403: ProblemDetailsDto;
+};
+
+export type FindAll2Error = FindAll2Errors[keyof FindAll2Errors];
+
+export type FindAll2Responses = {
+    200: Array<AccountResponseDto>;
+};
+
+export type FindAll2Response = FindAll2Responses[keyof FindAll2Responses];
+
+export type SummaryData = {
+    body?: never;
+    path?: never;
+    query?: {
+        days?: number;
+    };
+    url: '/api/v1/accounts/usage';
+};
+
+export type SummaryErrors = {
+    /**
+     * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
+     */
+    401: ProblemDetailsDto;
+    /**
+     * AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this
+     */
+    403: ProblemDetailsDto;
+};
+
+export type SummaryError = SummaryErrors[keyof SummaryErrors];
+
+export type SummaryResponses = {
+    200: UsageSummaryResponseDto;
+};
+
+export type SummaryResponse = SummaryResponses[keyof SummaryResponses];
+
+export type SyncData = {
+    body: SyncAccountsRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/accounts/sync';
+};
+
+export type SyncErrors = {
+    /**
+     * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
+     */
+    401: ProblemDetailsDto;
+    /**
+     * AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this
+     */
+    403: ProblemDetailsDto;
+};
+
+export type SyncError = SyncErrors[keyof SyncErrors];
+
+export type SyncResponses = {
+    200: Array<AccountResponseDto>;
+};
+
+export type SyncResponse = SyncResponses[keyof SyncResponses];
+
+export type ArchiveData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/accounts/{id}';
+};
+
+export type ArchiveErrors = {
+    /**
+     * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
+     */
+    401: ProblemDetailsDto;
+    /**
+     * AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this
+     */
+    403: ProblemDetailsDto;
+    /**
+     * ACCOUNT_001 — Account not found
+     */
+    404: ProblemDetailsDto;
+};
+
+export type ArchiveError = ArchiveErrors[keyof ArchiveErrors];
+
+export type ArchiveResponses = {
+    204: void;
+};
+
+export type ArchiveResponse = ArchiveResponses[keyof ArchiveResponses];
+
+export type Update2Data = {
+    body: UpdateAccountRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/accounts/{id}';
+};
+
+export type Update2Errors = {
+    /**
+     * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
+     */
+    401: ProblemDetailsDto;
+    /**
+     * AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this
+     */
+    403: ProblemDetailsDto;
+    /**
+     * ACCOUNT_001 — Account not found
+     */
+    404: ProblemDetailsDto;
+};
+
+export type Update2Error = Update2Errors[keyof Update2Errors];
+
+export type Update2Responses = {
+    200: AccountResponseDto;
+};
+
+export type Update2Response = Update2Responses[keyof Update2Responses];
+
+export type ActivateData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/accounts/{id}/activate';
+};
+
+export type ActivateErrors = {
+    /**
+     * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
+     */
+    401: ProblemDetailsDto;
+    /**
+     * AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this
+     */
+    403: ProblemDetailsDto;
+    /**
+     * ACCOUNT_001 — Account not found
+     */
+    404: ProblemDetailsDto;
+};
+
+export type ActivateError = ActivateErrors[keyof ActivateErrors];
+
+export type ActivateResponses = {
+    200: Array<AccountResponseDto>;
+};
+
+export type ActivateResponse = ActivateResponses[keyof ActivateResponses];
+
+export type FindAll3Data = {
+    body?: never;
+    path?: never;
     query?: {
         /**
          * Page number (default: 1)
@@ -887,7 +1261,7 @@ export type FindAll2Data = {
     url: '/api/v1/roles';
 };
 
-export type FindAll2Errors = {
+export type FindAll3Errors = {
     /**
      * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
      */
@@ -898,13 +1272,13 @@ export type FindAll2Errors = {
     403: ProblemDetailsDto;
 };
 
-export type FindAll2Error = FindAll2Errors[keyof FindAll2Errors];
+export type FindAll3Error = FindAll3Errors[keyof FindAll3Errors];
 
-export type FindAll2Responses = {
+export type FindAll3Responses = {
     200: PaginatedRolesResponseDto;
 };
 
-export type FindAll2Response = FindAll2Responses[keyof FindAll2Responses];
+export type FindAll3Response = FindAll3Responses[keyof FindAll3Responses];
 
 export type CreateData = {
     body: CreateRoleRequest;
@@ -1002,7 +1376,7 @@ export type FindOne2Responses = {
 
 export type FindOne2Response = FindOne2Responses[keyof FindOne2Responses];
 
-export type Update2Data = {
+export type Update3Data = {
     body: UpdateRoleRequest;
     path: {
         id: string;
@@ -1011,7 +1385,7 @@ export type Update2Data = {
     url: '/api/v1/roles/{id}';
 };
 
-export type Update2Errors = {
+export type Update3Errors = {
     /**
      * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
      */
@@ -1026,13 +1400,13 @@ export type Update2Errors = {
     404: ProblemDetailsDto;
 };
 
-export type Update2Error = Update2Errors[keyof Update2Errors];
+export type Update3Error = Update3Errors[keyof Update3Errors];
 
-export type Update2Responses = {
+export type Update3Responses = {
     200: RoleResponseDto;
 };
 
-export type Update2Response = Update2Responses[keyof Update2Responses];
+export type Update3Response = Update3Responses[keyof Update3Responses];
 
 export type UpdatePermissionsData = {
     body: UpdateRolePermissionsRequest;

@@ -1004,6 +1004,367 @@
         "tags": ["Authorization"]
       }
     },
+    "/api/v1/accounts": {
+      "get": {
+        "operationId": "findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List my coding-agent accounts with their latest limits",
+        "tags": ["Accounts"]
+      }
+    },
+    "/api/v1/accounts/usage": {
+      "get": {
+        "operationId": "summary",
+        "parameters": [
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 90,
+              "default": 30,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageSummaryResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Tokens used across my accounts, by model, account and day, priced at API rates",
+        "tags": ["Accounts"]
+      }
+    },
+    "/api/v1/accounts/sync": {
+      "post": {
+        "description": "Never carries a credential. Answers with every tracked account.",
+        "operationId": "sync",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncAccountsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Report the logins, limits and token counts a desktop app read",
+        "tags": ["Accounts"]
+      }
+    },
+    "/api/v1/accounts/{id}": {
+      "patch": {
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ACCOUNT_001 — Account not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Rename an account or set its plan and price",
+        "tags": ["Accounts"]
+      },
+      "delete": {
+        "operationId": "archive",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "401": {
+            "description": "AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ACCOUNT_001 — Account not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Stop tracking an account",
+        "tags": ["Accounts"]
+      }
+    },
+    "/api/v1/accounts/{id}/activate": {
+      "post": {
+        "description": "Deactivates the owner’s other accounts of the same provider. Answers with every account.",
+        "operationId": "activate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ACCOUNT_001 — Account not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Make this the account terminals use for its provider",
+        "tags": ["Accounts"]
+      }
+    },
     "/api/v1/roles": {
       "get": {
         "operationId": "findAll",
@@ -2161,6 +2522,654 @@
           }
         },
         "required": ["groups", "grantable"]
+      },
+      "LimitWindowResponseDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "The provider's own key, e.g. five_hour"
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["session", "weekly", "weekly_model", "monthly", "other"]
+          },
+          "label": {
+            "type": "string"
+          },
+          "utilization": {
+            "type": "number",
+            "nullable": true,
+            "description": "Percent used, 0–100+"
+          },
+          "resetsAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "windowMinutes": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": ["key", "kind", "label", "utilization", "resetsAt", "windowMinutes"]
+      },
+      "ExtraUsageResponseDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "monthlyLimit": {
+            "type": "number",
+            "nullable": true
+          },
+          "usedCredits": {
+            "type": "number",
+            "nullable": true
+          },
+          "utilization": {
+            "type": "number",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": ["enabled", "monthlyLimit", "usedCredits", "utilization", "currency"]
+      },
+      "UsageSnapshotResponseDto": {
+        "type": "object",
+        "properties": {
+          "capturedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source": {
+            "type": "string",
+            "enum": ["poll", "live"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ok", "auth_expired", "no_credentials", "rate_limited", "error"]
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "windows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LimitWindowResponseDto"
+            }
+          },
+          "extraUsage": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExtraUsageResponseDto"
+              }
+            ]
+          }
+        },
+        "required": ["capturedAt", "source", "status", "message", "windows", "extraUsage"]
+      },
+      "WeeklyPeakResponseDto": {
+        "type": "object",
+        "properties": {
+          "resetsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "peakUtilization": {
+            "type": "number",
+            "description": "Highest percent of the weekly allowance used before it reset"
+          }
+        },
+        "required": ["resetsAt", "peakUtilization"]
+      },
+      "AccountResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string",
+            "enum": ["claude-code", "codex"]
+          },
+          "externalId": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "The person's label, else the email"
+          },
+          "label": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "organization": {
+            "type": "string",
+            "nullable": true
+          },
+          "location": {
+            "type": "string",
+            "nullable": true
+          },
+          "reportedPlan": {
+            "type": "string",
+            "nullable": true,
+            "description": "Plan as the provider names it"
+          },
+          "planId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Catalog plan id in effect"
+          },
+          "planName": {
+            "type": "string",
+            "nullable": true
+          },
+          "planOverridden": {
+            "type": "boolean",
+            "description": "True when the person chose the plan"
+          },
+          "monthlyPriceCents": {
+            "type": "number",
+            "description": "Monthly cost in effect, US cents"
+          },
+          "priceOverridden": {
+            "type": "boolean",
+            "description": "True when the person set the price"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "lastSyncedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "latest": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UsageSnapshotResponseDto"
+              }
+            ]
+          },
+          "weeklyPeaks": {
+            "description": "Weeks that reset in the last 30 days",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WeeklyPeakResponseDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "provider",
+          "externalId",
+          "displayName",
+          "label",
+          "email",
+          "organization",
+          "location",
+          "reportedPlan",
+          "planId",
+          "planName",
+          "planOverridden",
+          "monthlyPriceCents",
+          "priceOverridden",
+          "isActive",
+          "lastSyncedAt",
+          "createdAt",
+          "latest",
+          "weeklyPeaks"
+        ]
+      },
+      "TokenTotalsResponseDto": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "number"
+          },
+          "output": {
+            "type": "number"
+          },
+          "cacheWrite": {
+            "type": "number"
+          },
+          "cacheRead": {
+            "type": "number"
+          },
+          "messages": {
+            "type": "number"
+          },
+          "apiCostCents": {
+            "type": "number",
+            "description": "What these tokens would cost at API prices, US cents"
+          }
+        },
+        "required": ["input", "output", "cacheWrite", "cacheRead", "messages", "apiCostCents"]
+      },
+      "ModelUsageResponseDto": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "number"
+          },
+          "output": {
+            "type": "number"
+          },
+          "cacheWrite": {
+            "type": "number"
+          },
+          "cacheRead": {
+            "type": "number"
+          },
+          "messages": {
+            "type": "number"
+          },
+          "apiCostCents": {
+            "type": "number",
+            "description": "What these tokens would cost at API prices, US cents"
+          },
+          "model": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string",
+            "nullable": true,
+            "description": "Readable name when the model is priced"
+          }
+        },
+        "required": [
+          "input",
+          "output",
+          "cacheWrite",
+          "cacheRead",
+          "messages",
+          "apiCostCents",
+          "model",
+          "label"
+        ]
+      },
+      "AccountUsageResponseDto": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "number"
+          },
+          "output": {
+            "type": "number"
+          },
+          "cacheWrite": {
+            "type": "number"
+          },
+          "cacheRead": {
+            "type": "number"
+          },
+          "messages": {
+            "type": "number"
+          },
+          "apiCostCents": {
+            "type": "number",
+            "description": "What these tokens would cost at API prices, US cents"
+          },
+          "accountId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "input",
+          "output",
+          "cacheWrite",
+          "cacheRead",
+          "messages",
+          "apiCostCents",
+          "accountId"
+        ]
+      },
+      "DailyUsageResponseDto": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "number"
+          },
+          "output": {
+            "type": "number"
+          },
+          "cacheWrite": {
+            "type": "number"
+          },
+          "cacheRead": {
+            "type": "number"
+          },
+          "messages": {
+            "type": "number"
+          },
+          "apiCostCents": {
+            "type": "number",
+            "description": "What these tokens would cost at API prices, US cents"
+          },
+          "day": {
+            "type": "string",
+            "example": "2026-11-02"
+          }
+        },
+        "required": [
+          "input",
+          "output",
+          "cacheWrite",
+          "cacheRead",
+          "messages",
+          "apiCostCents",
+          "day"
+        ]
+      },
+      "UsageSummaryResponseDto": {
+        "type": "object",
+        "properties": {
+          "days": {
+            "type": "number"
+          },
+          "since": {
+            "type": "string",
+            "example": "2026-10-04"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/TokenTotalsResponseDto"
+          },
+          "byModel": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModelUsageResponseDto"
+            }
+          },
+          "byAccount": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccountUsageResponseDto"
+            }
+          },
+          "daily": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DailyUsageResponseDto"
+            }
+          }
+        },
+        "required": ["days", "since", "totals", "byModel", "byAccount", "daily"]
+      },
+      "SyncAccountsRequest": {
+        "type": "object",
+        "properties": {
+          "device": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "platform": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              }
+            },
+            "required": ["name", "platform"]
+          },
+          "accounts": {
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "provider": {
+                  "type": "string",
+                  "enum": ["claude-code", "codex"]
+                },
+                "externalId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "email": {
+                  "type": "string",
+                  "maxLength": 320,
+                  "nullable": true
+                },
+                "organization": {
+                  "type": "string",
+                  "maxLength": 200,
+                  "nullable": true
+                },
+                "reportedPlan": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "nullable": true
+                },
+                "location": {
+                  "type": "string",
+                  "maxLength": 300,
+                  "nullable": true
+                },
+                "snapshot": {
+                  "type": "object",
+                  "properties": {
+                    "capturedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                    },
+                    "source": {
+                      "type": "string",
+                      "enum": ["poll", "live"]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["ok", "auth_expired", "no_credentials", "rate_limited", "error"]
+                    },
+                    "message": {
+                      "type": "string",
+                      "maxLength": 500,
+                      "nullable": true
+                    },
+                    "windows": {
+                      "maxItems": 20,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          },
+                          "kind": {
+                            "type": "string",
+                            "enum": ["session", "weekly", "weekly_model", "monthly", "other"]
+                          },
+                          "label": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          },
+                          "utilization": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1000,
+                            "nullable": true
+                          },
+                          "resetsAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                            "nullable": true
+                          },
+                          "windowMinutes": {
+                            "type": "integer",
+                            "exclusiveMinimum": 0,
+                            "maximum": 9007199254740991,
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "key",
+                          "kind",
+                          "label",
+                          "utilization",
+                          "resetsAt",
+                          "windowMinutes"
+                        ]
+                      }
+                    },
+                    "extraUsage": {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "monthlyLimit": {
+                          "type": ["number", "null"]
+                        },
+                        "usedCredits": {
+                          "type": ["number", "null"]
+                        },
+                        "utilization": {
+                          "type": ["number", "null"]
+                        },
+                        "currency": {
+                          "type": "string",
+                          "maxLength": 8,
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "enabled",
+                        "monthlyLimit",
+                        "usedCredits",
+                        "utilization",
+                        "currency"
+                      ],
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "capturedAt",
+                    "source",
+                    "status",
+                    "message",
+                    "windows",
+                    "extraUsage"
+                  ],
+                  "nullable": true
+                },
+                "dailyTokens": {
+                  "maxItems": 1000,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "day": {
+                        "type": "string",
+                        "format": "date",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                      },
+                      "model": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 120
+                      },
+                      "input": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "output": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "cacheWrite": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "cacheRead": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "messages": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": [
+                      "day",
+                      "model",
+                      "input",
+                      "output",
+                      "cacheWrite",
+                      "cacheRead",
+                      "messages"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "provider",
+                "externalId",
+                "email",
+                "organization",
+                "reportedPlan",
+                "location",
+                "snapshot",
+                "dailyTokens"
+              ]
+            }
+          }
+        },
+        "required": ["device", "accounts"]
+      },
+      "UpdateAccountRequest": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "nullable": true
+          },
+          "planId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60,
+            "nullable": true
+          },
+          "monthlyPriceCents": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000,
+            "nullable": true
+          }
+        }
       },
       "RoleResponseDto": {
         "type": "object",

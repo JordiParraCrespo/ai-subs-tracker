@@ -23,6 +23,8 @@ export const apiHttpMetricsOptions: HttpMetricsOptions = {
     { templatePrefix: '/v1/roles', group: 'admin' },
     { templatePrefix: '/v1/access-grants', group: 'admin' },
     { templatePrefix: '/v1/authz', group: 'admin' },
+    // The desktop collector syncs here every few minutes per machine.
+    { templatePrefix: '/v1/accounts', group: 'accounts' },
     // flama:plugins api-metrics-routes
   ],
 };

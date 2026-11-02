@@ -1,0 +1,12 @@
+{
+  "extends": "@flama/tsconfig/tsconfig.library.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "module": "node20",
+    "moduleResolution": "node16",
+    "types": ["node"]
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.spec.ts", "src/**/__tests__/**"]
+}

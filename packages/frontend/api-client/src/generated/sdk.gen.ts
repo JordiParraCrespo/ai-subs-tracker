@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AssignData, AssignErrors, AssignResponses, CatalogData, CatalogErrors, CatalogResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CheckData, CheckResponses, CreateData, CreateErrors, CreateResponses, DeleteAvatarData, DeleteAvatarErrors, DeleteAvatarResponses, DeploymentCapabilitiesData, DeploymentCapabilitiesResponses, FindAll2Data, FindAll2Errors, FindAll2Responses, FindAllData, FindAllErrors, FindAllResponses, FindOne2Data, FindOne2Errors, FindOne2Responses, FindOneData, FindOneErrors, FindOneResponses, FindSessionsData, FindSessionsErrors, FindSessionsResponses, FindUserRolesData, FindUserRolesErrors, FindUserRolesResponses, GetProfileData, GetProfileErrors, GetProfileResponses, GetSettingsData, GetSettingsErrors, GetSettingsResponses, MeData, MeErrors, MeResponses, PermissionsData, PermissionsErrors, PermissionsResponses, ReadinessData, ReadinessErrors, ReadinessResponses, Remove2Data, Remove2Errors, Remove2Responses, RemoveData, RemoveErrors, RemoveResponses, RevokeOtherSessionsData, RevokeOtherSessionsErrors, RevokeOtherSessionsResponses, RevokeSessionData, RevokeSessionErrors, RevokeSessionResponses, Update2Data, Update2Errors, Update2Responses, UpdateData, UpdateErrors, UpdatePermissionsData, UpdatePermissionsErrors, UpdatePermissionsResponses, UpdateProfileData, UpdateProfileErrors, UpdateProfileResponses, UpdateResponses, UpdateSettingsData, UpdateSettingsErrors, UpdateSettingsResponses, UploadAvatarData, UploadAvatarErrors, UploadAvatarResponses } from './types.gen';
+import type { ActivateData, ActivateErrors, ActivateResponses, ArchiveData, ArchiveErrors, ArchiveResponses, AssignData, AssignErrors, AssignResponses, CatalogData, CatalogErrors, CatalogResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CheckData, CheckResponses, CreateData, CreateErrors, CreateResponses, DeleteAvatarData, DeleteAvatarErrors, DeleteAvatarResponses, DeploymentCapabilitiesData, DeploymentCapabilitiesResponses, FindAll2Data, FindAll2Errors, FindAll2Responses, FindAll3Data, FindAll3Errors, FindAll3Responses, FindAllData, FindAllErrors, FindAllResponses, FindOne2Data, FindOne2Errors, FindOne2Responses, FindOneData, FindOneErrors, FindOneResponses, FindSessionsData, FindSessionsErrors, FindSessionsResponses, FindUserRolesData, FindUserRolesErrors, FindUserRolesResponses, GetProfileData, GetProfileErrors, GetProfileResponses, GetSettingsData, GetSettingsErrors, GetSettingsResponses, MeData, MeErrors, MeResponses, PermissionsData, PermissionsErrors, PermissionsResponses, ReadinessData, ReadinessErrors, ReadinessResponses, Remove2Data, Remove2Errors, Remove2Responses, RemoveData, RemoveErrors, RemoveResponses, RevokeOtherSessionsData, RevokeOtherSessionsErrors, RevokeOtherSessionsResponses, RevokeSessionData, RevokeSessionErrors, RevokeSessionResponses, SummaryData, SummaryErrors, SummaryResponses, SyncData, SyncErrors, SyncResponses, Update2Data, Update2Errors, Update2Responses, Update3Data, Update3Errors, Update3Responses, UpdateData, UpdateErrors, UpdatePermissionsData, UpdatePermissionsErrors, UpdatePermissionsResponses, UpdateProfileData, UpdateProfileErrors, UpdateProfileResponses, UpdateResponses, UpdateSettingsData, UpdateSettingsErrors, UpdateSettingsResponses, UploadAvatarData, UploadAvatarErrors, UploadAvatarResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -209,9 +209,75 @@ export const catalog = <ThrowOnError extends boolean = false>(options?: Options<
 });
 
 /**
- * List all roles
+ * List my coding-agent accounts with their latest limits
  */
 export const findAll2 = <ThrowOnError extends boolean = false>(options?: Options<FindAll2Data, ThrowOnError>): RequestResult<FindAll2Responses, FindAll2Errors, ThrowOnError> => (options?.client ?? client).get<FindAll2Responses, FindAll2Errors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts',
+    ...options
+});
+
+/**
+ * Tokens used across my accounts, by model, account and day, priced at API rates
+ */
+export const summary = <ThrowOnError extends boolean = false>(options?: Options<SummaryData, ThrowOnError>): RequestResult<SummaryResponses, SummaryErrors, ThrowOnError> => (options?.client ?? client).get<SummaryResponses, SummaryErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts/usage',
+    ...options
+});
+
+/**
+ * Report the logins, limits and token counts a desktop app read
+ *
+ * Never carries a credential. Answers with every tracked account.
+ */
+export const sync = <ThrowOnError extends boolean = false>(options: Options<SyncData, ThrowOnError>): RequestResult<SyncResponses, SyncErrors, ThrowOnError> => (options.client ?? client).post<SyncResponses, SyncErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts/sync',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Stop tracking an account
+ */
+export const archive = <ThrowOnError extends boolean = false>(options: Options<ArchiveData, ThrowOnError>): RequestResult<ArchiveResponses, ArchiveErrors, ThrowOnError> => (options.client ?? client).delete<ArchiveResponses, ArchiveErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts/{id}',
+    ...options
+});
+
+/**
+ * Rename an account or set its plan and price
+ */
+export const update2 = <ThrowOnError extends boolean = false>(options: Options<Update2Data, ThrowOnError>): RequestResult<Update2Responses, Update2Errors, ThrowOnError> => (options.client ?? client).patch<Update2Responses, Update2Errors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Make this the account terminals use for its provider
+ *
+ * Deactivates the owner’s other accounts of the same provider. Answers with every account.
+ */
+export const activate = <ThrowOnError extends boolean = false>(options: Options<ActivateData, ThrowOnError>): RequestResult<ActivateResponses, ActivateErrors, ThrowOnError> => (options.client ?? client).post<ActivateResponses, ActivateErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts/{id}/activate',
+    ...options
+});
+
+/**
+ * List all roles
+ */
+export const findAll3 = <ThrowOnError extends boolean = false>(options?: Options<FindAll3Data, ThrowOnError>): RequestResult<FindAll3Responses, FindAll3Errors, ThrowOnError> => (options?.client ?? client).get<FindAll3Responses, FindAll3Errors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/roles',
     ...options
@@ -251,7 +317,7 @@ export const findOne2 = <ThrowOnError extends boolean = false>(options: Options<
 /**
  * Update a role (description and/or permissions)
  */
-export const update2 = <ThrowOnError extends boolean = false>(options: Options<Update2Data, ThrowOnError>): RequestResult<Update2Responses, Update2Errors, ThrowOnError> => (options.client ?? client).patch<Update2Responses, Update2Errors, ThrowOnError>({
+export const update3 = <ThrowOnError extends boolean = false>(options: Options<Update3Data, ThrowOnError>): RequestResult<Update3Responses, Update3Errors, ThrowOnError> => (options.client ?? client).patch<Update3Responses, Update3Errors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/roles/{id}',
     ...options,
