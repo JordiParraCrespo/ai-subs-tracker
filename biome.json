@@ -68,6 +68,7 @@
       "!**/*.css",
       "!**/*.gen.ts",
       "!pnpm-lock.yaml",
+      "!designs",
       "!**/packages/frontend/api-client/src/data-access",
       "!**/packages/frontend/design-system/*/src/components"
     ]
