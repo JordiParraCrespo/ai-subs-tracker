@@ -22,16 +22,30 @@
  *   pnpm ci:local                    # affected packages, against origin/main
  *   pnpm ci:local --base <ref>       # against another base
  *   pnpm ci:local --all              # every package
+ *   pnpm ci:local --skip-e2e         # the Check steps only, to re-run them quickly
  *
- * The API's integration and e2e suites and the Docker images are jobs of
- * their own in CI, with services this command does not start.
+ * Then the end-to-end stage (`e2e-stage.mjs`): the local stack
+ * (`scripts/stack/stack.mjs`) with this commit's API, and the API, screens and
+ * desktop suites the branch's packages select. The screens and the desktop
+ * app have no CI runner, so this is the one place they are checked before a
+ * push. `--skip-e2e` leaves the stage out and records nothing: it is for
+ * re-running the Check steps after a fix, never for getting a push through.
+ *
+ * Every run writes `.ci-local/report.md` (the commit, the base, one row per
+ * step and its time) for the pull request's description, and each step's
+ * output stays in the terminal. The API's integration suite and the Docker
+ * images are CI jobs of their own, with services this command does not start.
  */
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { affected } from './affected.mjs';
+// flama:begin e2e
+import { e2eSteps, STACK_DOWN } from './e2e-stage.mjs';
+
+// flama:end e2e
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const WORKFLOW = join(ROOT, '.github/workflows/ci.yml');
@@ -84,6 +98,28 @@ function record(tree) {
   writeFileSync(file, `${kept.join('\n')}\n`);
 }
 
+/** `.ci-local/report.md`: what ran on which commit, one row per step. */
+function writeReport({ base, scope, rows, seconds, recorded }) {
+  const dir = join(ROOT, '.ci-local');
+  mkdirSync(dir, { recursive: true });
+  const head = git('rev-parse', 'HEAD');
+  const dirty = git('status', '--porcelain') !== '';
+  const lines = [
+    `**Commit** \`${head.slice(0, 12)}\`${dirty ? ' (with uncommitted changes)' : ''} · **base** ${base ?? 'everything'} · ${scope} · ${seconds}s`,
+    '',
+    '| Step | Result | Time |',
+    '| --- | --- | --- |',
+    ...rows.map(
+      ({ name, ok, ms }) =>
+        `| ${name} | ${ok ? 'pass' : '**fail**'} | ${(ms / 1000).toFixed(1)}s |`,
+    ),
+    '',
+    recorded ? 'Recorded: this tree may be pushed.' : 'Not recorded: this run cannot be pushed on.',
+    '',
+  ];
+  writeFileSync(join(dir, 'report.md'), lines.join('\n'));
+}
+
 function main() {
   const steps = catalog();
   const all = process.argv.includes('--all');
@@ -100,30 +136,78 @@ function main() {
 
   console.log(`ci:local — ${run.scope} (${run.reason}), ${run.packages.length} package(s)\n`);
   const started = Date.now();
-  for (const step of steps) {
-    console.log(`\x1b[1m▶ ${step.name}\x1b[0m`);
+  const rows = [];
+  const report = (recorded) =>
+    writeReport({
+      base,
+      scope: run.scope,
+      rows,
+      seconds: ((Date.now() - started) / 1000).toFixed(0),
+      recorded,
+    });
+  /** Runs one step, printing and recording it; false when it failed. */
+  const runStep = (name, command, args, stepEnv = {}) => {
+    console.log(`\x1b[1m▶ ${name}\x1b[0m`);
     const t = Date.now();
-    const { status } = spawnSync('bash', ['-eo', 'pipefail', '-c', step.run], {
+    const { status } = spawnSync(command, args, {
       cwd: ROOT,
       stdio: 'inherit',
-      env: { ...env, ...step.env },
+      env: { ...env, ...stepEnv },
     });
+    rows.push({ name, ok: status === 0, ms: Date.now() - t });
     if (status !== 0) {
-      console.error(
-        `\n\x1b[31m✗ ${step.name} failed.\x1b[0m Fix it and run \`pnpm ci:local\` again.`,
-      );
+      console.error(`\n\x1b[31m✗ ${name} failed.\x1b[0m Fix it and run \`pnpm ci:local\` again.`);
+      return false;
+    }
+    console.log(`\x1b[32m✓ ${name}\x1b[0m (${((Date.now() - t) / 1000).toFixed(1)}s)\n`);
+    return true;
+  };
+
+  for (const step of steps) {
+    if (!runStep(step.name, 'bash', ['-eo', 'pipefail', '-c', step.run], step.env)) {
+      report(false);
       process.exit(1);
     }
-    console.log(`\x1b[32m✓ ${step.name}\x1b[0m (${((Date.now() - t) / 1000).toFixed(1)}s)\n`);
   }
 
+  const skipE2e = process.argv.includes('--skip-e2e');
+  // flama:begin e2e
+  const stage = skipE2e
+    ? []
+    : e2eSteps(run.packages, {
+        linuxWithoutDisplay: process.platform === 'linux' && !process.env.DISPLAY,
+      });
+  if (stage.length) {
+    let ok = true;
+    for (const step of stage) {
+      ok = runStep(step.name, step.command, step.args);
+      if (!ok) break;
+    }
+    runStep(STACK_DOWN.name, STACK_DOWN.command, STACK_DOWN.args);
+    if (!ok) {
+      report(false);
+      process.exit(1);
+    }
+  }
+  // flama:end e2e
+
   const seconds = ((Date.now() - started) / 1000).toFixed(0);
+  if (skipE2e) {
+    report(false);
+    console.log(
+      `\x1b[33m✓ The Check steps passed in ${seconds}s; the e2e stage was skipped.\x1b[0m`,
+    );
+    console.log('  Nothing recorded: run `pnpm ci:local` without --skip-e2e before pushing.');
+    return;
+  }
   if (!tree || cleanTree() !== tree) {
+    report(false);
     console.log(`\x1b[33m✓ Passed in ${seconds}s over uncommitted changes.\x1b[0m`);
     console.log('  Nothing recorded: commit, then run `pnpm ci:local` again before pushing.');
     return;
   }
   record(tree);
+  report(true);
   console.log(
     `\x1b[32m✓ ci:local passed in ${seconds}s.\x1b[0m Tree ${tree.slice(0, 12)} recorded; it may be pushed.`,
   );

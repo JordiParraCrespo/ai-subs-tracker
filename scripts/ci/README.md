@@ -37,6 +37,7 @@ block a merge it is required alongside `CI`.
 ```bash
 pnpm ci:local              # affected packages, against origin/main
 pnpm ci:local --all        # every package
+pnpm ci:local --skip-e2e   # the Check steps only, to re-run them after a fix; records nothing
 ```
 
 There is one step catalog: the Check job in `.github/workflows/ci.yml`.
@@ -44,6 +45,13 @@ There is one step catalog: the Check job in `.github/workflows/ci.yml`.
 runner does, with the same `AFFECTED_PACKAGES` / `AFFECTED_FILTERS`. Those
 steps stay plain shell: no `if:`, no `uses:`, no `${{ }}`. The script refuses
 a step it cannot run, and `local.test.mjs` fails on one.
+
+After the Check steps comes the end-to-end stage (`e2e-stage.mjs`): the
+local stack (`scripts/stack/stack.mjs`) with this commit's API, then the
+`api`, `web` and `desktop` Playwright projects the affected packages select.
+The screens and the desktop app have no CI runner, so this is where they are
+checked before a push. A run writes `.ci-local/report.md` for the pull
+request.
 
 When every step passes on a clean working copy, HEAD's tree is recorded in
 `.git/flama-ci-ok`. The `pre-push` hook in `.githooks/` checks the tree of

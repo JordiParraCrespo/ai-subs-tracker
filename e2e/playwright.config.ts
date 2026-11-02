@@ -70,6 +70,14 @@ export default defineConfig({
       },
     },
     // flama:end web
+    // The desktop app (Electron) against the stack: `e2e:desktop`, after
+    // building @flama/web and @flama/desktop; Linux without a display needs
+    // `xvfb-run -a`. One worker: each run launches the whole app.
+    {
+      name: 'desktop',
+      testDir: './tests/desktop',
+      fullyParallel: false,
+    },
     // flama:begin web
     // `pnpm screens` (scripts/stack/screens.mjs): the routes it names, light
     // and dark, into `.screenshots/`. Throwaway specs for one state live in

@@ -1,64 +1,54 @@
 # @flama/e2e
 
-End-to-end coverage for authentication, driven by Playwright against a running
-stack. Two projects share one runner:
+End-to-end coverage driven by Playwright against a running stack. Four
+projects share one runner:
 
 - **`api`** — drives the Better Auth endpoints and the REST routes behind them
   with `request` only, so it needs no browser.
-- **`web`** — drives `apps/web` in Chromium, exercising the same journeys
-  through the UI a user actually sees.
+- **`web`** — drives `apps/web` in Chromium, through the screens a person
+  actually sees: sign-in, the accounts, usage, Tokenmaxx, People, Renewals,
+  the profile and settings.
+- **`desktop`** — launches the Electron app (`apps/desktop`) on a throwaway
+  home with Claude Code and Codex logins written to disk, signs in through its
+  screens, waits for its collector to sync to the API, and switches a login
+  on, checking the pointer file the terminals read. Its logins never reach a
+  provider, so it runs offline.
+- **`screens`** — `pnpm screens`: the routes it names, photographed light and
+  dark for a pull request. Not a test of anything; with no routes named it
+  skips.
 
 ## Where it runs
 
 CI runs the **`api` project** on every pull request, in the `End-to-End Tests
-(API)` job: Postgres and Redis as service containers, migrations, the API
-started from its build, then `e2e:api`. No browser is involved, so that job
-needs none.
-
-The **`web` project does not run in CI yet, and does not pass.** On `main` it is
-15 failures out of 64, and they are not flakes — the suite drifted while nothing
-ran it:
-
-- six `team.spec.ts` specs, and the profile spec that opens the team page, drive
-  a `/team` route that `apps/web` no longer has. Organization surfaces now live
-  in `apps/web/src/features/organizations/` — the onboarding and
-  accept-invitation screens, and the general pane of `/settings` — while roles
-  and users moved to the control plane (`apps/admin-web`, over
-  `@flama/frontend-admin`). The specs did not follow
-- `nav-permissions.spec.ts` asserts a nav catalog that has the same problem
-- the rest — an avatar upload, a password change signing other devices out, a
-  wrong-password error, the language switch — are individually stale or broken
-  and need diagnosing one at a time
-
-Fixing that is its own piece of work: port the specs to whichever app owns each
-surface now, then add `--project=web` to the CI job. Until then a green CI says
-nothing about the browser journeys, so run `pnpm --filter @flama/e2e e2e:web`
-locally when you touch them.
+(API)` job. The **`web` and `desktop` projects** have no runner there:
+`pnpm ci:local` runs them, with the `api` project, against the local stack
+whenever the branch touches what they cover (`scripts/ci/e2e-stage.mjs`), so a
+push is checked end to end before it leaves the machine.
 
 ## Running it
 
 ```bash
-# 1. infrastructure
-pnpm docker:up                       # Postgres + Redis
-cp .env.example .env                 # EMAIL_PROVIDER=console is what the suite reads
+node scripts/stack/stack.mjs up --web     # Postgres, Redis, the API built here, the screens
 
-# 2. build + migrate + start the API, capturing its log (see "Mailbox" below)
-pnpm build
-pnpm --filter @flama/api migration:run
-node apps/api/dist/main.js > /tmp/api.log 2>&1 &
+pnpm --filter @flama/e2e e2e:api          # API only, no browser needed
+pnpm --filter @flama/e2e e2e:web          # the screens
+pnpm turbo run build --filter=@flama/web --filter=@flama/desktop
+pnpm --filter @flama/e2e e2e:desktop      # on Linux without a display: xvfb-run -a pnpm …
+pnpm --filter @flama/e2e e2e:ratelimit    # see "The rate-limit test" below
 
-# 3. the web app (only needed for the `web` project)
-pnpm --filter @flama/web dev &
-
-# 4. the tests
-pnpm test:e2e                              # everything (from the repo root)
-pnpm --filter @flama/e2e e2e:api           # API only, no browser needed
-pnpm --filter @flama/e2e e2e:web           # browser only
-pnpm --filter @flama/e2e e2e:ratelimit     # see "The rate-limit test" below
+node scripts/stack/stack.mjs down
 ```
 
+`scripts/stack/stack.mjs` is the steps this used to list by hand: it uses a
+Postgres and a Redis already listening (or starts them with Docker), builds,
+migrates and starts the API with its log in `.stack/api.log`, which is the
+suites' mailbox (below), and with `--web` serves the screens through Vite. It
+never writes `.env`. The `local-stack` skill is how an agent uses it.
+
 Overridable via environment: `API_URL` (default `http://localhost:3001`),
-`WEB_URL` (`http://localhost:3000`), `API_LOG` (`/tmp/api.log`).
+`WEB_URL` (`http://localhost:3000`), `API_LOG` (`.stack/api.log`), and
+`PLAYWRIGHT_CHROMIUM_PATH` for a Chromium the machine ships
+(`scripts/chromium.mjs` also finds `/opt/pw-browsers/chromium` on its own).
 
 Database settings are **not** a separate knob. `support/db.ts` imports
 `@flama/env/load` and reads the same `DB_HOST` / `DB_PORT` / `DB_USERNAME` /
@@ -80,8 +70,9 @@ from where the API already puts them, so there is nothing to install:
 - **Email verification** — the token is a signed JWT that is never stored, so
   `support/mail.ts` reads it out of the API log instead. With
   `EMAIL_PROVIDER=console` the API's `ConsoleEmailService` logs every message it
-  would have sent, which makes the log the mailbox. That is why step 2 above
-  redirects the API's output to a file, and why `API_LOG` must point at it.
+  would have sent, which makes the log the mailbox. That is why the stack
+  captures the API's output to `.stack/api.log`, and why `API_LOG` must point
+  at the file when the API runs some other way.
 
 ## Accounts and workspaces
 
@@ -129,11 +120,15 @@ re-tested by accident everywhere else.
 ```
 e2e/
 ├── support/
+│   ├── accounts.ts # a desktop collector's sync, sent straight to the API
 │   ├── auth.ts     # request contexts, sign-up/in/out, reset helpers, problem-doc assertions
 │   ├── db.ts       # reset tokens, roles, orgs, sessions, password hashes
-│   └── mail.ts     # reads the console-provider "mailbox" out of the API log
+│   ├── mail.ts     # reads the console-provider "mailbox" out of the API log
+│   └── web.ts      # browser sign-in and a fresh account per spec
 └── tests/
     ├── api/        # sign-up, sign-in, password reset, verification, protected
-    │               # routes, authorization, session security, OAuth
-    └── web/        # the same journeys through apps/web in Chromium
+    │               # routes, authorization, session security, OAuth, accounts
+    ├── web/        # the same journeys through apps/web in Chromium
+    ├── desktop/    # the Electron app, its collector and the sync
+    └── screens/    # `pnpm screens`; local/ holds throwaway specs (git-ignored)
 ```

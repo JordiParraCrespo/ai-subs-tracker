@@ -165,10 +165,13 @@ with before it touches anything.
 - Conventional commits enforced via commitlint
 - Independent versioning per package via Changesets
 - Run **`pnpm ci:local`** before pushing: it is pull request CI's Check job,
-  run here over what the branch affects, and the `pre-push` git hook refuses
-  a commit it has not passed. Require the `CI` check. How CI decides what runs,
-  how an image is picked up and where a root-level file is declared, is
-  `scripts/ci/README.md`
+  run here over what the branch affects, then the API, screens and desktop
+  e2e suites against the local stack, and the `pre-push` git hook refuses a
+  commit it has not passed. Require the `CI` check. The order of work from an
+  edit to a pull request is the `/local-ci` skill; standing the stack up,
+  running a suite and photographing the screens is `/local-stack`. How CI
+  decides what runs, how an image is picked up and where a root-level file is
+  declared, is `scripts/ci/README.md`
 - Actions are pinned to a commit SHA with the tag in a comment, and a
   workflow's token gets only what it uses. `.github/` holds the rest of the
   repository's policy — Dependabot, `CODEOWNERS` (the security-critical paths
@@ -382,6 +385,10 @@ pnpm check:compiler     # React Compiler bailouts per app; fails on a file outsi
 pnpm check:singletons   # One installed copy of each module-state library for apps/web (pnpm-lock.yaml)
 # flama:end web
 pnpm docker:dev         # Start Postgres + Redis
+# flama:begin e2e
+node scripts/stack/stack.mjs up [--web]  # The stack the e2e suites run against (e2e/README.md)
+pnpm screens /dashboard # Light and dark screenshots of routes, for a pull request (/local-stack)
+# flama:end e2e
 pnpm monitoring:up      # Prometheus + Grafana over the local API (needs METRICS_TOKEN); docker/monitoring/README.md
 pnpm generate:api-client # Regenerate typed API client (no database needed)
 pnpm changeset          # Create a changeset for versioning

@@ -11,7 +11,8 @@
     "lint": "biome check .",
     "report": "playwright show-report",
     "typecheck": "tsc -p tsconfig.json",
-    "screens": "playwright test --project=screens"
+    "screens": "playwright test --project=screens",
+    "e2e:desktop": "playwright test --project=desktop --workers=1"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.2",

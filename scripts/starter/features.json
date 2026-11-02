@@ -34,7 +34,7 @@
       "title": "End-to-end tests",
       "summary": "e2e/ — Playwright suites against the running API and web app",
       "identifiers": ["@flama/e2e", "e2e/"],
-      "paths": ["e2e"],
+      "paths": ["e2e", "scripts/ci/e2e-stage.mjs", "scripts/ci/e2e-stage.test.mjs"],
       "slots": {
         "pnpm-workspace.yaml": ["qa"]
       },
