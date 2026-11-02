@@ -46,14 +46,10 @@
     "add": "Add account"
   },
   "models": {
-    "cacheRead": "Cache read",
-    "cost": "At API prices",
-    "empty": "No tokens recorded in this period.",
     "input": "Input",
-    "model": "Model",
     "output": "Output",
-    "share": "Share",
-    "title": "By model"
+    "cost": "Cost",
+    "share": "Share of spend"
   },
   "overview": {
     "greeting": {
@@ -125,19 +121,62 @@
     "nothingUsable": "Every account is at a limit or needs a sign-in."
   },
   "usage": {
-    "apiValue": "At API prices",
-    "dailyValue": "Daily value at API prices",
-    "messages": "Messages",
-    "notEnough": "Not enough days recorded to draw a trend yet.",
-    "paid": "Plans cost {{value}} for these days",
-    "period": "{{days}} days",
-    "sub": "Tokens across every account, last {{days}} days",
     "title": "Usage & tokens",
-    "tokens": "Tokens"
+    "sub": "Tokens across every account, priced at API rates · past {{days}} days",
+    "allAccounts": "All accounts",
+    "period": "Last {{days}} days",
+    "search": "Search",
+    "clear": "Clear",
+    "metric": {
+      "spend": "Spend",
+      "tokens": "Tokens"
+    },
+    "kpi": {
+      "paid": "Paid for plans",
+      "api": "Value at API prices",
+      "tokens": "Tokens",
+      "perMillion": "Value per 1M tokens"
+    },
+    "chart": {
+      "spend": "Daily value at API prices",
+      "tokens": "Daily tokens"
+    },
+    "pastDays": "Past {{days}} days",
+    "groupBy": "Group by",
+    "group": {
+      "model": "Model",
+      "account": "Account",
+      "provider": "Provider"
+    },
+    "groupCount": {
+      "model_one": "{{count}} model",
+      "model_other": "{{count}} models",
+      "account_one": "{{count}} account",
+      "account_other": "{{count}} accounts",
+      "provider_one": "{{count}} provider",
+      "provider_other": "{{count}} providers"
+    },
+    "accountCount_one": "{{count}} account",
+    "accountCount_other": "{{count}} accounts",
+    "modelCount_one": "{{count}} model",
+    "modelCount_other": "{{count}} models",
+    "messages": "Messages",
+    "noResults": "No results",
+    "noMatch": "No usage matches these filters."
   },
   "value": {
-    "bar": "Value of {{name}}",
-    "title": "What you'd pay at API prices"
+    "title": "What you'd pay at API prices",
+    "sub": "Plan usage priced at each provider's pay-as-you-go rates",
+    "paid": "You paid for plans",
+    "api": "Same usage via API",
+    "saved": "Saved",
+    "over": "Paid over API",
+    "multiple": "Value per dollar",
+    "chart": "API-equivalent cost",
+    "legendPaid": "Paid",
+    "legendApi": "At API prices",
+    "noUsage": "No usage",
+    "bar": "Paid against API value for {{name}}"
   },
   "status": {
     "active": "Active",

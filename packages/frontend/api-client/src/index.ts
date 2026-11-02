@@ -56,6 +56,7 @@ export type {
   UpdateRoleRequest,
   UpdateUserRequest,
   UpdateUserSettingsRequest,
+  UsageRowResponseDto,
   UsageSnapshotResponseDto,
   UsageSummaryResponseDto,
   UserResponseDto,

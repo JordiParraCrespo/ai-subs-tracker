@@ -238,6 +238,7 @@ export type {
   UploadAvatarErrors,
   UploadAvatarResponse,
   UploadAvatarResponses,
+  UsageRowResponseDto,
   UsageSnapshotResponseDto,
   UsageSummaryResponseDto,
   UserResponseDto,

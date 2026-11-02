@@ -86,4 +86,6 @@ export interface UsageSummary {
   byModel: (TokenTotals & { model: string; label: string | null })[];
   byAccount: (TokenTotals & { accountId: string })[];
   daily: (TokenTotals & { day: string })[];
+  /** Every account, day and model, priced: what the usage screen filters and groups. */
+  rows: (TokenTotals & { accountId: string; day: string; model: string })[];
 }

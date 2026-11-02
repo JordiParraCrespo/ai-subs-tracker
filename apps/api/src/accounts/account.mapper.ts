@@ -218,6 +218,11 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
       daily: [...daily]
         .map(([day, t]) => rounded({ ...t, day }))
         .sort((a, b) => a.day.localeCompare(b.day)),
+      rows: rows.map((row) => {
+        const priced = emptyTotals();
+        addInto(priced, row);
+        return rounded({ ...priced, accountId: row.accountId, day: row.day, model: row.model });
+      }),
     };
   }
 }

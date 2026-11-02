@@ -300,14 +300,10 @@
       "add": "Añadir cuenta"
     },
     "models": {
-      "cacheRead": "Lectura de caché",
-      "cost": "A precio de API",
-      "empty": "No hay tokens en este periodo.",
       "input": "Entrada",
-      "model": "Modelo",
       "output": "Salida",
-      "share": "Proporción",
-      "title": "Por modelo"
+      "cost": "Coste",
+      "share": "Parte del gasto"
     },
     "overview": {
       "greeting": {
@@ -379,19 +375,62 @@
       "nothingUsable": "Todas las cuentas están en un límite o necesitan iniciar sesión."
     },
     "usage": {
-      "apiValue": "A precio de API",
-      "dailyValue": "Valor diario a precio de API",
-      "messages": "Mensajes",
-      "notEnough": "Aún no hay días suficientes para dibujar una tendencia.",
-      "paid": "Los planes costaron {{value}} en estos días",
-      "period": "{{days}} días",
-      "sub": "Tokens de todas las cuentas, últimos {{days}} días",
       "title": "Uso y tokens",
-      "tokens": "Tokens"
+      "sub": "Tokens de todas las cuentas, a precios de API · últimos {{days}} días",
+      "allAccounts": "Todas las cuentas",
+      "period": "Últimos {{days}} días",
+      "search": "Buscar",
+      "clear": "Limpiar",
+      "metric": {
+        "spend": "Gasto",
+        "tokens": "Tokens"
+      },
+      "kpi": {
+        "paid": "Pagado en planes",
+        "api": "Valor a precios de API",
+        "tokens": "Tokens",
+        "perMillion": "Valor por 1M de tokens"
+      },
+      "chart": {
+        "spend": "Valor diario a precios de API",
+        "tokens": "Tokens diarios"
+      },
+      "pastDays": "Últimos {{days}} días",
+      "groupBy": "Agrupar por",
+      "group": {
+        "model": "Modelo",
+        "account": "Cuenta",
+        "provider": "Proveedor"
+      },
+      "groupCount": {
+        "model_one": "{{count}} modelo",
+        "model_other": "{{count}} modelos",
+        "account_one": "{{count}} cuenta",
+        "account_other": "{{count}} cuentas",
+        "provider_one": "{{count}} proveedor",
+        "provider_other": "{{count}} proveedores"
+      },
+      "accountCount_one": "{{count}} cuenta",
+      "accountCount_other": "{{count}} cuentas",
+      "modelCount_one": "{{count}} modelo",
+      "modelCount_other": "{{count}} modelos",
+      "messages": "Mensajes",
+      "noResults": "Sin resultados",
+      "noMatch": "Ningún uso coincide con estos filtros."
     },
     "value": {
-      "bar": "Valor de {{name}}",
-      "title": "Lo que pagarías a precio de API"
+      "title": "Lo que pagarías a precios de API",
+      "sub": "El uso de los planes a las tarifas de pago por uso de cada proveedor",
+      "paid": "Pagaste en planes",
+      "api": "El mismo uso vía API",
+      "saved": "Ahorrado",
+      "over": "Pagado de más",
+      "multiple": "Valor por dólar",
+      "chart": "Coste equivalente en API",
+      "legendPaid": "Pagado",
+      "legendApi": "A precios de API",
+      "noUsage": "Sin uso",
+      "bar": "Pagado frente a valor de API de {{name}}"
     },
     "status": {
       "active": "Activa",

@@ -358,6 +358,21 @@ export type DailyUsageResponseDto = {
     day: string;
 };
 
+export type UsageRowResponseDto = {
+    input: number;
+    output: number;
+    cacheWrite: number;
+    cacheRead: number;
+    messages: number;
+    /**
+     * What these tokens would cost at API prices, US cents
+     */
+    apiCostCents: number;
+    accountId: string;
+    day: string;
+    model: string;
+};
+
 export type UsageSummaryResponseDto = {
     days: number;
     since: string;
@@ -365,6 +380,10 @@ export type UsageSummaryResponseDto = {
     byModel: Array<ModelUsageResponseDto>;
     byAccount: Array<AccountUsageResponseDto>;
     daily: Array<DailyUsageResponseDto>;
+    /**
+     * Every account, day and model, priced
+     */
+    rows: Array<UsageRowResponseDto>;
 };
 
 export type SyncAccountsRequest = {

@@ -2880,6 +2880,51 @@
           "day"
         ]
       },
+      "UsageRowResponseDto": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "number"
+          },
+          "output": {
+            "type": "number"
+          },
+          "cacheWrite": {
+            "type": "number"
+          },
+          "cacheRead": {
+            "type": "number"
+          },
+          "messages": {
+            "type": "number"
+          },
+          "apiCostCents": {
+            "type": "number",
+            "description": "What these tokens would cost at API prices, US cents"
+          },
+          "accountId": {
+            "type": "string"
+          },
+          "day": {
+            "type": "string",
+            "example": "2026-11-02"
+          },
+          "model": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "input",
+          "output",
+          "cacheWrite",
+          "cacheRead",
+          "messages",
+          "apiCostCents",
+          "accountId",
+          "day",
+          "model"
+        ]
+      },
       "UsageSummaryResponseDto": {
         "type": "object",
         "properties": {
@@ -2910,9 +2955,16 @@
             "items": {
               "$ref": "#/components/schemas/DailyUsageResponseDto"
             }
+          },
+          "rows": {
+            "description": "Every account, day and model, priced",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UsageRowResponseDto"
+            }
           }
         },
-        "required": ["days", "since", "totals", "byModel", "byAccount", "daily"]
+        "required": ["days", "since", "totals", "byModel", "byAccount", "daily", "rows"]
       },
       "SyncAccountsRequest": {
         "type": "object",
