@@ -5,7 +5,7 @@ import { PROVIDER_NAMES } from '../lib/providers';
 /** Avatar, name and "Provider · Plan" — the left cell of every account row. */
 export function AccountIdentity({ account }: { account: AccountEntity }) {
   return (
-    <div className="flex min-w-0 items-center gap-3">
+    <div className="flex min-w-40 items-center gap-3">
       <Avatar size="sm">
         <AvatarFallback gradient={account.provider === 'codex' ? 'teal' : 'purple'}>
           {account.initials}

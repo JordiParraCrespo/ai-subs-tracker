@@ -49,3 +49,8 @@ src/
   (`fetch`, `readKeychain`, `now`, `env`, `home`), so tests never touch the
   network or the real home. A new provider is a folder plus one line in
   `registry.ts`, with specs over a fake home.
+
+Rules this package follows: [`provider-integrations.md`](../../.agents/rules/provider-integrations.md)
+(one capability, a provider per vendor, an honest client name) and
+[`integrations.md`](../../.agents/rules/integrations.md) (respect the vendor's
+rate limits).

@@ -1,0 +1,31 @@
+{
+  "name": "@flama/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Subtrack desktop: reads local Claude Code and Codex logins and syncs their usage.",
+  "author": "Subtrack",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "dev": "node scripts/build.mjs && electron . --dev",
+    "start": "electron .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "biome check src/ scripts/",
+    "package": "node scripts/build.mjs --require-renderer && electron-builder --config electron-builder.json",
+    "clean": "rm -rf dist release",
+    "package:dir": "node scripts/build.mjs --require-renderer && electron-builder --config electron-builder.json --dir"
+  },
+  "devDependencies": {
+    "@flama/shared": "workspace:*",
+    "@flama/tsconfig": "workspace:^",
+    "@flama/usage-providers": "workspace:*",
+    "@types/node": "^26.6.5",
+    "electron": "44.9.0",
+    "electron-builder": "26.17.0",
+    "esbuild": "0.28.2",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5"
+  }
+}

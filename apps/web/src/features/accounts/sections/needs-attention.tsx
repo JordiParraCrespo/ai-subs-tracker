@@ -27,9 +27,9 @@ export function NeedsAttention() {
         {items.map(({ account, pace, kind }) => (
           <div key={account.id} className="flex items-center justify-between gap-4 py-3">
             <AccountIdentity account={account} />
-            <div className="text-right text-sm">
+            <div className="min-w-0 max-w-1/2 text-right text-sm">
               <div className="font-medium text-ink-900">{t(`accounts.attention.${kind}`)}</div>
-              <div className="text-ink-600">
+              <div className="line-clamp-2 break-words text-ink-600">
                 {kind === 'signin'
                   ? (account.latest?.message ?? t('accounts.attention.signinHint'))
                   : t('accounts.attention.detail', {
