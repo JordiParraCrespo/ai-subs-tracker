@@ -1,5 +1,4 @@
 // flama:begin organizations
-export { organizationSharedOptions } from './organization-options';
 // flama:end organizations
 export type {
   AuthSession,

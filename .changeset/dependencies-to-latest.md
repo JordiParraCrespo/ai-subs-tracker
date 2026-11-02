@@ -2,17 +2,14 @@
 "@flama/shared": major
 "@flama/frontend-core": major
 "@flama/frontend-web": major
-"@flama/frontend-mobile": major
 "@flama/backend-core": major
 "@flama/backend-authz": major
 "@flama/backend-cache": major
 "@flama/backend-email": major
 "@flama/backend-queue": major
 "@flama/backend-storage": major
-"@flama/design-system-mobile": major
 "@flama/api": minor
 "@flama/web": minor
-"@flama/mobile": minor
 "@flama/api-client": patch
 "@flama/auth": patch
 "@flama/backend-ddd": patch

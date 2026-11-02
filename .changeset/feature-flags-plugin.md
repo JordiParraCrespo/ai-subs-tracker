@@ -4,7 +4,6 @@
 "@flama/api-client": major
 "@flama/frontend-core": major
 "@flama/web": minor
-"@flama/mobile": minor
 "@flama/translations": minor
 ---
 

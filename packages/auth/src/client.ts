@@ -1,6 +1,5 @@
 import { adminClient, inferAdditionalFields, twoFactorClient } from 'better-auth/client/plugins';
 // flama:begin organizations
-import { organizationClientPlugin } from './organization-client';
 // flama:end organizations
 import { userAdditionalFields } from './user-fields';
 
@@ -27,15 +26,11 @@ export function sharedClientPlugins() {
     // `TwoFactorRequiredError` its login screen answers with the code step.
     twoFactorClient(),
     // flama:begin organizations
-    // Organizations, members, invitations and workspaces (teams) under
-    // `authClient.organization.*`.
-    organizationClientPlugin(),
     // flama:end organizations
   ] as const;
 }
 
 // flama:begin organizations
-export { organizationSharedOptions } from './organization-options';
 // flama:end organizations
 export type {
   AuthSession,

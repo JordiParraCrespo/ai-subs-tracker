@@ -3,30 +3,11 @@ import { Global, Module, type Provider } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 // flama:begin organizations
-import { MemberOrmEntity } from '../organizations/database/member.orm-entity';
-import { TeamOrmEntity } from '../organizations/database/team.orm-entity';
-import { TeamMemberOrmEntity } from '../organizations/database/team-member.orm-entity';
-import { ORGANIZATION_RESOURCES } from '../organizations/organizations.resource';
 // flama:end organizations
 import { RoleOrmEntity } from '../roles/database/role.orm-entity';
 import { RoleResource } from '../roles/roles.resource';
 import { UserResource } from '../users/users.resource';
 // flama:begin organizations
-import { AccessGrantMapper } from './access-grant.mapper';
-import { ActiveOrganizationResolver } from './application/active-organization.resolver';
-import { PrincipalResidencyChecker } from './application/principal-residency.policy';
-import { SCOPE_RESOLVER_PROVIDER } from './application/scope.resolver';
-import { ACCESS_GRANT_REPOSITORY } from './authz.di-tokens';
-import { CreateAccessGrantCommandHandler } from './commands/create-access-grant/create-access-grant.command-handler';
-import { CreateAccessGrantHttpController } from './commands/create-access-grant/create-access-grant.http.controller';
-import { RevokeAccessGrantCommandHandler } from './commands/revoke-access-grant/revoke-access-grant.command-handler';
-import { RevokeAccessGrantHttpController } from './commands/revoke-access-grant/revoke-access-grant.http.controller';
-import { AccessGrantOrmEntity } from './database/access-grant.orm-entity';
-import { AccessGrantRepository } from './database/access-grant.repository';
-import { AccessScopeInterceptor } from './interceptors/access-scope.interceptor';
-import { FindAccessGrantQueryHandler } from './queries/find-access-grant/find-access-grant.query-handler';
-import { FindAccessGrantsHttpController } from './queries/find-access-grants/find-access-grants.http.controller';
-import { FindAccessGrantsQueryHandler } from './queries/find-access-grants/find-access-grants.query-handler';
 // flama:end organizations
 import { FindAuthzCatalogHttpController } from './queries/find-catalog/find-catalog.http.controller';
 import { FindAuthzCatalogQueryHandler } from './queries/find-catalog/find-catalog.query-handler';
@@ -35,9 +16,6 @@ import { FindAuthzCatalogQueryHandler } from './queries/find-catalog/find-catalo
 const httpControllers = [
   FindAuthzCatalogHttpController,
   // flama:begin organizations
-  FindAccessGrantsHttpController,
-  CreateAccessGrantHttpController,
-  RevokeAccessGrantHttpController,
   // flama:end organizations
 ];
 
@@ -63,17 +41,12 @@ const queryHandlers: Provider[] = [FindAuthzCatalogQueryHandler];
     TypeOrmModule.forFeature([
       RoleOrmEntity,
       // flama:begin organizations
-      AccessGrantOrmEntity,
-      MemberOrmEntity,
-      TeamOrmEntity,
-      TeamMemberOrmEntity,
       // flama:end organizations
     ]),
     AuthzKernelModule.forFeature([
       UserResource,
       RoleResource,
       // flama:begin organizations
-      ...ORGANIZATION_RESOURCES,
       // flama:end organizations
     ]),
   ],
@@ -81,25 +54,11 @@ const queryHandlers: Provider[] = [FindAuthzCatalogQueryHandler];
   providers: [
     ...queryHandlers,
     // flama:begin organizations
-    CreateAccessGrantCommandHandler,
-    RevokeAccessGrantCommandHandler,
-    FindAccessGrantsQueryHandler,
-    FindAccessGrantQueryHandler,
-    AccessGrantMapper,
-    { provide: ACCESS_GRANT_REPOSITORY, useClass: AccessGrantRepository },
-    ActiveOrganizationResolver,
-    PrincipalResidencyChecker,
-    AccessScopeInterceptor,
-    SCOPE_RESOLVER_PROVIDER,
     // flama:end organizations
   ],
   exports: [
     TypeOrmModule,
     // flama:begin organizations
-    SCOPE_RESOLVER_PROVIDER,
-    ACCESS_GRANT_REPOSITORY,
-    AccessScopeInterceptor,
-    ActiveOrganizationResolver,
     // flama:end organizations
   ],
 })

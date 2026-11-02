@@ -2,7 +2,6 @@
 "@flama/frontend-core": minor
 "@flama/frontend-consumer": minor
 "@flama/frontend-web": minor
-"@flama/frontend-mobile": minor
 "@flama/shared": minor
 ---
 

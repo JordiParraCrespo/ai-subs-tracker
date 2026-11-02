@@ -10,14 +10,8 @@ import { TwoFactor } from '../auth/database/two-factor.orm-entity';
 import { Verification } from '../auth/database/verification.orm-entity';
 import { auth, closeAuthConnections } from '../auth/infrastructure/better-auth.config';
 // flama:begin organizations
-import { AccessGrantOrmEntity } from '../authz/database/access-grant.orm-entity';
 // flama:end organizations
 // flama:begin organizations
-import { InvitationOrmEntity } from '../organizations/database/invitation.orm-entity';
-import { MemberOrmEntity } from '../organizations/database/member.orm-entity';
-import { OrganizationOrmEntity } from '../organizations/database/organization.orm-entity';
-import { TeamOrmEntity } from '../organizations/database/team.orm-entity';
-import { TeamMemberOrmEntity } from '../organizations/database/team-member.orm-entity';
 // flama:end organizations
 import { UserSettingsOrmEntity } from '../profile/database/user-settings.orm-entity';
 import { RoleOrmEntity } from '../roles/database/role.orm-entity';
@@ -26,8 +20,6 @@ import { UserOrmEntity } from '../users/database/user.orm-entity';
 // flama:plugins entity-imports
 
 // flama:begin organizations
-import { seedOrganization } from './seed-organization';
-
 // flama:end organizations
 
 const dataSource = new DataSource({
@@ -47,15 +39,9 @@ const dataSource = new DataSource({
     // flama:plugins entities
     RoleOrmEntity,
     // flama:begin organizations
-    AccessGrantOrmEntity,
     // flama:end organizations
     UserRoleOrmEntity,
     // flama:begin organizations
-    OrganizationOrmEntity,
-    MemberOrmEntity,
-    InvitationOrmEntity,
-    TeamOrmEntity,
-    TeamMemberOrmEntity,
     // flama:end organizations
     OutboxMessageSchema,
   ],
@@ -186,7 +172,6 @@ async function seed() {
   }
 
   // flama:begin organizations
-  await seedOrganization(dataSource, userRepo, roleRepo, userRoleRepo);
   // flama:end organizations
 
   console.log('Seeding complete.');

@@ -53,14 +53,8 @@ export { $UserSettingsResponseDto } from './schemas/$UserSettingsResponseDto';
 export { $WorkspaceMemberResponseDto } from './schemas/$WorkspaceMemberResponseDto';
 export { $WorkspaceResponseDto } from './schemas/$WorkspaceResponseDto';
 
-export { AccessGrantsApi } from './services/AccessGrantsApi';
 export { AuthorizationApi } from './services/AuthorizationApi';
 export { HealthApi } from './services/HealthApi';
-export { InvitationsApi } from './services/InvitationsApi';
-export { OrganizationInvitationsApi } from './services/OrganizationInvitationsApi';
-export { OrganizationMembersApi } from './services/OrganizationMembersApi';
-export { OrganizationsApi } from './services/OrganizationsApi';
 export { ProfileApi } from './services/ProfileApi';
 export { RolesApi } from './services/RolesApi';
 export { UsersApi } from './services/UsersApi';
-export { WorkspacesApi } from './services/WorkspacesApi';

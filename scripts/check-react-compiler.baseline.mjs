@@ -18,12 +18,5 @@ export const BASELINE = {
   // flama:end web
   // flama:plugins compiler-baseline
   // flama:begin mobile
-  'apps/mobile': [
-    'packages/frontend/core/src/react/analytics.queries.ts',
-    'packages/frontend/design-system/mobile/src/components/ui/combobox.tsx',
-    'packages/frontend/design-system/mobile/src/components/ui/stage-breakdown.tsx',
-    'packages/frontend/design-system/mobile/src/components/ui/toast.tsx',
-    'packages/frontend/design-system/mobile/src/hooks/use-hardware-back.ts',
-  ],
   // flama:end mobile
 };

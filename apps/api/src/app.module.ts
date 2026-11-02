@@ -37,7 +37,6 @@ import { storageDrivers } from './config/storage.config';
 import { TypeOrmQueryLogger } from './config/typeorm-query.logger';
 import { HealthModule } from './health/health.module';
 // flama:begin organizations
-import { OrganizationsModule } from './organizations/organizations.module';
 // flama:end organizations
 import { OutboxModule } from './outbox/outbox.module';
 import { ProfileModule } from './profile/profile.module';
@@ -172,9 +171,6 @@ import { UsersModule } from './users/user.module';
     // flama:end admin-api
     HealthModule,
     QueueModule,
-    // flama:begin organizations
-    OrganizationsModule,
-    // flama:end organizations
     // flama:plugins api-modules
   ],
   providers: [

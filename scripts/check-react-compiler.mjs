@@ -71,18 +71,6 @@ export const TARGETS = [
   // flama:end web
   // flama:plugins compiler-targets
   // flama:begin mobile
-  {
-    app: 'apps/mobile',
-    compiler: 'babel',
-    sources: [
-      'apps/mobile/app',
-      'apps/mobile/features',
-      'apps/mobile/lib',
-      'packages/frontend/mobile/src',
-      'packages/frontend/design-system/mobile/src',
-      ...SHARED,
-    ],
-  },
   // flama:end mobile
 ];
 

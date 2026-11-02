@@ -69,16 +69,6 @@ const APPS = [
   },
   // flama:end web
   // flama:plugins admin-web
-  // flama:begin mobile
-  {
-    app: 'apps/mobile',
-    routes: 'app',
-    features: 'features',
-    product: 'consumer',
-    allow: ['dashboard'],
-    kit: 'mobile',
-  },
-  // flama:end mobile
   // flama:plugins admin-mobile
   // flama:plugins extension
 ];
@@ -88,9 +78,6 @@ const KITS = [
   'packages/frontend/web',
   // flama:end web
   // flama:plugins web-kits
-  // flama:begin mobile
-  'packages/frontend/mobile',
-  // flama:end mobile
   // flama:plugins mobile-kits
 ];
 

@@ -16,8 +16,6 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthPublicRouteImport } from './routes/_auth/_public'
-import { Route as AuthAcceptInvitationRouteImport } from './routes/_auth/accept-invitation'
-import { Route as AuthOnboardingRouteImport } from './routes/_auth/onboarding'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthPublicForgotPasswordRouteImport } from './routes/_auth/_public/forgot-password'
@@ -56,16 +54,6 @@ const TermsRoute = TermsRouteImport.update({
 } as any)
 const AuthPublicRoute = AuthPublicRouteImport.update({
   id: '/_public',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthAcceptInvitationRoute = AuthAcceptInvitationRouteImport.update({
-  id: '/accept-invitation',
-  path: '/accept-invitation',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthOnboardingRoute = AuthOnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -111,8 +99,6 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
-  '/accept-invitation': typeof AuthAcceptInvitationRoute
-  '/onboarding': typeof AuthOnboardingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/forgot-password': typeof AuthPublicForgotPasswordRoute
@@ -126,8 +112,6 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
-  '/accept-invitation': typeof AuthAcceptInvitationRoute
-  '/onboarding': typeof AuthOnboardingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/forgot-password': typeof AuthPublicForgotPasswordRoute
@@ -145,8 +129,6 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/_auth/_public': typeof AuthPublicRouteWithChildren
-  '/_auth/accept-invitation': typeof AuthAcceptInvitationRoute
-  '/_auth/onboarding': typeof AuthOnboardingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_auth/_public/forgot-password': typeof AuthPublicForgotPasswordRoute
@@ -162,8 +144,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/privacy'
     | '/terms'
-    | '/accept-invitation'
-    | '/onboarding'
     | '/dashboard'
     | '/profile'
     | '/forgot-password'
@@ -177,8 +157,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/privacy'
     | '/terms'
-    | '/accept-invitation'
-    | '/onboarding'
     | '/dashboard'
     | '/profile'
     | '/forgot-password'
@@ -195,8 +173,6 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/_auth/_public'
-    | '/_auth/accept-invitation'
-    | '/_auth/onboarding'
     | '/_authenticated/dashboard'
     | '/_authenticated/profile'
     | '/_auth/_public/forgot-password'
@@ -264,20 +240,6 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthPublicRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_auth/accept-invitation': {
-      id: '/_auth/accept-invitation'
-      path: '/accept-invitation'
-      fullPath: '/accept-invitation'
-      preLoaderRoute: typeof AuthAcceptInvitationRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_auth/onboarding': {
-      id: '/_auth/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof AuthOnboardingRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_authenticated/dashboard': {
@@ -352,14 +314,10 @@ const AuthPublicRouteWithChildren = AuthPublicRoute._addFileChildren(
 
 interface AuthRouteChildren {
   AuthPublicRoute: typeof AuthPublicRouteWithChildren
-  AuthAcceptInvitationRoute: typeof AuthAcceptInvitationRoute
-  AuthOnboardingRoute: typeof AuthOnboardingRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthPublicRoute: AuthPublicRouteWithChildren,
-  AuthAcceptInvitationRoute: AuthAcceptInvitationRoute,
-  AuthOnboardingRoute: AuthOnboardingRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

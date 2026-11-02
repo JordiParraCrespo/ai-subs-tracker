@@ -2,7 +2,6 @@ import { AppShell, redirectSignedOut, type ShellWorkspace } from '@flama/fronten
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import type { ComponentType, ReactNode } from 'react';
 // flama:begin organizations
-import { WorkspaceGate } from '@/features/organizations/sections/workspace-gate';
 // flama:end organizations
 import { NAV, USER_MENU_LINKS } from '@/lib/nav';
 
@@ -23,7 +22,6 @@ type ShellGate = ComponentType<{
  */
 const GATES: ShellGate[] = [
   // flama:begin organizations
-  WorkspaceGate,
   // flama:end organizations
 ];
 

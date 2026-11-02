@@ -1,7 +1,6 @@
 ---
 "@flama/react-hooks": minor
 "@flama/design-system-web": minor
-"@flama/design-system-mobile": minor
 "@flama/frontend-web": minor
 ---
 

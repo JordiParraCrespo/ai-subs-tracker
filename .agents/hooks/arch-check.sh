@@ -20,9 +20,6 @@ frontend_changed=$(git status --porcelain -- packages/frontend 2>/dev/null)
 # flama:begin web
 frontend_changed+=$(git status --porcelain -- apps/web 2>/dev/null)
 # flama:end web
-# flama:begin mobile
-frontend_changed+=$(git status --porcelain -- apps/mobile 2>/dev/null)
-# flama:end mobile
 # flama:plugins admin-web
 # flama:plugins admin-mobile
 # flama:plugins extension

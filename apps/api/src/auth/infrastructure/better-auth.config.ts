@@ -1,8 +1,5 @@
 import '@flama/env/load';
 import { randomUUID } from 'node:crypto';
-// flama:begin mobile
-import { expo } from '@better-auth/expo';
-// flama:end mobile
 // flama:plugins auth-imports
 import { userAdditionalFields } from '@flama/auth';
 import { Logger } from '@nestjs/common';
@@ -16,8 +13,6 @@ import { accountLinking, socialProviders } from './oauth-providers.config';
 // flama:plugins auth-plugin-imports
 
 // flama:begin organizations
-import { organizationPlugin, withActiveOrganization } from './organization-plugin.config';
-
 // flama:end organizations
 
 /**
@@ -43,9 +38,6 @@ const superadminAc = defaultAc.newRole({
 });
 
 const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
-// flama:begin mobile
-const mobileScheme = process.env.MOBILE_SCHEME ?? 'flama';
-// flama:end mobile
 // flama:plugins auth-consts
 
 // Read through `orUndefined` so a blank `DB_X=` means "unset" here exactly as
@@ -86,9 +78,6 @@ export const auth = betterAuth({
   database: pool,
   trustedOrigins: [
     frontendUrl,
-    // flama:begin mobile
-    `${mobileScheme}://`,
-    // flama:end mobile
     // flama:plugins trusted-origins
   ],
   // Brute-force protection on the auth surface. `/api/auth/*` is mounted on the
@@ -240,22 +229,9 @@ export const auth = betterAuth({
       },
     },
     // flama:begin organizations
-    session: {
-      create: {
-        // Set the user's active organization (and its default workspace) on the
-        // session so org-scoped requests work immediately after sign-in without
-        // an explicit `setActive` round-trip. An account that belongs to no
-        // organization yet leaves both null, and the web app sends it to
-        // onboarding rather than to a dashboard it cannot read.
-        before: (session) => withActiveOrganization(pool, session),
-      },
-    },
     // flama:end organizations
   },
   plugins: [
-    // flama:begin mobile
-    expo(),
-    // flama:end mobile
     // flama:plugins auth-plugins
     admin({
       // Users whose `role` is one of these can call the admin plugin endpoints
@@ -284,7 +260,6 @@ export const auth = betterAuth({
       issuer: process.env.TWO_FACTOR_ISSUER || 'Flama',
     }),
     // flama:begin organizations
-    organizationPlugin(frontendUrl),
     // flama:end organizations
     // Accepts `Authorization: Bearer <session token>`. Used by the API's own
     // auth guard, which mints a short-lived delegated session for a scoped

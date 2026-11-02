@@ -55,7 +55,6 @@
       "!**/dist",
       "!**/build",
       "!**/.next",
-      "!**/.expo",
       "!**/.turbo",
       "!**/.docusaurus",
       "!**/coverage",

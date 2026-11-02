@@ -8,7 +8,6 @@ import { describe, expect, it } from 'vitest';
 // flama:end api-tokens
 // flama:plugins handler-imports
 // flama:begin organizations
-import { ListMembersHttpController } from '../../organizations/queries/list-members/list-members.http.controller';
 // flama:end organizations
 import { FindRolesHttpController } from '../../roles/queries/find-roles/find-roles.http.controller';
 
@@ -32,7 +31,6 @@ import { FindRolesHttpController } from '../../roles/queries/find-roles/find-rol
 /** The handler each guarded endpoint's data actually comes from. */
 const HANDLERS: Record<GuardedEndpoint, { controller: object; handler: string }> = {
   // flama:begin organizations
-  '/organizations/:orgId/members': { controller: ListMembersHttpController, handler: 'list' },
   // flama:end organizations
   '/roles': { controller: FindRolesHttpController, handler: 'findAll' },
   // flama:begin api-tokens

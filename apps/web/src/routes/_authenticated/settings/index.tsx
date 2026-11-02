@@ -3,8 +3,6 @@ import { PageHead, SectionNav } from '@flama/frontend-web';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 // flama:begin organizations
-import { GENERAL_SETTINGS_SECTION } from '@/features/organizations/lib/settings-section';
-import { GeneralSettingsSection } from '@/features/organizations/sections/general-settings';
 // flama:end organizations
 import { SecuritySection } from '@/features/profile/sections/security';
 
@@ -14,7 +12,6 @@ import { SecuritySection } from '@/features/profile/sections/security';
  */
 const SECTIONS = [
   // flama:begin organizations
-  { ...GENERAL_SETTINGS_SECTION, Pane: GeneralSettingsSection },
   // flama:end organizations
   { key: 'security', icon: ShieldCheck, Pane: SecuritySection },
 ] as const;

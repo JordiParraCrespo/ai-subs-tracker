@@ -4,10 +4,8 @@
 "@flama/api-client": minor
 "@flama/frontend-core": minor
 "@flama/frontend-web": minor
-"@flama/frontend-mobile": minor
 "@flama/translations": minor
 "@flama/web": minor
-"@flama/mobile": minor
 ---
 
 Add server-evaluated feature flags, wired into the API, web and mobile.

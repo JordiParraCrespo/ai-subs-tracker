@@ -31,7 +31,6 @@ test('lists every section', async ({ page }) => {
 
   const nav = sectionNav(page);
   // flama:begin organizations
-  await expect(nav.getByRole('button', { name: 'General', exact: true })).toBeVisible();
   // flama:end organizations
   await expect(nav.getByRole('button', { name: 'Security', exact: true })).toBeVisible();
 

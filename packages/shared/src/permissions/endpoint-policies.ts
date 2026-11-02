@@ -33,7 +33,6 @@ export interface EndpointPolicy {
  */
 export const ENDPOINT_POLICIES = {
   // flama:begin organizations
-  '/organizations/:orgId/members': [{ action: 'read', subject: 'Member' }],
   // flama:end organizations
   '/roles': [{ action: 'read', subject: 'Role' }],
   // flama:begin api-tokens

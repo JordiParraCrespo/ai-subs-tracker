@@ -2,7 +2,6 @@ import { expect, type Locator, type Page } from '@playwright/test';
 import { signedUpContext, type TestUser } from './auth';
 
 // flama:begin organizations
-import { createOrganization } from './organizations';
 // flama:end organizations
 
 /**
@@ -40,7 +39,6 @@ export async function signInAs(
 export async function provisionedUser(prefix = 'user') {
   const { api, user, userId } = await signedUpContext(prefix);
   // flama:begin organizations
-  await createOrganization(api);
   // flama:end organizations
   return { api, user, userId };
 }

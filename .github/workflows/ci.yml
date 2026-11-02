@@ -59,7 +59,7 @@ jobs:
         run: pnpm exec biome ci .
       # The repo's own GritQL lint plugins, over their fixtures.
       - run: pnpm check:biome-plugins
-      # flama:begin web|mobile
+      # flama:begin web
       # The design-system linter (`@shadcn/lint` through oxlint, scoped to its
       # own rules — Biome keeps correctness) over every web and mobile app that
       # has a `lint:design` script. Every rule is at `warn` while the findings
@@ -68,7 +68,7 @@ jobs:
       # once it is clean.
       - name: Design-system lint
         run: pnpm lint:design
-      # flama:end web|mobile
+      # flama:end web
       # flama:plugins design-lint
       # The agent git guard (`.agents/hooks/git-guard.mjs`): its policy, case by case.
       - name: Agent git guard
@@ -78,15 +78,15 @@ jobs:
       # Import rules are dependency-cruiser's, below.
       - name: API structure
         run: pnpm check:api-structure
-      # flama:begin web|mobile
+      # flama:begin web
       # The frontend layout contract: feature names, kind directories, the
       # route line cap, no copies of what a kit ships, and the docs every
       # package carries. Import rules are dependency-cruiser's, below.
       - name: Frontend structure
         run: pnpm check:structure
-      # flama:end web|mobile
+      # flama:end web
       # flama:plugins frontend-structure
-      # flama:begin web|mobile
+      # flama:begin web
       # What the React Compiler leaves uncompiled, per app, run with the
       # compiler that app's build runs. Every build ships a bailout as written
       # and says nothing, so this is where one shows up. It fails on a file
@@ -94,7 +94,7 @@ jobs:
       # accepted, and names the listed ones that have gone so the list shrinks.
       - name: React Compiler bailouts
         run: pnpm check:compiler
-      # flama:end web|mobile
+      # flama:end web
       # flama:plugins react-compiler
       # flama:begin web
       # A library that keeps module state must install once for apps/web: the

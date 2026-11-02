@@ -9,7 +9,6 @@ const NEW_PASSWORD = 'Rotated!Password9';
 test.describe('web auth UI', () => {
   test('a visitor can register and lands on the dashboard', async ({ page }) => {
     // flama:begin organizations
-    test.skip(true, 'with organizations a new account starts at onboarding: onboarding.spec.ts');
     // flama:end organizations
     const user = newUser('uireg');
 

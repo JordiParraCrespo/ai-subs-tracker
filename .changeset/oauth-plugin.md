@@ -1,11 +1,8 @@
 ---
 "@flama/api": major
 "@flama/web": major
-"@flama/mobile": major
 "@flama/frontend-core": major
 "@flama/frontend-web": major
-"@flama/frontend-mobile": major
-"@flama/design-system-mobile": minor
 "@flama/shared": major
 "@flama/api-client": major
 "@flama/translations": major

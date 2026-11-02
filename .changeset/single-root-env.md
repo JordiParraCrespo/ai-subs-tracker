@@ -2,7 +2,6 @@
 "@flama/env": minor
 "@flama/api": minor
 "@flama/web": patch
-"@flama/mobile": patch
 ---
 
 One `.env` at the repo root, documented by a root `.env.example`.

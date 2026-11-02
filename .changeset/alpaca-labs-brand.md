@@ -1,6 +1,5 @@
 ---
 "@flama/design-system-web": minor
-"@flama/design-system-mobile": minor
 ---
 
 Rebrand the design system onto the Alpaca Labs visual language, on both web and

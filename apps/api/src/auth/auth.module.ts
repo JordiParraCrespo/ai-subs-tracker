@@ -1,11 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 // flama:begin organizations
-import { InvitationOrmEntity } from '../organizations/database/invitation.orm-entity';
-import { MemberOrmEntity } from '../organizations/database/member.orm-entity';
-import { OrganizationOrmEntity } from '../organizations/database/organization.orm-entity';
-import { TeamOrmEntity } from '../organizations/database/team.orm-entity';
-import { TeamMemberOrmEntity } from '../organizations/database/team-member.orm-entity';
 // flama:end organizations
 import { UsersModule } from '../users/user.module';
 import { CredentialScopeResolver } from './application/credential-scope.resolver';
@@ -56,11 +51,6 @@ import { DelegatedSessionAdapter } from './infrastructure/delegated-session.adap
       Verification,
       // flama:plugins auth-entities
       // flama:begin organizations
-      OrganizationOrmEntity,
-      MemberOrmEntity,
-      InvitationOrmEntity,
-      TeamOrmEntity,
-      TeamMemberOrmEntity,
       // flama:end organizations
     ]),
   ],

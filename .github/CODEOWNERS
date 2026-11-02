@@ -19,7 +19,6 @@
 # /packages/shared/src/permissions/   @JordiParraCrespo @your-org/security
 # /packages/shared/src/scopes/        @JordiParraCrespo @your-org/security
 # flama:begin organizations
-# /apps/api/src/organizations/        @JordiParraCrespo @your-org/security
 # flama:end organizations
 # /apps/api/src/throttling/           @JordiParraCrespo @your-org/security
 # /packages/backend/core/src/filters/ @JordiParraCrespo @your-org/security

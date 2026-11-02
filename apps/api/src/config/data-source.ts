@@ -8,14 +8,8 @@ import { Session } from '../auth/database/session.orm-entity';
 import { TwoFactor } from '../auth/database/two-factor.orm-entity';
 import { Verification } from '../auth/database/verification.orm-entity';
 // flama:begin organizations
-import { AccessGrantOrmEntity } from '../authz/database/access-grant.orm-entity';
 // flama:end organizations
 // flama:begin organizations
-import { InvitationOrmEntity } from '../organizations/database/invitation.orm-entity';
-import { MemberOrmEntity } from '../organizations/database/member.orm-entity';
-import { OrganizationOrmEntity } from '../organizations/database/organization.orm-entity';
-import { TeamOrmEntity } from '../organizations/database/team.orm-entity';
-import { TeamMemberOrmEntity } from '../organizations/database/team-member.orm-entity';
 // flama:end organizations
 import { UserSettingsOrmEntity } from '../profile/database/user-settings.orm-entity';
 import { RoleOrmEntity } from '../roles/database/role.orm-entity';
@@ -47,15 +41,9 @@ export default new DataSource({
     // flama:plugins entities
     RoleOrmEntity,
     // flama:begin organizations
-    AccessGrantOrmEntity,
     // flama:end organizations
     UserRoleOrmEntity,
     // flama:begin organizations
-    OrganizationOrmEntity,
-    MemberOrmEntity,
-    InvitationOrmEntity,
-    TeamOrmEntity,
-    TeamMemberOrmEntity,
     // flama:end organizations
     OutboxMessageSchema,
   ],

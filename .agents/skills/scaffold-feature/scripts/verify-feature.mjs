@@ -35,7 +35,6 @@ const APPS = {
   web: { dir: 'apps/web', features: 'src/features', arch: ['src'], typecheck: true },
   // flama:end web
   // flama:begin mobile
-  mobile: { dir: 'apps/mobile', features: 'features', arch: ['app', 'features', 'lib'] },
   // flama:end mobile
 };
 
