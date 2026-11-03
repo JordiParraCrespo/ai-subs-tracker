@@ -19,11 +19,119 @@
     "security": "Seguridad",
     "desktop": "Este ordenador"
   },
-  "security": {
-    "description": "Todos los dispositivos con sesión iniciada en tu cuenta, y una forma de cerrar cualquiera de ellas.",
-    "sessions": "Sesiones activas",
-    "title": "Seguridad"
+  "subtitle": "Tu cuenta",
+  "title": "Configuración",
+  "profile": {
+    "title": "Perfil",
+    "description": "Tu nombre y el correo con el que inicias sesión.",
+    "firstName": "Nombre",
+    "lastName": "Apellidos",
+    "email": "Correo",
+    "saved": "Perfil guardado"
   },
-  "subtitle": "Tu cuenta y su seguridad.",
-  "title": "Configuración"
+  "security": {
+    "title": "Seguridad",
+    "description": "Contraseña, verificación en dos pasos y los dispositivos con tu sesión iniciada.",
+    "manage": "Gestionar",
+    "dialogTitle": "Seguridad",
+    "dialogDescription": "Tu contraseña, la verificación en dos pasos y dónde tienes la sesión iniciada.",
+    "password": "Contraseña",
+    "passwordSub": "La usas con tu correo para iniciar sesión",
+    "noPassword": "Inicias sesión con Google o GitHub",
+    "change": "Cambiar",
+    "twoFactor": "Verificación en dos pasos",
+    "twoFactorOff": "Pide un código de tu móvil al iniciar sesión",
+    "twoFactorOn": "Pide un código de tu app al iniciar sesión",
+    "twoFactorNeedsPassword": "Protege el inicio de sesión con contraseña, que esta cuenta no usa",
+    "on": "Activada",
+    "off": "Desactivada",
+    "setUp": "Configurar",
+    "turnOff": "Desactivar",
+    "devices": "Dispositivos",
+    "thisDevice": "Este dispositivo",
+    "signOut": "Cerrar sesión",
+    "signOutAll": "Cerrar sesión en los demás dispositivos",
+    "activeNow": "Activo ahora",
+    "unknownDevice": "Dispositivo desconocido",
+    "unknownLocation": "Dirección desconocida",
+    "noDevices": "No hay dispositivos con la sesión iniciada.",
+    "back": "Atrás",
+    "cancel": "Cancelar",
+    "step": "Paso {{step}} de 3"
+  },
+  "changePassword": {
+    "title": "Cambiar contraseña",
+    "description": "Usa al menos 8 caracteres y un número.",
+    "current": "Contraseña actual",
+    "new": "Nueva contraseña",
+    "confirm": "Confirma la nueva contraseña",
+    "note": "Al cambiarla se cierra la sesión en los demás dispositivos.",
+    "cta": {
+      "current": "Escribe tu contraseña actual",
+      "length": "Usa al menos 8 caracteres",
+      "number": "Añade un número",
+      "match": "Confirma la nueva contraseña"
+    },
+    "submit": "Cambiar contraseña"
+  },
+  "twoFactorSetup": {
+    "passwordTitle": "Configurar la verificación en dos pasos",
+    "passwordDescription": "Confirma que eres tú para empezar.",
+    "password": "Contraseña",
+    "passwordPlaceholder": "Tu contraseña",
+    "passwordEmpty": "Escribe tu contraseña",
+    "continue": "Continuar",
+    "scanTitle": "Escanea el código",
+    "scanDescription": "Usa cualquier app de autenticación y escribe el código que muestra.",
+    "qrLabel": "Código QR para tu app de autenticación",
+    "cantScan": "¿No puedes escanearlo?",
+    "enterKey": "Escribe esta clave en tu app.",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "code": "Código de 6 dígitos de tu app",
+    "codeEmpty": "Escribe el código de 6 dígitos",
+    "verify": "Verificar",
+    "codesTitle": "Guarda tus códigos de respaldo",
+    "codesDescription": "Cada uno sirve una vez si pierdes el móvil. Solo se muestran ahora.",
+    "codesLabel": "Códigos de respaldo",
+    "download": "Descargar",
+    "saved": "Los he guardado en un lugar seguro",
+    "savedEmpty": "Confirma que los has guardado",
+    "done": "Hecho"
+  },
+  "twoFactorOff": {
+    "title": "¿Desactivar la verificación en dos pasos?",
+    "description": "Para iniciar sesión solo hará falta tu contraseña. Escríbela para confirmar.",
+    "password": "Contraseña",
+    "cta": "Desactivar"
+  },
+  "signOutOne": {
+    "title": "¿Cerrar sesión en {{device}}?",
+    "description": "Ese dispositivo tendrá que iniciar sesión de nuevo para acceder a tu cuenta.",
+    "cta": "Cerrar sesión"
+  },
+  "signOutOthers": {
+    "title": "¿Cerrar sesión en los demás dispositivos?",
+    "description": "Se cierra la sesión en todos menos en este. Las apps de escritorio dejan de sincronizar hasta que vuelvan a iniciar sesión.",
+    "cta_one": "Cerrar sesión en {{count}} dispositivo",
+    "cta_other": "Cerrar sesión en {{count}} dispositivos"
+  },
+  "workspace": {
+    "title": "Espacio de trabajo",
+    "description": "Cómo llamas a este conjunto de suscripciones. Aparece en la barra lateral.",
+    "name": "Nombre del espacio",
+    "placeholder": "p. ej. Proyectos personales",
+    "saved": "Espacio renombrado"
+  },
+  "language": {
+    "title": "Idioma",
+    "description": "Idioma de la interfaz y formato de fecha."
+  },
+  "appearance": {
+    "title": "Apariencia",
+    "description": "Elige cómo se ve la app. Selecciona un tema o deja que siga la configuración del sistema.",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  }
 }

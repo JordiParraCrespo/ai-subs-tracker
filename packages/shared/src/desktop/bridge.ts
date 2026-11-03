@@ -42,6 +42,16 @@ export interface AddLoginResult {
   message: string | null;
 }
 
+/**
+ * What a login in flight has printed that the person can use: the link to
+ * sign in at (Claude Code's manual link, Codex's device page) and Codex's
+ * one-time code. Either is null until the CLI prints it.
+ */
+export interface LoginProgress {
+  link: string | null;
+  code: string | null;
+}
+
 export interface ShellIntegration {
   /** The snippet to source; makes `claude` / `codex` follow the active account. */
   snippet: string;
@@ -75,8 +85,17 @@ export interface DesktopBridge {
     onStatus(listener: (status: CollectorStatus) => void): () => void;
   };
   accounts: {
-    /** Signs a new account into its own folder by running the provider's CLI login. */
+    /**
+     * Signs a new account into its own folder by running the provider's CLI
+     * login; resolves when the CLI exits. One login runs at a time.
+     */
     addLogin(provider: ProviderId): Promise<AddLoginResult>;
+    /** What the running login printed: its link and, for Codex, its code. */
+    onLoginProgress(listener: (progress: LoginProgress) => void): () => void;
+    /** Types a code the person pasted into the running login's prompt. */
+    submitLoginCode(code: string): Promise<void>;
+    /** Stops the running login; `addLogin` then resolves as cancelled. */
+    cancelLogin(): Promise<void>;
     /** Points terminals at the login with this provider and external id. */
     activate(provider: ProviderId, externalId: string): Promise<void>;
   };
@@ -107,6 +126,9 @@ export const DESKTOP_CHANNELS = {
   collectorRefresh: 'subtrack:collector:refresh',
   collectorChanged: 'subtrack:collector:changed',
   accountsAddLogin: 'subtrack:accounts:add-login',
+  accountsLoginProgress: 'subtrack:accounts:login-progress',
+  accountsLoginCode: 'subtrack:accounts:login-code',
+  accountsLoginCancel: 'subtrack:accounts:login-cancel',
   accountsActivate: 'subtrack:accounts:activate',
   shellIntegration: 'subtrack:shell:integration',
   shellInstall: 'subtrack:shell:install',

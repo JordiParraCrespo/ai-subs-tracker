@@ -1,4 +1,6 @@
+import type { TwoFactorMethod } from '@flama/frontend-core';
 import { useErrorMessage, useVerifyTwoFactor } from '@flama/frontend-core/react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AuthSubtitle, AuthTitle } from '../components/auth-primitives';
 import { TwoFactorChallengeForm } from '../forms/two-factor-challenge-form';
@@ -21,13 +23,25 @@ export function TwoFactorChallenge({
   const { t } = useTranslation();
   const resolveError = useErrorMessage();
   const verify = useVerifyTwoFactor({ onSuccess });
+  // The heading follows the method, so the method lives here, above the form.
+  const [method, setMethod] = useState<TwoFactorMethod>('totp');
+  const backup = method === 'backup-code';
 
   return (
     <>
-      <AuthTitle>{t('auth.twoFactor.title')}</AuthTitle>
-      <AuthSubtitle>{t('auth.twoFactor.description')}</AuthSubtitle>
+      <AuthTitle>{t(backup ? 'auth.twoFactor.backupTitle' : 'auth.twoFactor.title')}</AuthTitle>
+      <AuthSubtitle>
+        {t(backup ? 'auth.twoFactor.backupDescription' : 'auth.twoFactor.description', {
+          app: t('common.appName'),
+        })}
+      </AuthSubtitle>
 
       <TwoFactorChallengeForm
+        method={method}
+        onMethodChange={(next) => {
+          setMethod(next);
+          verify.reset();
+        }}
         isPending={verify.isPending}
         error={
           verify.error

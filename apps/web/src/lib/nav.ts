@@ -5,7 +5,6 @@ import {
   Flame,
   LayoutDashboard,
   Settings,
-  UserRound,
   Users,
 } from '@flama/design-system-web/icons';
 import type { NavItem, NavLink } from '@flama/frontend-web';
@@ -34,6 +33,5 @@ export const NAV = [
 
 /** The account menu's own destinations, above the language list. */
 export const USER_MENU_LINKS = [
-  { to: '/profile', icon: UserRound, labelKey: 'viewProfile' },
   { to: '/settings', icon: Settings, labelKey: 'settings' },
 ] as const satisfies readonly NavLink[];

@@ -22,5 +22,6 @@
     "now": "ahora",
     "week": "{{count}}sem",
     "year": "{{count}}a"
-  }
+  },
+  "close": "Cerrar"
 }

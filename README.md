@@ -46,8 +46,8 @@ The screens follow the designs in [`designs/`](designs/).
   account's plan and price in the app.
 - **Switching is a toggle.** Marking an account "in use" writes
   `~/.subtrack/active/<provider>`. The opt-in shell snippet makes `claude` and
-  `codex` in your terminal follow it. **Add account** signs a new login into its
-  own folder with the provider's CLI (`claude auth login`, `codex login`).
+  `codex` in your terminal follow it. **Add subscription** signs a new login into its
+  own folder with the provider's CLI (`claude auth login`, `codex login --device-auth`).
 
 **What it never does:** refresh a provider's token, send a provider credential
 anywhere but that provider, or replace a status line you already have. Only

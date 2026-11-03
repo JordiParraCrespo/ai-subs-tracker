@@ -53,7 +53,7 @@ pnpm --filter @flama/e2e e2e:web  # a screen wired to the API gets a spec in e2e
   renders. `/settings` composes `organizations` and `profile`.
 - Putting `useWatch` or a query in the page and threading the value down.
   Subscribe at the leaf — `src/features/auth/components/password-checklist.tsx`
-  for a form value, `src/features/profile/sections/session-list.tsx` for a query: the screen composes,
+  for a form value, `src/features/profile/sections/security-overview.tsx` for a query: the screen composes,
   each section asks for what it renders. `pnpm check:structure` fails a query a
   screen holds for one sibling, and a prop that is only forwarded.
 - Hand-rolling a table or an error callout while `DataTable` and `Alert` sit

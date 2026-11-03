@@ -146,3 +146,115 @@
 .ds-date-stack__mon{font:var(--ds-type-eyebrow);letter-spacing:var(--ds-tracking-eyebrow);text-transform:uppercase;color:var(--ds-text-subtle)}
 .ds-date-stack__day{font:600 16px/20px var(--ds-font-sans)}
 .ds-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:72px;padding:0 16px 0 24px;box-sizing:border-box}
+/* The state card (`DsStateCard`): first-run emptiness, and the pages that stand in for a page.
+   The export sizes its min-height on the content box; the 96px is its padding. */
+.ds-state{display:grid;place-items:center;padding:48px 24px;min-height:calc(420px + 96px)}
+.ds-state--status{min-height:calc(min(560px,70vh) + 96px)}
+.ds-state__body{display:flex;flex-direction:column;align-items:center;gap:20px;max-width:420px;text-align:center}
+.ds-state__disc{width:56px;height:56px}
+.ds-state__disc svg{width:24px;height:24px}
+.ds-state__text{display:flex;flex-direction:column;gap:6px}
+.ds-state__eyebrow{font:var(--ds-type-eyebrow);letter-spacing:var(--ds-tracking-eyebrow);text-transform:uppercase;color:var(--ds-text-subtle)}
+.ds-state__title{margin:0;font:var(--ds-type-card-title);letter-spacing:var(--ds-tracking-tight)}
+.ds-state--empty .ds-state__title{font:500 18px/24px var(--ds-font-sans)}
+.ds-state__line{margin:0;font:var(--ds-type-label);color:var(--ds-text-muted);text-wrap:pretty}
+.ds-state--empty .ds-state__line{font:500 16px/20px var(--ds-font-sans)}
+.ds-state__actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+
+/* The design's modal (DsModal): 520px, radius 24, header 24/20/16/24, body 0 24 20, footer above a divider. */
+.ds-modal__overlay{position:fixed;inset:0;z-index:70;background:var(--ds-overlay)}
+.ds-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:71;width:520px;max-width:calc(100% - 48px);max-height:calc(100vh - 48px);display:flex;flex-direction:column;background:var(--ds-surface-overlay);color:var(--ds-text);border-radius:24px;outline:1px solid var(--ds-outline-card);box-shadow:var(--ds-shadow-overlay);overflow:hidden;box-sizing:border-box}
+.ds-modal:focus-visible{outline:1px solid var(--ds-outline-card)}
+.ds-modal__head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:24px 20px 16px 24px}
+.ds-modal__titles{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ds-modal__eyebrow{font:var(--ds-type-eyebrow);letter-spacing:var(--ds-tracking-eyebrow);text-transform:uppercase;color:var(--ds-text-subtle)}
+.ds-modal__title{margin:0;font:var(--ds-type-card-title);letter-spacing:var(--ds-tracking-tight)}
+.ds-modal__sub{margin:0;font:var(--ds-type-label);color:var(--ds-text-muted);text-wrap:pretty}
+.ds-modal__body{flex:1;min-height:0;padding:0 24px 20px;display:flex;flex-direction:column;gap:16px}
+.ds-modal__foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 24px 24px;border-top:1px solid var(--ds-divider)}
+.ds-modal__actions{display:flex;gap:8px}
+
+/* A Settings card (DsSettingsCard): radius 24, a 48px brand-tinted disc, 20px between disc and body. */
+.ds-settings-card{padding:24px;border-radius:24px;display:flex;gap:20px;align-items:flex-start;box-sizing:border-box}
+.ds-settings-card__disc{width:48px;height:48px;border-radius:999px;display:grid;place-items:center;flex:none;background:color-mix(in oklch,var(--ds-brand) 18%,transparent);color:var(--ds-accent)}
+.ds-settings-card__disc svg{width:20px;height:20px}
+.ds-settings-card__main{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;padding-top:2px}
+.ds-settings-card__titles{display:flex;flex-direction:column;gap:6px}
+.ds-settings-card__title{margin:0;font:var(--ds-type-body-strong);letter-spacing:var(--ds-tracking-tight)}
+.ds-settings-card__sub{font:var(--ds-type-label);color:var(--ds-text-muted);text-wrap:pretty}
+
+/* The design's option tile (`.ds-option`). */
+.ds-option{width:136px;padding:var(--ds-space-5) var(--ds-space-3);border:0;border-radius:var(--ds-radius-xl);background:var(--ds-option);color:var(--ds-text);font:600 14px/20px var(--ds-font-sans);display:flex;flex-direction:column;align-items:center;gap:var(--ds-space-2);cursor:pointer;transition:background-color var(--ds-duration-fast);box-sizing:border-box}
+.ds-option svg{width:20px;height:20px}
+.ds-option:hover{background:var(--ds-option-hover)}
+.ds-option[data-checked]{background:var(--ds-brand-soft);color:var(--ds-brand);outline:2px solid var(--ds-brand);outline-offset:-2px}
+.light .ds-option[data-checked]{background:var(--ds-gray-800);color:#fff;outline:0}
+.ds-option-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;max-width:432px}
+.ds-option-grid .ds-option{width:100%}
+.ds-text-field--sm{height:var(--ds-control-sm);border-radius:var(--ds-radius-lg);font-size:14px}
+.ds-field{display:flex;flex-direction:column;min-width:0}
+.ds-field-error{padding-top:6px;font:var(--ds-type-label);color:var(--ds-negative)}
+.ds-fields-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+
+/* Rows inside a settings modal: a setting with its control, and a device in a list. */
+.ds-setting-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0}
+.ds-setting-row+.ds-setting-row,.ds-setting-list{border-top:1px solid var(--ds-divider)}
+.ds-setting-row__meta{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ds-setting-row__control{display:flex;align-items:center;gap:8px;flex:none}
+.ds-setting-list{display:flex;flex-direction:column;gap:4px;padding-top:16px}
+.ds-device-row{display:flex;align-items:center;gap:12px;padding:10px 0}
+.ds-device-row>.ds-disc{width:36px;height:36px;flex:none}
+.ds-device-row>.ds-disc svg{width:16px;height:16px}
+.ds-device-row__meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ds-code-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;padding:16px;border-radius:16px;background:var(--ds-fill);font:500 14px/22px ui-monospace,SFMono-Regular,Menlo,monospace;margin:0;list-style:none}
+.ds-mono-key{font:500 13px/20px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ds-text-secondary);word-break:break-all}
+.ds-modal__body--rows{gap:0;padding-bottom:8px}
+.ds-modal__body--loose{gap:20px}
+.ds-field--wide{grid-column:1/-1}
+
+/* The add-subscription flow: a 560px modal, tool rows, the waiting card, Codex's code and a copyable link. */
+.ds-modal--wide{width:560px}
+.ds-modal__body--list{gap:8px;padding-bottom:24px}
+.ds-modal__body--flow{gap:20px;padding-bottom:24px}
+.ds-pick-row{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;outline:1px solid var(--ds-outline-card);outline-offset:-1px;cursor:pointer;transition:background-color var(--ds-duration-fast)}
+.ds-pick-row:hover{background:var(--ds-surface-hover)}
+.ds-pick-row:focus-visible{outline:2px solid var(--ds-outline-focus)}
+.ds-pick-row__meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ds-pick-row__chevron{display:flex;color:var(--ds-text-subtle)}
+.ds-wait-card{display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;outline:1px solid var(--ds-outline-card);outline-offset:-1px}
+.ds-wait-card>.ds-disc{width:40px;height:40px;flex:none}
+.ds-wait-card>.ds-disc svg{width:20px;height:20px;animation:ds-spin 1s linear infinite}
+.ds-wait-card__meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+@keyframes ds-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.ds-wait-card>.ds-disc svg{animation:none}}
+.ds-device-code{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 20px 20px 24px;border-radius:16px;background:var(--ds-fill)}
+.ds-device-code__value{font:600 32px/40px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}
+.ds-link-field{display:flex;align-items:center;gap:8px;height:40px;padding:0 4px 0 12px;border-radius:10px;background:var(--ds-field);outline:1px solid var(--ds-outline-field);outline-offset:-1px}
+.ds-link-field__value{flex:1;min-width:0;font:500 13px/20px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ds-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-stack-4{display:flex;flex-direction:column;gap:4px}
+.ds-stack-8{display:flex;flex-direction:column;gap:8px}
+
+/* ⌘K as the design draws it (`searchOpen`): 620px, a 60px search row, eyebrow groups, 48px rows, a hints footer. */
+.ds-palette{max-width:min(620px,calc(100% - 48px))!important;top:12vh;border-radius:24px!important;background:var(--ds-surface-overlay);color:var(--ds-text);outline:1px solid var(--ds-outline-card);border:0;box-shadow:var(--ds-shadow-overlay)}
+.ds-palette .ds-palette__search{height:60px;padding:0 20px;gap:12px;border-bottom:1px solid var(--ds-divider)}
+.ds-palette .ds-palette__search>svg{width:20px;height:20px;color:var(--ds-text-muted)}
+.ds-palette [cmdk-input]{font:var(--ds-type-body);color:var(--ds-text)}
+.ds-palette [cmdk-input]::placeholder{color:var(--ds-text-subtle)}
+.ds-palette__esc{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:6px;background:var(--ds-fill);color:var(--ds-text-muted);font:var(--ds-type-badge)}
+.ds-palette [cmdk-list]{max-height:min(480px,calc(70vh - 110px));padding:8px}
+.ds-palette [cmdk-group-heading]{padding:12px 12px 6px!important;font:var(--ds-type-eyebrow)!important;letter-spacing:var(--ds-tracking-eyebrow);text-transform:uppercase;color:var(--ds-text-subtle)!important}
+.ds-palette [cmdk-item]{height:48px;padding:0 12px;border-radius:12px!important;gap:12px;font:var(--ds-type-label-strong);color:var(--ds-text)}
+.ds-palette [cmdk-item][data-selected=true]{background:var(--ds-fill)}
+.ds-palette [cmdk-item]>svg:last-child{display:none}
+.ds-palette__disc{width:28px!important;height:28px!important;flex:none}
+.ds-palette__disc svg{width:16px!important;height:16px!important}
+.ds-palette__meta{margin-left:auto;white-space:nowrap}
+.ds-palette__label{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-palette [cmdk-empty]{padding:40px 24px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.ds-palette__foot{display:flex;gap:20px;padding:12px 20px;border-top:1px solid var(--ds-divider)}
+
+/* The design's toast (`toastOn`): a 48px pill in the text colour on the page's, centred, a 16px icon then the line. */
+[data-sonner-toaster] [data-sonner-toast].cn-toast{left:0;right:0;margin:0 auto;width:fit-content;max-width:calc(100vw - 48px);height:48px;padding:0 20px;gap:10px;border:0;border-radius:999px;background:var(--ds-text);color:var(--ds-bg-app);box-shadow:var(--ds-shadow-float);font:var(--ds-type-label-strong);white-space:nowrap}
+[data-sonner-toaster] [data-sonner-toast].cn-toast [data-icon]{margin:0;width:16px;height:16px;color:inherit}
+[data-sonner-toaster] [data-sonner-toast].cn-toast [data-content]{min-width:0}
+[data-sonner-toaster] [data-sonner-toast].cn-toast [data-title]{font:inherit;color:inherit;overflow:hidden;text-overflow:ellipsis}

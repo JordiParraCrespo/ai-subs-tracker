@@ -9,6 +9,7 @@ const SAVED: UserSettingsProps = {
   density: 'compact',
   weeklyDigest: false,
   productUpdates: true,
+  workspaceName: 'Side projects',
 };
 
 describe('UserSettingsEntity', () => {
@@ -49,12 +50,34 @@ describe('UserSettingsEntity', () => {
     expect(settings.productUpdates).toBe(true);
   });
 
+  it('keeps the saved workspace name when a save leaves it out, and clears it on null', () => {
+    // The preferences form never shows the name; if leaving it out cleared
+    // it, saving a theme would wipe what Settings named the workspace.
+    const settings = UserSettingsEntity.createDefault('user-uuid');
+    settings.update(SAVED);
+    const { workspaceName: _left, ...withoutName } = SAVED;
+
+    settings.update(withoutName);
+    expect(settings.workspaceName).toBe('Side projects');
+
+    settings.update({ ...withoutName, workspaceName: null });
+    expect(settings.workspaceName).toBeNull();
+  });
+
+  it('rejects a blank workspace name', () => {
+    const settings = UserSettingsEntity.createDefault('user-uuid');
+
+    expect(() => settings.update({ ...SAVED, workspaceName: '   ' })).toThrow(
+      ArgumentInvalidException,
+    );
+  });
+
   it('touches updatedAt on update', () => {
     const settings = UserSettingsEntity.create({
       id: 'user-uuid',
       createdAt: new Date('2020-01-01'),
       updatedAt: new Date('2020-01-01'),
-      props: { ...DEFAULT_USER_SETTINGS },
+      props: { ...DEFAULT_USER_SETTINGS, workspaceName: null },
     });
 
     settings.update(SAVED);

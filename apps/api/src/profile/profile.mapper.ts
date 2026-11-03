@@ -38,6 +38,7 @@ export class ProfileMapper
     record.density = entity.density;
     record.weeklyDigest = entity.weeklyDigest;
     record.productUpdates = entity.productUpdates;
+    record.workspaceName = entity.workspaceName;
     return record;
   }
 
@@ -52,6 +53,7 @@ export class ProfileMapper
         density: record.density,
         weeklyDigest: record.weeklyDigest,
         productUpdates: record.productUpdates,
+        workspaceName: record.workspaceName,
       },
     });
   }
@@ -64,6 +66,7 @@ export class ProfileMapper
     dto.density = entity.density;
     dto.weeklyDigest = entity.weeklyDigest;
     dto.productUpdates = entity.productUpdates;
+    dto.workspaceName = entity.workspaceName;
     dto.createdAt = entity.createdAt;
     dto.updatedAt = entity.updatedAt;
     return dto;

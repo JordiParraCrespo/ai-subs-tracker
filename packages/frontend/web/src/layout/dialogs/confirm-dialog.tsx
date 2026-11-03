@@ -1,23 +1,19 @@
 import {
   Alert,
   AlertDescription,
-  Button,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogHero,
-  DialogHeroPlate,
-  DialogTitle,
+  DsButton,
+  DsModal,
+  DsModalBody,
+  DsModalFooter,
+  DsModalHeader,
 } from '@flama/design-system-web';
-import { TriangleAlert } from '@flama/design-system-web/icons';
 import { useErrorMessage } from '@flama/frontend-core/react';
 import { useTranslation } from 'react-i18next';
 
 /**
- * The workspace's "are you sure?" — a hero-plated dialog whose confirm button
- * is destructive, for an action that cannot be undone.
+ * The workspace's "are you sure?", drawn as the design's confirm modal: the
+ * question, what it means, Cancel and the deed, for an action that cannot be
+ * undone.
  *
  * At the top of `components/` rather than inside `team/`, where it was written:
  * the inbox's bulk delete is the second feature to need it, and layout
@@ -47,31 +43,25 @@ export function ConfirmDialog({
   const { t } = useTranslation();
   const resolveError = useErrorMessage();
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent>
-        <DialogHero gradient="pinkCoral">
-          <DialogHeroPlate>
-            <TriangleAlert className="text-destructive" />
-          </DialogHeroPlate>
-        </DialogHero>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
-        {error && (
+    <DsModal open onOpenChange={(open) => !open && onClose()}>
+      <DsModalHeader title={title} description={description} closeLabel={t('common.close')} />
+      {error ? (
+        <DsModalBody>
           <Alert variant="destructive">
             <AlertDescription>{resolveError(error, t('common.error')).message}</AlertDescription>
           </Alert>
-        )}
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={onClose}>
-            {t('common.cancel')}
-          </Button>
-          <Button type="button" variant="destructive" disabled={pending} onClick={onConfirm}>
-            {confirmLabel ?? t('common.confirm')}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </DsModalBody>
+      ) : (
+        <div className="h-2" />
+      )}
+      <DsModalFooter>
+        <DsButton variant="ghost" size="sm" onClick={onClose}>
+          {t('common.cancel')}
+        </DsButton>
+        <DsButton variant="primary" size="sm" disabled={pending} onClick={onConfirm}>
+          {confirmLabel ?? t('common.confirm')}
+        </DsButton>
+      </DsModalFooter>
+    </DsModal>
   );
 }

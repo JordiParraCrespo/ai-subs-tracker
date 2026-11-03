@@ -136,11 +136,11 @@ test.describe('web auth UI', () => {
 
     await page.fill('#password', NEW_PASSWORD);
     await page.fill('#confirmPassword', NEW_PASSWORD);
-    await page.getByRole('button', { name: 'Reset password' }).click();
-    await expect(page.getByRole('heading', { name: /password updated/i })).toBeVisible({
+    await page.getByRole('button', { name: 'Save new password' }).click();
+    await expect(page.getByRole('heading', { name: /password changed/i })).toBeVisible({
       timeout: 20_000,
     });
-    await page.getByRole('button', { name: /continue to workspace/i }).click();
+    await page.getByRole('link', { name: 'Sign in', exact: true }).click();
     await expect(page).toHaveURL(/\/login/, { timeout: 20_000 });
 
     await loginThroughUi(page, user.email, NEW_PASSWORD);
@@ -160,8 +160,8 @@ test.describe('web auth UI', () => {
     await page.goto(`/reset-password?token=${token}`);
     await page.fill('#password', NEW_PASSWORD);
     await page.fill('#confirmPassword', NEW_PASSWORD);
-    await page.getByRole('button', { name: 'Reset password' }).click();
-    await expect(page.getByRole('heading', { name: /password updated/i })).toBeVisible({
+    await page.getByRole('button', { name: 'Save new password' }).click();
+    await expect(page.getByRole('heading', { name: /password changed/i })).toBeVisible({
       timeout: 20_000,
     });
 
@@ -175,7 +175,7 @@ test.describe('web auth UI', () => {
   test('the reset page refuses a link with no token', async ({ page }) => {
     await page.goto('/reset-password');
 
-    await expect(page.getByText(/invalid or has expired/i)).toBeVisible({
+    await expect(page.getByRole('heading', { name: /this link has expired/i })).toBeVisible({
       timeout: 20_000,
     });
     await expect(page.locator('#password')).toHaveCount(0);
@@ -185,7 +185,7 @@ test.describe('web auth UI', () => {
     await page.goto('/reset-password?token=this-token-was-never-issued');
     await page.fill('#password', NEW_PASSWORD);
     await page.fill('#confirmPassword', NEW_PASSWORD);
-    await page.getByRole('button', { name: 'Reset password' }).click();
+    await page.getByRole('button', { name: 'Save new password' }).click();
 
     // The form must stay put and say something, rather than silently "succeed".
     await expect(page).toHaveURL(/\/reset-password/, { timeout: 20_000 });

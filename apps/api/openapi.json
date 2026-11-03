@@ -2100,6 +2100,11 @@
           "productUpdates": {
             "type": "boolean"
           },
+          "workspaceName": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 80
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -2116,6 +2121,7 @@
           "density",
           "weeklyDigest",
           "productUpdates",
+          "workspaceName",
           "createdAt",
           "updatedAt"
         ]
@@ -2140,6 +2146,12 @@
           },
           "productUpdates": {
             "type": "boolean"
+          },
+          "workspaceName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "nullable": true
           }
         },
         "required": ["theme", "locale", "density", "weeklyDigest", "productUpdates"]

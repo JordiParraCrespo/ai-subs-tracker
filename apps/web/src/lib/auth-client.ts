@@ -16,7 +16,7 @@ import { createAuthClient } from 'better-auth/react';
  * API, keeping web and API same-origin so the cookie is sent without
  * cross-site restrictions.
  */
-const apiBaseUrl = desktop?.apiUrl ?? import.meta.env.VITE_API_URL ?? '';
+export const apiBaseUrl = desktop?.apiUrl ?? import.meta.env.VITE_API_URL ?? '';
 
 /**
  * Inside the desktop app the screens are served from `app://subtrack`, a

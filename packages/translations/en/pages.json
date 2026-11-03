@@ -134,5 +134,25 @@
         "hint": "Who did what, and when"
       }
     }
+  },
+  "status": {
+    "goHome": "Go to overview",
+    "notFound": {
+      "eyebrow": "Error 404",
+      "title": "Page not found",
+      "text": "There’s nothing at this address. It may have moved or been removed."
+    },
+    "error": {
+      "eyebrow": "Something went wrong",
+      "title": "This page hit an error",
+      "text": "Reloading usually fixes it. Your data is safe.",
+      "reload": "Reload"
+    },
+    "offline": {
+      "eyebrow": "Offline",
+      "title": "Can’t reach {{app}}",
+      "text": "Check your connection. Numbers update as soon as you’re back.",
+      "retry": "Try again"
+    }
   }
 }

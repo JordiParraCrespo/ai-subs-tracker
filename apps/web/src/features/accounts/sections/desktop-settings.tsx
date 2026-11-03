@@ -1,11 +1,11 @@
-import { Button, Switch } from '@flama/design-system-web';
+import { Button, DsSettingsCard, Switch } from '@flama/design-system-web';
+import { Laptop } from '@flama/design-system-web/icons';
 import {
   desktopBridge as desktop,
   GroupHeading,
   RowControl,
   RowMeta,
   SectionCard,
-  SectionHead,
   SectionRow,
 } from '@flama/frontend-web';
 import { useTranslation } from 'react-i18next';
@@ -20,18 +20,14 @@ export function DesktopSettings() {
   const { t } = useTranslation();
   const setup = useDesktopSetup();
 
-  const head = (
-    <SectionHead
-      size="card"
-      title={t('accounts.settings.title')}
-      sub={t('accounts.settings.description')}
-    />
-  );
-
   if (!desktop) {
     return (
-      <>
-        {head}
+      <DsSettingsCard
+        id="desktop"
+        icon={<Laptop />}
+        title={t('accounts.settings.title')}
+        description={t('accounts.settings.description')}
+      >
         <SectionCard>
           <SectionRow>
             <RowMeta
@@ -40,13 +36,17 @@ export function DesktopSettings() {
             />
           </SectionRow>
         </SectionCard>
-      </>
+      </DsSettingsCard>
     );
   }
 
   return (
-    <>
-      {head}
+    <DsSettingsCard
+      id="desktop"
+      icon={<Laptop />}
+      title={t('accounts.settings.title')}
+      description={t('accounts.settings.description')}
+    >
       <DesktopStatus />
       <GroupHeading description={t('accounts.settings.shellDescription')}>
         {t('accounts.settings.shellTitle')}
@@ -104,6 +104,6 @@ export function DesktopSettings() {
           </SectionRow>
         ))}
       </SectionCard>
-    </>
+    </DsSettingsCard>
   );
 }

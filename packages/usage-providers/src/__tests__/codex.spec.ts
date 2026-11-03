@@ -343,7 +343,7 @@ describe('codex commands', () => {
   it('signs a new account into its own CODEX_HOME', () => {
     expect(codexProvider.loginCommand('/m/codex/c1')).toEqual({
       command: 'codex',
-      args: ['login'],
+      args: ['login', '--device-auth'],
       env: { CODEX_HOME: '/m/codex/c1' },
     });
     const base = { provider: 'codex' as const, managed: true };

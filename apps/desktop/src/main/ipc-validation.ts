@@ -14,6 +14,15 @@ export const MAX_TOKEN_LENGTH = 4096;
 export const MAX_ID_LENGTH = 200;
 export const MAX_PATH_LENGTH = 1024;
 export const MAX_URL_LENGTH = 2048;
+/** A sign-in code pasted from a provider's page; Claude's is well under this. */
+export const MAX_LOGIN_CODE_LENGTH = 512;
+
+/** A pasted sign-in code: one line of printable text, never a second command. */
+export function parseLoginCode(value: unknown): string {
+  const code = parseBoundedString(value, MAX_LOGIN_CODE_LENGTH, 'sign-in code').trim();
+  if (!code || !/^[\x21-\x7e]+$/.test(code)) throw new IpcArgumentError('Invalid sign-in code.');
+  return code;
+}
 
 export function parseProvider(value: unknown): ProviderId {
   if (typeof value === 'string' && (PROVIDER_IDS as readonly string[]).includes(value)) {

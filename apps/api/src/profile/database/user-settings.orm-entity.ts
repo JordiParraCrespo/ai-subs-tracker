@@ -30,6 +30,9 @@ export class UserSettingsOrmEntity {
   @Column({ type: 'boolean', default: false })
   productUpdates!: boolean;
 
+  @Column({ type: 'varchar', length: 80, nullable: true })
+  workspaceName!: string | null;
+
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
 

@@ -1,4 +1,9 @@
-import { type CollectorStatus, DESKTOP_CHANNELS, type DesktopBridge } from '@flama/shared/desktop';
+import {
+  type CollectorStatus,
+  DESKTOP_CHANNELS,
+  type DesktopBridge,
+  type LoginProgress,
+} from '@flama/shared/desktop';
 import { contextBridge, type IpcRendererEvent, ipcRenderer } from 'electron';
 
 /**
@@ -55,6 +60,13 @@ const bridge: DesktopBridge = {
   },
   accounts: {
     addLogin: (provider) => invoke(DESKTOP_CHANNELS.accountsAddLogin, provider),
+    onLoginProgress(listener) {
+      const handler = (_event: IpcRendererEvent, progress: LoginProgress) => listener(progress);
+      ipcRenderer.on(DESKTOP_CHANNELS.accountsLoginProgress, handler);
+      return () => ipcRenderer.removeListener(DESKTOP_CHANNELS.accountsLoginProgress, handler);
+    },
+    submitLoginCode: (code) => invoke(DESKTOP_CHANNELS.accountsLoginCode, code),
+    cancelLogin: () => invoke(DESKTOP_CHANNELS.accountsLoginCancel),
     activate: (provider, externalId) =>
       invoke(DESKTOP_CHANNELS.accountsActivate, provider, externalId),
   },

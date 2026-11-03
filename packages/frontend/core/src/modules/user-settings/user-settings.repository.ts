@@ -14,6 +14,7 @@ function toSettings(data: UserSettingsResponseDto): UserSettingsEntity {
     data.density,
     data.weeklyDigest,
     data.productUpdates,
+    data.workspaceName ?? null,
     new Date(data.createdAt),
     new Date(data.updatedAt),
   );

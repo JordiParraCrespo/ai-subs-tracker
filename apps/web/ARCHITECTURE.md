@@ -47,7 +47,7 @@ loads `@flama/frontend-consumer` and would fail `pnpm arch` for touching
 | Kind | What goes there | Fetch? | Router? | Example in this app |
 | --- | --- | --- | --- | --- |
 | `screens/` | the page body a route mounts | yes | yes | `profile/screens/profile.tsx` |
-| `sections/` | a pane, a card group, a table | yes | yes | `profile/sections/session-list.tsx` |
+| `sections/` | a pane, a card group, a table | yes | yes | `profile/sections/security-overview.tsx` |
 | `dialogs/` | one dialog per file, owning its mutation | yes | yes | `profile/dialogs/revoke-session.tsx` |
 | `forms/` | React Hook Form over a shared Zod schema; props in, `onSubmit` out | no | no | `auth/forms/login-form.tsx` |
 | `components/` | entity UI: a row, a badge, a hero, a preview | no | no | `profile/components/session-row.tsx` |
@@ -119,12 +119,11 @@ fall out of step with its path.
 
 ## Render rules
 
-- **State lives in the lowest component that reads it.** The open pane is
-  search state on `/settings` and `/profile`, read by the route that switches
-  panes (through the kit's `SectionNav`); the sections below it hold their
-  own. A dialog opened from a row menu is the exception: `token-table.tsx` and
-  `session-list.tsx` keep *which* row is being revoked, because the menu
-  unmounts when it closes, and the dialog owns the mutation.
+- **State lives in the lowest component that reads it.** Each Settings card
+  holds its own; the security dialog holds which of its steps is showing,
+  and each step owns its mutation. A dialog opened from a row menu is the
+  exception: `token-table.tsx` keeps *which* row is being revoked, because
+  the menu unmounts when it closes, and the dialog owns the mutation.
 - **Fetch in the component that draws the result.** `general-settings.tsx`
   asks for the organization itself; the settings route reads it again only
   for the heading it draws. `pnpm check:structure` reports a route, screen or

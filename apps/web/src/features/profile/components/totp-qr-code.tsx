@@ -9,7 +9,15 @@ const QUIET_ZONE = 4;
  * Dark on light in both themes (`qr-ink` on `qr-paper`): not every scanner
  * reads an inverted code.
  */
-export function TotpQrCode({ value, label }: { value: string; label: string }) {
+export function TotpQrCode({
+  value,
+  label,
+  className = 'size-44 rounded-xl border border-border-subtle',
+}: {
+  value: string;
+  label: string;
+  className?: string;
+}) {
   const modules = toQR(value);
   const size = Math.sqrt(modules.length);
   const extent = size + QUIET_ZONE * 2;
@@ -27,7 +35,7 @@ export function TotpQrCode({ value, label }: { value: string; label: string }) {
       aria-label={label}
       viewBox={`0 0 ${extent} ${extent}`}
       shapeRendering="crispEdges"
-      className="size-44 rounded-xl border border-border-subtle bg-qr-paper text-qr-ink"
+      className={`bg-qr-paper text-qr-ink ${className}`}
     >
       <path d={path} fill="currentColor" />
     </svg>

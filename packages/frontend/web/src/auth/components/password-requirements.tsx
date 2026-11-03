@@ -1,14 +1,14 @@
 import { cn } from '@flama/design-system-web';
-import { Check } from '@flama/design-system-web/icons';
+import { Circle, CircleCheck } from '@flama/design-system-web/icons';
 import { checkPassword, meetsPasswordRequirements, type PasswordRule } from '@flama/frontend-core';
 import { useTranslation } from 'react-i18next';
 
 export { checkPassword, meetsPasswordRequirements as meetsRequirements, type PasswordRule };
 
 /**
- * The live checklist under a password field. Rules read tertiary until they
- * pass, then fill green and take primary ink — the only place colour carries
- * meaning on these screens.
+ * The live checklist under a password field, as the design draws it: an
+ * open circle per rule, which turns into a check in the positive colour once
+ * the rule passes.
  */
 export function PasswordRequirements({
   results,
@@ -22,31 +22,16 @@ export function PasswordRequirements({
   const { t } = useTranslation();
 
   return (
-    <ul className={cn('flex list-none flex-col gap-[7px] p-0', className)}>
+    <ul className={cn('m-0 flex list-none flex-col gap-2 p-0', className)}>
       {rules.map((rule) => {
         const passed = results[rule];
-
+        const Icon = passed ? CircleCheck : Circle;
         return (
           <li
             key={rule}
-            className={cn(
-              'flex items-center gap-2 text-sm transition-colors',
-              passed ? 'text-ink-900' : 'text-ink-400',
-            )}
+            className={cn('ds-text-label flex items-center gap-2', passed ? 'ds-t-up' : 'ds-muted')}
           >
-            <span
-              className={cn(
-                'flex size-4 shrink-0 items-center justify-center rounded-full border-[1.5px] transition-colors',
-                passed ? 'border-status-active bg-status-active' : 'border-border-default',
-              )}
-            >
-              <Check
-                className={cn(
-                  'size-[9px] stroke-[3] text-white transition-opacity',
-                  passed ? 'opacity-100' : 'opacity-0',
-                )}
-              />
-            </span>
+            <Icon className="size-4 flex-none" strokeWidth={1.5} aria-hidden />
             {t(`auth.passwordRules.${rule}`)}
           </li>
         );

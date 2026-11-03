@@ -16,8 +16,6 @@
     "showLess": "Show less"
   },
   "desktop": {
-    "add": "Add {{provider}}",
-    "addFailed": "The sign-in did not finish.",
     "lastSync": "Last synced {{when}}",
     "never": "never",
     "phase": {
@@ -45,7 +43,7 @@
     "title": "Subscriptions",
     "sub_one": "{{count}} account · {{spend}}/mo",
     "sub_other": "{{count}} accounts · {{spend}}/mo",
-    "add": "Add account"
+    "add": "Add subscription"
   },
   "models": {
     "input": "Input",
@@ -345,5 +343,82 @@
     "missingTitle": "No renewal day yet",
     "missingSub": "Providers do not report when a plan bills. Set the day from your receipt to put it on the calendar.",
     "setDay": "Set day"
+  },
+  "firstRun": {
+    "sub": "Nothing tracked yet",
+    "overview": {
+      "title": "No spend to show yet",
+      "text": "Add your first subscription to see monthly spend, renewals and who uses what."
+    },
+    "subscriptions": {
+      "title": "No subscriptions yet",
+      "text": "Add the AI tools your team pays for. Claude Code and Codex sign in through the browser."
+    },
+    "people": {
+      "title": "No one here yet",
+      "text": "Everyone who signs in to a subscription shows here, with what they use and what it costs."
+    },
+    "usage": {
+      "title": "No usage yet",
+      "text": "Usage and tokens appear after the first session on a tracked account."
+    },
+    "tokenmaxx": {
+      "title": "Nothing to rotate yet",
+      "text": "Add two or more plan accounts and Tokenmaxx tells you which one to use next."
+    },
+    "renewals": {
+      "title": "No renewals coming up",
+      "text": "Renewal dates show here once you add a subscription."
+    }
+  },
+  "add": {
+    "title": "Add subscription",
+    "description": "Pick the tool. Claude Code and Codex sign in through the browser.",
+    "how": {
+      "claude-code": "Sign in through claude.com",
+      "codex": "Sign in with a code at openai.com"
+    },
+    "claude": {
+      "title": "Finish signing in to Claude",
+      "description": "We opened claude.com in your browser. Sign in with the account you want to add.",
+      "waiting": "Waiting for Claude…",
+      "expires": "Subtrack waits up to 15 minutes",
+      "otherTitle": "Signed in to a different account?",
+      "otherText": "Copy the link and open it in a private window, so the account you use now stays signed in.",
+      "useCode": "Use a code instead",
+      "copyLink": "Copy sign-in link",
+      "linkCopied": "Link copied"
+    },
+    "code": {
+      "title": "Sign in with a code",
+      "description": "For when the browser is on another device.",
+      "open": "1. Open this link on any device",
+      "paste": "2. Paste the code Claude shows you",
+      "placeholder": "Paste it here",
+      "copy": "Copy",
+      "copied": "Copied",
+      "empty": "Paste the code",
+      "submit": "Sign in",
+      "checking": "Signing in…"
+    },
+    "codex": {
+      "title": "Enter this code at OpenAI",
+      "description": "Open the page, sign in with the account you want to add and enter the code.",
+      "waiting": "Waiting for approval at auth.openai.com",
+      "expires": "The code expires in 15 minutes",
+      "copyCode": "Copy code",
+      "openPage": "Open page",
+      "preparing": "Asking OpenAI for a code…"
+    },
+    "desktop": {
+      "title": "Add it from the desktop app",
+      "description": "Claude Code and Codex sign in on your computer.",
+      "text": "Subtrack’s desktop app runs the sign-in and reads the plan from it, so nothing from your login ever reaches a browser tab. Open the app and choose Add subscription there."
+    },
+    "back": "Back",
+    "failed": "Sign-in did not finish."
+  },
+  "search": {
+    "group": "Subscriptions"
   }
 }

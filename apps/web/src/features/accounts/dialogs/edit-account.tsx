@@ -1,13 +1,11 @@
 import {
   Alert,
   AlertDescription,
-  Button,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+  DsButton,
+  DsModal,
+  DsModalBody,
+  DsModalFooter,
+  DsModalHeader,
   toast,
 } from '@flama/design-system-web';
 import type { AccountEntity } from '@flama/frontend-consumer';
@@ -49,12 +47,13 @@ export function EditAccountDialog({
   }
 
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{t('accounts.edit.title')}</DialogTitle>
-          <DialogDescription>{t('accounts.edit.description')}</DialogDescription>
-        </DialogHeader>
+    <DsModal open onOpenChange={(open) => !open && onClose()}>
+      <DsModalHeader
+        title={t('accounts.edit.title')}
+        description={t('accounts.edit.description')}
+        closeLabel={t('common.close')}
+      />
+      <DsModalBody>
         {update.error && (
           <Alert variant="destructive">
             <AlertDescription>
@@ -63,15 +62,15 @@ export function EditAccountDialog({
           </Alert>
         )}
         <EditAccountForm id={FORM} account={account} isPending={update.isPending} onSubmit={save} />
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={onClose}>
-            {t('common.cancel')}
-          </Button>
-          <Button type="submit" form={FORM} disabled={update.isPending}>
-            {t('common.save')}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      </DsModalBody>
+      <DsModalFooter>
+        <DsButton variant="ghost" size="sm" onClick={onClose}>
+          {t('common.cancel')}
+        </DsButton>
+        <DsButton variant="primary" size="sm" type="submit" form={FORM} disabled={update.isPending}>
+          {t('common.save')}
+        </DsButton>
+      </DsModalFooter>
+    </DsModal>
   );
 }

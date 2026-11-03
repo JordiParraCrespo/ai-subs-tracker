@@ -11,12 +11,11 @@ import {
   parseClaudeStatusline,
 } from '@flama/usage-providers';
 import { app, type BrowserWindow, ipcMain, safeStorage, shell } from 'electron';
-import { addLogin, loginShellPath } from './add-login';
+import { type LoginHandle, loginShellPath, startLogin } from './add-login';
 import { postSync, type SyncedAccount } from './api-client';
 import { Collector } from './collector';
 import { resolveConfig } from './config';
 import { registerIpc } from './ipc';
-import { parseExternalUrl } from './ipc-validation';
 import {
   installLiveFeed,
   type LiveFeedServer,
@@ -96,6 +95,10 @@ async function main(): Promise<void> {
     serveRenderer(rendererRoot(app.isPackaged, process.resourcesPath, __dirname), config.apiUrl);
 
   let win: BrowserWindow | null = null;
+  /** The add-account sign-in in flight, which the screens can type a code into or stop. */
+  let login: LoginHandle | null = null;
+  /** Bumped by every start and cancel, so a cancel during the PATH lookup still holds. */
+  let loginGeneration = 0;
   let tray: TrayController | null = null;
   let quitting = false;
   let lastSynced: SyncedAccount[] | null = null;
@@ -206,23 +209,34 @@ async function main(): Promise<void> {
       async addLogin(provider) {
         const impl = getProvider(provider);
         if (!impl) return { ok: false, message: 'Unknown provider.' };
+        // One login at a time: a second "Add" stops the first, whose folder
+        // is then removed like any sign-in that did not finish.
+        login?.cancel();
+        const generation = ++loginGeneration;
         const path = await loginShellPath(process.env.SHELL, process.env.PATH);
-        const result = await addLogin({
+        // Back, a close or another pick while the shell answered: never start.
+        if (generation !== loginGeneration) return { ok: false, message: 'Sign-in cancelled.' };
+        const handle = startLogin({
           managedRoot,
           provider,
           command: (dir) => impl.loginCommand(dir),
-          openUrl: (url) => {
-            try {
-              void shell.openExternal(parseExternalUrl(url));
-            } catch {
-              // not a URL we open
-            }
+          onProgress: (progress) => {
+            if (win && !win.isDestroyed())
+              win.webContents.send(DESKTOP_CHANNELS.accountsLoginProgress, progress);
           },
           env: { ...process.env, PATH: path },
           log,
         });
+        login = handle;
+        const result = await handle.result;
+        if (login === handle) login = null;
         if (result.ok) void collector.runNow();
         return result;
+      },
+      submitLoginCode: (code) => login?.submitCode(code),
+      cancelLogin: () => {
+        loginGeneration++;
+        login?.cancel();
       },
       async activate(provider, externalId) {
         const item = collector

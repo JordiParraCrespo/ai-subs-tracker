@@ -17,21 +17,21 @@ export const Route = createFileRoute('/_auth')({
 
 function ConsumerAuthLayout() {
   return (
-    <AuthLayout action={<SwitchAction />}>
+    <AuthLayout footer={<SwitchAction />}>
       <Outlet />
     </AuthLayout>
   );
 }
 
-/** The design's top-right: sign-in offers an account, sign-up offers sign-in. */
+/** The design's line under the form: sign-in offers an account, sign-up offers sign-in. */
 function SwitchAction() {
   const { t } = useTranslation();
   const pathname = useLocation({ select: (location) => location.pathname });
   if (pathname === '/login')
     return (
       <>
-        <span className="ds-cell-sub">{t('auth.layout.newHere')}</span>
-        <Link to="/register" className="ds-btn ds-btn--sm">
+        <span className="ds-t-sub">{t('auth.layout.newHere')}</span>
+        <Link to="/register" className="ds-btn ds-btn--text">
           {t('auth.layout.createAccount')}
         </Link>
       </>
@@ -39,8 +39,8 @@ function SwitchAction() {
   if (pathname === '/register')
     return (
       <>
-        <span className="ds-cell-sub">{t('auth.layout.haveAccount')}</span>
-        <Link to="/login" className="ds-btn ds-btn--sm">
+        <span className="ds-t-sub">{t('auth.layout.haveAccount')}</span>
+        <Link to="/login" className="ds-btn ds-btn--text">
           {t('auth.layout.signIn')}
         </Link>
       </>

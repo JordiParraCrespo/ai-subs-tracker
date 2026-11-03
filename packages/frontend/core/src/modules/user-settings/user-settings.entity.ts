@@ -15,6 +15,8 @@ export class UserSettingsEntity {
     public readonly density: TableDensity,
     public readonly weeklyDigest: boolean,
     public readonly productUpdates: boolean,
+    /** What the person calls their set of subscriptions; `null` until named. */
+    public readonly workspaceName: string | null,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
   ) {}

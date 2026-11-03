@@ -1,11 +1,12 @@
 import { Checkbox, DsButton, FieldGroup, Input, Label } from '@flama/design-system-web';
+import { ArrowLeft } from '@flama/design-system-web/icons';
 import type { TwoFactorMethod, VerifyTwoFactorParams } from '@flama/frontend-core';
 import { type TwoFactorChallengeDto, twoFactorChallengeSchema } from '@flama/shared/schemas/auth';
-import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useZodResolver } from '../../forms';
 import { AuthField, AuthFormError, authInputClass } from '../components/auth-primitives';
+import { TwoFactorSubmit } from '../components/two-factor-submit';
 
 /**
  * The second step of a password sign-in on an account with two-factor on: a
@@ -14,11 +15,16 @@ import { AuthField, AuthFormError, authInputClass } from '../components/auth-pri
  * `isTwoFactorRequired`, and hand the values to `useVerifyTwoFactor`.
  */
 export function TwoFactorChallengeForm({
+  method,
+  onMethodChange,
   isPending,
   error,
   onSubmit,
   onCancel,
 }: {
+  /** The authenticator app's code, or a backup code; the section shows the heading for it. */
+  method: TwoFactorMethod;
+  onMethodChange: (method: TwoFactorMethod) => void;
   isPending: boolean;
   /** The resolved failure message, if the last attempt failed. */
   error?: string;
@@ -27,8 +33,6 @@ export function TwoFactorChallengeForm({
   onCancel: () => void;
 }) {
   const { t } = useTranslation();
-  const [method, setMethod] = useState<TwoFactorMethod>('totp');
-
   const {
     register,
     control,
@@ -41,7 +45,7 @@ export function TwoFactorChallengeForm({
   });
 
   const switchMethod = () => {
-    setMethod(method === 'totp' ? 'backup-code' : 'totp');
+    onMethodChange(method === 'totp' ? 'backup-code' : 'totp');
     resetField('code');
   };
 
@@ -101,27 +105,20 @@ export function TwoFactorChallengeForm({
           )}
         />
 
-        <DsButton type="submit" variant="primary" size="md" block disabled={isPending}>
-          {isPending ? t('auth.twoFactor.verifying') : t('auth.twoFactor.verify')}
-        </DsButton>
+        <TwoFactorSubmit control={control} method={method} isPending={isPending} />
 
-        <div className="flex items-center justify-between text-sm">
-          <button
-            type="button"
-            onClick={switchMethod}
-            disabled={isPending}
-            className="text-accent-blue transition-opacity hover:opacity-80"
-          >
+        <div className="flex items-center justify-between gap-3">
+          <DsButton size="text" onClick={switchMethod} disabled={isPending}>
             {method === 'totp' ? t('auth.twoFactor.useBackupCode') : t('auth.twoFactor.useApp')}
-          </button>
-          <button
-            type="button"
+          </DsButton>
+          <DsButton
+            size="text"
+            icon={<ArrowLeft className="size-4" />}
             onClick={onCancel}
             disabled={isPending}
-            className="text-ink-600 transition-colors hover:text-ink-900"
           >
             {t('auth.twoFactor.back')}
-          </button>
+          </DsButton>
         </div>
       </FieldGroup>
     </form>

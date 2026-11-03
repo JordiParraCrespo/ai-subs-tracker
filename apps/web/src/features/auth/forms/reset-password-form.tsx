@@ -19,7 +19,15 @@ import { useTranslation } from 'react-i18next';
  * deliberately never carry.
  */
 
-const RULES: readonly PasswordRule[] = ['length', 'case', 'number', 'match'];
+const RULES: readonly PasswordRule[] = ['length', 'number', 'match'];
+
+/** The design's button names the first rule still unmet, then says what it does. */
+function submitLabel(results: Record<PasswordRule, boolean>): string {
+  if (!results.length) return 'auth.resetPassword.cta.length';
+  if (!results.number) return 'auth.resetPassword.cta.number';
+  if (!results.match) return 'auth.resetPassword.cta.match';
+  return 'auth.resetPassword.submit';
+}
 
 export function ResetPasswordForm({
   isPending,
@@ -85,7 +93,7 @@ export function ResetPasswordForm({
           rules={RULES}
           className="-mt-1.5 mb-1.5"
         >
-          {(satisfied) => (
+          {(satisfied, results) => (
             <DsButton
               type="submit"
               variant="primary"
@@ -93,7 +101,9 @@ export function ResetPasswordForm({
               block
               disabled={isPending || !satisfied}
             >
-              {isPending ? t('auth.resetPassword.submitting') : t('auth.resetPassword.submit')}
+              {isPending
+                ? t('auth.resetPassword.submitting')
+                : t(submitLabel(results) as 'auth.resetPassword.submit')}
             </DsButton>
           )}
         </PasswordChecklist>

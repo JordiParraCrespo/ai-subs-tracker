@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { type ComponentType, createContext, useContext } from 'react';
 import type { NavItem, NavLink, ShellWorkspace } from '../lib/nav';
 
 /**
@@ -11,6 +11,12 @@ export interface ShellConfig {
   /** Links shown in the account menu above the language list. */
   userMenuLinks?: readonly NavLink[];
   workspace?: ShellWorkspace;
+  /**
+   * ⌘K's results from the app's product (its records, as `CommandGroup`s of
+   * `CommandItem`s), shown above the pages. The kit knows no product, so the
+   * app hands this over; `onDone` closes the palette after a pick.
+   */
+  commandResults?: ComponentType<{ onDone: () => void }>;
 }
 
 const ShellContext = createContext<ShellConfig | null>(null);

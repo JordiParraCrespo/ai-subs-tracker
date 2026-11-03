@@ -68,7 +68,8 @@ export function App() {
       <SessionGate>
         <RouterProvider router={router} context={{ auth: { isAuthenticated } }} />
       </SessionGate>
-      <Toaster theme={theme} position="bottom-right" />
+      {/* The design's toast: one pill, centred 32px above the bottom edge. */}
+      <Toaster theme={theme} position="bottom-center" offset={32} />
     </>
   );
 }

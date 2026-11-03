@@ -6,6 +6,7 @@ import {
   isTrustedSender,
   parseExternalUrl,
   parseHome,
+  parseLoginCode,
   parseProvider,
   parseToken,
 } from '../ipc-validation';
@@ -23,6 +24,8 @@ function services(): DesktopServices {
     })),
     collectorRefresh: vi.fn(),
     addLogin: vi.fn(async () => ({ ok: true, message: null })),
+    submitLoginCode: vi.fn(),
+    cancelLogin: vi.fn(),
     activate: vi.fn(async () => undefined),
     shellIntegration: vi.fn(),
     shellInstall: vi.fn(),
@@ -64,6 +67,13 @@ describe('IPC argument validation', () => {
     }
   });
 
+  it('takes a pasted sign-in code as one printable line, never a second one', () => {
+    expect(parseLoginCode('  abc#DEF_123  ')).toBe('abc#DEF_123');
+    for (const bad of ['', '   ', 'abc\ndef', 'a b', 'x'.repeat(600), 7]) {
+      expect(() => parseLoginCode(bad)).toThrow(IpcArgumentError);
+    }
+  });
+
   it('trusts only frames from the renderer origin', () => {
     expect(isTrustedSender('app://subtrack/accounts', 'app://subtrack')).toBe(true);
     expect(isTrustedSender('http://localhost:3000/x', 'http://localhost:3000')).toBe(true);
@@ -74,9 +84,10 @@ describe('IPC argument validation', () => {
 });
 
 describe('IPC handlers', () => {
-  it('has a handler for every invoke channel (all but the change event)', () => {
+  it('has a handler for every invoke channel (all but the two change events)', () => {
     const channels = Object.values(DESKTOP_CHANNELS).filter(
-      (c) => c !== DESKTOP_CHANNELS.collectorChanged,
+      (c) =>
+        c !== DESKTOP_CHANNELS.collectorChanged && c !== DESKTOP_CHANNELS.accountsLoginProgress,
     );
     expect(Object.keys(ipcHandlers(services())).sort()).toEqual([...channels].sort());
   });

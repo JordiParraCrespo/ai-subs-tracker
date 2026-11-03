@@ -23,7 +23,8 @@
       "now": "ahora",
       "week": "{{count}}sem",
       "year": "{{count}}a"
-    }
+    },
+    "close": "Cerrar"
   },
   "validation": {
     "title": "Error de validación",
@@ -178,22 +179,29 @@
       "resent": "Enlace reenviado"
     },
     "resetPassword": {
-      "title": "Restablecer contraseña",
-      "description": "Elige una nueva contraseña para tu cuenta",
+      "title": "Elige una contraseña nueva",
+      "description": "Elige una contraseña nueva para tu cuenta.",
       "newPassword": "Nueva contraseña",
-      "newPasswordPlaceholder": "Introduce una nueva contraseña",
-      "submit": "Restablecer contraseña",
+      "newPasswordPlaceholder": "Crea una contraseña",
+      "submit": "Guardar contraseña",
       "submitting": "Restableciendo...",
-      "invalidTitle": "Enlace no válido",
-      "invalidMessage": "Este enlace no es válido o ha expirado. Solicita uno nuevo.",
-      "requestNewLink": "Solicitar un nuevo enlace",
-      "successTitle": "Contraseña actualizada",
-      "successMessage": "Ya puedes iniciar sesión.",
       "failedTitle": "Error al restablecer",
       "error": "No se pudo restablecer la contraseña",
       "confirmPassword": "Confirmar contraseña",
-      "confirmPasswordPlaceholder": "Repite la contraseña",
-      "continue": "Ir al espacio de trabajo"
+      "confirmPasswordPlaceholder": "Escríbela otra vez",
+      "forEmail": "Para {{email}}",
+      "cta": {
+        "length": "Usa al menos 8 caracteres",
+        "number": "Añade un número",
+        "match": "Confirma la contraseña"
+      },
+      "expiredTitle": "Este enlace ha caducado",
+      "expiredText": "Los enlaces sirven una vez y durante 30 minutos. Envía uno nuevo a {{email}}.",
+      "expiredTextNoEmail": "Los enlaces sirven una vez y durante 30 minutos. Pide uno nuevo.",
+      "sendNew": "Enviar un enlace nuevo",
+      "changedTitle": "Contraseña cambiada",
+      "changedText": "Se cerró la sesión en los demás dispositivos. Inicia sesión con tu contraseña nueva.",
+      "signIn": "Iniciar sesión"
     },
     "session": {
       "errorTitle": "Problema de conexión",
@@ -232,17 +240,21 @@
     },
     "showPassword": "Mostrar contraseña",
     "twoFactor": {
-      "title": "Verificación en dos pasos",
-      "description": "Introduce el código de tu aplicación de autenticación para terminar de iniciar sesión.",
-      "code": "Código de verificación",
+      "title": "Escribe tu código",
+      "description": "Abre tu app de autenticación y escribe el código de 6 dígitos de {{app}}.",
+      "code": "Código de 6 dígitos",
       "backupCode": "Código de respaldo",
-      "trustDevice": "No volver a preguntar en este dispositivo durante 30 días",
+      "trustDevice": "Confiar en este ordenador durante 30 días",
       "verify": "Verificar",
       "verifying": "Verificando...",
       "useBackupCode": "Usar un código de respaldo",
-      "useApp": "Usar tu aplicación de autenticación",
-      "back": "Volver",
-      "invalidCode": "Ese código no es correcto."
+      "useApp": "Usar la app",
+      "back": "Volver a iniciar sesión",
+      "invalidCode": "Ese código no es correcto.",
+      "backupTitle": "Escribe un código de respaldo",
+      "backupDescription": "Usa uno de los códigos que guardaste al activar la verificación en dos pasos. Cada uno sirve una vez.",
+      "needCode": "Escribe el código de 6 dígitos",
+      "needBackupCode": "Escribe un código de respaldo"
     },
     "layout": {
       "newHere": "¿Eres nuevo?",
@@ -269,8 +281,6 @@
       "showLess": "Ver menos"
     },
     "desktop": {
-      "add": "Añadir {{provider}}",
-      "addFailed": "El inicio de sesión no terminó.",
       "lastSync": "Última sincronización {{when}}",
       "never": "nunca",
       "phase": {
@@ -298,7 +308,7 @@
       "title": "Suscripciones",
       "sub_one": "{{count}} cuenta · {{spend}}/mes",
       "sub_other": "{{count}} cuentas · {{spend}}/mes",
-      "add": "Añadir cuenta"
+      "add": "Añadir suscripción"
     },
     "models": {
       "input": "Entrada",
@@ -598,6 +608,83 @@
       "missingTitle": "Sin día de renovación",
       "missingSub": "Los proveedores no indican cuándo se cobra un plan. Pon el día de tu recibo para verlo en el calendario.",
       "setDay": "Poner día"
+    },
+    "firstRun": {
+      "sub": "Aún no hay nada",
+      "overview": {
+        "title": "Aún no hay gasto que mostrar",
+        "text": "Añade tu primera suscripción para ver el gasto mensual, las renovaciones y quién usa qué."
+      },
+      "subscriptions": {
+        "title": "Aún no hay suscripciones",
+        "text": "Añade las herramientas de IA que paga tu equipo. Claude Code y Codex inician sesión en el navegador."
+      },
+      "people": {
+        "title": "Aún no hay nadie",
+        "text": "Cada persona que inicia sesión en una suscripción aparece aquí, con lo que usa y lo que cuesta."
+      },
+      "usage": {
+        "title": "Aún no hay uso",
+        "text": "El uso y los tokens aparecen tras la primera sesión en una cuenta."
+      },
+      "tokenmaxx": {
+        "title": "Aún no hay nada que rotar",
+        "text": "Añade dos o más cuentas de un plan y Tokenmaxx te dice cuál usar después."
+      },
+      "renewals": {
+        "title": "No hay renovaciones próximas",
+        "text": "Las fechas de renovación aparecen aquí cuando añades una suscripción."
+      }
+    },
+    "add": {
+      "title": "Añadir suscripción",
+      "description": "Elige la herramienta. Claude Code y Codex inician sesión en el navegador.",
+      "how": {
+        "claude-code": "Inicia sesión en claude.com",
+        "codex": "Inicia sesión con un código en openai.com"
+      },
+      "claude": {
+        "title": "Termina de iniciar sesión en Claude",
+        "description": "Abrimos claude.com en tu navegador. Inicia sesión con la cuenta que quieres añadir.",
+        "waiting": "Esperando a Claude…",
+        "expires": "Subtrack espera hasta 15 minutos",
+        "otherTitle": "¿Tienes otra cuenta abierta?",
+        "otherText": "Copia el enlace y ábrelo en una ventana privada, así la cuenta que usas ahora sigue con la sesión iniciada.",
+        "useCode": "Usar un código",
+        "copyLink": "Copiar enlace",
+        "linkCopied": "Enlace copiado"
+      },
+      "code": {
+        "title": "Inicia sesión con un código",
+        "description": "Para cuando el navegador está en otro dispositivo.",
+        "open": "1. Abre este enlace en cualquier dispositivo",
+        "paste": "2. Pega el código que te muestra Claude",
+        "placeholder": "Pégalo aquí",
+        "copy": "Copiar",
+        "copied": "Copiado",
+        "empty": "Pega el código",
+        "submit": "Iniciar sesión",
+        "checking": "Iniciando sesión…"
+      },
+      "codex": {
+        "title": "Escribe este código en OpenAI",
+        "description": "Abre la página, inicia sesión con la cuenta que quieres añadir y escribe el código.",
+        "waiting": "Esperando la aprobación en auth.openai.com",
+        "expires": "El código caduca en 15 minutos",
+        "copyCode": "Copiar código",
+        "openPage": "Abrir página",
+        "preparing": "Pidiendo un código a OpenAI…"
+      },
+      "desktop": {
+        "title": "Añádela desde la app de escritorio",
+        "description": "Claude Code y Codex inician sesión en tu ordenador.",
+        "text": "La app de escritorio de Subtrack inicia la sesión y lee el plan, así nada de tu inicio de sesión llega a una pestaña del navegador. Abre la app y elige Añadir suscripción."
+      },
+      "back": "Atrás",
+      "failed": "No se completó el inicio de sesión."
+    },
+    "search": {
+      "group": "Suscripciones"
     }
   },
   "home": {
@@ -628,9 +715,8 @@
     "menu": "Menú",
     "dashboard": "Resumen",
     "logOut": "Cerrar sesión",
-    "commandEmpty": "Sin resultados.",
-    "commandPlaceholder": "Busca páginas y acciones…",
-    "goTo": "Ir a",
+    "commandPlaceholder": "Busca suscripciones y páginas",
+    "goTo": "Páginas",
     "primaryNavigation": "Navegación principal",
     "profile": "Perfil",
     "search": "Buscar",
@@ -639,12 +725,17 @@
     "users": "Usuarios",
     "roles": "Roles",
     "toggleSidebar": "Mostrar u ocultar el menú",
-    "viewProfile": "Ver perfil",
     "accounts": "Suscripciones",
     "tokenmaxx": "Tokenmaxx",
     "usage": "Uso y tokens",
     "people": "Personas",
-    "renewals": "Renovaciones"
+    "renewals": "Renovaciones",
+    "commandTitle": "Buscar",
+    "commandNoResults": "Nada para «{{query}}»",
+    "commandTry": "Prueba con una suscripción o el nombre de una página.",
+    "commandMove": "↑ ↓ para moverte",
+    "commandOpen": "↵ para abrir",
+    "commandClose": "⌘K para cerrar"
   },
   "control": {
     "accessDeniedTitle": "Se necesita acceso al panel de control",
@@ -949,100 +1040,26 @@
           "hint": "Quién hizo qué, y cuándo"
         }
       }
-    }
-  },
-  "profile": {
-    "changePhoto": "Cambiar foto",
-    "details": {
-      "cancel": "Cancelar",
-      "description": "Tu información personal. Así te ven tus compañeros en todo el espacio de trabajo.",
-      "email": "Correo electrónico",
-      "emailDescription": "Se usa para iniciar sesión y recibir avisos",
-      "emailHint": "Lo gestiona tu espacio de trabajo: escribe a un administrador para cambiarlo.",
-      "firstName": "Nombre",
-      "jobTitle": "Puesto",
-      "jobTitleDescription": "Aparece en tu ficha de perfil",
-      "lastName": "Apellidos",
-      "phone": "Teléfono",
-      "save": "Guardar cambios",
-      "title": "Perfil"
     },
-    "joined": "Se unió en {{date}}",
-    "password": {
-      "confirm": "Confirmar contraseña",
-      "confirmPlaceholder": "Repite la nueva contraseña",
-      "current": "Contraseña actual",
-      "description": "Protege tu cuenta con una contraseña sólida y verificación en dos pasos.",
-      "mismatch": "Las dos contraseñas deben coincidir.",
-      "new": "Nueva contraseña",
-      "newDescription": "Al menos 8 caracteres",
-      "newPlaceholder": "Nueva contraseña",
-      "submit": "Actualizar contraseña",
-      "title": "Contraseña",
-      "twoFactor": "Verificación en dos pasos",
-      "twoFactorDescription": "Pedir un código de tu aplicación de autenticación al iniciar sesión.",
-      "twoFactorOn": "Activada"
-    },
-    "sections": {
-      "details": "Perfil",
-      "password": "Contraseña",
-      "sessions": "Sesiones",
-      "preferences": "Preferencias"
-    },
-    "sessions": {
-      "activeNow": "Activa ahora",
-      "credentialsNote": "Aquí solo aparecen dispositivos. Las claves de API y las apps conectadas se revocan en API y webhooks: cerrar la sesión de un dispositivo no las desactiva.",
-      "description": "Dispositivos con la sesión iniciada en tu cuenta. Cierra cualquiera que no reconozcas.",
-      "empty": "No hay ningún dispositivo con la sesión iniciada.",
-      "revokeDescription": "Ese dispositivo tendrá que volver a iniciar sesión para acceder a tu cuenta.",
-      "revokeOthersDescription": "Todos los dispositivos salvo este tendrán que volver a iniciar sesión. Las claves de API y las apps conectadas siguen funcionando.",
-      "revokeOthersTitle": "¿Cerrar la sesión en el resto de dispositivos?",
-      "revokeTitle": "¿Cerrar la sesión de {{device}}?",
-      "signOut": "Cerrar sesión",
-      "signOutAll": "Cerrar el resto de sesiones",
-      "thisDevice": "Este dispositivo",
-      "title": "Sesiones",
-      "unknownDevice": "Dispositivo no reconocido",
-      "unknownLocation": "Dirección desconocida"
-    },
-    "preferences": {
-      "title": "Preferencias",
-      "description": "Cómo se ve el espacio de trabajo y qué llega a tu bandeja.",
-      "darkTheme": "Tema oscuro",
-      "darkThemeDescription": "Cambia todo el espacio de trabajo a una paleta oscura.",
-      "language": "Idioma",
-      "density": "Densidad de las tablas",
-      "densityDescription": "Altura de fila en las tablas del espacio de trabajo",
-      "densities": {
-        "comfortable": "Cómoda",
-        "compact": "Compacta"
+    "status": {
+      "goHome": "Ir al resumen",
+      "notFound": {
+        "eyebrow": "Error 404",
+        "title": "Página no encontrada",
+        "text": "No hay nada en esta dirección. Puede que se haya movido o eliminado."
       },
-      "weeklyDigest": "Resumen semanal",
-      "weeklyDigestDescription": "Resumen de los lunes con lo ocurrido en tu espacio de trabajo.",
-      "productUpdates": "Novedades del producto",
-      "productUpdatesDescription": "Correos ocasionales sobre nuevas funciones."
-    },
-    "twoFactor": {
-      "enableTitle": "Configurar la verificación en dos pasos",
-      "enablePasswordStep": "Introduce tu contraseña para empezar. A partir de entonces, iniciar sesión con contraseña también pedirá un código de tu aplicación de autenticación.",
-      "enableScanStep": "Escanea el código QR con tu aplicación de autenticación e introduce el código de 6 dígitos que muestra.",
-      "enableCodesStep": "Guarda estos códigos de respaldo en un lugar seguro. Cada uno te permite iniciar sesión una vez si pierdes tu aplicación de autenticación, y no se volverán a mostrar.",
-      "password": "Contraseña",
-      "code": "Código de tu aplicación",
-      "qrLabel": "Código QR para tu aplicación de autenticación",
-      "manualEntry": "¿No puedes escanearlo? Introduce esta clave:",
-      "backupCodesLabel": "Códigos de respaldo",
-      "copyCodes": "Copiar códigos",
-      "continue": "Continuar",
-      "verify": "Activar",
-      "done": "Hecho",
-      "disableTitle": "¿Desactivar la verificación en dos pasos?",
-      "disableDescription": "Iniciar sesión solo pedirá tu contraseña, y los dispositivos de confianza volverán a pedir el código si la activas de nuevo. Introduce tu contraseña para confirmar.",
-      "disable": "Desactivar",
-      "regenerateTitle": "Nuevos códigos de respaldo",
-      "regenerateDescription": "Tus códigos de respaldo actuales dejarán de funcionar. Introduce tu contraseña para obtener otros nuevos.",
-      "regenerate": "Nuevos códigos de respaldo",
-      "needsPassword": "Requiere inicio de sesión con contraseña"
+      "error": {
+        "eyebrow": "Algo ha fallado",
+        "title": "Esta página ha dado un error",
+        "text": "Recargar suele arreglarlo. Tus datos están a salvo.",
+        "reload": "Recargar"
+      },
+      "offline": {
+        "eyebrow": "Sin conexión",
+        "title": "No se puede conectar con {{app}}",
+        "text": "Revisa tu conexión. Las cifras se actualizan en cuanto vuelvas.",
+        "retry": "Reintentar"
+      }
     }
   },
   "public": {
@@ -1215,13 +1232,121 @@
       "security": "Seguridad",
       "desktop": "Este ordenador"
     },
-    "security": {
-      "description": "Todos los dispositivos con sesión iniciada en tu cuenta, y una forma de cerrar cualquiera de ellas.",
-      "sessions": "Sesiones activas",
-      "title": "Seguridad"
+    "subtitle": "Tu cuenta",
+    "title": "Configuración",
+    "profile": {
+      "title": "Perfil",
+      "description": "Tu nombre y el correo con el que inicias sesión.",
+      "firstName": "Nombre",
+      "lastName": "Apellidos",
+      "email": "Correo",
+      "saved": "Perfil guardado"
     },
-    "subtitle": "Tu cuenta y su seguridad.",
-    "title": "Configuración"
+    "security": {
+      "title": "Seguridad",
+      "description": "Contraseña, verificación en dos pasos y los dispositivos con tu sesión iniciada.",
+      "manage": "Gestionar",
+      "dialogTitle": "Seguridad",
+      "dialogDescription": "Tu contraseña, la verificación en dos pasos y dónde tienes la sesión iniciada.",
+      "password": "Contraseña",
+      "passwordSub": "La usas con tu correo para iniciar sesión",
+      "noPassword": "Inicias sesión con Google o GitHub",
+      "change": "Cambiar",
+      "twoFactor": "Verificación en dos pasos",
+      "twoFactorOff": "Pide un código de tu móvil al iniciar sesión",
+      "twoFactorOn": "Pide un código de tu app al iniciar sesión",
+      "twoFactorNeedsPassword": "Protege el inicio de sesión con contraseña, que esta cuenta no usa",
+      "on": "Activada",
+      "off": "Desactivada",
+      "setUp": "Configurar",
+      "turnOff": "Desactivar",
+      "devices": "Dispositivos",
+      "thisDevice": "Este dispositivo",
+      "signOut": "Cerrar sesión",
+      "signOutAll": "Cerrar sesión en los demás dispositivos",
+      "activeNow": "Activo ahora",
+      "unknownDevice": "Dispositivo desconocido",
+      "unknownLocation": "Dirección desconocida",
+      "noDevices": "No hay dispositivos con la sesión iniciada.",
+      "back": "Atrás",
+      "cancel": "Cancelar",
+      "step": "Paso {{step}} de 3"
+    },
+    "changePassword": {
+      "title": "Cambiar contraseña",
+      "description": "Usa al menos 8 caracteres y un número.",
+      "current": "Contraseña actual",
+      "new": "Nueva contraseña",
+      "confirm": "Confirma la nueva contraseña",
+      "note": "Al cambiarla se cierra la sesión en los demás dispositivos.",
+      "cta": {
+        "current": "Escribe tu contraseña actual",
+        "length": "Usa al menos 8 caracteres",
+        "number": "Añade un número",
+        "match": "Confirma la nueva contraseña"
+      },
+      "submit": "Cambiar contraseña"
+    },
+    "twoFactorSetup": {
+      "passwordTitle": "Configurar la verificación en dos pasos",
+      "passwordDescription": "Confirma que eres tú para empezar.",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Tu contraseña",
+      "passwordEmpty": "Escribe tu contraseña",
+      "continue": "Continuar",
+      "scanTitle": "Escanea el código",
+      "scanDescription": "Usa cualquier app de autenticación y escribe el código que muestra.",
+      "qrLabel": "Código QR para tu app de autenticación",
+      "cantScan": "¿No puedes escanearlo?",
+      "enterKey": "Escribe esta clave en tu app.",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "code": "Código de 6 dígitos de tu app",
+      "codeEmpty": "Escribe el código de 6 dígitos",
+      "verify": "Verificar",
+      "codesTitle": "Guarda tus códigos de respaldo",
+      "codesDescription": "Cada uno sirve una vez si pierdes el móvil. Solo se muestran ahora.",
+      "codesLabel": "Códigos de respaldo",
+      "download": "Descargar",
+      "saved": "Los he guardado en un lugar seguro",
+      "savedEmpty": "Confirma que los has guardado",
+      "done": "Hecho"
+    },
+    "twoFactorOff": {
+      "title": "¿Desactivar la verificación en dos pasos?",
+      "description": "Para iniciar sesión solo hará falta tu contraseña. Escríbela para confirmar.",
+      "password": "Contraseña",
+      "cta": "Desactivar"
+    },
+    "signOutOne": {
+      "title": "¿Cerrar sesión en {{device}}?",
+      "description": "Ese dispositivo tendrá que iniciar sesión de nuevo para acceder a tu cuenta.",
+      "cta": "Cerrar sesión"
+    },
+    "signOutOthers": {
+      "title": "¿Cerrar sesión en los demás dispositivos?",
+      "description": "Se cierra la sesión en todos menos en este. Las apps de escritorio dejan de sincronizar hasta que vuelvan a iniciar sesión.",
+      "cta_one": "Cerrar sesión en {{count}} dispositivo",
+      "cta_other": "Cerrar sesión en {{count}} dispositivos"
+    },
+    "workspace": {
+      "title": "Espacio de trabajo",
+      "description": "Cómo llamas a este conjunto de suscripciones. Aparece en la barra lateral.",
+      "name": "Nombre del espacio",
+      "placeholder": "p. ej. Proyectos personales",
+      "saved": "Espacio renombrado"
+    },
+    "language": {
+      "title": "Idioma",
+      "description": "Idioma de la interfaz y formato de fecha."
+    },
+    "appearance": {
+      "title": "Apariencia",
+      "description": "Elige cómo se ve la app. Selecciona un tema o deja que siga la configuración del sistema.",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    }
   },
   "table": {
     "clearFilter": "Quitar el filtro",

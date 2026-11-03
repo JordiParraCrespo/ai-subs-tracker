@@ -19,7 +19,13 @@ export interface UserSettingsProps {
   density: TableDensity;
   weeklyDigest: boolean;
   productUpdates: boolean;
+  workspaceName: string | null;
 }
+
+/** The fields a save carries; a missing `workspaceName` keeps the saved one. */
+export type UserSettingsUpdate = Omit<UserSettingsProps, 'workspaceName'> & {
+  workspaceName?: string | null;
+};
 
 /**
  * A user's workspace preferences. The aggregate is keyed by the user's own id
@@ -44,7 +50,7 @@ export class UserSettingsEntity extends AggregateRoot<UserSettingsProps> {
   static createDefault(userId: string): UserSettingsEntity {
     return new UserSettingsEntity({
       id: userId,
-      props: { ...DEFAULT_USER_SETTINGS },
+      props: { ...DEFAULT_USER_SETTINGS, workspaceName: null },
     });
   }
 
@@ -72,17 +78,22 @@ export class UserSettingsEntity extends AggregateRoot<UserSettingsProps> {
     return this.props.productUpdates;
   }
 
+  get workspaceName(): string | null {
+    return this.props.workspaceName;
+  }
+
   /**
    * Replace every preference at once. The settings pane always holds the full
    * set, and a wholesale replace means a client cannot half-apply a form it
    * rendered from a now-stale read.
    */
-  update(props: UserSettingsProps): void {
+  update(props: UserSettingsUpdate): void {
     this.props.theme = props.theme;
     this.props.locale = props.locale;
     this.props.density = props.density;
     this.props.weeklyDigest = props.weeklyDigest;
     this.props.productUpdates = props.productUpdates;
+    if (props.workspaceName !== undefined) this.props.workspaceName = props.workspaceName;
     this.setUpdatedAt(new Date());
     this.validate();
   }
@@ -96,6 +107,10 @@ export class UserSettingsEntity extends AggregateRoot<UserSettingsProps> {
     }
     if (!TABLE_DENSITIES.includes(this.props.density)) {
       throw new ArgumentInvalidException(`Unknown table density: ${this.props.density}`);
+    }
+    const name = this.props.workspaceName;
+    if (name !== null && (name.trim().length === 0 || name.length > 80)) {
+      throw new ArgumentInvalidException('A workspace name is 1 to 80 characters');
     }
   }
 }

@@ -43,6 +43,7 @@ describe('GetUserSettingsQueryHandler', () => {
         density: 'compact',
         weeklyDigest: false,
         productUpdates: true,
+        workspaceName: null,
       },
     });
     repo.findOneById = vi.fn().mockResolvedValue(Some(saved));
