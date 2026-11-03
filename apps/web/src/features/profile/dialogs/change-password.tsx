@@ -23,6 +23,7 @@ export function ChangePasswordStep({ onBack }: { onBack: () => void }) {
   return (
     <>
       <DsModalHeader
+        closeLabel={t('common.close')}
         title={t('settings.changePassword.title')}
         description={t('settings.changePassword.description')}
       />

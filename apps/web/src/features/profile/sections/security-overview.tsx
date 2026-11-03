@@ -33,6 +33,7 @@ export function SecurityOverview({ onStep }: { onStep: (step: SecurityStep) => v
   return (
     <>
       <DsModalHeader
+        closeLabel={t('common.close')}
         title={t('settings.security.dialogTitle')}
         description={t('settings.security.dialogDescription')}
       />

@@ -15,6 +15,7 @@ export function SignOutOthersStep({ count, onBack }: { count: number; onBack: ()
   return (
     <>
       <DsModalHeader
+        closeLabel={t('common.close')}
         title={t('settings.signOutOthers.title')}
         description={t('settings.signOutOthers.description')}
       />

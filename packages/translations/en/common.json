@@ -22,5 +22,6 @@
     "now": "now",
     "week": "{{count}}w",
     "year": "{{count}}y"
-  }
+  },
+  "close": "Close"
 }

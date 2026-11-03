@@ -25,6 +25,7 @@ export function CodexSignIn({
   return (
     <>
       <DsModalHeader
+        closeLabel={t('common.close')}
         title={t('accounts.add.codex.title')}
         description={t('accounts.add.codex.description')}
       />

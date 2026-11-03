@@ -47,6 +47,7 @@ export function TwoFactorOnStep({ onBack }: { onBack: () => void }) {
     return (
       <>
         <DsModalHeader
+          closeLabel={t('common.close')}
           eyebrow={eyebrow}
           title={t('settings.twoFactorSetup.passwordTitle')}
           description={t('settings.twoFactorSetup.passwordDescription')}
@@ -69,6 +70,7 @@ export function TwoFactorOnStep({ onBack }: { onBack: () => void }) {
     return (
       <>
         <DsModalHeader
+          closeLabel={t('common.close')}
           eyebrow={eyebrow}
           title={t('settings.twoFactorSetup.scanTitle')}
           description={t('settings.twoFactorSetup.scanDescription')}
@@ -111,6 +113,7 @@ export function TwoFactorOnStep({ onBack }: { onBack: () => void }) {
   return (
     <>
       <DsModalHeader
+        closeLabel={t('common.close')}
         eyebrow={eyebrow}
         title={t('settings.twoFactorSetup.codesTitle')}
         description={t('settings.twoFactorSetup.codesDescription')}

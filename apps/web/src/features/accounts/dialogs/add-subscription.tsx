@@ -57,6 +57,7 @@ export function AddSubscriptionDialog({ onClose }: { onClose: () => void }) {
       {step.kind === 'pick' && (
         <>
           <DsModalHeader
+            closeLabel={t('common.close')}
             title={t('accounts.add.title')}
             description={t('accounts.add.description')}
           />
@@ -109,6 +110,7 @@ export function AddSubscriptionDialog({ onClose }: { onClose: () => void }) {
       {step.kind === 'desktop' && (
         <>
           <DsModalHeader
+            closeLabel={t('common.close')}
             title={t('accounts.add.desktop.title')}
             description={t('accounts.add.desktop.description')}
           />

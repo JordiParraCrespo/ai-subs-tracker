@@ -39,6 +39,7 @@ export function SignInCodeForm({
       noValidate
     >
       <DsModalHeader
+        closeLabel={t('common.close')}
         title={t('accounts.add.code.title')}
         description={t('accounts.add.code.description')}
       />

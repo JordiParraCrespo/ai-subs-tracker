@@ -24,6 +24,7 @@ export function ClaudeSignIn({
   return (
     <>
       <DsModalHeader
+        closeLabel={t('common.close')}
         title={t('accounts.add.claude.title')}
         description={t('accounts.add.claude.description')}
       />

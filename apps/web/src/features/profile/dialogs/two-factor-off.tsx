@@ -19,6 +19,7 @@ export function TwoFactorOffStep({ onBack }: { onBack: () => void }) {
   return (
     <>
       <DsModalHeader
+        closeLabel={t('common.close')}
         title={t('settings.twoFactorOff.title')}
         description={t('settings.twoFactorOff.description')}
       />

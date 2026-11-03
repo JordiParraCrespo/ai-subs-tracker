@@ -23,7 +23,8 @@
       "now": "ahora",
       "week": "{{count}}sem",
       "year": "{{count}}a"
-    }
+    },
+    "close": "Cerrar"
   },
   "validation": {
     "title": "Error de validación",

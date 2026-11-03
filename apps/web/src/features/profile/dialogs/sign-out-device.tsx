@@ -23,6 +23,7 @@ export function SignOutDeviceStep({
   return (
     <>
       <DsModalHeader
+        closeLabel={t('common.close')}
         title={t('settings.signOutOne.title', { device })}
         description={t('settings.signOutOne.description')}
       />
