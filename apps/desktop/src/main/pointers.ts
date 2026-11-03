@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import type { ProviderId } from '@flama/shared/subscriptions';
 
@@ -25,6 +25,15 @@ export function pointerPath(home: string, provider: ProviderId): string {
   return join(pointerDir(home), provider);
 }
 
+/**
+ * Where a Subtrack install kept the pointers. Shell functions already loaded
+ * in an open terminal, and a PowerShell profile someone pasted the snippet
+ * into, still read here; `writePointer` keeps it in step while it exists.
+ */
+export function legacyPointerDir(home: string): string {
+  return join(home, '.subtrack', 'active');
+}
+
 /** What the pointer file holds for this login: '' for the default. */
 export function pointerContent(login: PointerLogin): string {
   return login.isDefault ? '' : resolve(login.home);
@@ -49,10 +58,29 @@ export async function writePointer(home: string, login: PointerLogin): Promise<b
   } catch {
     current = null;
   }
+  await mirrorLegacy(home, login.provider, next);
   if (current === next) return false;
   await mkdir(dirname(path), { recursive: true });
   await writeFile(path, next, { mode: 0o644 });
   return true;
+}
+
+/** Writes `content` to the Subtrack-era pointer too, only when that folder still exists. */
+async function mirrorLegacy(home: string, provider: ProviderId, content: string): Promise<void> {
+  const dir = legacyPointerDir(home);
+  try {
+    if (!(await stat(dir)).isDirectory()) return;
+  } catch {
+    return;
+  }
+  const path = join(dir, provider);
+  let current: string | null = null;
+  try {
+    current = (await readFile(path, 'utf8')).trim();
+  } catch {
+    current = null;
+  }
+  if (current !== content) await writeFile(path, content, { mode: 0o644 });
 }
 
 /** True when terminals use this login, given the pointer's content. */

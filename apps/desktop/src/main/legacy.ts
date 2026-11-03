@@ -1,7 +1,7 @@
-import { mkdir, readFile, rm, rmdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { PROVIDER_IDS } from '@flama/shared/subscriptions';
-import { pointerPath } from './pointers';
+import { legacyPointerDir, pointerPath } from './pointers';
 
 /**
  * The app was called Subtrack until November 2026. What an install of that
@@ -12,8 +12,10 @@ import { pointerPath } from './pointers';
  *   Keychain item from the config folder's path, so moving that folder would
  *   sign every added login out. An install that already has `Subtrack` keeps
  *   using it; a new install gets `ResetOwl`.
- * - **The pointers move** from `~/.subtrack/active/` to `~/.resetowl/active/`.
- *   Their content (the absolute home of the active login) does not change.
+ * - **The pointers are copied** from `~/.subtrack/active/` to
+ *   `~/.resetowl/active/`, content unchanged, and the old ones are kept in
+ *   step for as long as that folder exists: terminals opened before the
+ *   update and a pasted PowerShell profile still read them.
  * - **The shell block is rewritten in place** when the rc file still has the
  *   old one: it is ours, the person opted into it, and only the text between
  *   its markers changes (`upsertBlock` in `shell-integration.ts`).
@@ -35,41 +37,35 @@ export function userDataDir(appData: string, exists: (path: string) => boolean):
 }
 
 export function legacyPointerPath(home: string, provider: string): string {
-  return join(home, '.subtrack', 'active', provider);
+  return join(legacyPointerDir(home), provider);
 }
 
 /**
- * Moves each `~/.subtrack/active/<provider>` to the new pointer path. A
- * pointer already at the new path wins (the new app wrote it), and the old
- * one is dropped. Returns the providers whose pointer was moved.
+ * Copies each `~/.subtrack/active/<provider>` to the new pointer path. A
+ * pointer already at the new path wins (the new app wrote it). The old files
+ * stay: terminals opened before the update, and a PowerShell profile with the
+ * pasted snippet, still read them, and `writePointer` keeps them in step.
+ * Returns the providers whose pointer was copied.
  */
 export async function migratePointers(home: string): Promise<string[]> {
-  const moved: string[] = [];
+  const copied: string[] = [];
   for (const provider of PROVIDER_IDS) {
-    const old = legacyPointerPath(home, provider);
     let content: string;
     try {
-      content = await readFile(old, 'utf8');
+      content = await readFile(legacyPointerPath(home, provider), 'utf8');
     } catch {
       continue;
     }
     const next = pointerPath(home, provider);
-    let present = true;
     try {
       await readFile(next, 'utf8');
+      continue;
     } catch {
-      present = false;
+      // Not there yet: copy it.
     }
-    if (!present) {
-      await mkdir(dirname(next), { recursive: true });
-      await writeFile(next, content, { mode: 0o644 });
-      moved.push(provider);
-    }
-    await rm(old, { force: true });
+    await mkdir(dirname(next), { recursive: true });
+    await writeFile(next, content, { mode: 0o644 });
+    copied.push(provider);
   }
-  // Only empty directories go: anything else in them is not ours to remove.
-  for (const dir of [join(home, '.subtrack', 'active'), join(home, '.subtrack')]) {
-    await rmdir(dir).catch(() => undefined);
-  }
-  return moved;
+  return copied;
 }

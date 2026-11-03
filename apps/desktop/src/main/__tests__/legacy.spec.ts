@@ -8,7 +8,7 @@ import {
   migratePointers,
   userDataDir,
 } from '../legacy';
-import { pointerPath } from '../pointers';
+import { pointerPath, writePointer } from '../pointers';
 import {
   BEGIN_MARKER,
   migrateShellIntegration,
@@ -44,23 +44,39 @@ describe('the data folder', () => {
 });
 
 describe('the active pointers', () => {
-  it('move to ~/.resetowl with the same content, and the old folder goes', async () => {
+  const work = '/Users/maya/Library/Application Support/Subtrack/accounts/claude-code/ab';
+
+  it('are copied to ~/.resetowl with the same content', async () => {
     const home = await tempDir();
-    const old = legacyPointerPath(home, 'claude-code');
     await mkdir(join(home, '.subtrack', 'active'), { recursive: true });
-    await writeFile(
-      old,
-      '/Users/maya/Library/Application Support/Subtrack/accounts/claude-code/ab',
-    );
+    await writeFile(legacyPointerPath(home, 'claude-code'), work);
     await writeFile(legacyPointerPath(home, 'codex'), '');
 
     expect((await migratePointers(home)).sort()).toEqual(['claude-code', 'codex']);
-    expect(await readFile(pointerPath(home, 'claude-code'), 'utf8')).toBe(
-      '/Users/maya/Library/Application Support/Subtrack/accounts/claude-code/ab',
-    );
+    expect(await readFile(pointerPath(home, 'claude-code'), 'utf8')).toBe(work);
     // An empty pointer (the default login) stays empty: never a path.
     expect(await readFile(pointerPath(home, 'codex'), 'utf8')).toBe('');
-    expect(await readdir(home)).not.toContain('.subtrack');
+  });
+
+  it('keep answering old readers: open terminals and a pasted PowerShell profile', async () => {
+    // Regression: deleting ~/.subtrack/active made those fall back to the
+    // default account, silently, because their functions still read it.
+    const home = await tempDir();
+    await mkdir(join(home, '.subtrack', 'active'), { recursive: true });
+    await writeFile(legacyPointerPath(home, 'claude-code'), work);
+    await migratePointers(home);
+    expect(await readFile(legacyPointerPath(home, 'claude-code'), 'utf8')).toBe(work);
+
+    // Switching account later reaches the old path too.
+    const other = join(home, 'accounts', 'claude-code', 'cd');
+    await writePointer(home, { provider: 'claude-code', home: other, isDefault: false });
+    expect(await readFile(legacyPointerPath(home, 'claude-code'), 'utf8')).toBe(other);
+    await writePointer(home, {
+      provider: 'claude-code',
+      home: join(home, '.claude'),
+      isDefault: true,
+    });
+    expect(await readFile(legacyPointerPath(home, 'claude-code'), 'utf8')).toBe('');
   });
 
   it('keep a pointer the new app already wrote', async () => {
@@ -74,16 +90,11 @@ describe('the active pointers', () => {
     expect(await readFile(pointerPath(home, 'codex'), 'utf8')).toBe('/new');
   });
 
-  it('leave anything else in ~/.subtrack alone', async () => {
+  it('never create ~/.subtrack on a machine that never had Subtrack', async () => {
     const home = await tempDir();
-    await mkdir(join(home, '.subtrack', 'active'), { recursive: true });
-    await writeFile(join(home, '.subtrack', 'notes.txt'), 'mine');
-    await migratePointers(home);
-    expect(await readFile(join(home, '.subtrack', 'notes.txt'), 'utf8')).toBe('mine');
-  });
-
-  it('do nothing on a machine that never had Subtrack', async () => {
-    expect(await migratePointers(await tempDir())).toEqual([]);
+    expect(await migratePointers(home)).toEqual([]);
+    await writePointer(home, { provider: 'codex', home: join(home, 'x'), isDefault: false });
+    expect(await readdir(home)).not.toContain('.subtrack');
   });
 });
 

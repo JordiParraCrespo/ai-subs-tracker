@@ -123,7 +123,7 @@ async function main(): Promise<void> {
   // Take over what an install named Subtrack left, before anything reads it.
   try {
     const moved = await migratePointers(home);
-    if (moved.length) log(`moved the active pointers for ${moved.join(', ')} to ~/.resetowl`);
+    if (moved.length) log(`copied the active pointers for ${moved.join(', ')} to ~/.resetowl`);
     if (await migrateShellIntegration(shellEnv)) log('updated the shell integration block');
   } catch (err) {
     log(`migration skipped: ${err instanceof Error ? err.message : String(err)}`);
