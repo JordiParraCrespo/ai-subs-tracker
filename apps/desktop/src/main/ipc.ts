@@ -13,6 +13,7 @@ import {
   parseBoundedString,
   parseExternalUrl,
   parseHome,
+  parseLoginCode,
   parseProvider,
   parseToken,
 } from './ipc-validation';
@@ -20,7 +21,8 @@ import {
 /**
  * One `ipcMain.handle` per invoke channel of `DESKTOP_CHANNELS`, each parsing
  * its arguments before anything runs and refusing a sender that is not the
- * app's own renderer. `collectorChanged` is main → renderer only.
+ * app's own renderer. `collectorChanged` and `accountsLoginProgress` are
+ * main → renderer only.
  */
 
 export interface DesktopServices {
@@ -29,6 +31,8 @@ export interface DesktopServices {
   collectorStatus(): CollectorStatus;
   collectorRefresh(): Promise<CollectorStatus>;
   addLogin(provider: ProviderId): Promise<AddLoginResult>;
+  submitLoginCode(code: string): void;
+  cancelLogin(): void;
   activate(provider: ProviderId, externalId: string): Promise<void>;
   shellIntegration(): Promise<ShellIntegration>;
   shellInstall(): Promise<ShellIntegration>;
@@ -48,6 +52,8 @@ export function ipcHandlers(services: DesktopServices): Record<string, Handler> 
     [DESKTOP_CHANNELS.collectorStatus]: () => services.collectorStatus(),
     [DESKTOP_CHANNELS.collectorRefresh]: () => services.collectorRefresh(),
     [DESKTOP_CHANNELS.accountsAddLogin]: (provider) => services.addLogin(parseProvider(provider)),
+    [DESKTOP_CHANNELS.accountsLoginCode]: (code) => services.submitLoginCode(parseLoginCode(code)),
+    [DESKTOP_CHANNELS.accountsLoginCancel]: () => services.cancelLogin(),
     [DESKTOP_CHANNELS.accountsActivate]: (provider, externalId) =>
       services.activate(
         parseProvider(provider),

@@ -184,7 +184,9 @@ async function read(
 }
 
 function loginCommand(home: string): LoginCommand {
-  return { command: 'codex', args: ['login'], env: { CODEX_HOME: home } };
+  // The device-code flow: a page and a one-time code the screens can show,
+  // rather than a callback on a localhost port another app may hold.
+  return { command: 'codex', args: ['login', '--device-auth'], env: { CODEX_HOME: home } };
 }
 
 function launchEnv(login: DetectedLogin): Record<string, string> {

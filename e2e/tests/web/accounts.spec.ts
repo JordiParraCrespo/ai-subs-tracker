@@ -110,3 +110,20 @@ test('a renewal day puts the plan on the renewals calendar', async ({ page }) =>
 
   await api.dispose();
 });
+
+test('in a browser, adding a subscription says the desktop app signs it in', async ({ page }) => {
+  const { user, api } = await provisionedUser('addbrowser');
+  await signInAs(page, user);
+  await page.goto('/accounts');
+
+  await page.getByRole('button', { name: 'Add subscription' }).first().click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('heading', { name: 'Add subscription' })).toBeVisible();
+  await expect(dialog.getByRole('button', { name: /Codex/ })).toBeVisible();
+  await dialog.getByRole('button', { name: /Claude Code/ }).click();
+  await expect(dialog.getByRole('heading', { name: 'Add it from the desktop app' })).toBeVisible();
+  await dialog.getByRole('button', { name: 'Back' }).click();
+  await expect(dialog.getByRole('heading', { name: 'Add subscription' })).toBeVisible();
+
+  await api.dispose();
+});

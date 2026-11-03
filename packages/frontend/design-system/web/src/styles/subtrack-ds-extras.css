@@ -211,3 +211,25 @@
 .ds-modal__body--rows{gap:0;padding-bottom:8px}
 .ds-modal__body--loose{gap:20px}
 .ds-field--wide{grid-column:1/-1}
+
+/* The add-subscription flow: a 560px modal, tool rows, the waiting card, Codex's code and a copyable link. */
+.ds-modal--wide{width:560px}
+.ds-modal__body--list{gap:8px;padding-bottom:24px}
+.ds-modal__body--flow{gap:20px;padding-bottom:24px}
+.ds-pick-row{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;outline:1px solid var(--ds-outline-card);outline-offset:-1px;cursor:pointer;transition:background-color var(--ds-duration-fast)}
+.ds-pick-row:hover{background:var(--ds-surface-hover)}
+.ds-pick-row:focus-visible{outline:2px solid var(--ds-outline-focus)}
+.ds-pick-row__meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ds-pick-row__chevron{display:flex;color:var(--ds-text-subtle)}
+.ds-wait-card{display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;outline:1px solid var(--ds-outline-card);outline-offset:-1px}
+.ds-wait-card>.ds-disc{width:40px;height:40px;flex:none}
+.ds-wait-card>.ds-disc svg{width:20px;height:20px;animation:ds-spin 1s linear infinite}
+.ds-wait-card__meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+@keyframes ds-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.ds-wait-card>.ds-disc svg{animation:none}}
+.ds-device-code{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 20px 20px 24px;border-radius:16px;background:var(--ds-fill)}
+.ds-device-code__value{font:600 32px/40px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}
+.ds-link-field{display:flex;align-items:center;gap:8px;height:40px;padding:0 4px 0 12px;border-radius:10px;background:var(--ds-field);outline:1px solid var(--ds-outline-field);outline-offset:-1px}
+.ds-link-field__value{flex:1;min-width:0;font:500 13px/20px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ds-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-stack-4{display:flex;flex-direction:column;gap:4px}
+.ds-stack-8{display:flex;flex-direction:column;gap:8px}

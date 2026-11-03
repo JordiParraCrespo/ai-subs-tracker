@@ -1,12 +1,11 @@
-import { DsButton } from '@flama/design-system-web';
 import { useAccounts } from '@flama/frontend-consumer/react';
 import { PageHead, useLocale } from '@flama/frontend-web';
 import { useTranslation } from 'react-i18next';
 import { formatMoney } from '../lib/format';
 import { monthlySpendCents } from '../lib/insights';
-import { AddAccountMenu } from './add-account-menu';
+import { AddSubscription } from './add-subscription';
 
-/** The page header: "N accounts · $X/mo", and Add account where the desktop app can sign one in. */
+/** The page header: "N accounts · $X/mo", and Add subscription. */
 export function SubscriptionsHead() {
   const { t } = useTranslation();
   const locale = useLocale();
@@ -19,9 +18,7 @@ export function SubscriptionsHead() {
         count: accounts.length,
         spend: formatMoney(monthlySpendCents(accounts), locale),
       })}
-      action={
-        <AddAccountMenu trigger={(props) => <DsButton variant="primary" size="sm" {...props} />} />
-      }
+      action={<AddSubscription />}
     />
   );
 }

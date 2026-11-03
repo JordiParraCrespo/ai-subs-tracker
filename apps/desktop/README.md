@@ -31,7 +31,7 @@ terminal follow the account marked active.
   | `collector.ts` | the loop: every 10 min, refresh (≤1/min), backoff, 401, rate-limit pause, live sends |
   | `pointers.ts` | `~/.subtrack/active/<provider>`, which login terminals use |
   | `shell-integration.ts` | the `claude` / `codex` shell functions and the rc-file install |
-  | `add-login.ts` | "Add account": runs the provider's CLI login into a folder of its own |
+  | `add-login.ts` | "Add subscription": runs the provider's CLI login into a folder of its own, reports the link and code it prints, types a pasted code into it |
   | `live-feed.ts` | the opt-in Claude Code status-line feed |
   | `tray-model.ts`, `tray.ts` | "Use next: … — x% left", Refresh, Open, Quit |
   | `ipc.ts`, `ipc-validation.ts` | one handler per channel, arguments parsed, sender checked |

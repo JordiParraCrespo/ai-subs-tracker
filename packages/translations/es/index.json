@@ -280,8 +280,6 @@
       "showLess": "Ver menos"
     },
     "desktop": {
-      "add": "Añadir {{provider}}",
-      "addFailed": "El inicio de sesión no terminó.",
       "lastSync": "Última sincronización {{when}}",
       "never": "nunca",
       "phase": {
@@ -309,7 +307,7 @@
       "title": "Suscripciones",
       "sub_one": "{{count}} cuenta · {{spend}}/mes",
       "sub_other": "{{count}} cuentas · {{spend}}/mes",
-      "add": "Añadir cuenta"
+      "add": "Añadir suscripción"
     },
     "models": {
       "input": "Entrada",
@@ -636,6 +634,53 @@
         "title": "No hay renovaciones próximas",
         "text": "Las fechas de renovación aparecen aquí cuando añades una suscripción."
       }
+    },
+    "add": {
+      "title": "Añadir suscripción",
+      "description": "Elige la herramienta. Claude Code y Codex inician sesión en el navegador.",
+      "how": {
+        "claude-code": "Inicia sesión en claude.com",
+        "codex": "Inicia sesión con un código en openai.com"
+      },
+      "claude": {
+        "title": "Termina de iniciar sesión en Claude",
+        "description": "Abrimos claude.com en tu navegador. Inicia sesión con la cuenta que quieres añadir.",
+        "waiting": "Esperando a Claude…",
+        "expires": "Subtrack espera hasta 15 minutos",
+        "otherTitle": "¿Tienes otra cuenta abierta?",
+        "otherText": "Copia el enlace y ábrelo en una ventana privada, así la cuenta que usas ahora sigue con la sesión iniciada.",
+        "useCode": "Usar un código",
+        "copyLink": "Copiar enlace",
+        "linkCopied": "Enlace copiado"
+      },
+      "code": {
+        "title": "Inicia sesión con un código",
+        "description": "Para cuando el navegador está en otro dispositivo.",
+        "open": "1. Abre este enlace en cualquier dispositivo",
+        "paste": "2. Pega el código que te muestra Claude",
+        "placeholder": "Pégalo aquí",
+        "copy": "Copiar",
+        "copied": "Copiado",
+        "empty": "Pega el código",
+        "submit": "Iniciar sesión",
+        "checking": "Iniciando sesión…"
+      },
+      "codex": {
+        "title": "Escribe este código en OpenAI",
+        "description": "Abre la página, inicia sesión con la cuenta que quieres añadir y escribe el código.",
+        "waiting": "Esperando la aprobación en auth.openai.com",
+        "expires": "El código caduca en 15 minutos",
+        "copyCode": "Copiar código",
+        "openPage": "Abrir página",
+        "preparing": "Pidiendo un código a OpenAI…"
+      },
+      "desktop": {
+        "title": "Añádela desde la app de escritorio",
+        "description": "Claude Code y Codex inician sesión en tu ordenador.",
+        "text": "La app de escritorio de Subtrack inicia la sesión y lee el plan, así nada de tu inicio de sesión llega a una pestaña del navegador. Abre la app y elige Añadir suscripción."
+      },
+      "back": "Atrás",
+      "failed": "No se completó el inicio de sesión."
     }
   },
   "home": {

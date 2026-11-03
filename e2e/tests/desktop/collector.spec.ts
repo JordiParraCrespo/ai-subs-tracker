@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { chmod, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
@@ -213,6 +213,92 @@ test('the desktop app finds the logins on disk, syncs them, and switches the ter
         readFile(join(home, '.subtrack', 'active', 'claude-code'), 'utf8').catch(() => null),
       )
       .toBe(expected);
+  } finally {
+    await app.close();
+    await api.dispose();
+  }
+});
+
+/**
+ * A stand-in for `claude` on the app's PATH: it prints what Claude Code's
+ * login prints when its stdin is a pipe (the manual link and the paste
+ * prompt), takes the code from that prompt, and signs a login into
+ * `CLAUDE_CONFIG_DIR` as the real one would. Nothing leaves the machine.
+ */
+async function fakeClaude(bin: string, email: string) {
+  const script = `#!/bin/sh
+echo "Opening browser to sign in…"
+echo "If the browser didn't open, visit: https://claude.com/cai/oauth/authorize?code=true&state=e2e"
+printf 'Paste code here if prompted > '
+read code
+[ "$code" = "e2e-pasted-code" ] || exit 1
+mkdir -p "$CLAUDE_CONFIG_DIR"
+printf '%s' '${json({ claudeAiOauth: { accessToken: 'never-sent', expiresAt: 1, subscriptionType: 'pro' } })}' > "$CLAUDE_CONFIG_DIR/.credentials.json"
+printf '%s' '${json({ oauthAccount: { accountUuid: `added-${email}`, emailAddress: email } })}' > "$CLAUDE_CONFIG_DIR/.claude.json"
+`;
+  await write(join(bin, 'claude'), script);
+  await chmod(join(bin, 'claude'), 0o755);
+}
+
+test('adds a Claude Code account through the add-subscription modal, by pasted code', async () => {
+  test.setTimeout(120_000);
+  const { api, user } = await provisionedUser('desktopadd');
+  const tag = user.email.split('@')[0].toLowerCase();
+  const home = await machineHome(tag);
+  const bin = join(home, 'bin');
+  const added = `${tag}@added.e2e`;
+  await fakeClaude(bin, added);
+
+  const app = await electron.launch({
+    executablePath: electronPath,
+    args: [DESKTOP, '--no-sandbox'],
+    env: {
+      ...process.env,
+      HOME: home,
+      // No login shell to ask for a PATH: the one given here, fake CLI first.
+      SHELL: '',
+      PATH: `${bin}:${process.env.PATH ?? ''}`,
+      XDG_CONFIG_HOME: join(home, '.config'),
+      CLAUDE_CONFIG_DIR: '',
+      CODEX_HOME: '',
+      SUBTRACK_API_URL: API_URL,
+    },
+  });
+  try {
+    const page = await app.firstWindow();
+    await page.fill('#email', user.email);
+    await page.fill('#password', user.password);
+    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+    await expect(page).toHaveURL(/\/dashboard/, { timeout: 30_000 });
+
+    await page.goto('app://subtrack/accounts');
+    await page.getByRole('button', { name: 'Add subscription' }).click();
+    const dialog = page.getByRole('dialog');
+    await dialog.getByRole('button', { name: /Claude Code/ }).click();
+    await expect(dialog.getByText('Waiting for Claude…')).toBeVisible();
+
+    // The link arrives from the CLI's output; the code path needs it.
+    await dialog.getByRole('button', { name: 'Use a code instead' }).click();
+    await expect(
+      dialog.getByText('https://claude.com/cai/oauth/authorize?code=true&state=e2e'),
+    ).toBeVisible();
+    await dialog.getByLabel('2. Paste the code Claude shows you').fill('e2e-pasted-code');
+    await dialog.getByRole('button', { name: 'Sign in', exact: true }).click();
+    await expect(page.getByText('Account added')).toBeVisible({ timeout: 30_000 });
+    await expect(dialog).toBeHidden();
+
+    // The new login lives in a folder of its own, and the collector synced it.
+    await expect
+      .poll(
+        async () => {
+          const accounts: SyncedAccount[] = await (
+            await api.get(`${API_URL}/api/v1/accounts`)
+          ).json();
+          return accounts.find((account) => account.email === added)?.provider ?? null;
+        },
+        { timeout: 60_000 },
+      )
+      .toBe('claude-code');
   } finally {
     await app.close();
     await api.dispose();

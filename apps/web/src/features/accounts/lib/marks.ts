@@ -7,12 +7,12 @@ import { PROVIDER_NAMES } from './providers';
  * Codex the neutral disc), "Provider · Plan" as its title, and who it is
  * under it.
  */
-const COLORS = { 'claude-code': '#7764d8', codex: '#404040' } as const;
+export const PROVIDER_COLORS = { 'claude-code': '#7764d8', codex: '#404040' } as const;
 
 export function accountMark(account: AccountEntity): { initials: string; color: string } {
   const plan = account.planName?.replace(/[^A-Za-z]/g, '') ?? '';
   const initials = account.provider === 'codex' ? 'CX' : `C${(plan[0] ?? 'L').toUpperCase()}`;
-  return { initials, color: COLORS[account.provider] };
+  return { initials, color: PROVIDER_COLORS[account.provider] };
 }
 
 export function accountTitle(account: AccountEntity): string {
