@@ -6,8 +6,13 @@ import '../lib/legal-note';
 export interface AuthLayoutProps {
   /** The wordmark's label; defaults to the product name. */
   brandLabel?: string;
-  /** The top bar's right-hand side: "New here? Create account" and the like. */
+  /** The top bar's right-hand side, beside the wordmark. */
   action?: ReactNode;
+  /**
+   * The line under the form, after its legal note: the design's "New here?
+   * Create account" and "Have an account? Sign in".
+   */
+  footer?: ReactNode;
   children: ReactNode;
 }
 
@@ -19,7 +24,7 @@ export interface AuthLayoutProps {
  * may be here is each child route's own `beforeLoad`, so one layout can cover
  * screens with opposite answers.
  */
-export function AuthLayout({ brandLabel, action, children }: AuthLayoutProps) {
+export function AuthLayout({ brandLabel, action, footer, children }: AuthLayoutProps) {
   const { t } = useTranslation();
   // The innermost match that declares a note wins, so a page overrides its
   // layout and a page without one shows nothing.
@@ -50,6 +55,7 @@ export function AuthLayout({ brandLabel, action, children }: AuthLayoutProps) {
               {t(legalNoteKey)}
             </p>
           )}
+          {footer && <div className="mt-6 flex items-center justify-center gap-1">{footer}</div>}
         </div>
       </main>
     </div>
