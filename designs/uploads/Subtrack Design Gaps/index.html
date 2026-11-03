@@ -1,0 +1,386 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Subtrack Design Gaps</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column; each gap is a row of notes beside its screenshots, stacking on a phone. */
+:root {
+  --bg: #171717; --panel: #1f1f1f; --line: rgba(255,255,255,.08);
+  --fg: #fafafa; --muted: #a1a1a1; --subtle: #737373;
+  --brand: #9d91e8; --brand-wash: rgba(119,100,216,.16);
+  --review: #f0abfc; --review-wash: rgba(240,171,252,.12);
+  --ok: #9d91e8;
+  --font: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg: #f6f5f8; --panel: #ffffff; --line: rgba(23,23,23,.09);
+  --fg: #171717; --muted: #525252; --subtle: #737373;
+  --brand: #5b48c2; --brand-wash: rgba(119,100,216,.12);
+  --review: #a21caf; --review-wash: rgba(162,28,175,.08); --ok: #5b48c2; color-scheme: light } }
+:root[data-theme="light"] {
+  --bg: #f6f5f8; --panel: #ffffff; --line: rgba(23,23,23,.09);
+  --fg: #171717; --muted: #525252; --subtle: #737373;
+  --brand: #5b48c2; --brand-wash: rgba(119,100,216,.12);
+  --review: #a21caf; --review-wash: rgba(162,28,175,.08); --ok: #5b48c2; color-scheme: light }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font: 500 16px/1.55 var(--font); -webkit-font-smoothing: antialiased }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 56px 96px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 56px }
+h1 { font-size: clamp(30px, 4vw, 40px); line-height: 1.15; font-weight: 600; letter-spacing: -.02em; margin: 0; text-wrap: balance }
+h2 { font-size: 22px; font-weight: 600; letter-spacing: -.01em; margin: 0; text-wrap: balance }
+h3 { font-size: 18px; font-weight: 600; margin: 0; text-wrap: balance }
+p { margin: 0; max-width: 68ch }
+.lede { color: var(--muted); font-size: 18px }
+header { display: flex; flex-direction: column; gap: 16px }
+.eyebrow { font: 600 12px/1 var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--subtle) }
+.tally { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px }
+.tally a { display: flex; flex-direction: column; gap: 2px; padding: 14px 18px; border-radius: 14px; background: var(--panel);
+  outline: 1px solid var(--line); outline-offset: -1px; color: inherit; text-decoration: none; min-width: 180px }
+.tally a:hover, .tally a:focus-visible { outline-color: var(--brand) }
+.tally b { font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums }
+.tally span { color: var(--muted); font-size: 14px }
+section.group { display: flex; flex-direction: column; gap: 20px }
+.group > p { color: var(--muted) }
+.gap { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 28px; padding: 24px;
+  background: var(--panel); border-radius: 18px; outline: 1px solid var(--line); outline-offset: -1px }
+@media (max-width: 860px) { .gap { grid-template-columns: minmax(0, 1fr); padding: 18px } }
+.notes { display: flex; flex-direction: column; gap: 12px; min-width: 0 }
+.where { font: 500 13px/1.4 var(--mono); color: var(--subtle); overflow-wrap: anywhere }
+.notes ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; color: var(--muted); font-size: 15px }
+.notes strong { color: var(--fg); font-weight: 600 }
+.ask { border-left: 2px solid var(--brand); padding: 2px 0 2px 12px; display: flex; flex-direction: column; gap: 4px; font-size: 15px }
+.ask b { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--brand); font-weight: 600 }
+.pill { align-self: flex-start; display: inline-flex; height: 24px; align-items: center; padding: 0 9px; border-radius: 7px;
+  font-size: 12px; font-weight: 600; background: var(--review-wash); color: var(--review) }
+.pill.mine { background: var(--brand-wash); color: var(--brand) }
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; min-width: 0; align-content: start }
+.shots.one { grid-template-columns: minmax(0, 1fr) }
+figure { margin: 0; display: flex; flex-direction: column; gap: 6px; min-width: 0 }
+figure a { display: block; border-radius: 10px; overflow: hidden; outline: 1px solid var(--line); outline-offset: -1px; background: #111 }
+figure img { display: block; width: 100%; height: auto }
+figcaption { font-size: 13px; color: var(--subtle) }
+.plain { margin: 0; padding: 14px 16px; border-radius: 10px; background: var(--bg); font: 500 13px/1.6 var(--mono);
+  color: var(--muted); overflow-x: auto; white-space: pre }
+footer { color: var(--subtle); font-size: 14px }
+a:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px }
+@media (prefers-reduced-motion: no-preference) { .tally a { transition: outline-color .15s } }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Subtrack · against designs/ · 3 Nov 2026</span>
+    <h1>What the app shows that the design never drew</h1>
+    <p class="lede">The eight designed screens and the sign-in flow are built to the export. Everything below is what Subtrack also has to show, and where today's version is either the Flama starter's styling or something I made up. Screenshots are the real app, dark theme, 1440px unless marked.</p>
+    <div class="tally">
+      <a href="#design"><b>12</b><span>need a design</span></a>
+      <a href="#check"><b>3</b><span>adapted from the design, need a check</span></a>
+      <a href="#mine"><b>3</b><span>the design covers, I still have to port</span></a>
+    </div>
+  </header>
+
+  <section class="group" id="design" aria-labelledby="design-h">
+    <h2 id="design-h">Needs a design</h2>
+    <p>No screen in the export covers these. Ordered by how often someone will see them.</p>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill">Biggest gap</span>
+        <h3>First run: an account with nothing synced yet</h3>
+        <span class="where">/dashboard /accounts /people /usage /tokenmaxx /renewals</span>
+        <ul>
+          <li>Everyone starts here: the account exists, but the desktop app hasn't found any logins yet.</li>
+          <li>Today each page renders its full layout with zeros: "$0", "0 accounts", an empty table that reads "0–0 of 0", a flat chart.</li>
+          <li>Nothing tells the person what to do next: install the desktop app, sign in there, wait for the first sync.</li>
+        </ul>
+        <div class="ask"><b>Needed</b>One first-run state (or one per page) that points to the desktop app, plus how a page looks with one account but no usage yet.</div>
+      </div>
+      <div class="shots">
+        <figure><a href="img/empty-dashboard.jpg"><img src="img/empty-dashboard.jpg" alt="Overview with every figure at zero and a flat chart" loading="lazy"></a><figcaption>Overview</figcaption></figure>
+        <figure><a href="img/empty-accounts.jpg"><img src="img/empty-accounts.jpg" alt="Subscriptions table with no rows, reading 0–0 of 0" loading="lazy"></a><figcaption>Subscriptions</figcaption></figure>
+        <figure><a href="img/empty-tokenmaxx.jpg"><img src="img/empty-tokenmaxx.jpg" alt="Tokenmaxx showing Nothing to pick" loading="lazy"></a><figcaption>Tokenmaxx</figcaption></figure>
+        <figure><a href="img/empty-renewals.jpg"><img src="img/empty-renewals.jpg" alt="Empty renewals calendar" loading="lazy"></a><figcaption>Renewals</figcaption></figure>
+      </div>
+    </article>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill">Starter screen</span>
+        <h3>My profile</h3>
+        <span class="where">/profile · Profile, Password, Sessions, Preferences</span>
+        <ul>
+          <li>This is the Flama starter's page, restyled only by the shared tokens. It's the screen in your screenshot.</li>
+          <li>The copy is written for a team product: "how teammates see you across the workspace", "Managed by your workspace — contact an admin".</li>
+          <li>Preferences offers table density, a weekly digest and product update emails. Subtrack sends no email and has no dense tables.</li>
+          <li>Phone and job title don't mean anything for a personal app.</li>
+        </ul>
+        <div class="ask"><b>Needed</b>What a personal account page holds (name, email, password, two-factor, devices, language, theme?), and whether it should merge into Settings instead.</div>
+      </div>
+      <div class="shots">
+        <figure><a href="img/profile-details.jpg"><img src="img/profile-details.jpg" alt="Profile pane with first name, last name, email, phone and job title" loading="lazy"></a><figcaption>Profile</figcaption></figure>
+        <figure><a href="img/profile-password.jpg"><img src="img/profile-password.jpg" alt="Password pane with two-factor toggle" loading="lazy"></a><figcaption>Password</figcaption></figure>
+        <figure><a href="img/profile-sessions.jpg"><img src="img/profile-sessions.jpg" alt="Sessions pane listing signed-in devices" loading="lazy"></a><figcaption>Sessions</figcaption></figure>
+        <figure><a href="img/profile-preferences.jpg"><img src="img/profile-preferences.jpg" alt="Preferences pane with dark theme, language, table density and email toggles" loading="lazy"></a><figcaption>Preferences</figcaption></figure>
+      </div>
+    </article>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill">Starter screen</span>
+        <h3>Two-factor: setting it up, and the code at sign-in</h3>
+        <span class="where">Profile → Password → Two-factor · /login after a correct password</span>
+        <ul>
+          <li>Setup is three steps in the starter's gradient-topped dialog: confirm the password, scan the QR code and enter a code, then save the backup codes.</li>
+          <li>The sign-in step asks for the 6-digit code, with "use a backup code" and "trust this device". It isn't captured here, but it has the same starter look.</li>
+        </ul>
+        <div class="ask"><b>Needed</b>The setup steps, the backup-codes step, and the code screen in the sign-in layout you already designed.</div>
+      </div>
+      <div class="shots">
+        <figure><a href="img/twofactor-password-dialog.jpg"><img src="img/twofactor-password-dialog.jpg" alt="Dialog asking for the password before two-factor setup" loading="lazy"></a><figcaption>Step 1: password</figcaption></figure>
+        <figure><a href="img/twofactor-qr-dialog.jpg"><img src="img/twofactor-qr-dialog.jpg" alt="Dialog with a QR code and a code field" loading="lazy"></a><figcaption>Step 2: QR code</figcaption></figure>
+      </div>
+    </article>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill">Invented</span>
+        <h3>Set a new password</h3>
+        <span class="where">/reset-password?token=… (the link in the reset email)</span>
+        <ul>
+          <li>The design has "Reset your password" and "Check your email", but not the page the email link opens.</li>
+          <li>Today it uses the design's auth frame with the starter's password checklist under the fields.</li>
+        </ul>
+        <div class="ask"><b>Needed</b>The new-password screen, its checklist, an expired-link state, and "password changed".</div>
+      </div>
+      <div class="shots one">
+        <figure><a href="img/reset-password-new.jpg"><img src="img/reset-password-new.jpg" alt="Reset password screen with two fields and a checklist" loading="lazy"></a><figcaption>From the email link</figcaption></figure>
+      </div>
+    </article>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill">Invented</span>
+        <h3>Settings → This computer</h3>
+        <span class="where">/settings, in the desktop app and in a browser</span>
+        <ul>
+          <li>The design's Settings has Workspace and Notifications. Subtrack's real settings are about the machine, so I made up this card.</li>
+          <li><strong>In the desktop app</strong> it shows: how many logins it found and when it last synced; Add Claude Code, Add Codex and Refresh; the terminal integration, printing the raw shell snippet; and one toggle per Claude Code login for the live limits feed.</li>
+          <li><strong>In a browser</strong> it says to open the desktop app.</li>
+          <li>The Security card below it reuses the profile's session rows.</li>
+        </ul>
+        <div class="ask"><b>Needed</b>How the machine settings read, including the "installed / not installed" states and a calmer way to show the shell snippet.</div>
+      </div>
+      <div class="shots">
+        <figure><a href="img/desktop-settings.jpg"><img src="img/desktop-settings.jpg" alt="Desktop settings with login count, add buttons, a shell snippet and live feed toggles" loading="lazy"></a><figcaption>In the desktop app</figcaption></figure>
+        <figure><a href="img/settings-browser.jpg"><img src="img/settings-browser.jpg" alt="Settings in a browser, pointing to the desktop app" loading="lazy"></a><figcaption>In a browser</figcaption></figure>
+      </div>
+    </article>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill">Invented</span>
+        <h3>Add account</h3>
+        <span class="where">Subscriptions → Add account (desktop app only)</span>
+        <ul>
+          <li>The design's "Add subscription" opens a form. Subtrack's adds a login instead: a menu (Claude Code, Codex), then the provider's own sign-in in a terminal window.</li>
+          <li>There is no screen for "waiting for you to sign in", success, or "that account is already tracked".</li>
+        </ul>
+        <div class="ask"><b>Needed</b>The add flow: pick a provider, the waiting state while its sign-in runs, then done or failed.</div>
+      </div>
+      <div class="shots one">
+        <figure><a href="img/desktop-add-account.jpg"><img src="img/desktop-add-account.jpg" alt="Add account menu with Claude Code and Codex" loading="lazy"></a><figcaption>The menu today</figcaption></figure>
+      </div>
+    </article>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill">Starter screen</span>
+        <h3>Search (⌘K)</h3>
+        <span class="where">The sidebar's Search field</span>
+        <ul>
+          <li>The design draws the field, not what opens. Today the starter's palette lists the six pages.</li>
+          <li>Searching accounts by email or plan would make it useful.</li>
+        </ul>
+        <div class="ask"><b>Needed</b>The palette, and what it can find.</div>
+      </div>
+      <div class="shots one">
+        <figure><a href="img/command-palette.jpg"><img src="img/command-palette.jpg" alt="Command palette listing the pages" loading="lazy"></a><figcaption>Open over Overview</figcaption></figure>
+      </div>
+    </article>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill">Missing</span>
+        <h3>Page not found, and when something breaks</h3>
+        <span class="where">Any unknown URL · a crashed page · the API unreachable</span>
+        <ul>
+          <li>An unknown URL prints the router's bare "Not Found" in the corner.</li>
+          <li>A crash shows the starter's error screen, and an unreachable API shows a red alert inside the page.</li>
+        </ul>
+        <div class="ask"><b>Needed</b>Not found, something went wrong, and "can't reach Subtrack" (offline).</div>
+      </div>
+      <div class="shots one">
+        <figure><a href="img/not-found.jpg"><img src="img/not-found.jpg" alt="Blank page with Not Found in small text" loading="lazy"></a><figcaption>/this-page-does-not-exist</figcaption></figure>
+      </div>
+    </article>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill">Invented</span>
+        <h3>Phone width</h3>
+        <span class="where">Every page in a narrow window</span>
+        <ul>
+          <li>The design is desktop-only. On a narrow window the sidebar becomes a top bar with a menu button, and the pages stack.</li>
+          <li>The desktop app's window can be made narrow too.</li>
+        </ul>
+        <div class="ask"><b>Needed</b>Whether narrow widths matter. If so, the bar and one page as a pattern.</div>
+      </div>
+      <div class="shots">
+        <figure><a href="img/phone-dashboard.jpg"><img src="img/phone-dashboard.jpg" alt="Overview at phone width with a top bar" loading="lazy"></a><figcaption>Overview, 390px</figcaption></figure>
+        <figure><a href="img/phone-subscriptions.jpg"><img src="img/phone-subscriptions.jpg" alt="Subscriptions at phone width" loading="lazy"></a><figcaption>Subscriptions, 390px</figcaption></figure>
+      </div>
+    </article>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill">Starter screen</span>
+        <h3>Public pages</h3>
+        <span class="where">/about /privacy /terms (/ goes straight to sign-in)</span>
+        <ul>
+          <li>These are still the starter's marketing for a team workspace ("One workspace for your team, with the right access for everyone"), in its own light layout.</li>
+          <li>Privacy and terms will need real text either way: what the desktop app reads, and what reaches the server.</li>
+        </ul>
+        <div class="ask"><b>Needed</b>A product call first: keep a public site, or only privacy and terms? Then their design.</div>
+      </div>
+      <div class="shots">
+        <figure><a href="img/public-about.jpg"><img src="img/public-about.jpg" alt="About page with team workspace marketing" loading="lazy"></a><figcaption>/about</figcaption></figure>
+        <figure><a href="img/public-privacy.jpg"><img src="img/public-privacy.jpg" alt="Privacy policy in the starter layout" loading="lazy"></a><figcaption>/privacy</figcaption></figure>
+      </div>
+    </article>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill">Invented</span>
+        <h3>The tray menu (desktop)</h3>
+        <span class="where">macOS menu bar · Windows and Linux tray</span>
+        <ul>
+          <li>A native menu, so it follows the system's look, but its words and states are mine.</li>
+          <li>Its headline names the account to use next and how much of its week is left.</li>
+        </ul>
+        <div class="ask"><b>Needed</b>The wording, and whether it should hold more (switch account, per-account rows).</div>
+      </div>
+      <div class="shots one">
+<pre class="plain">Use next: maya@work.dev — 70% left     (or "Not synced yet",
+                                         "No account has room right now")
+──────────────
+Refresh now
+Open Subtrack
+──────────────
+Quit</pre>
+      </div>
+    </article>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill">Small states</span>
+        <h3>Messages, loading and alerts</h3>
+        <span class="where">Everywhere</span>
+        <ul>
+          <li><strong>Toasts</strong> ("Account saved", "Password updated…") are the starter's.</li>
+          <li><strong>Loading</strong> shows grey skeleton blocks with no design.</li>
+          <li><strong>Error banners</strong> in forms, like the sign-in error on the right, are the starter's red alert.</li>
+        </ul>
+        <div class="ask"><b>Needed</b>Toast, skeleton and inline alert in the design's style. Tokens might be enough.</div>
+      </div>
+      <div class="shots one">
+        <figure><a href="img/login-oauth-error.jpg"><img src="img/login-oauth-error.jpg" alt="Sign-in screen with a red error banner" loading="lazy"></a><figcaption>Sign-in with an error</figcaption></figure>
+      </div>
+    </article>
+  </section>
+
+  <section class="group" id="check" aria-labelledby="check-h">
+    <h2 id="check-h">Adapted from the design: please check</h2>
+    <p>The design was drawn for a team. These screens keep its layout but change what it means for one person with several logins.</p>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill">Adapted</span>
+        <h3>People</h3>
+        <span class="where">/people</span>
+        <ul>
+          <li>A "person" here is an email a provider knows a login by, and their tools are the plans signed in under it.</li>
+          <li>"Idle seats" became <strong>idle plans</strong>: a plan that used under 5% of its week.</li>
+          <li>The design's Add person, Edit tools and Remove person have no meaning for one person, so they're not shown. Each row opens to its plans with an Edit button.</li>
+        </ul>
+        <div class="ask"><b>Check</b>Is "People" the right word and the right page for one person's logins?</div>
+      </div>
+      <div class="shots one">
+        <figure><a href="img/sbs-people.jpg"><img src="img/sbs-people.jpg" alt="Design on the left, built page on the right" loading="lazy"></a><figcaption>Design (left) and built (right)</figcaption></figure>
+      </div>
+    </article>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill">Adapted</span>
+        <h3>Renewals</h3>
+        <span class="where">/renewals · the account editor's new field</span>
+        <ul>
+          <li>Claude and Codex never say when a plan bills, so each account got a "Renews on day of month" field the person fills in.</li>
+          <li>Paid plans without a day are listed under a "No renewal day yet" block I added below "Next 30 days", each with Set day.</li>
+          <li>Trials don't exist for these plans, so the trial chips are gone.</li>
+        </ul>
+        <div class="ask"><b>Check</b>Where to ask for the billing day, and how plans without one should look.</div>
+      </div>
+      <div class="shots one">
+        <figure><a href="img/sbs-renewals.jpg"><img src="img/sbs-renewals.jpg" alt="Design calendar on the left, built calendar on the right" loading="lazy"></a><figcaption>Design (left) and built (right)</figcaption></figure>
+      </div>
+    </article>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill">Adapted</span>
+        <h3>One provider's accounts</h3>
+        <span class="where">/accounts/claude-code · /accounts/codex</span>
+        <ul>
+          <li>Built from the design's "Claude Max accounts" screen, which shows one plan shared by people.</li>
+          <li>Here it shows one provider's logins: the pick for next, a card per login with its week, session, terminal switch and Edit/Remove, then suggested moves.</li>
+        </ul>
+        <div class="ask"><b>Check</b>Whether this page earns its place next to Subscriptions and Tokenmaxx.</div>
+      </div>
+      <div class="shots one">
+        <figure><a href="img/provider-accounts.jpg"><img src="img/provider-accounts.jpg" alt="Claude Code accounts page" loading="lazy"></a><figcaption>Claude Code accounts</figcaption></figure>
+      </div>
+    </article>
+  </section>
+
+  <section class="group" id="mine" aria-labelledby="mine-h">
+    <h2 id="mine-h">The design covers it; I still have to port it</h2>
+    <p>The export has a modal and a remove confirmation. These dialogs still use the starter's, with the gradient header. No designer time needed: tell me and I'll move them over.</p>
+
+    <article class="gap">
+      <div class="notes">
+        <span class="pill mine">On me</span>
+        <h3>Edit account, remove account, sign out a device</h3>
+        <span class="where">Subscriptions and People rows · Settings → Security</span>
+        <ul>
+          <li>Edit account maps onto the design's add/edit modal: name, plan, price, renewal day.</li>
+          <li>Remove account and "Sign out this device" map onto its remove confirmation.</li>
+          <li>The two-factor dialogs above would take the same modal once designed.</li>
+        </ul>
+      </div>
+      <div class="shots">
+        <figure><a href="img/edit-account-dialog.jpg"><img src="img/edit-account-dialog.jpg" alt="Edit account dialog" loading="lazy"></a><figcaption>Edit account</figcaption></figure>
+        <figure><a href="img/remove-account-dialog.jpg"><img src="img/remove-account-dialog.jpg" alt="Remove account confirmation" loading="lazy"></a><figcaption>Remove account</figcaption></figure>
+        <figure><a href="img/session-signout-dialog.jpg"><img src="img/session-signout-dialog.jpg" alt="Sign out a device confirmation" loading="lazy"></a><figcaption>Sign out a device</figcaption></figure>
+      </div>
+    </article>
+  </section>
+
+  <footer>Captured on the local stack at commit 7a4823b (main). Click any screenshot for the full size.</footer>
+</div>
+
+</body></html>

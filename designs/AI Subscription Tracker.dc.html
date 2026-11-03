@@ -21,7 +21,7 @@
 <style>html,body{margin:0;height:100%;background:#171717}a{color:var(--text)}a:hover{color:var(--text-secondary)}</style>
 </helmet>
 <div data-theme="{{ theme }}" class="ds-frame" style="font-family:var(--font-sans);color:var(--text)">
-  <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Sidebar" brand="Subtrack" sections="{{ navSections }}" footer="{{ navFooter }}" active="{{ navActive }}" on-select="{{ go }}" on-search="{{ goSubs }}" on-account-click="{{ toggleMenu }}" account-label="{{ accountLabel }}" search-label="Search" dc-props="{{ sidebarProps }}" hint-size="272px,100%" style="height:100%;display:flex"></x-import>
+  <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Sidebar" brand="Subtrack" sections="{{ navSections }}" footer="{{ navFooter }}" active="{{ navActive }}" on-select="{{ go }}" on-search="{{ openSearch }}" on-account-click="{{ toggleMenu }}" account-label="{{ accountLabel }}" search-label="Search" dc-props="{{ sidebarProps }}" hint-size="272px,100%" style="height:100%;display:flex"></x-import>
   <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closeMenu }}" style="position:fixed;inset:0;z-index:40"></div>
     <div data-theme="dark" style="position:fixed;left:12px;bottom:76px;width:248px;z-index:41;background:var(--surface-overlay);color:var(--text);border-radius:16px;outline:1px solid var(--outline-card);box-shadow:var(--shadow-float);overflow:hidden;font-family:var(--font-sans)">
@@ -33,11 +33,11 @@
         </div>
       </div>
       <div style="border-top:1px solid var(--divider);padding:6px">
-        <button onClick="{{ menuPeople }}" style="all:unset;box-sizing:border-box;width:100%;height:40px;padding:0 10px;border-radius:10px;display:flex;align-items:center;gap:10px;font:var(--type-label);cursor:pointer" style-hover="background:var(--fill-ghost-hover)">
-          <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="users" size="{{ 16 }}" hint-size="16px,16px"></x-import>People
+        <button onClick="{{ menuSettings }}" style="all:unset;box-sizing:border-box;width:100%;height:40px;padding:0 10px;border-radius:10px;display:flex;align-items:center;gap:10px;font:var(--type-label);cursor:pointer" style-hover="background:var(--fill-ghost-hover)">
+          <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="user" size="{{ 16 }}" hint-size="16px,16px"></x-import>Profile
         </button>
         <button onClick="{{ menuSettings }}" style="all:unset;box-sizing:border-box;width:100%;height:40px;padding:0 10px;border-radius:10px;display:flex;align-items:center;gap:10px;font:var(--type-label);cursor:pointer" style-hover="background:var(--fill-ghost-hover)">
-          <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="settings" size="{{ 16 }}" hint-size="16px,16px"></x-import>Workspace settings
+          <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="settings" size="{{ 16 }}" hint-size="16px,16px"></x-import>Settings
         </button>
         <button onClick="{{ menuTheme }}" style="all:unset;box-sizing:border-box;width:100%;height:40px;padding:0 10px;border-radius:10px;display:flex;align-items:center;gap:10px;font:var(--type-label);cursor:pointer" style-hover="background:var(--fill-ghost-hover)">
           <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="{{ themeIcon }}" size="{{ 16 }}" hint-size="16px,16px"></x-import>{{ menuThemeLabel }}
@@ -114,12 +114,87 @@
       <div style="position:relative;width:560px;max-width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;background:var(--surface-overlay);color:var(--text);border-radius:24px;outline:1px solid var(--outline-card);box-shadow:var(--shadow-overlay);overflow:hidden">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:24px 20px 16px 24px">
           <div style="display:flex;flex-direction:column;gap:4px">
-            <h2 style="margin:0;font:var(--type-card-title);letter-spacing:var(--tracking-tight)">Add subscription</h2>
-            <span class="ds-t-sub">Track a new AI tool, its billing and who uses it</span>
+            <h2 style="margin:0;font:var(--type-card-title);letter-spacing:var(--tracking-tight)">{{ subTitle }}</h2>
+            <span class="ds-t-sub">{{ subSubtitle }}</span>
           </div>
           <x-import component-from-global-scope="DashboardDesignSystem_d616c8.IconButton" kind="ghost" icon="x" label="Close" on-click="{{ closeSub }}" hint-size="36px,36px"></x-import>
         </div>
+
+        <sc-if value="{{ subStepPick }}" hint-placeholder-val="{{ true }}">
+          <div class="ds-scroll" style="flex:1;min-height:0;padding:0 24px 24px;display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ provRows }}" as="pv" hint-placeholder-count="5">
+              <button onClick="{{ pv.pick }}" style="all:unset;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;outline:1px solid var(--outline-card);outline-offset:-1px;cursor:pointer;transition:background-color 150ms" style-hover="background:var(--surface-hover)">
+                <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Avatar" kind="entity" initials="{{ pv.initials }}" color="{{ pv.color }}" size="{{ 40 }}" hint-size="40px,40px"></x-import>
+                <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                  <span style="font:var(--type-label-strong)">{{ pv.name }}</span>
+                  <span class="ds-t-sub">{{ pv.how }}</span>
+                </span>
+                <span style="display:flex;color:var(--text-subtle)"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="chevron-right" size="{{ 16 }}" hint-size="16px,16px"></x-import></span>
+              </button>
+            </sc-for>
+            <div style="display:flex;justify-content:center;padding-top:8px"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" size="text" on-click="{{ pickOther }}" hint-size="160px,24px">Add another tool by hand</x-import></div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ subStepSignin }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:0 24px 24px;display:flex;flex-direction:column;gap:20px">
+            <sc-if value="{{ authIsCodex }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 20px 20px 24px;border-radius:16px;background:var(--fill)">
+                <span style="font:600 32px/40px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em">K7QF-2XMB</span>
+                <x-import component-from-global-scope="DashboardDesignSystem_d616c8.IconButton" kind="ghost" icon="{{ copyIcon }}" label="Copy code" on-click="{{ copyLink }}" hint-size="40px,40px"></x-import>
+              </div>
+            </sc-if>
+            <div style="display:flex;align-items:center;gap:14px;padding:16px;border-radius:16px;outline:1px solid var(--outline-card);outline-offset:-1px">
+              <span class="ds-disc" style="width:40px;height:40px;flex:none"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="loader-circle" size="{{ 20 }}" hint-size="20px,20px"></x-import></span>
+              <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                <span style="font:var(--type-label-strong)">{{ authWaitTitle }}</span>
+                <span class="ds-t-sub">The link expires in 10 minutes</span>
+              </span>
+            </div>
+            <sc-if value="{{ authIsClaude }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <span style="font:var(--type-label-strong)">Signed in to a different account?</span>
+                <span style="font:var(--type-label);color:var(--text-muted);text-wrap:pretty">Copy the link and open it in a private window, so the account you use now stays signed in.</span>
+              </div>
+            </sc-if>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 24px 24px;border-top:1px solid var(--divider)">
+            <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" size="text" icon="arrow-left" on-click="{{ subBack }}" hint-size="60px,24px">Back</x-import>
+            <div style="display:flex;gap:8px">
+              <sc-if value="{{ authIsClaude }}" hint-placeholder-val="{{ true }}">
+                <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="ghost" size="sm" on-click="{{ useCode }}" hint-size="140px,36px">Use a code instead</x-import>
+                <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="secondary" size="sm" icon="{{ copyIcon }}" on-click="{{ copyLink }}" hint-size="150px,36px">{{ copyLabel }}</x-import>
+              </sc-if>
+              <sc-if value="{{ authIsCodex }}" hint-placeholder-val="{{ false }}">
+                <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="primary" size="sm" icon-end="arrow-up-right" on-click="{{ openAuthPage }}" hint-size="120px,36px">Open page</x-import>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ subStepCode }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:0 24px 24px;display:flex;flex-direction:column;gap:20px">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span style="font:var(--type-label-strong)">1. Open this link on any device</span>
+              <div style="display:flex;align-items:center;gap:8px;height:40px;padding:0 4px 0 12px;border-radius:10px;background:var(--field);outline:1px solid var(--outline-field);outline-offset:-1px">
+                <span style="flex:1;min-width:0;font:500 13px/20px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">https://claude.com/cai/oauth/authorize?code=true&amp;client_id=…</span>
+                <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" size="xs" icon="{{ copyIcon }}" on-click="{{ copyLink }}" hint-size="70px,32px">{{ copyShort }}</x-import>
+              </div>
+            </div>
+            <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Input" label="2. Paste the code Claude shows you" size="sm" placeholder="Paste it here" value="{{ authCode }}" on-change="{{ setAuthCode }}" hint-size="100%,62px"></x-import>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 24px 24px;border-top:1px solid var(--divider)">
+            <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" size="text" icon="arrow-left" on-click="{{ backToSignin }}" hint-size="60px,24px">Back</x-import>
+            <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="primary" size="sm" disabled="{{ codeDisabled }}" on-click="{{ submitCode }}" hint-size="140px,36px">{{ codeCta }}</x-import>
+          </div>
+        </sc-if>
+        <sc-if value="{{ subStepForm }}" hint-placeholder-val="{{ false }}">
         <div class="ds-scroll" style="flex:1;min-height:0;padding:0 24px 16px;display:flex;flex-direction:column;gap:20px">
+          <sc-if value="{{ subSigned }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:var(--info-badge);color:var(--info-text)">
+              <span style="display:flex;margin-top:2px"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="circle-check" size="{{ 16 }}" hint-size="16px,16px"></x-import></span>
+              <span style="font:var(--type-label);color:var(--text);text-wrap:pretty">{{ signedText }}</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ showPresets }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;flex-direction:column;gap:8px">
             <span style="font:var(--type-label-strong)">Start from</span>
             <div style="display:flex;flex-wrap:wrap;gap:8px">
@@ -128,6 +203,7 @@
               </sc-for>
             </div>
           </div>
+          </sc-if>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
             <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Input" label="Name" size="sm" placeholder="e.g. ChatGPT Team" value="{{ sName }}" on-change="{{ setSName }}" hint-size="100%,62px"></x-import>
             <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Input" label="Vendor" size="sm" placeholder="e.g. OpenAI" value="{{ sVendor }}" on-change="{{ setSVendor }}" hint-size="100%,62px"></x-import>
@@ -181,7 +257,129 @@
             <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="primary" size="sm" disabled="{{ subDisabled }}" on-click="{{ saveSub }}" hint-size="150px,36px">{{ subCta }}</x-import>
           </div>
         </div>
+        </sc-if>
       </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ secOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:70;background:var(--overlay);display:grid;place-items:center;padding:24px">
+      <div onClick="{{ closeSec }}" style="position:absolute;inset:0"></div>
+      <div style="position:relative;width:520px;max-width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;background:var(--surface-overlay);color:var(--text);border-radius:24px;outline:1px solid var(--outline-card);box-shadow:var(--shadow-overlay);overflow:hidden">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:24px 20px 16px 24px">
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <sc-if value="{{ secStepLabel }}" hint-placeholder-val="{{ false }}"><span style="font:var(--type-eyebrow);letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-subtle)">{{ secStepLabel }}</span></sc-if>
+            <h2 style="margin:0;font:var(--type-card-title);letter-spacing:var(--tracking-tight)">{{ secTitle }}</h2>
+            <span style="font:var(--type-label);color:var(--text-muted);text-wrap:pretty">{{ secSub }}</span>
+          </div>
+          <x-import component-from-global-scope="DashboardDesignSystem_d616c8.IconButton" kind="ghost" icon="x" label="Close" on-click="{{ closeSec }}" hint-size="36px,36px"></x-import>
+        </div>
+        <sc-if value="{{ secMain }}" hint-placeholder-val="{{ true }}">
+          <div class="ds-scroll" style="flex:1;min-height:0;padding:0 24px 8px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0;"><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font:var(--type-label-strong)">Password</span><span class="ds-t-sub">{{ pwChanged }}</span></div><div style="display:flex;align-items:center;gap:8px;flex:none"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="secondary" size="xs" on-click="{{ secToPw }}" hint-size="80px,32px">Change</x-import></div></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0;border-top:1px solid var(--divider)"><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font:var(--type-label-strong)">Two-factor authentication</span><span class="ds-t-sub">{{ tfaSub }}</span></div><div style="display:flex;align-items:center;gap:8px;flex:none"><span style="display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:6px;background:{{ tfaBg }};color:{{ tfaFg }};font:var(--type-badge)">{{ tfaBadge }}</span><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="{{ tfaBtnVariant }}" size="xs" on-click="{{ tfaAction }}" hint-size="80px,32px">{{ tfaBtn }}</x-import></div></div>
+            <div style="display:flex;flex-direction:column;border-top:1px solid var(--divider);padding-top:16px;gap:4px">
+              <span style="font:var(--type-label-strong)">Devices</span>
+              <sc-for list="{{ devRows }}" as="dv" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
+                  <span class="ds-disc" style="width:36px;height:36px;flex:none"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="{{ dv.icon }}" size="{{ 16 }}" hint-size="16px,16px"></x-import></span>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font:var(--type-label-strong)">{{ dv.name }}</span><span class="ds-t-sub">{{ dv.where }}</span></div>
+                  <sc-if value="{{ dv.current }}" hint-placeholder-val="{{ false }}"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Badge" variant="info" hint-size="80px,24px">This device</x-import></sc-if>
+                  <sc-if value="{{ dv.other }}" hint-placeholder-val="{{ true }}"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="ghost" size="xs" on-click="{{ dv.signOut }}" hint-size="70px,32px">Sign out</x-import></sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 24px 24px;border-top:1px solid var(--divider)"><span></span><div style="display:flex;gap:8px"><sc-if value="{{ hasOtherDevices }}" hint-placeholder-val="{{ true }}"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="secondary" size="sm" icon="log-out" on-click="{{ signOutAll }}" hint-size="200px,36px">Sign out all other devices</x-import></sc-if></div></div>
+        </sc-if>
+        <sc-if value="{{ secConfirm }}" hint-placeholder-val="{{ false }}">
+          <div style="height:8px"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 24px 24px;border-top:1px solid var(--divider)"><span></span><div style="display:flex;gap:8px"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="ghost" size="sm" on-click="{{ secHome }}" hint-size="70px,36px">Cancel</x-import><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="primary" size="sm" on-click="{{ secConfirmGo }}" hint-size="120px,36px">{{ secConfirmCta }}</x-import></div></div>
+        </sc-if>
+        <sc-if value="{{ secPw }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:0 24px 20px;display:flex;flex-direction:column;gap:16px">
+            <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Input" label="Current password" size="sm" type="password" autocomplete="current-password" value="{{ spCur }}" on-change="{{ setSpCur }}" hint-size="100%,62px"></x-import>
+            <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Input" label="New password" size="sm" type="password" autocomplete="new-password" value="{{ spNew }}" on-change="{{ setSpNew }}" hint-size="100%,62px"></x-import>
+            <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Input" label="Confirm new password" size="sm" type="password" autocomplete="new-password" value="{{ spConf }}" on-change="{{ setSpConf }}" hint-size="100%,62px"></x-import>
+            <span class="ds-t-sub">Other devices are signed out when you change it.</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 24px 24px;border-top:1px solid var(--divider)"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" size="text" icon="arrow-left" on-click="{{ secHome }}" hint-size="60px,24px">Back</x-import><div style="display:flex;gap:8px"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="primary" size="sm" disabled="{{ spDisabled }}" on-click="{{ spSave }}" hint-size="160px,36px">{{ spCta }}</x-import></div></div>
+        </sc-if>
+        <sc-if value="{{ sec2fa1 }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:0 24px 20px;display:flex;flex-direction:column;gap:16px">
+            <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Input" label="Password" size="sm" type="password" autocomplete="current-password" placeholder="Your password" value="{{ spCur }}" on-change="{{ setSpCur }}" hint-size="100%,62px"></x-import>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 24px 24px;border-top:1px solid var(--divider)"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" size="text" icon="arrow-left" on-click="{{ secHome }}" hint-size="60px,24px">Back</x-import><div style="display:flex;gap:8px"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="primary" size="sm" disabled="{{ s1Disabled }}" on-click="{{ s1Go }}" hint-size="140px,36px">{{ s1Cta }}</x-import></div></div>
+        </sc-if>
+        <sc-if value="{{ sec2fa2 }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:0 24px 20px;display:flex;flex-direction:column;gap:20px">
+            <div style="display:flex;gap:20px;align-items:center">
+              <div style="width:136px;height:136px;flex:none;border-radius:16px;background:#fff;display:grid;place-items:center;color:#525252;font:var(--type-label)">QR code</div>
+              <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+                <span style="font:var(--type-label-strong)">Can’t scan it?</span>
+                <span class="ds-t-sub">Enter this key in your app instead.</span>
+                <span style="font:500 13px/20px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--text-secondary);word-break:break-all">LJGE Y3DT KNCE QRKK KFFD GSSF</span>
+                <div><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" size="text" icon="{{ keyIcon }}" on-click="{{ copyKey }}" hint-size="90px,24px">{{ keyLabel }}</x-import></div>
+              </div>
+            </div>
+            <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Input" label="6-digit code from your app" size="sm" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" value="{{ s2Code }}" on-change="{{ setS2Code }}" hint-size="100%,62px"></x-import>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 24px 24px;border-top:1px solid var(--divider)"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" size="text" icon="arrow-left" on-click="{{ secTo2fa1 }}" hint-size="60px,24px">Back</x-import><div style="display:flex;gap:8px"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="primary" size="sm" disabled="{{ s2Disabled }}" on-click="{{ s2Go }}" hint-size="160px,36px">{{ s2Cta }}</x-import></div></div>
+        </sc-if>
+        <sc-if value="{{ sec2fa3 }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:0 24px 20px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;padding:16px;border-radius:16px;background:var(--fill);font:500 14px/22px ui-monospace,SFMono-Regular,Menlo,monospace">
+              <sc-for list="{{ backupCodes }}" as="bc" hint-placeholder-count="10"><span>{{ bc }}</span></sc-for>
+            </div>
+            <div style="display:flex;gap:8px"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="secondary" size="xs" icon="download" hint-size="100px,32px">Download</x-import><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="secondary" size="xs" icon="{{ keyIcon }}" on-click="{{ copyKey }}" hint-size="80px,32px">{{ keyLabel }}</x-import></div>
+            <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Checkbox" checked="{{ s3Saved }}" on-change="{{ toggleS3 }}" hint-size="100%,20px">I saved these somewhere safe</x-import>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 24px 24px;border-top:1px solid var(--divider)"><span></span><div style="display:flex;gap:8px"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="primary" size="sm" disabled="{{ s3Disabled }}" on-click="{{ s3Go }}" hint-size="170px,36px">{{ s3Cta }}</x-import></div></div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:80;background:var(--overlay);display:flex;justify-content:center;align-items:flex-start;padding:12vh 24px 24px">
+      <div onClick="{{ closeSearch }}" style="position:absolute;inset:0"></div>
+      <div style="position:relative;width:620px;max-width:100%;max-height:70vh;display:flex;flex-direction:column;background:var(--surface-overlay);color:var(--text);border-radius:24px;outline:1px solid var(--outline-card);box-shadow:var(--shadow-overlay);overflow:hidden">
+        <div style="display:flex;align-items:center;gap:12px;height:60px;padding:0 20px;border-bottom:1px solid var(--divider)">
+          <span style="display:flex;color:var(--text-muted)"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="search" size="{{ 20 }}" hint-size="20px,20px"></x-import></span>
+          <input autofocus="{{ true }}" value="{{ sq }}" onChange="{{ setSq }}" placeholder="Search subscriptions, people and pages" style="all:unset;flex:1;min-width:0;font:var(--type-body);color:var(--text)">
+          <span style="display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:6px;background:var(--fill);color:var(--text-muted);font:var(--type-badge)">esc</span>
+        </div>
+        <div class="ds-scroll" style="flex:1;min-height:0;padding:8px">
+          <sc-for list="{{ sResults }}" as="r" hint-placeholder-count="6">
+            <sc-if value="{{ r.showGroup }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:12px 12px 6px;font:var(--type-eyebrow);letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-subtle)">{{ r.group }}</div>
+            </sc-if>
+            <button onClick="{{ r.run }}" onMouseEnter="{{ r.hover }}" style="all:unset;box-sizing:border-box;width:100%;display:flex;align-items:center;gap:12px;height:48px;padding:0 12px;border-radius:12px;cursor:pointer;background:{{ r.bg }}">
+              <sc-if value="{{ r.isPage }}" hint-placeholder-val="{{ false }}">
+                <span class="ds-disc" style="width:28px;height:28px;flex:none"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="{{ r.icon }}" size="{{ 16 }}" hint-size="16px,16px"></x-import></span>
+              </sc-if>
+              <sc-if value="{{ r.isEntity }}" hint-placeholder-val="{{ true }}">
+                <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Avatar" kind="entity" initials="{{ r.initials }}" color="{{ r.color }}" size="{{ 28 }}" hint-size="28px,28px"></x-import>
+              </sc-if>
+              <span style="flex:1;min-width:0;font:var(--type-label-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.label }}</span>
+              <span class="ds-t-sub" style="white-space:nowrap">{{ r.meta }}</span>
+            </button>
+          </sc-for>
+          <sc-if value="{{ sNone }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:40px 24px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center">
+              <span style="font:var(--type-label-strong)">No results for “{{ sq }}”</span>
+              <span class="ds-t-sub">Try a tool, a person or a page name.</span>
+            </div>
+          </sc-if>
+        </div>
+        <div style="display:flex;gap:20px;padding:12px 20px;border-top:1px solid var(--divider)">
+          <span class="ds-t-sub">↑ ↓ to move</span><span class="ds-t-sub">↵ to open</span><span class="ds-t-sub">⌘K to close</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position:fixed;left:50%;bottom:32px;transform:translateX(-50%);z-index:100;display:flex;align-items:center;gap:10px;height:48px;padding:0 20px;border-radius:999px;background:var(--text);color:var(--bg-frame);box-shadow:var(--shadow-float);font:var(--type-label-strong);white-space:nowrap">
+      <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="circle-check" size="{{ 16 }}" hint-size="16px,16px"></x-import><span>{{ toastText }}</span>
     </div>
   </sc-if>
   <sc-if value="{{ cancelOpen }}" hint-placeholder-val="{{ false }}">
@@ -203,12 +401,6 @@
     <div class="ds-scroll" style="position:fixed;inset:0;z-index:90;background:var(--bg-frame);color:var(--text);display:flex;flex-direction:column;font-family:var(--font-sans)">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:24px 32px">
         <span style="font:700 20px/28px var(--font-sans);letter-spacing:var(--tracking-tight)">Subtrack</span>
-        <sc-if value="{{ isSignin }}" hint-placeholder-val="{{ true }}">
-          <div style="display:flex;align-items:center;gap:8px"><span class="ds-t-sub">New here?</span><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="secondary" size="sm" on-click="{{ goSignup }}" hint-size="100px,36px">Create account</x-import></div>
-        </sc-if>
-        <sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
-          <div style="display:flex;align-items:center;gap:8px"><span class="ds-t-sub">Have an account?</span><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="secondary" size="sm" on-click="{{ goSignin }}" hint-size="80px,36px">Sign in</x-import></div>
-        </sc-if>
       </div>
       <div style="flex:1;display:grid;place-items:center;padding:24px 24px 96px">
         <div style="width:440px;max-width:100%;display:flex;flex-direction:column;gap:28px">
@@ -228,6 +420,7 @@
               </div>
               <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" type="submit" disabled="{{ authDisabled }}" dc-props="{{ fullW }}" hint-size="100%,48px">{{ authCta }}</x-import>
             </form>
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px"><span class="ds-t-sub">New here?</span><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" size="text" on-click="{{ goSignup }}" hint-size="110px,24px">Create account</x-import></div>
           </sc-if>
 
           <sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
@@ -247,6 +440,7 @@
               <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" type="submit" disabled="{{ authDisabled }}" dc-props="{{ fullW }}" hint-size="100%,48px">{{ authCta }}</x-import>
               <span style="font:var(--type-label);color:var(--text-subtle);text-align:center;text-wrap:pretty">By creating an account you agree to the Terms and Privacy Policy.</span>
             </form>
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px"><span class="ds-t-sub">Have an account?</span><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" size="text" on-click="{{ goSignin }}" hint-size="60px,24px">Sign in</x-import></div>
           </sc-if>
 
           <sc-if value="{{ isWorkspace }}" hint-placeholder-val="{{ false }}">
@@ -287,6 +481,58 @@
             <div style="display:flex;justify-content:center;align-items:center;gap:6px"><span class="ds-t-sub">Didn’t get it?</span><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" size="text" disabled="{{ resentDisabled }}" on-click="{{ resend }}" hint-size="100px,24px">{{ resentLabel }}</x-import></div>
           </sc-if>
 
+          <sc-if value="{{ isReset }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <h1 style="margin:0;font:var(--type-title-lg);letter-spacing:var(--tracking-tight)">Choose a new password</h1>
+              <span style="font:var(--type-label);color:var(--text-muted);text-wrap:pretty">For {{ resetEmail }}</span>
+            </div>
+            <form onSubmit="{{ authSubmit }}" style="display:flex;flex-direction:column;gap:16px;margin:0">
+              <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Input" label="New password" type="password" autocomplete="new-password" placeholder="Create a password" value="{{ afPassword }}" on-change="{{ setAfPassword }}" hint-size="100%,70px"></x-import>
+              <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Input" label="Confirm password" type="password" autocomplete="new-password" placeholder="Enter it again" value="{{ afConfirm }}" on-change="{{ setAfConfirm }}" hint-size="100%,70px"></x-import>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ pwChecks }}" as="pc" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;gap:8px;color:{{ pc.color }}"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="{{ pc.icon }}" size="{{ 16 }}" hint-size="16px,16px"></x-import><span style="font:var(--type-label)">{{ pc.label }}</span></div>
+                </sc-for>
+              </div>
+              <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" type="submit" disabled="{{ authDisabled }}" dc-props="{{ fullW }}" hint-size="100%,48px">{{ authCta }}</x-import>
+            </form>
+          </sc-if>
+
+          <sc-if value="{{ isExpired }}" hint-placeholder-val="{{ false }}">
+            <span class="ds-disc" style="width:52px;height:52px"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="clock-alert" size="{{ 24 }}" hint-size="24px,24px"></x-import></span>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <h1 style="margin:0;font:var(--type-title-lg);letter-spacing:var(--tracking-tight)">This link has expired</h1>
+              <span style="font:var(--type-label);color:var(--text-muted);text-wrap:pretty">Reset links work once and for 30 minutes. Send a new one to {{ resetEmail }}.</span>
+            </div>
+            <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" on-click="{{ goSent }}" dc-props="{{ fullW }}" hint-size="100%,48px">Send a new link</x-import>
+            <div style="display:flex;justify-content:center"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" size="text" icon="arrow-left" on-click="{{ goSignin }}" hint-size="120px,24px">Back to sign in</x-import></div>
+          </sc-if>
+
+          <sc-if value="{{ isChanged2 }}" hint-placeholder-val="{{ false }}">
+            <span class="ds-disc" style="width:52px;height:52px"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="circle-check" size="{{ 24 }}" hint-size="24px,24px"></x-import></span>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <h1 style="margin:0;font:var(--type-title-lg);letter-spacing:var(--tracking-tight)">Password changed</h1>
+              <span style="font:var(--type-label);color:var(--text-muted);text-wrap:pretty">Other devices were signed out. Sign in with your new password.</span>
+            </div>
+            <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" on-click="{{ goSignin }}" dc-props="{{ fullW }}" hint-size="100%,48px">Sign in</x-import>
+          </sc-if>
+
+          <sc-if value="{{ isTwofa }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <h1 style="margin:0;font:var(--type-title-lg);letter-spacing:var(--tracking-tight)">{{ tfTitle }}</h1>
+              <span style="font:var(--type-label);color:var(--text-muted);text-wrap:pretty">{{ tfSub }}</span>
+            </div>
+            <form onSubmit="{{ authSubmit }}" style="display:flex;flex-direction:column;gap:16px;margin:0">
+              <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Input" label="{{ tfLabel }}" autocomplete="one-time-code" inputmode="{{ tfMode }}" placeholder="{{ tfPh }}" value="{{ afCode }}" on-change="{{ setAfCode }}" hint-size="100%,70px"></x-import>
+              <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Checkbox" checked="{{ afTrust }}" on-change="{{ toggleTrust }}" hint-size="100%,20px">Trust this computer for 30 days</x-import>
+              <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" type="submit" disabled="{{ authDisabled }}" dc-props="{{ fullW }}" hint-size="100%,48px">{{ authCta }}</x-import>
+            </form>
+            <div style="display:flex;justify-content:space-between;gap:12px">
+              <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" size="text" on-click="{{ toggleBackup }}" hint-size="140px,24px">{{ tfSwap }}</x-import>
+              <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" size="text" icon="arrow-left" on-click="{{ goSignin }}" hint-size="120px,24px">Back to sign in</x-import>
+            </div>
+          </sc-if>
+
         </div>
       </div>
     </div>
@@ -313,6 +559,31 @@
               <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="primary" size="sm" icon="plus" on-click="{{ addPerson }}" hint-size="120px,36px">Add person</x-import>
             </sc-if>
           </header>
+        </sc-if>
+
+        <sc-if value="{{ showStatus }}" hint-placeholder-val="{{ false }}">
+          <div class="ds-card" style="min-height:min(560px,70vh);display:grid;place-items:center;padding:48px 24px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:20px;max-width:420px;text-align:center">
+              <span class="ds-disc" style="width:56px;height:56px"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="{{ stIcon }}" size="{{ 24 }}" hint-size="24px,24px"></x-import></span>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <span style="font:var(--type-eyebrow);letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-subtle)">{{ stEyebrow }}</span>
+                <h1 style="margin:0;font:var(--type-card-title);letter-spacing:var(--tracking-tight)">{{ stTitle }}</h1>
+                <span style="font:var(--type-label);color:var(--text-muted);text-wrap:pretty">{{ stText }}</span>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+                <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="primary" size="sm" icon="{{ stIcon2 }}" on-click="{{ stGo }}" hint-size="140px,36px">{{ stCta }}</x-import>
+                <sc-if value="{{ stHas2 }}" hint-placeholder-val="{{ false }}"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="ghost" size="sm" on-click="{{ stGo2 }}" hint-size="140px,36px">{{ stCta2 }}</x-import></sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showEmpty }}" hint-placeholder-val="{{ false }}">
+          <div class="ds-card" style="min-height:420px;display:grid;place-items:center;padding:48px 24px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:20px;max-width:420px;text-align:center">
+              <span class="ds-disc" style="width:56px;height:56px"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="{{ emptyIcon }}" size="{{ 24 }}" hint-size="24px,24px"></x-import></span>
+              <x-import component-from-global-scope="DashboardDesignSystem_d616c8.EmptyState" title="{{ emptyTitle }}" description="{{ emptyText }}" action-label="{{ emptyCta }}" action-icon="plus" on-action="{{ emptyAction }}" hint-size="100%,140px"></x-import>
+            </div>
+          </div>
         </sc-if>
 
         <!-- OVERVIEW -->
@@ -1035,37 +1306,86 @@
 
         <!-- SETTINGS -->
         <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
-          <div style="display:flex;flex-direction:column;gap:16px;max-width:720px">
-            <div class="ds-card" style="padding:24px;display:flex;flex-direction:column;gap:20px">
-              <h2 class="ds-t-card" style="font:var(--type-body-strong);letter-spacing:var(--tracking-tight)">Workspace</h2>
-              <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Input" label="Workspace name" size="sm" value="{{ wsName }}" on-change="{{ setWsName }}" hint-size="100%,62px"></x-import>
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
-                <div style="display:flex;flex-direction:column;gap:2px">
-                  <span style="font:var(--type-label-strong)">Language</span>
-                  <span class="ds-t-sub">Interface language and date format</span>
+          <div style="display:flex;flex-direction:column;gap:24px;max-width:720px;width:100%;margin:0 auto">
+
+            <div class="ds-card" style="padding:24px;border-radius:24px;display:flex;gap:20px;align-items:flex-start">
+              <span style="width:48px;height:48px;border-radius:999px;display:grid;place-items:center;flex:none;background:color-mix(in oklch, var(--brand) 18%, transparent);color:var(--accent)"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="user" size="{{ 20 }}" hint-size="20px,20px"></x-import></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;padding-top:2px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <h2 style="margin:0;font:var(--type-body-strong);letter-spacing:var(--tracking-tight)">Profile</h2>
+                  <span style="font:var(--type-label);color:var(--text-muted);text-wrap:pretty">Your name and the email you sign in with. Teammates see these in People.</span>
                 </div>
-                <dc-import name="Filter Select" options="{{ langOptions }}" value="{{ lang }}" on-change="{{ setLang }}" icon="languages" align="right" neutral="{{ true }}" hint-size="160px,36px"></dc-import>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
-                <div style="display:flex;flex-direction:column;gap:2px">
-                  <span style="font:var(--type-label-strong)">Currency</span>
-                  <span class="ds-t-sub">Used for totals and budgets</span>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+                  <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Input" label="Name" size="sm" value="{{ userName }}" on-change="{{ setUserName }}" hint-size="100%,62px"></x-import>
+                  <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Input" label="Email" size="sm" default-value="maya@northwind.dev" type="email" hint-size="100%,62px"></x-import>
                 </div>
-                <x-import component-from-global-scope="DashboardDesignSystem_d616c8.SegmentedControl" size="sm" options="{{ currencyOptions }}" value="{{ currency }}" on-change="{{ setCurrency }}" hint-size="180px,40px"></x-import>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
-                <div style="display:flex;flex-direction:column;gap:2px">
-                  <span style="font:var(--type-label-strong)">Theme</span>
-                  <span class="ds-t-sub">Applies to this browser</span>
-                </div>
-                <x-import component-from-global-scope="DashboardDesignSystem_d616c8.SegmentedControl" size="sm" options="{{ themeOptions }}" value="{{ theme }}" on-change="{{ setTheme }}" hint-size="160px,40px"></x-import>
               </div>
             </div>
-            <div class="ds-card" style="padding:24px;display:flex;flex-direction:column;gap:16px">
-              <h2 class="ds-t-card" style="font:var(--type-body-strong);letter-spacing:var(--tracking-tight)">Notifications</h2>
-              <sc-for list="{{ notifyRows }}" as="n" hint-placeholder-count="3">
-                <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Checkbox" checked="{{ n.on }}" on-change="{{ n.toggle }}" hint-size="100%,20px">{{ n.label }}</x-import>
-              </sc-for>
+
+            <div class="ds-card" style="padding:24px;border-radius:24px;display:flex;gap:20px;align-items:flex-start">
+              <span style="width:48px;height:48px;border-radius:999px;display:grid;place-items:center;flex:none;background:color-mix(in oklch, var(--brand) 18%, transparent);color:var(--accent)"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="shield-check" size="{{ 20 }}" hint-size="20px,20px"></x-import></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;padding-top:2px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <h2 style="margin:0;font:var(--type-body-strong);letter-spacing:var(--tracking-tight)">Security</h2>
+                  <span style="font:var(--type-label);color:var(--text-muted);text-wrap:pretty">Password, two-factor and the devices signed in to your account.</span>
+                </div>
+                <div style="display:flex"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="primary" on-click="{{ openSec }}" hint-size="auto,40px">Manage</x-import></div>
+              </div>
+            </div>
+
+            <div class="ds-card" style="padding:24px;border-radius:24px;display:flex;gap:20px;align-items:flex-start">
+              <span style="width:48px;height:48px;border-radius:999px;display:grid;place-items:center;flex:none;background:color-mix(in oklch, var(--brand) 18%, transparent);color:var(--accent)"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="building-2" size="{{ 20 }}" hint-size="20px,20px"></x-import></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;padding-top:2px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <h2 style="margin:0;font:var(--type-body-strong);letter-spacing:var(--tracking-tight)">Workspace</h2>
+                  <span style="font:var(--type-label);color:var(--text-muted);text-wrap:pretty">The name your team sees when they join.</span>
+                </div>
+                <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Input" label="Workspace name" size="sm" value="{{ wsName }}" on-change="{{ setWsName }}" hint-size="100%,62px"></x-import>
+              </div>
+            </div>
+
+            <div class="ds-card" style="padding:24px;border-radius:24px;display:flex;gap:20px;align-items:flex-start">
+              <span style="width:48px;height:48px;border-radius:999px;display:grid;place-items:center;flex:none;background:color-mix(in oklch, var(--brand) 18%, transparent);color:var(--accent)"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="languages" size="{{ 20 }}" hint-size="20px,20px"></x-import></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;padding-top:2px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <h2 style="margin:0;font:var(--type-body-strong);letter-spacing:var(--tracking-tight)">Language and currency</h2>
+                  <span style="font:var(--type-label);color:var(--text-muted);text-wrap:pretty">Interface language, date format and the currency for totals and plan prices.</span>
+                </div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+                  <dc-import name="Filter Select" options="{{ langOptions }}" value="{{ lang }}" on-change="{{ setLang }}" icon="languages" neutral="{{ true }}" hint-size="160px,36px"></dc-import>
+                  <x-import component-from-global-scope="DashboardDesignSystem_d616c8.SegmentedControl" size="sm" options="{{ currencyOptions }}" value="{{ currency }}" on-change="{{ setCurrency }}" hint-size="180px,40px"></x-import>
+                </div>
+              </div>
+            </div>
+
+            <div class="ds-card" style="padding:24px;border-radius:24px;display:flex;gap:20px;align-items:flex-start">
+              <span style="width:48px;height:48px;border-radius:999px;display:grid;place-items:center;flex:none;background:color-mix(in oklch, var(--brand) 18%, transparent);color:var(--accent)"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="bell" size="{{ 20 }}" hint-size="20px,20px"></x-import></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;padding-top:2px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <h2 style="margin:0;font:var(--type-body-strong);letter-spacing:var(--tracking-tight)">Stay up to date</h2>
+                  <span style="font:var(--type-label);color:var(--text-muted);text-wrap:pretty">Choose what Subtrack emails you about. No marketing.</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <sc-for list="{{ notifyRows }}" as="n" hint-placeholder-count="3">
+                    <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Checkbox" checked="{{ n.on }}" on-change="{{ n.toggle }}" hint-size="100%,20px">{{ n.label }}</x-import>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+
+            <div class="ds-card" style="padding:24px;border-radius:24px;display:flex;gap:20px;align-items:flex-start">
+              <span style="width:48px;height:48px;border-radius:999px;display:grid;place-items:center;flex:none;background:color-mix(in oklch, var(--brand) 18%, transparent);color:var(--accent)"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="contrast" size="{{ 20 }}" hint-size="20px,20px"></x-import></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;padding-top:2px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <h2 style="margin:0;font:var(--type-body-strong);letter-spacing:var(--tracking-tight)">Appearance</h2>
+                  <span style="font:var(--type-label);color:var(--text-muted);text-wrap:pretty">Choose how the app looks. Select a theme or let it follow your system settings.</span>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;max-width:432px">
+                  <sc-for list="{{ themeTiles }}" as="o" hint-placeholder-count="3">
+                    <x-import component-from-global-scope="DashboardDesignSystem_d616c8.OptionTile" icon="{{ o.icon }}" label="{{ o.label }}" checked="{{ o.on }}" on-click="{{ o.pick }}" hint-size="100%,88px"></x-import>
+                  </sc-for>
+                </div>
+              </div>
             </div>
           </div>
         </sc-if>
@@ -1075,7 +1395,7 @@
   </main>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark' | 'light'&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;signin&quot;,&quot;signup&quot;,&quot;workspace&quot;,&quot;forgot&quot;,&quot;sent&quot;,&quot;overview&quot;,&quot;subscriptions&quot;,&quot;people&quot;,&quot;accounts&quot;,&quot;usage&quot;,&quot;tokenmaxx&quot;,&quot;renewals&quot;,&quot;settings&quot;],&quot;default&quot;:&quot;overview&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;pageSize&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[5,8,10,20],&quot;default&quot;:8,&quot;tsType&quot;:&quot;number&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark' | 'light'&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;signin&quot;,&quot;signup&quot;,&quot;workspace&quot;,&quot;forgot&quot;,&quot;sent&quot;,&quot;overview&quot;,&quot;subscriptions&quot;,&quot;people&quot;,&quot;accounts&quot;,&quot;usage&quot;,&quot;tokenmaxx&quot;,&quot;renewals&quot;,&quot;settings&quot;,&quot;reset&quot;,&quot;expired&quot;,&quot;changed&quot;,&quot;twofa&quot;,&quot;notfound&quot;,&quot;error&quot;,&quot;offline&quot;],&quot;default&quot;:&quot;overview&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;pageSize&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[5,8,10,20],&quot;default&quot;:8,&quot;tsType&quot;:&quot;number&quot;},&quot;emptyWorkspace&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;label&quot;:&quot;First-run empty states&quot;}}">
 class Component extends DCLogic {
   state = { addedSubs: [], cancelled: [], subModal: null, cancelOpen: false, af: {}, resent: false, userName: 'Maya Chen', addedPeople: [], removedPeople: [], grants: {}, modal: null, metric: 'Spend', screen: null, subId: 'chatgpt', detailTab: 'Seats', filter: 'all', q: '', removed: {}, provider: 'All', monthOff: 0,
     rules: { trial: true, renewal: true, unused: true, api: true, digest: false },
@@ -1111,9 +1431,10 @@ class Component extends DCLogic {
   kick() { requestAnimationFrame(() => window.dispatchEvent(new Event('resize'))); setTimeout(() => window.dispatchEvent(new Event('resize')), 300); }
   componentDidMount() {
     this.kick();
+    window.addEventListener('keydown', this.onKey);
     this._t = setInterval(() => { const b = document.querySelector('.ds-panel__body'); if (b && window.ResizeObserver) { clearInterval(this._t); let w = 0; this._ro = new ResizeObserver(e => { const nw = Math.round(e[0].contentRect.width); if (nw !== w) { w = nw; window.dispatchEvent(new Event('resize')); } }); this._ro.observe(b); } }, 100);
   }
-  componentWillUnmount() { clearInterval(this._t); this._ro && this._ro.disconnect(); }
+  componentWillUnmount() { window.removeEventListener('keydown', this.onKey); clearTimeout(this._tt); clearInterval(this._t); this._ro && this._ro.disconnect(); }
   componentDidUpdate(prev, prevState) {
     if (prev.theme !== this.props.theme) this.setState({ theme: null });
     if (prevState.screen !== this.state.screen) this.kick();
@@ -1193,7 +1514,20 @@ class Component extends DCLogic {
     else sub = { ...base, price: +m.price, day: +m.day };
     const ppl = Object.keys(m.people).filter(k => m.people[k]);
     this.setState(st => ({ addedSubs: [...st.addedSubs, sub], grants: ppl.length ? { ...st.grants, [id]: ppl } : st.grants, subModal: null }));
+    this.toast(sub.name + ' added');
   }
+  toast(msg) { clearTimeout(this._tt); this.setState({ toast: msg }); this._tt = setTimeout(() => this.setState({ toast: null }), 4000); }
+  onKey = e => {
+    const k = e.key;
+    if ((e.metaKey || e.ctrlKey) && k.toLowerCase() === 'k') { e.preventDefault(); this.setState(x => ({ searchOpen: !x.searchOpen, sq:'', sIdx:0 })); return; }
+    if (k === 'Escape') { if (this.state.searchOpen) this.setState({ searchOpen:false }); else if (this.state.sec) this.setState({ sec:null }); return; }
+    if (!this.state.searchOpen) return;
+    const n = (this._sItems || []).length;
+    if (k === 'ArrowDown' && n) { e.preventDefault(); this.setState(x => ({ sIdx: ((x.sIdx || 0) + 1) % n })); }
+    if (k === 'ArrowUp' && n) { e.preventDefault(); this.setState(x => ({ sIdx: ((x.sIdx || 0) - 1 + n) % n })); }
+    if (k === 'Enter' && n) { e.preventDefault(); this._sItems[Math.min(this.state.sIdx || 0, n - 1)].run(); }
+  };
+  isEmpty() { return !!this.props.emptyWorkspace && this.state.addedSubs.length === 0; }
   subs() {
     return [...this.base, ...this.state.addedSubs].filter(s => !this.state.cancelled.includes(s.id)).map(s => {
       const o = { ...s, isUsage: !!s.usage, isTrial: !!s.trial };
@@ -1253,7 +1587,7 @@ class Component extends DCLogic {
     const subs = this.subs();
     const total = subs.reduce((a, s) => a + s.monthly, 0);
     const roster = this.roster();
-    const authMode = st.auth !== undefined ? st.auth : (['signin','signup','workspace','forgot','sent'].includes(p.startScreen) ? p.startScreen : null);
+    const authMode = st.auth !== undefined ? st.auth : (['signin','signup','workspace','forgot','sent','reset','expired','changed','twofa'].includes(p.startScreen) ? p.startScreen : null);
     const att = this.attention(subs);
     const asg = Object.fromEntries(Object.entries(st.assign || this.assign0).filter(([p]) => !st.removedPeople.includes(p))), aLoads = this.loads(asg), recs = this.recommend(asg);
     const aName = id => this.accts.find(a => a.id === id).name;
@@ -1479,6 +1813,8 @@ class Component extends DCLogic {
       toggleTheme: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }),
       setTheme: v => this.setState({ theme: v }),
       themeOptions: [{ value:'dark', label:'Dark' }, { value:'light', label:'Light' }],
+      themeTiles: [['system','System','monitor'],['light','Light','sun'],['dark','Dark','moon']].map(([v,l,i]) => ({ label:l, icon:i, on: (this.state.themeMode || 'dark') === v, pick: () => this.setState({ themeMode:v, theme: v === 'system' ? (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : v }) })),
+      setUserName: v => this.setState({ userName: v && v.target ? v.target.value : v }),
       navSections: [{ items: [
         { id:'overview', label:'Overview', icon:'layout-dashboard' },
         { id:'subscriptions', label:'Subscriptions', icon:'credit-card' },
@@ -1489,18 +1825,79 @@ class Component extends DCLogic {
       navFooter: [],
       navActive: screen === 'detail' || screen === 'accounts' ? 'subscriptions' : screen,
       go, goSubs: () => go('subscriptions'), goSettings: () => go('settings'), goRenewals: () => go('renewals'),
-      showHeader: screen !== 'detail', pageTitle: t[0], pageSub: t[1],
+      showHeader: screen !== 'detail' && !['notfound','error','offline'].includes(screen), pageTitle: t[0], pageSub: this.isEmpty() && screen !== 'settings' ? 'Nothing tracked yet' : t[1],
       accountLabel: React.createElement('span', { style: { display:'flex', flexDirection:'column', gap:2, minWidth:0 } },
         React.createElement('span', { style: { font:'600 14px/20px var(--font-sans)', color:'#fff', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' } }, st.wsName),
         React.createElement('span', { style: { font:'500 12px/16px var(--font-sans)', color:'var(--gray-400)' } }, st.userName + ' · Admin')),
       sidebarProps: { style: { height:'100%' } },
       menuOpen: !!st.menu, toggleMenu: () => this.setState(s => ({ menu: !s.menu })), closeMenu: () => this.setState({ menu:false }),
       menuMeta: subs.length + ' tools · ' + this.money(total) + '/mo',
-      menuThemeLabel: theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme',
+      menuThemeLabel: theme === 'dark' ? 'Light theme' : 'Dark theme',
       menuSettings: () => this.setState({ menu:false, screen:'settings' }),
       menuPeople: () => this.setState({ menu:false, screen:'people' }),
       menuTheme: () => this.setState({ menu:false, theme: theme === 'dark' ? 'light' : 'dark' }),
       isAccounts: screen === 'accounts', isPeople: screen === 'people',
+      toastOn: !!st.toast, toastText: st.toast || '',
+      ...(() => {
+        const sc = { notfound:['file-question','Error 404','Page not found','There’s nothing at this address. It may have moved or been removed.','Go to overview','layout-dashboard',null],
+          error:['triangle-alert','Something went wrong','This page hit an error','Reloading usually fixes it. Your data is safe.','Reload','rotate-cw','Go to overview'],
+          offline:['wifi-off','Offline','Can’t reach Subtrack','Check your connection. Numbers update as soon as you’re back.','Try again','rotate-cw',null] }[screen];
+        return { showStatus: !!sc, stIcon: sc ? sc[0] : 'circle', stEyebrow: sc ? sc[1] : '', stTitle: sc ? sc[2] : '', stText: sc ? sc[3] : '', stCta: sc ? sc[4] : '', stIcon2: sc ? sc[5] : 'circle',
+          stGo: () => this.setState({ screen:'overview' }), stHas2: !!(sc && sc[6]), stCta2: sc && sc[6] || '', stGo2: () => this.setState({ screen:'overview' }) };
+      })(),
+      ...(() => {
+        const sq = (st.sq || '').trim().toLowerCase();
+        const pages = [['overview','Overview','layout-dashboard'],['subscriptions','Subscriptions','credit-card'],['people','People','users'],['usage','Usage & tokens','activity'],['tokenmaxx','Tokenmaxx','flame'],['renewals','Renewals','calendar'],['settings','Settings','settings']];
+        const close = fn => () => { this.setState({ searchOpen:false, sq:'' }); fn(); };
+        const groups = [
+          ['Subscriptions', subs.map(x => ({ label:x.name, meta:x.vendor, initials:x.initials, color:x.color, isEntity:true, run: close(this.open(x.id)) }))],
+          ['People', roster.map(r => ({ label:r.name, meta:r.role, initials:r.name.split(' ').map(w => w[0]).join('').slice(0, 2), color:'#404040', isEntity:true, run: close(() => this.setState({ screen:'people' })) }))],
+          ['Pages', pages.map(([id, label, icon]) => ({ label, meta:'', icon, isPage:true, run: close(() => this.setState({ screen:id })) }))] ];
+        const items = [];
+        groups.forEach(([g, list]) => { list.filter(x => !sq || (x.label + ' ' + x.meta).toLowerCase().includes(sq)).slice(0, sq ? 6 : 3).forEach((x, i) => items.push({ ...x, group:g, showGroup: i === 0 })); });
+        this._sItems = items;
+        const idx = Math.min(st.sIdx || 0, Math.max(items.length - 1, 0));
+        return { searchOpen: !!st.searchOpen, openSearch: () => this.setState({ searchOpen:true, sq:'', sIdx:0 }), closeSearch: () => this.setState({ searchOpen:false }),
+          sq: st.sq || '', setSq: e => this.setState({ sq: e.target.value, sIdx:0 }), sNone: !items.length,
+          sResults: items.map((x, i) => ({ isEntity:false, isPage:false, initials:'', color:'#404040', icon:'circle', ...x, bg: i === idx ? 'var(--fill)' : 'transparent', hover: () => this.setState({ sIdx:i }) })) };
+      })(),
+      ...(() => {
+        const v = st.sec, sf = st.secForm || {}, devs = st.devices || [
+          { id:'mac', icon:'monitor', name:'MacBook Pro · Subtrack app', where:'Madrid · Active now', current:true },
+          { id:'win', icon:'globe', name:'Chrome on Windows', where:'Barcelona · 2 hours ago' },
+          { id:'ios', icon:'smartphone', name:'Safari on iPhone', where:'Madrid · Yesterday' } ];
+        const setV = (sec, extra) => this.setState({ sec, ...extra });
+        const updF = k => e => { const val = e && e.target ? e.target.value : e; this.setState(x => ({ secForm: { ...x.secForm, [k]: val } })); };
+        const others = devs.filter(d => !d.current), tfa = !!st.tfaOn;
+        const cf = st.secConfirm;
+        const titles = { main:['Security','Your password, two-factor and where you’re signed in.'], pw:['Change password','Use at least 8 characters with a number.'],
+          '2fa1':['Set up two-factor','Confirm it’s you to start.'], '2fa2':['Scan the code','Use any authenticator app, then enter the code it shows.'], '2fa3':['Save your backup codes','Each works once if you lose your phone. This is the only time they’re shown.'],
+          confirm:[cf ? cf.title : '', cf ? cf.text : ''] }[v || 'main'];
+        const nw = sf.nw || '', spCta = !sf.cur ? 'Enter current password' : nw.length < 8 ? 'Use at least 8 characters' : !/\d/.test(nw) ? 'Add a number' : nw !== (sf.conf || '') ? 'Confirm new password' : 'Change password';
+        const c2 = (sf.code || '').replace(/\s/g, '');
+        return {
+          secOpen: !!v, openSec: () => setV('main', { secForm:{} }), closeSec: () => setV(null), secHome: () => setV('main', { secForm:{} }),
+          secTitle: titles[0], secSub: titles[1], secStepLabel: v === '2fa1' ? 'Step 1 of 3' : v === '2fa2' ? 'Step 2 of 3' : v === '2fa3' ? 'Step 3 of 3' : '',
+          secMain: v === 'main', secPw: v === 'pw', sec2fa1: v === '2fa1', sec2fa2: v === '2fa2', sec2fa3: v === '2fa3', secConfirm: v === 'confirm',
+          pwChanged: st.pwChangedNow ? 'Changed just now' : 'Last changed 4 months ago',
+          tfaSub: tfa ? 'Asks for a code from your app when you sign in' : 'Add a code from your phone when you sign in', tfaBadge: tfa ? 'On' : 'Off', tfaBg: tfa ? 'var(--info-badge)' : 'var(--fill)', tfaFg: tfa ? 'var(--info-text)' : 'var(--text-secondary)',
+          tfaBtn: tfa ? 'Turn off' : 'Set up', tfaBtnVariant: tfa ? 'ghost' : 'primary',
+          tfaAction: () => tfa ? setV('confirm', { secConfirm: { title:'Turn off two-factor?', text:'Signing in will only need your password. You can set it up again any time.', cta:'Turn off', go: () => { this.setState({ tfaOn:false, sec:'main' }); this.toast('Two-factor turned off'); } } }) : setV('2fa1', { secForm:{} }),
+          devRows: devs.map(d => ({ ...d, current: !!d.current, other: !d.current, signOut: () => setV('confirm', { secConfirm: { title:'Sign out ' + d.name.split(' · ')[0] + '?', text:'That device has to sign in again to reach ' + st.wsName + '.', cta:'Sign out', go: () => { this.setState(x => ({ devices: devs.filter(y => y.id !== d.id), sec:'main' })); this.toast('Signed out ' + d.name.split(' · ')[0]); } } }) })),
+          hasOtherDevices: others.length > 0,
+          signOutAll: () => setV('confirm', { secConfirm: { title:'Sign out all other devices?', text:'Every device except this one is signed out. Desktop apps stop syncing until they sign in again.', cta:'Sign out ' + others.length + (others.length === 1 ? ' device' : ' devices'), go: () => { this.setState({ devices: devs.filter(y => y.current), sec:'main' }); this.toast('Signed out ' + others.length + ' devices'); } } }),
+          secConfirmCta: cf ? cf.cta : '', secConfirmGo: () => cf && cf.go(),
+          secToPw: () => setV('pw', { secForm:{} }),
+          spCur: sf.cur || '', spNew: nw, spConf: sf.conf || '', setSpCur: updF('cur'), setSpNew: updF('nw'), setSpConf: updF('conf'),
+          spCta, spDisabled: spCta !== 'Change password', spSave: () => { if (spCta === 'Change password') { this.setState(x => ({ sec:'main', secForm:{}, pwChangedNow:true, devices: (x.devices || devs).filter(y => y.current) })); this.toast('Password changed. Other devices were signed out.'); } },
+          s1Cta: sf.cur ? 'Continue' : 'Enter your password', s1Disabled: !sf.cur, s1Go: () => sf.cur && setV('2fa2'), secTo2fa1: () => setV('2fa1'),
+          keyIcon: st.keyCopied ? 'check' : 'copy', keyLabel: st.keyCopied ? 'Copied' : 'Copy', copyKey: () => { this.setState({ keyCopied:true }); setTimeout(() => this.setState({ keyCopied:false }), 2000); },
+          s2Code: sf.code || '', setS2Code: updF('code'), s2Cta: /^\d{6}$/.test(c2) ? 'Verify' : 'Enter the 6-digit code', s2Disabled: !/^\d{6}$/.test(c2), s2Go: () => /^\d{6}$/.test(c2) && setV('2fa3'),
+          backupCodes: ['4f9k-2m8q','h7c3-pw1x','9tqz-6bn4','m2ve-k8r5','x5ja-3dy7','b8nu-q4hc','r1wt-7gz2','e6ks-m9lp','p3hy-c5vf','z7rd-1xq8'],
+          s3Saved: !!sf.saved, toggleS3: () => this.setState(x => ({ secForm: { ...x.secForm, saved: !(x.secForm || {}).saved } })),
+          s3Cta: sf.saved ? 'Turn on two-factor' : 'Confirm you saved them', s3Disabled: !sf.saved, s3Go: () => { if (sf.saved) { this.setState({ tfaOn:true, sec:'main', secForm:{} }); this.toast('Two-factor is on'); } },
+        };
+      })(),
       ...(() => {
         // ---------- auth ----------
         const af = st.af || {}, mode = authMode;
@@ -1508,12 +1905,24 @@ class Component extends DCLogic {
         const okEmail = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(af.email || ''), pw = (af.password || '').length;
         const enter = extra => this.setState({ auth:null, screen:'overview', af:{}, resent:false, menu:false, ...extra });
         let cta = '', ok = false, submit = () => {};
-        if (mode === 'signin') { cta = !af.email ? 'Enter your email' : !okEmail ? 'Enter a valid email' : !pw ? 'Enter your password' : 'Sign in'; ok = okEmail && pw > 0; submit = () => enter({}); }
+        if (mode === 'signin') { cta = !af.email ? 'Enter your email' : !okEmail ? 'Enter a valid email' : !pw ? 'Enter your password' : 'Sign in'; ok = okEmail && pw > 0; submit = () => st.tfaOn ? this.setState({ auth:'twofa', af: { ...af, code:'' } }) : enter({}); }
+        const pwv = af.password || '', checks = [['At least 8 characters', pwv.length >= 8], ['At least one number', /\d/.test(pwv)], ['Both passwords match', !!pwv && pwv === (af.confirm || '')]];
+        if (mode === 'reset') { cta = pwv.length < 8 ? 'Use at least 8 characters' : !/\d/.test(pwv) ? 'Add a number' : pwv !== (af.confirm || '') ? 'Confirm your password' : 'Save new password'; ok = cta === 'Save new password'; submit = () => this.setState({ auth:'changed', af:{} }); }
+        const code = (af.code || '').replace(/\s/g, ''), backup = !!af.backup;
+        if (mode === 'twofa') { const need = backup ? 9 : 6; cta = code.length < need ? (backup ? 'Enter a backup code' : 'Enter the 6-digit code') : 'Verify'; ok = code.length >= need; submit = () => enter({}); }
         if (mode === 'signup') { cta = !(af.name || '').trim() ? 'Enter your name' : !okEmail ? 'Enter a valid email' : pw < 8 ? 'Use at least 8 characters' : 'Create account'; ok = cta === 'Create account'; submit = () => this.setState({ auth:'workspace' }); }
         if (mode === 'workspace') { cta = !(af.ws || '').trim() ? 'Enter a workspace name' : 'Create workspace'; ok = !!(af.ws || '').trim(); submit = () => enter({ wsName: af.ws.trim(), userName: (af.name || '').trim() || st.userName, addedPeople: [], removedPeople: [] }); }
         if (mode === 'forgot') { cta = !okEmail ? 'Enter a valid email' : 'Send reset link'; ok = okEmail; submit = () => this.setState({ auth:'sent' }); }
         const go = m => () => this.setState({ auth:m, resent:false });
         return {
+          isReset: mode === 'reset', isExpired: mode === 'expired', isChanged2: mode === 'changed', isTwofa: mode === 'twofa',
+          resetEmail: af.email || 'maya@northwind.dev', afConfirm: af.confirm || '', setAfConfirm: upd('confirm'),
+          pwChecks: checks.map(([label, on]) => ({ label, icon: on ? 'circle-check' : 'circle', color: on ? 'var(--positive)' : 'var(--text-muted)' })),
+          afCode: af.code || '', setAfCode: upd('code'), afTrust: !!af.trust, toggleTrust: () => this.setState(x => ({ af: { ...x.af, trust: !x.af.trust } })),
+          toggleBackup: () => this.setState(x => ({ af: { ...x.af, backup: !x.af.backup, code:'' } })),
+          tfTitle: backup ? 'Enter a backup code' : 'Enter your code', tfSub: backup ? 'Use one of the codes you saved when you set up two-factor. Each works once.' : 'Open your authenticator app and enter the 6-digit code for Subtrack.',
+          tfLabel: backup ? 'Backup code' : '6-digit code', tfMode: backup ? 'text' : 'numeric', tfPh: backup ? 'xxxx-xxxx' : '123456', tfSwap: backup ? 'Use your app instead' : 'Use a backup code',
+          goSent: go('sent'),
           isAuth: !!mode, isSignin: mode === 'signin', isSignup: mode === 'signup', isWorkspace: mode === 'workspace', isForgot: mode === 'forgot', isSent: mode === 'sent',
           afName: af.name || '', afEmail: af.email || '', afPassword: af.password || '', afWs: af.ws || '', afSize: af.size || '2–10',
           setAfName: upd('name'), setAfEmail: upd('email'), setAfPassword: upd('password'), setAfWs: upd('ws'), setAfSize: upd('size'),
@@ -1529,8 +1938,39 @@ class Component extends DCLogic {
       ...(() => {
         // ---------- add subscription ----------
         const m = st.subModal;
-        const openAdd = () => this.setState({ subModal: { name:'', vendor:'', cat:'Chat assistants', bill:'seat', price:'', day:'', trialEnd:'', budget:'', people:{} } });
+        const openAdd = () => this.setState({ subModal: { step:'pick', name:'', vendor:'', cat:'Chat assistants', bill:'seat', price:'', day:'', trialEnd:'', budget:'', people:{} } });
         if (!m) return { subModalOpen:false, openAddSub: openAdd };
+        const setM = p => this.setState(x => ({ subModal: { ...x.subModal, ...p } }));
+        const startWait = () => { clearTimeout(this._auth); this._auth = setTimeout(() => this.setState(x => x.subModal && x.subModal.step === 'signin' ? { subModal: { ...x.subModal, step:'form', signed:true } } : null), 4500); };
+        const provs = [
+          { name:'Claude Code', initials:'CC', color:'#7764d8', how:'Sign in through claude.com', auth:'claude', preset:{ name:'Claude Code', vendor:'Anthropic', cat:'Coding', bill:'seat', price:'200' } },
+          { name:'Codex', initials:'CX', color:'#404040', how:'Sign in with a code at openai.com', auth:'codex', preset:{ name:'Codex', vendor:'OpenAI', cat:'Coding', bill:'seat', price:'200' } },
+          { name:'GLM Coding Plan', initials:'GL', color:'#155dfc', how:'Enter the plan and price', preset:{ name:'GLM Coding Plan', vendor:'Zhipu AI', cat:'Coding', bill:'seat', price:'15' } },
+          { name:'Higgsfield', initials:'HF', color:'#262626', how:'Enter the plan and price', preset:{ name:'Higgsfield', vendor:'Higgsfield', cat:'Image & video', bill:'seat', price:'29' } },
+          { name:'ElevenLabs', initials:'EL', color:'#171717', how:'Enter the plan and price', preset:{ name:'ElevenLabs', vendor:'ElevenLabs', cat:'Voice', bill:'seat', price:'22' } } ];
+        const step = m.step || 'form', isClaude = m.auth === 'claude', copied = !!m.copied;
+        const codeOk = (m.code || '').trim().length >= 8;
+        const flow = {
+          subStepPick: step === 'pick', subStepSignin: step === 'signin', subStepCode: step === 'code', subStepForm: step === 'form',
+          subTitle: step === 'pick' ? 'Add subscription' : step === 'signin' ? (isClaude ? 'Finish signing in to Claude' : 'Enter this code at OpenAI') : step === 'code' ? 'Sign in with a code' : m.signed ? 'Check the details' : 'Add subscription',
+          subSubtitle: step === 'pick' ? 'Pick the tool. Claude Code and Codex sign in through the browser.' : step === 'signin' ? (isClaude ? 'We opened claude.com in your browser. Sign in with the account you want to add.' : 'Open the page, sign in with the account you want to add and enter the code.') : step === 'code' ? 'For when the browser is on another device.' : m.signed ? 'Add the price and who uses it. You can change these later.' : 'Track a new AI tool, its billing and who uses it',
+          provRows: provs.map(p => ({ ...p, pick: () => { setM({ ...p.preset, step: p.auth ? 'signin' : 'form', auth: p.auth || null, copied:false, picked:true }); if (p.auth) startWait(); } })),
+          pickOther: () => setM({ step:'form', picked:false }),
+          authIsClaude: isClaude, authIsCodex: m.auth === 'codex',
+          authWaitTitle: isClaude ? 'Waiting for Claude…' : 'Waiting for approval at auth.openai.com',
+          copyIcon: copied ? 'check' : 'copy', copyLabel: copied ? 'Link copied' : 'Copy sign-in link', copyShort: copied ? 'Copied' : 'Copy',
+          copyLink: () => { setM({ copied:true }); setTimeout(() => this.setState(x => x.subModal ? { subModal: { ...x.subModal, copied:false } } : null), 2000); },
+          openAuthPage: () => window.open('https://auth.openai.com/codex/device', '_blank', 'noopener'),
+          subBack: () => { clearTimeout(this._auth); setM({ step:'pick', auth:null }); },
+          useCode: () => { clearTimeout(this._auth); setM({ step:'code', code:'' }); },
+          backToSignin: () => { setM({ step:'signin' }); startWait(); },
+          authCode: m.code || '', setAuthCode: e => setM({ code: e && e.target ? e.target.value : e }),
+          codeDisabled: !codeOk, codeCta: codeOk ? 'Sign in' : 'Paste the code',
+          submitCode: () => codeOk && setM({ step:'form', signed:true }),
+          subSigned: step === 'form' && !!m.signed,
+          signedText: isClaude ? 'Signed in as work@example.com. Max 20× detected from the login.' : 'Signed in as dev@northwind.dev. Pro detected from the login.',
+          showPresets: step === 'form' && !m.picked,
+        };
         const upd = k => e => { const v = e && e.target ? e.target.value : e; this.setState(x => ({ subModal: { ...x.subModal, [k]: v } })); };
         const nPeople = Object.values(m.people).filter(Boolean).length, price = +m.price || 0, day = +m.day;
         let cta = 'Add subscription';
@@ -1543,7 +1983,7 @@ class Component extends DCLogic {
           : m.bill === 'trial' ? 'Free, then ' + this.money(price * Math.max(nPeople, 1)) + '/mo'
           : this.money(price * nPeople) + '/mo · ' + nPeople + ' seat' + (nPeople === 1 ? '' : 's');
         const allCats = [...new Set([...cats, 'Chat assistants','Coding','Image & video','Research','Productivity','Voice','API','Other'])];
-        return { subModalOpen:true, openAddSub: openAdd, closeSub: () => this.setState({ subModal:null }), saveSub: () => cta === 'Add subscription' && this.saveSub(),
+        return { ...flow, subModalOpen:true, openAddSub: openAdd, closeSub: () => { clearTimeout(this._auth); this.setState({ subModal:null }); }, saveSub: () => cta === 'Add subscription' && this.saveSub(),
           presetRows: [
       { name:'Claude Code', vendor:'Anthropic', cat:'Coding', bill:'seat', price:'100' },
       { name:'Codex', vendor:'OpenAI', cat:'Coding', bill:'seat', price:'20' },
@@ -1572,7 +2012,7 @@ class Component extends DCLogic {
         };
       })(),
       isSubsOnly: screen === 'subscriptions',
-      isTokenmaxx: screen === 'tokenmaxx',
+      isTokenmaxx: !this.isEmpty() && screen === 'tokenmaxx',
       pkTaskOptions: [{ value:'', label:'Any task' }, { value:'coding', label:'Coding' }, { value:'chat', label:'Chat & research' }, { value:'voice', label:'Voice' }], pkTask: st.pkTask || '', setPkTask: v => this.setState({ pkTask:v, tmSkip:0 }),
       pkToolOptions: [{ value:'', label:'Any tool' }, ...[...new Set(tmAll.map(a => a.tool))].map(t => ({ value:t, label:t }))], pkTool: st.pkTool || '', setPkTool: v => this.setState({ pkTool:v, tmSkip:0 }),
       pkGoalOptions: [{ value:'expiring', label:'Use it or lose it' }, { value:'headroom', label:'Most headroom' }, { value:'value', label:'Most $ unused' }, { value:'pace', label:'Safest pace' }], pkGoal, setPkGoal: v => this.setState({ pkGoal:v, tmSkip:0 }),
@@ -1625,7 +2065,18 @@ class Component extends DCLogic {
       hasRecs: recs.length > 0, noRecs: recs.length === 0,
       upgradeRows: this.accts.filter(a => aLoads[a.id] >= 90 && Object.values(asg).filter(x => x === a.id).length === 1).map(a => ({ title: Object.keys(asg).find(p => asg[p] === a.id) + ' uses ' + aLoads[a.id] + '% of ' + a.name + ' alone', sub:'Moving people won’t help here. Upgrade this account to Max 20× (' + this.money(200) + '/mo).' })),
       resetAssign: () => this.setState({ assign:null }), isChanged: !!st.assign,
-      isOverview: screen === 'overview', isSubs: screen === 'subscriptions' || screen === 'people', isDetail: screen === 'detail', isUsage: screen === 'usage', isRenewals: screen === 'renewals', isBudgets: screen === 'budgets', isSettings: screen === 'settings',
+      isOverview: !this.isEmpty() && screen === 'overview', isSubs: !this.isEmpty() && (screen === 'subscriptions' || screen === 'people'), isDetail: screen === 'detail', isUsage: !this.isEmpty() && screen === 'usage', isRenewals: !this.isEmpty() && screen === 'renewals',
+      ...(() => {
+        const e = { overview:['layout-dashboard','No spend to show yet','Add your first subscription to see monthly spend, renewals and who uses what.','Add subscription'],
+          subscriptions:['credit-card','No subscriptions yet','Add the AI tools your team pays for. Claude Code and Codex sign in through the browser.','Add subscription'],
+          people:['users','No one here yet','Add the people on your team to give them seats and see who uses what.','Add person'],
+          usage:['activity','No usage yet','Usage and tokens appear after the first session on a tracked account.','Add subscription'],
+          tokenmaxx:['flame','Nothing to rotate yet','Add two or more plan accounts and Tokenmaxx tells you which one to use next.','Add subscription'],
+          renewals:['calendar','No renewals coming up','Renewal dates show here once you add a subscription.','Add subscription'] }[screen];
+        const on = this.isEmpty() && !!e;
+        return { showEmpty: on, emptyIcon: on ? e[0] : 'plus', emptyTitle: on ? e[1] : '', emptyText: on ? e[2] : '', emptyCta: on ? e[3] : '',
+          emptyAction: () => screen === 'people' ? this.setState({ modal: { mode:'add', name:'', role:'', email:'', tools:{}, original:{} } }) : this.setState({ subModal: { step:'pick', name:'', vendor:'', cat:'Chat assistants', bill:'seat', price:'', day:'', trialEnd:'', budget:'', people:{} } }) };
+      })(), isBudgets: screen === 'budgets', isSettings: screen === 'settings',
       fmtMoney: v => this.money(v), fmtMoney2: v => this.money(v),
       kpis: [
         { label:'Monthly spend', value:this.money(total), sub:'▲ ' + ((total / hist[hist.length - 1] - 1) * 100).toFixed(2) + '% vs October', subColor:'var(--text-muted)' },

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/dashboard-design-system-d616c894-4068-4659-b95f-873191821f97/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/dashboard-design-system-d616c894-4068-4659-b95f-873191821f97/tokens/colors.css">
+<link rel="stylesheet" href="_ds/dashboard-design-system-d616c894-4068-4659-b95f-873191821f97/tokens/typography.css">
+<link rel="stylesheet" href="_ds/dashboard-design-system-d616c894-4068-4659-b95f-873191821f97/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/dashboard-design-system-d616c894-4068-4659-b95f-873191821f97/tokens/effects.css">
+<link rel="stylesheet" href="_ds/dashboard-design-system-d616c894-4068-4659-b95f-873191821f97/tokens/accent-green.css">
+<link rel="stylesheet" href="_ds/dashboard-design-system-d616c894-4068-4659-b95f-873191821f97/components/components.css">
+<link rel="stylesheet" href="_ds/dashboard-design-system-d616c894-4068-4659-b95f-873191821f97/styles.css">
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script src="_ds/dashboard-design-system-d616c894-4068-4659-b95f-873191821f97/_ds_bundle.js"></script>
+<style>html,body{margin:0;background:#171717}a{color:var(--text);text-decoration:none}a:hover{color:var(--text-secondary)}</style>
+</helmet>
+<div data-theme="{{ theme }}" style="min-height:100vh;background:var(--bg-app);color:var(--text);font-family:var(--font-sans)">
+  <header style="position:sticky;top:0;z-index:10;background:var(--bg-app);border-bottom:1px solid var(--divider)">
+    <div class="ds-container" style="display:flex;align-items:center;justify-content:space-between;gap:24px;height:72px">
+      <a href="#top" style="font:700 20px/1 var(--font-sans);letter-spacing:var(--tracking-tight)">Subtrack</a>
+      <nav style="display:flex;align-items:center;gap:32px;font:var(--type-label);color:var(--text-muted)">
+        <a href="#features" style="color:var(--text-muted)">Features</a>
+        <a href="#how" style="color:var(--text-muted)">How it works</a>
+        <a href="#pricing" style="color:var(--text-muted)">Pricing</a>
+      </nav>
+      <div style="display:flex;align-items:center;gap:8px">
+        <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="ghost" size="sm" hint-size="72px,36px">Sign in</x-import>
+        <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="primary" size="sm" hint-size="110px,36px">Start free</x-import>
+      </div>
+    </div>
+  </header>
+
+  <section id="top" class="ds-container" style="padding-top:96px;padding-bottom:64px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:24px">
+    <h1 style="margin:0;max-width:860px;font:600 clamp(40px,6vw,72px)/1.04 var(--font-sans);letter-spacing:-0.035em;text-wrap:balance">Every AI tool your team pays for, in one place</h1>
+    <p style="margin:0;max-width:560px;font:500 18px/28px var(--font-sans);color:var(--text-muted);text-wrap:pretty">Subtrack tracks seats, spend and usage limits across ChatGPT, Claude, Cursor and the rest, and tells you what to cut.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding-top:8px">
+      <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="primary" size="lg" hint-size="160px,48px">Start free</x-import>
+      <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="secondary" size="lg" icon="play" hint-size="160px,48px">See a demo</x-import>
+    </div>
+    <span style="font:var(--type-label);color:var(--text-subtle)">Free for up to 10 tools. No card needed.</span>
+  </section>
+
+  <section class="ds-container" style="padding-bottom:120px">
+    <div style="border-radius:24px;outline:1px solid var(--outline-card);background:var(--bg-frame);padding:clamp(12px,2vw,24px)">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px">
+        <div class="ds-card" style="padding:24px;min-width:0;display:flex;flex-direction:column;gap:24px">
+          <x-import component-from-global-scope="DashboardDesignSystem_d616c8.AreaChart" title="Monthly spend" data="{{ spend }}" labels="{{ spendLabels }}" format-value="{{ fmtMoney }}" rest-label="Past year" hint-size="100%,300px"></x-import>
+          <div style="border-top:1px solid var(--divider);padding-top:20px">
+            <x-import component-from-global-scope="DashboardDesignSystem_d616c8.StatGrid" items="{{ stats }}" columns="{{ 3 }}" hint-size="100%,56px"></x-import>
+          </div>
+        </div>
+        <div class="ds-card" style="min-width:0;overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;height:56px;padding:0 24px">
+            <span style="font:var(--type-body-strong);letter-spacing:var(--tracking-tight)">Needs attention</span>
+            <span style="font:var(--type-label);color:var(--positive)">$1,284/mo to save</span>
+          </div>
+          <sc-for list="{{ attention }}" as="a" hint-placeholder-count="5">
+            <div class="ds-row ds-row--card" style="padding:16px 24px;border-top:1px solid var(--divider)">
+              <x-import component-from-global-scope="DashboardDesignSystem_d616c8.Avatar" kind="entity" initials="{{ a.initials }}" color="{{ a.color }}" size="{{ 32 }}" hint-size="32px,32px"></x-import>
+              <div class="ds-row__txt">
+                <span class="ds-t-strong" style="font:var(--type-label-strong)">{{ a.title }}</span>
+                <span class="ds-t-sub">{{ a.sub }}</span>
+              </div>
+              <div class="ds-row__end">
+                <span class="ds-t-money" style="font:500 14px/20px var(--font-sans)">{{ a.amount }}</span>
+                <span class="ds-t-sub">{{ a.amountSub }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="ds-container" style="padding-bottom:120px;display:flex;flex-direction:column;gap:48px">
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:640px">
+      <span style="font:var(--type-eyebrow);letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-subtle)">Features</span>
+      <h2 style="margin:0;font:600 clamp(32px,4vw,44px)/1.1 var(--font-sans);letter-spacing:-0.03em;text-wrap:balance">Know what you pay for, who uses it, and what to drop</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:16px">
+      <sc-for list="{{ features }}" as="f" hint-placeholder-count="4">
+        <div class="ds-card" style="padding:28px;display:flex;flex-direction:column;gap:20px">
+          <span class="ds-disc" style="width:44px;height:44px"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="{{ f.icon }}" size="{{ 20 }}" hint-size="20px,20px"></x-import></span>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="font:var(--type-body-strong);letter-spacing:var(--tracking-tight)">{{ f.title }}</span>
+            <span style="font:var(--type-label);color:var(--text-muted);text-wrap:pretty">{{ f.text }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="how" class="ds-container" style="padding-bottom:120px;display:flex;flex-direction:column;gap:48px">
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:640px">
+      <span style="font:var(--type-eyebrow);letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-subtle)">How it works</span>
+      <h2 style="margin:0;font:600 clamp(32px,4vw,44px)/1.1 var(--font-sans);letter-spacing:-0.03em">Set up in an afternoon</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));border-top:1px solid var(--divider)">
+      <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
+        <div style="padding:28px 32px 0 0;display:flex;flex-direction:column;gap:12px">
+          <span style="font:600 14px/20px var(--font-sans);color:var(--accent)">{{ s.n }}</span>
+          <span style="font:600 20px/28px var(--font-sans);letter-spacing:var(--tracking-tight)">{{ s.title }}</span>
+          <span style="font:var(--type-label);color:var(--text-muted);text-wrap:pretty;max-width:340px">{{ s.text }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="pricing" class="ds-container" style="padding-bottom:120px;display:flex;flex-direction:column;gap:48px">
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:640px">
+      <span style="font:var(--type-eyebrow);letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-subtle)">Pricing</span>
+      <h2 style="margin:0;font:600 clamp(32px,4vw,44px)/1.1 var(--font-sans);letter-spacing:-0.03em">Pays for itself with the first seat you cancel</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px">
+      <div class="ds-card" style="padding:32px;display:flex;flex-direction:column;gap:24px">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <span style="font:var(--type-body-strong)">Free</span>
+          <div style="display:flex;align-items:baseline;gap:6px"><span style="font:600 44px/1 var(--font-sans);letter-spacing:-0.04em">$0</span><span style="font:var(--type-label);color:var(--text-muted)">forever</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ freeItems }}" as="i" hint-placeholder-count="3">
+            <div style="display:flex;gap:10px;align-items:center;font:var(--type-label)"><span style="display:flex;color:var(--accent)"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="check" size="{{ 16 }}" hint-size="16px,16px"></x-import></span>{{ i }}</div>
+          </sc-for>
+        </div>
+        <div style="margin-top:auto"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="secondary" size="lg" block="{{ true }}" hint-size="100%,48px">Start free</x-import></div>
+      </div>
+      <div class="ds-card" style="padding:32px;display:flex;flex-direction:column;gap:24px;outline:2px solid var(--brand);outline-offset:-2px">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:var(--type-body-strong)">Team</span><span style="display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;background:var(--fill);color:var(--positive);font:var(--type-badge)">14-day trial</span></div>
+          <div style="display:flex;align-items:baseline;gap:6px"><span style="font:600 44px/1 var(--font-sans);letter-spacing:-0.04em">$3</span><span style="font:var(--type-label);color:var(--text-muted)">per team / month</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ teamItems }}" as="i" hint-placeholder-count="4">
+            <div style="display:flex;gap:10px;align-items:center;font:var(--type-label)"><span style="display:flex;color:var(--accent)"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="check" size="{{ 16 }}" hint-size="16px,16px"></x-import></span>{{ i }}</div>
+          </sc-for>
+        </div>
+        <div style="margin-top:auto"><x-import component-from-global-scope="DashboardDesignSystem_d616c8.Button" variant="primary" size="lg" block="{{ true }}" hint-size="100%,48px">Start trial</x-import></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-container" style="padding-bottom:96px">
+    <div style="border-radius:24px;background:var(--brand);color:var(--on-brand);padding:clamp(40px,6vw,72px);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:32px">
+      <div style="display:flex;flex-direction:column;gap:10px;max-width:560px">
+        <h2 style="margin:0;font:600 clamp(28px,3.5vw,40px)/1.1 var(--font-sans);letter-spacing:-0.03em;text-wrap:balance">See your AI spend in ten minutes</h2>
+        <span style="font:500 16px/24px var(--font-sans);opacity:.85">Connect billing, invite your team and get your first savings report today.</span>
+      </div>
+      <a href="#top" style="display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 24px;border-radius:12px;background:#fff;color:#171717;font:600 15px/1 var(--font-sans);letter-spacing:var(--tracking-tight)">Start free<x-import component-from-global-scope="DashboardDesignSystem_d616c8.Icon" name="arrow-right" size="{{ 16 }}" hint-size="16px,16px"></x-import></a>
+    </div>
+  </section>
+
+  <footer style="border-top:1px solid var(--divider)">
+    <div class="ds-container" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding-top:28px;padding-bottom:28px;font:var(--type-label);color:var(--text-subtle)">
+      <span style="font:700 16px/1 var(--font-sans);color:var(--text)">Subtrack</span>
+      <div style="display:flex;gap:24px"><a href="#" style="color:var(--text-subtle)">Privacy</a><a href="#" style="color:var(--text-subtle)">Terms</a><a href="#" style="color:var(--text-subtle)">Contact</a></div>
+      <span>© 2026 Subtrack</span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const spend = [1520,1575,1630,1710,1770,1850,1940,2020,2090,2180,2290,2412];
+    return {
+      theme: this.props.theme ?? 'dark',
+      spend,
+      spendLabels: spend.map((_, i) => new Date(2025, 11 + i, 1).toLocaleDateString('en-US', { month:'short', year:'numeric' })),
+      fmtMoney: v => '$' + Math.round(v).toLocaleString('en-US'),
+      stats: [
+        { label:'Annual run rate', value:'$28,944' },
+        { label:'Subscriptions', value:'14 tools' },
+        { label:'Seats', value:'86' }
+      ],
+      attention: [
+        { initials:'CG', color:'#10A37F', title:'ChatGPT Team', sub:'6 seats unused for 30 days', amount:'$180', amountSub:'/mo' },
+        { initials:'CU', color:'#262626', title:'Cursor Business', sub:'Overlaps with Copilot for 9 people', amount:'$360', amountSub:'/mo' },
+        { initials:'MJ', color:'#5B5BD6', title:'Midjourney', sub:'Renews in 4 days', amount:'$120', amountSub:'/mo' },
+        { initials:'CL', color:'#D97757', title:'Claude Max', sub:'Account 2 at 92% of weekly limit', amount:'$200', amountSub:'/mo' },
+        { initials:'PX', color:'#1F8A8A', title:'Perplexity Pro', sub:'Paid on a personal card', amount:'$20', amountSub:'/mo' }
+      ],
+      features: [
+        { icon:'wallet', title:'One bill view', text:'Pull every AI subscription from your cards and invoices into one monthly number.' },
+        { icon:'users', title:'Seat tracking', text:'See who has which tool, who stopped using it, and where seats overlap.' },
+        { icon:'gauge', title:'Usage limits', text:'Watch weekly limits across shared accounts and know which one to use next.' },
+        { icon:'bell', title:'Renewal alerts', text:'Get a heads-up before annual plans renew or a free trial starts charging.' }
+      ],
+      steps: [
+        { n:'01', title:'Connect billing', text:'Link a company card or forward invoices. Subtrack finds the AI tools.' },
+        { n:'02', title:'Invite your team', text:'Assign seats to people so unused and duplicate seats show up.' },
+        { n:'03', title:'Cut what you don’t use', text:'Act on the savings list each month, with the cancel link right there.' }
+      ],
+      freeItems: ['Up to 10 tools', 'Spend and renewal tracking', 'One workspace'],
+      teamItems: ['Unlimited tools and seats', 'Seat usage and overlap detection', 'Shared account limit balancing', 'Slack and email alerts']
+    };
+  }
+}
+</script>
+</body>
+</html>
