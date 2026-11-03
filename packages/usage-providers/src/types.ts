@@ -12,10 +12,10 @@ export interface ProviderEnv {
   env: Record<string, string | undefined>;
   now(): Date;
   fetch: typeof fetch;
-  /** Honest, e.g. `subtrack-desktop/0.1.0`. Never impersonate claude-code or Codex. */
+  /** Honest, e.g. `resetowl-desktop/0.1.0`. Never impersonate claude-code or Codex. */
   userAgent: string;
   /**
-   * Where Subtrack keeps isolated homes for extra accounts:
+   * Where ResetOwl keeps isolated homes for extra accounts:
    * `<managedRoot>/claude-code/<id>`, `<managedRoot>/codex/<id>`.
    */
   managedRoot: string;
@@ -30,7 +30,7 @@ export interface DetectedLogin {
   home: string;
   /** The login a plain terminal uses (`~/.claude`, `$CODEX_HOME` or `~/.codex`). */
   isDefault: boolean;
-  /** Lives under `managedRoot`, i.e. Subtrack signed it in. */
+  /** Lives under `managedRoot`, i.e. ResetOwl signed it in. */
   managed: boolean;
 }
 

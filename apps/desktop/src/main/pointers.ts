@@ -3,7 +3,7 @@ import { dirname, join, resolve } from 'node:path';
 import type { ProviderId } from '@flama/shared/subscriptions';
 
 /**
- * Which login a terminal uses, per provider: `~/.subtrack/active/<provider>`
+ * Which login a terminal uses, per provider: `~/.resetowl/active/<provider>`
  * holds the absolute home of the active login, or nothing at all when the
  * default login is active. The default is never written as a path: setting
  * `CLAUDE_CONFIG_DIR` even to `~/.claude` changes the macOS Keychain item
@@ -18,7 +18,7 @@ export interface PointerLogin {
 }
 
 export function pointerDir(home: string): string {
-  return join(home, '.subtrack', 'active');
+  return join(home, '.resetowl', 'active');
 }
 
 export function pointerPath(home: string, provider: ProviderId): string {

@@ -59,6 +59,9 @@ body {
   height: 72px;
 }
 .site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font: 700 20px/1 var(--ds-font-sans);
   letter-spacing: var(--ds-tracking-tight);
   color: var(--ds-text);
@@ -384,6 +387,9 @@ body {
   max-width: 320px;
 }
 .site-footer__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font: 700 16px/1 var(--ds-font-sans);
   color: var(--ds-text);
 }
@@ -411,6 +417,11 @@ body {
   padding-bottom: 28px;
   border-top: 1px solid var(--ds-divider);
   color: var(--ds-text-subtle);
+}
+
+/* The owl mark keeps its proportions beside the name. */
+.site-owl {
+  flex: none;
 }
 
 /* ---- Chrome additions ---------------------------------------------------- */

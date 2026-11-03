@@ -16,24 +16,24 @@ const base = {
 describe('config', () => {
   it('defaults the API to local unpackaged and to production packaged', () => {
     expect(resolveConfig(base).apiUrl).toBe('http://127.0.0.1:3001');
-    expect(resolveConfig({ ...base, isPackaged: true }).apiUrl).toBe('https://api.subtrack.app');
-    expect(resolveConfig({ ...base, env: { SUBTRACK_API_URL: 'https://x.dev/' } }).apiUrl).toBe(
+    expect(resolveConfig({ ...base, isPackaged: true }).apiUrl).toBe('https://api.resetowl.com');
+    expect(resolveConfig({ ...base, env: { RESETOWL_API_URL: 'https://x.dev/' } }).apiUrl).toBe(
       'https://x.dev',
     );
   });
 
   it('has an honest user agent', () => {
     const ua = resolveConfig(base).userAgent;
-    expect(ua).toBe('subtrack-desktop/0.1.0 (darwin)');
+    expect(ua).toBe('resetowl-desktop/0.1.0 (darwin)');
     expect(ua).not.toMatch(/claude|codex/i);
   });
 
   it('loads a dev server only when asked', () => {
     expect(resolveConfig(base).rendererUrl).toBeNull();
-    expect(resolveConfig(base).rendererOrigin).toBe('app://subtrack');
+    expect(resolveConfig(base).rendererOrigin).toBe('app://resetowl');
     expect(resolveConfig({ ...base, argv: ['--dev'] }).rendererUrl).toBe('http://localhost:3000');
     expect(resolveConfig({ ...base, isPackaged: true, argv: ['--dev'] }).rendererUrl).toBeNull();
-    const env = { SUBTRACK_RENDERER_URL: 'http://localhost:5173' };
+    const env = { RESETOWL_RENDERER_URL: 'http://localhost:5173' };
     expect(resolveConfig({ ...base, env }).rendererOrigin).toBe('http://localhost:5173');
   });
 

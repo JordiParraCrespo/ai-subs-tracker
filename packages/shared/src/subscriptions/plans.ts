@@ -1,5 +1,5 @@
 /**
- * The plans Subtrack recognises, per coding-agent provider.
+ * The plans ResetOwl recognises, per coding-agent provider.
  *
  * Plan names and prices move (Anthropic renamed Max 20x to Ultra on
  * 2026-10-30; OpenAI split Pro into three tiers on 2026-09-29), so this is one

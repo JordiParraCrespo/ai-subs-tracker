@@ -2,7 +2,7 @@
   "seo": {
     "home": {
       "title": "Use up the AI coding plans you pay for",
-      "description": "Tokenaitor shows what every Claude Code and Codex plan on your computer has left, tells you which account to use next, and prices your usage at API rates."
+      "description": "ResetOwl shows what every Claude Code and Codex plan on your computer has left, tells you which account to use next, and prices your usage at API rates."
     },
     "404": {
       "title": "Page not found",
@@ -28,13 +28,13 @@
   },
   "hero": {
     "title": "Use up the AI coding plans you pay for",
-    "lede": "Tokenaitor watches every Claude Code and Codex login on your computer, shows what each plan’s 5-hour and weekly limits have left, and tells you which account to use next.",
+    "lede": "ResetOwl watches every Claude Code and Codex login on your computer, shows what each plan’s 5-hour and weekly limits have left, and tells you which account to use next.",
     "primary": "Download for desktop",
     "secondary": "How it works",
     "note": "Free and open source. macOS, Windows and Linux."
   },
   "preview": {
-    "label": "Example of the Tokenaitor screens",
+    "label": "Example of the ResetOwl screens",
     "chartTitle": "Usage at API prices",
     "chartRest": "Past 12 months",
     "plansCost": "Plans cost",
@@ -81,7 +81,7 @@
     "title": "Set up in a minute",
     "install": {
       "title": "Install the desktop app",
-      "text": "Tokenaitor finds the Claude Code and Codex logins already on your computer."
+      "text": "ResetOwl finds the Claude Code and Codex logins already on your computer."
     },
     "accounts": {
       "title": "Add your other accounts",
@@ -95,7 +95,7 @@
   "privacy": {
     "eyebrow": "Privacy",
     "title": "Your logins never leave your computer",
-    "lede": "Tokenaitor never refreshes a provider’s token, talks to each provider as itself (subtrack-desktop), and never replaces a status line you already have.",
+    "lede": "ResetOwl never refreshes a provider’s token, talks to each provider as itself (resetowl-desktop), and never replaces a status line you already have.",
     "local": {
       "title": "Stays on your computer",
       "badge": "Never sent",
@@ -104,7 +104,7 @@
       "settings": "Your shell and Claude settings, unless you opt in"
     },
     "api": {
-      "title": "Reaches Tokenaitor",
+      "title": "Reaches ResetOwl",
       "identity": "Account emails and plan names",
       "limits": "Limit percentages and reset times",
       "tokens": "Token counts per model and day"
@@ -112,8 +112,8 @@
   },
   "cta": {
     "title": "Stop leaving paid limits on the table",
-    "lede": "Install Tokenaitor and see which of your accounts to use next in under a minute.",
-    "button": "Download Tokenaitor"
+    "lede": "Install ResetOwl and see which of your accounts to use next in under a minute.",
+    "button": "Download ResetOwl"
   },
   "footer": {
     "label": "Footer",

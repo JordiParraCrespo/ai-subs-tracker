@@ -2,8 +2,8 @@ import type { DesktopBridge } from '@flama/shared/desktop';
 
 declare global {
   interface Window {
-    /** Exposed by the Subtrack desktop app's preload script; absent in a browser. */
-    subtrack?: DesktopBridge;
+    /** Exposed by the ResetOwl desktop app's preload script; absent in a browser. */
+    resetowl?: DesktopBridge;
   }
 }
 
@@ -13,4 +13,4 @@ declare global {
  * this machine, switching the terminal's account) is simply not offered.
  */
 export const desktopBridge: DesktopBridge | undefined =
-  typeof window === 'undefined' ? undefined : window.subtrack;
+  typeof window === 'undefined' ? undefined : window.resetowl;

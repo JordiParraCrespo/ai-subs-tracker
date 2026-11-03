@@ -152,7 +152,7 @@ describe('collector', () => {
       }
     }
     expect(delays).toEqual([60_000, 120_000, 240_000, 480_000, 900_000, 900_000]);
-    expect(status.lastError).toContain('Could not reach the Subtrack API');
+    expect(status.lastError).toContain('Could not reach the ResetOwl API');
     h.timers.at(-1)?.fn();
     expect((await h.collector.refresh()).phase).toBe('idle');
     expect(h.timers.at(-1)?.ms).toBe(SYNC_INTERVAL_MS);

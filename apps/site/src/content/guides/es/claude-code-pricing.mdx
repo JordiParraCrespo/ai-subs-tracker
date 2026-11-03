@@ -14,7 +14,7 @@ faq:
   - q: ¿Qué ha pasado con Max 20x?
     a: Anthropic cambió el nombre de Max 20x a Ultra el 30 de octubre de 2026. Mantiene el precio de 200 $ y, en las cuentas verificadas, no tiene límite de 5 horas, solo semanal.
   - q: ¿Un plan de Claude sale más barato que la API?
-    a: Depende de cuánto lo uses. Valora tu uso real con las tarifas de la API de abajo y compáralo con el precio mensual del plan; Tokenaitor lo hace por ti a partir de las transcripciones de la CLI.
+    a: Depende de cuánto lo uses. Valora tu uso real con las tarifas de la API de abajo y compáralo con el precio mensual del plan; ResetOwl lo hace por ti a partir de las transcripciones de la CLI.
   - q: ¿Estos precios son mensuales?
     a: Sí, el precio mensual en dólares estadounidenses. Los precios Team son por usuario. No incluyen impuestos ni facturación anual.
 ---
@@ -28,7 +28,7 @@ Claude Code está incluido en los planes de pago de Claude de Anthropic. Estos s
 
 <PlanTable provider="claude-code" />
 
-**Max 20x ahora se llama Ultra.** Anthropic le cambió el nombre el 30 de octubre de 2026 y el precio se quedó en 200 $. Si una cuenta antigua aún informa del nombre anterior, Tokenaitor la muestra como Ultra.
+**Max 20x ahora se llama Ultra.** Anthropic le cambió el nombre el 30 de octubre de 2026 y el precio se quedó en 200 $. Si una cuenta antigua aún informa del nombre anterior, ResetOwl la muestra como Ultra.
 
 ## Qué límites mide cada plan
 
@@ -36,14 +36,14 @@ La mayoría de los planes miden dos límites: uno de **5 horas** y otro **semana
 
 ## Lo que costaría el mismo uso en la API
 
-La forma justa de juzgar un plan es valorar los tokens que usas de verdad a las tarifas de la API. Estos son los precios de pago por uso de Anthropic en dólares por millón de tokens, la misma tabla con la que Tokenaitor valora tu uso:
+La forma justa de juzgar un plan es valorar los tokens que usas de verdad a las tarifas de la API. Estos son los precios de pago por uso de Anthropic en dólares por millón de tokens, la misma tabla con la que ResetOwl valora tu uso:
 
 <ApiPriceTable vendor="anthropic" />
 
 La escritura en caché cuesta 1,25 veces el precio de entrada. Una sesión de programación con agentes vuelve a leer su contexto muchas veces, así que la lectura de caché suele ser el mayor número de tokens del día.
 
 <Callout>
-  Tokenaitor cuenta los tokens en las propias transcripciones de Claude Code, por modelo y por día, y muestra lo que habría costado ese uso en la API junto a lo que te cuesta cada plan.
+  ResetOwl cuenta los tokens en las propias transcripciones de Claude Code, por modelo y por día, y muestra lo que habría costado ese uso en la API junto a lo que te cuesta cada plan.
 </Callout>
 
 ## Cómo elegir plan

@@ -1,7 +1,7 @@
 # @flama/usage-providers — Agent Instructions
 
 Reads coding-agent logins on the local machine into `SyncAccount`
-(`@flama/shared/schemas/accounts`). Used by the Subtrack desktop app. Pure
+(`@flama/shared/schemas/accounts`). Used by the ResetOwl desktop app. Pure
 Node: no Electron, no React, nothing from `apps/*`.
 
 > Read the root [`CLAUDE.md`](../../CLAUDE.md). The contract it produces and the
@@ -31,7 +31,7 @@ src/
 - **Credentials go only to the provider that issued them**: the Claude token to
   `api.anthropic.com`, the Codex token to `chatgpt.com`. Never into a
   `SyncAccount`, a log line or an error message.
-- **Honest User-Agent**: `env.userAgent` (e.g. `subtrack-desktop/0.1.0`). Never
+- **Honest User-Agent**: `env.userAgent` (e.g. `resetowl-desktop/0.1.0`). Never
   impersonate Claude Code or Codex, and send none of their client headers
   (`originator`, `OpenAI-Beta`, …).
 - **`read` never throws** for a provider failure: map it to the snapshot

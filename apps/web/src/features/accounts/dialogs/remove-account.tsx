@@ -3,7 +3,7 @@ import { useArchiveAccount } from '@flama/frontend-consumer/react';
 import { ConfirmDialog } from '@flama/frontend-web';
 import { useTranslation } from 'react-i18next';
 
-/** Asks before Subtrack stops tracking an account, and owns the removal. */
+/** Asks before ResetOwl stops tracking an account, and owns the removal. */
 export function RemoveAccountDialog({
   account,
   onClose,

@@ -38,7 +38,7 @@ const OTHER_READERS: { pattern: RegExp; reader: string; directory: string }[] = 
   // flama:end site
   { pattern: /^VITE_/, reader: 'the web app', directory: 'apps/web' },
   { pattern: /^EXPO_PUBLIC_/, reader: 'the mobile app', directory: 'apps/mobile' },
-  { pattern: /^SUBTRACK_/, reader: 'the desktop app', directory: 'apps/desktop' },
+  { pattern: /^RESETOWL_/, reader: 'the desktop app', directory: 'apps/desktop' },
 ];
 
 const SKIP_DIRECTORIES = new Set(['node_modules', 'dist', '__tests__', '.turbo']);

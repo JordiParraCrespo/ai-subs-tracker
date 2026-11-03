@@ -20,8 +20,8 @@ describe('shell snippet', () => {
     expect(snippet.startsWith(BEGIN_MARKER)).toBe(true);
     expect(snippet.endsWith(END_MARKER)).toBe(true);
     expect(snippet).toContain(`'${pointerPath('/Users/maya', 'claude-code')}'`);
-    expect(snippet).toContain('CLAUDE_CONFIG_DIR="$_subtrack_home" command claude "$@"');
-    expect(snippet).toContain('CODEX_HOME="$_subtrack_home" command codex "$@"');
+    expect(snippet).toContain('CLAUDE_CONFIG_DIR="$_resetowl_home" command claude "$@"');
+    expect(snippet).toContain('CODEX_HOME="$_resetowl_home" command codex "$@"');
     expect(snippet).toContain('    command claude "$@"');
   });
 
@@ -73,7 +73,7 @@ describe('rc install', () => {
     const first = await installShellIntegration(env);
     expect(first).toMatchObject({ rcFile: rc, installed: true });
     const once = await readFile(rc, 'utf8');
-    expect(once.startsWith('export FOO=1\nalias ll="ls -l"\n\n# >>> subtrack >>>')).toBe(true);
+    expect(once.startsWith('export FOO=1\nalias ll="ls -l"\n\n# >>> resetowl >>>')).toBe(true);
 
     await installShellIntegration(env);
     expect(await readFile(rc, 'utf8')).toBe(once);

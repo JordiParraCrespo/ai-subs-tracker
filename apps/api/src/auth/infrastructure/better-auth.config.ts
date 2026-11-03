@@ -2,7 +2,7 @@ import '@flama/env/load';
 import { randomUUID } from 'node:crypto';
 // flama:plugins auth-imports
 import { userAdditionalFields } from '@flama/auth';
-import { DESKTOP_RENDERER_ORIGIN } from '@flama/shared/desktop';
+import { DESKTOP_RENDERER_ORIGIN, LEGACY_DESKTOP_RENDERER_ORIGIN } from '@flama/shared/desktop';
 import { Logger } from '@nestjs/common';
 import { betterAuth } from 'better-auth';
 import { admin, bearer, twoFactor } from 'better-auth/plugins';
@@ -82,6 +82,8 @@ export const auth = betterAuth({
     frontendUrl,
     // The desktop app signs in from its own scheme, with a bearer token.
     DESKTOP_RENDERER_ORIGIN,
+    // …and the one builds from before the rename to ResetOwl used.
+    LEGACY_DESKTOP_RENDERER_ORIGIN,
     // flama:plugins trusted-origins
   ],
   // Brute-force protection on the auth surface. `/api/auth/*` is mounted on the

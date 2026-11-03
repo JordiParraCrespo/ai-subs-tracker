@@ -86,7 +86,7 @@ export function registerIpc(
         !opts.isAppWebContents(event.sender.id) ||
         !isTrustedSender(event.senderFrame?.url, opts.rendererOrigin)
       ) {
-        throw new Error('Refused: not the Subtrack renderer.');
+        throw new Error('Refused: not the ResetOwl renderer.');
       }
       return handler(...args);
     });

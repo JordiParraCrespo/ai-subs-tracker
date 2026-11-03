@@ -68,10 +68,10 @@ describe('nodeProviderEnv', () => {
   it('only reads the Keychain on macOS', async () => {
     const env = nodeProviderEnv({
       managedRoot: '/tmp/m',
-      userAgent: 'subtrack-desktop/test',
+      userAgent: 'resetowl-desktop/test',
       platform: 'linux',
     });
     expect(await env.readKeychain('Claude Code-credentials')).toBeNull();
-    expect(env.userAgent).toBe('subtrack-desktop/test');
+    expect(env.userAgent).toBe('resetowl-desktop/test');
   });
 });

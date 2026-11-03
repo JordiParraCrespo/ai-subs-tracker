@@ -16,7 +16,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const DIST = join(import.meta.dirname, '..', 'dist');
-const ORIGIN = 'https://tokenaitor.com';
+const ORIGIN = 'https://resetowl.com';
 const errors = [];
 const fail = (page, message) => errors.push(`${page}: ${message}`);
 

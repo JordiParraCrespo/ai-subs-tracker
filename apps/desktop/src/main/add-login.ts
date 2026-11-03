@@ -9,7 +9,7 @@ import type { LoginCommand } from '@flama/usage-providers';
  * "Add account": signs a new login into a folder of its own by running the
  * provider's CLI login (`claude auth login`, `codex login --device-auth`) with
  * `CLAUDE_CONFIG_DIR` / `CODEX_HOME` pointed there. The CLI does the OAuth and
- * opens the browser itself; Subtrack reads what it prints (Claude's manual
+ * opens the browser itself; ResetOwl reads what it prints (Claude's manual
  * sign-in link, Codex's page and one-time code) so the screens can offer them,
  * types a code the person pastes into the CLI's own prompt, and waits for it
  * to exit. The credentials it writes stay in that folder and are never read
@@ -18,7 +18,7 @@ import type { LoginCommand } from '@flama/usage-providers';
 
 /** Codex's one-time code lasts 15 minutes; Claude's sign-in gets the same. */
 export const LOGIN_TIMEOUT_MS = 15 * 60_000;
-const PATH_MARKER = '__SUBTRACK_PATH__';
+const PATH_MARKER = '__RESETOWL_PATH__';
 
 /** Drops terminal escapes (colours, OSC 8 hyperlinks) from CLI output. */
 export function stripTerminal(text: string): string {

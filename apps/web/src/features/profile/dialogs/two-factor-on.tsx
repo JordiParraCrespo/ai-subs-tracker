@@ -128,7 +128,7 @@ export function TwoFactorOnStep({ onBack }: { onBack: () => void }) {
           <DsButton
             size="xs"
             icon={<Download className="size-4" />}
-            onClick={() => downloadText('subtrack-backup-codes.txt', codes.join('\n'))}
+            onClick={() => downloadText('resetowl-backup-codes.txt', codes.join('\n'))}
           >
             {t('settings.twoFactorSetup.download')}
           </DsButton>

@@ -7,7 +7,7 @@ export const NOW = new Date('2026-11-02T12:00:00Z');
 export const SINCE = '2026-10-01';
 
 export async function tempHome(): Promise<string> {
-  return mkdtemp(join(tmpdir(), 'subtrack-providers-'));
+  return mkdtemp(join(tmpdir(), 'resetowl-providers-'));
 }
 
 export async function writeText(path: string, text: string, mtime?: Date): Promise<void> {
@@ -52,7 +52,7 @@ export function testEnv(home: string, overrides: Partial<ProviderEnv> = {}): Pro
     env: {},
     now: () => NOW,
     fetch: failingFetch('network disabled in tests'),
-    userAgent: 'subtrack-desktop/test',
+    userAgent: 'resetowl-desktop/test',
     managedRoot: join(home, 'managed'),
     readKeychain: async () => null,
     ...overrides,

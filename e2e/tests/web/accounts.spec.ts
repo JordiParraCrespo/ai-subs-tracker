@@ -3,7 +3,7 @@ import { syncTwoAccounts } from '../../support/accounts';
 import { provisionedUser, reloadFromServer, signInAs } from '../../support/web';
 
 /**
- * The Subtrack screens over what a desktop collector synced. Every check reads
+ * The ResetOwl screens over what a desktop collector synced. Every check reads
  * back from the API: the data arrives through `POST /accounts/sync`, the same
  * route the desktop app uses.
  */

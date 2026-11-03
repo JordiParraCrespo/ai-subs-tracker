@@ -1,11 +1,12 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import type { ShellIntegration } from '@flama/shared/desktop';
+import { LEGACY_BEGIN_MARKER, LEGACY_END_MARKER } from './legacy';
 import { pointerPath } from './pointers';
 
 /**
  * Makes `claude` and `codex` in a terminal follow the account marked active
- * in Subtrack: two shell functions that read the pointer file and, when it
+ * in ResetOwl: two shell functions that read the pointer file and, when it
  * names a home, run the CLI with `CLAUDE_CONFIG_DIR` / `CODEX_HOME` set for
  * that one command. An empty pointer runs the plain CLI (the default login).
  *
@@ -14,8 +15,8 @@ import { pointerPath } from './pointers';
  * delete.
  */
 
-export const BEGIN_MARKER = '# >>> subtrack >>>';
-export const END_MARKER = '# <<< subtrack <<<';
+export const BEGIN_MARKER = '# >>> resetowl >>>';
+export const END_MARKER = '# <<< resetowl <<<';
 
 /** Single-quotes a path for sh. */
 function shQuote(value: string): string {
@@ -32,20 +33,20 @@ export function posixSnippet(home: string): string {
   const codex = shQuote(pointerPath(home, 'codex'));
   return [
     BEGIN_MARKER,
-    '# Added by Subtrack: `claude` and `codex` use the account marked active in the app.',
+    '# Added by ResetOwl: `claude` and `codex` use the account marked active in the app.',
     '# Remove this block to undo it.',
     'function claude {',
-    `  local _subtrack_home; _subtrack_home="$(cat ${claude} 2>/dev/null)"`,
-    '  if [ -n "$_subtrack_home" ]; then',
-    '    CLAUDE_CONFIG_DIR="$_subtrack_home" command claude "$@"',
+    `  local _resetowl_home; _resetowl_home="$(cat ${claude} 2>/dev/null)"`,
+    '  if [ -n "$_resetowl_home" ]; then',
+    '    CLAUDE_CONFIG_DIR="$_resetowl_home" command claude "$@"',
     '  else',
     '    command claude "$@"',
     '  fi',
     '}',
     'function codex {',
-    `  local _subtrack_home; _subtrack_home="$(cat ${codex} 2>/dev/null)"`,
-    '  if [ -n "$_subtrack_home" ]; then',
-    '    CODEX_HOME="$_subtrack_home" command codex "$@"',
+    `  local _resetowl_home; _resetowl_home="$(cat ${codex} 2>/dev/null)"`,
+    '  if [ -n "$_resetowl_home" ]; then',
+    '    CODEX_HOME="$_resetowl_home" command codex "$@"',
     '  else',
     '    command codex "$@"',
     '  fi',
@@ -69,7 +70,7 @@ export function powershellSnippet(home: string): string {
     ].join('\n');
   return [
     BEGIN_MARKER,
-    '# Added by Subtrack: `claude` and `codex` use the account marked active in the app.',
+    '# Added by ResetOwl: `claude` and `codex` use the account marked active in the app.',
     fn('claude', pointerPath(home, 'claude-code'), 'CLAUDE_CONFIG_DIR'),
     fn('codex', pointerPath(home, 'codex'), 'CODEX_HOME'),
     END_MARKER,
@@ -90,13 +91,26 @@ export function rcFileFor(
   return null;
 }
 
-/** `content` with the Subtrack block replaced by `snippet`, or appended when absent. */
-export function upsertBlock(content: string, snippet: string): string {
-  const start = content.indexOf(BEGIN_MARKER);
-  const end = start === -1 ? -1 : content.indexOf(END_MARKER, start);
-  if (start !== -1 && end !== -1) {
-    return content.slice(0, start) + snippet + content.slice(end + END_MARKER.length);
+/** Where our block sits: the current markers, or the ones a Subtrack install wrote. */
+function findBlock(content: string): { start: number; end: number } | null {
+  for (const [begin, end] of [
+    [BEGIN_MARKER, END_MARKER],
+    [LEGACY_BEGIN_MARKER, LEGACY_END_MARKER],
+  ] as const) {
+    const start = content.indexOf(begin);
+    const stop = start === -1 ? -1 : content.indexOf(end, start);
+    if (start !== -1 && stop !== -1) return { start, end: stop + end.length };
   }
+  return null;
+}
+
+/**
+ * `content` with the ResetOwl block replaced by `snippet` (a block an install
+ * named Subtrack wrote counts as ours), or appended when absent.
+ */
+export function upsertBlock(content: string, snippet: string): string {
+  const block = findBlock(content);
+  if (block) return content.slice(0, block.start) + snippet + content.slice(block.end);
   if (content.length === 0) return `${snippet}\n`;
   const sep = content.endsWith('\n') ? '\n' : '\n\n';
   return `${content}${sep}${snippet}\n`;
@@ -120,8 +134,23 @@ async function readText(path: string): Promise<string> {
 export async function shellIntegration(env: ShellEnv): Promise<ShellIntegration> {
   const rcFile = rcFileFor(env.home, env.shell, env.platform, env.zdotdir);
   const snippet = env.platform === 'win32' ? powershellSnippet(env.home) : posixSnippet(env.home);
-  const installed = rcFile ? (await readText(rcFile)).includes(BEGIN_MARKER) : false;
+  const installed = rcFile ? findBlock(await readText(rcFile)) !== null : false;
   return { snippet, rcFile, installed };
+}
+
+/**
+ * Rewrites a block a Subtrack install left in the rc file into the current
+ * one, so `claude` and `codex` read the moved pointers. Nothing is written
+ * when there is no old block: installing stays the person's choice.
+ */
+export async function migrateShellIntegration(env: ShellEnv): Promise<boolean> {
+  const rcFile = rcFileFor(env.home, env.shell, env.platform, env.zdotdir);
+  if (!rcFile) return false;
+  const before = await readText(rcFile);
+  if (!before.includes(LEGACY_BEGIN_MARKER) || before.includes(BEGIN_MARKER)) return false;
+  const snippet = env.platform === 'win32' ? powershellSnippet(env.home) : posixSnippet(env.home);
+  await writeFile(rcFile, upsertBlock(before, snippet));
+  return true;
 }
 
 /** Writes the block into the rc file; a no-op (installed: false) when there is none. */

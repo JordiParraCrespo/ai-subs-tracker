@@ -16,7 +16,7 @@ export interface TrayModel {
 
 export function trayModel(accounts: readonly SyncedAccount[] | null, now: Date): TrayModel {
   if (!accounts) {
-    return { headline: 'Not synced yet', title: '', tooltip: 'Subtrack' };
+    return { headline: 'Not synced yet', title: '', tooltip: 'ResetOwl' };
   }
   const ranking = rankAccounts(
     accounts.map((a) => ({
@@ -32,13 +32,13 @@ export function trayModel(accounts: readonly SyncedAccount[] | null, now: Date):
     return {
       headline: 'No account has room right now',
       title: '',
-      tooltip: 'Subtrack: no account has room right now',
+      tooltip: 'ResetOwl: no account has room right now',
     };
   }
   const left = Math.round(pick.left);
   return {
     headline: `Use next: ${account.displayName} — ${left}% left`,
     title: `${left}%`,
-    tooltip: `Subtrack: use ${account.displayName} next (${left}% of the week left)`,
+    tooltip: `ResetOwl: use ${account.displayName} next (${left}% of the week left)`,
   };
 }

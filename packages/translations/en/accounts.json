@@ -70,7 +70,7 @@
   },
   "remove": {
     "confirm": "Remove",
-    "description": "Subtrack stops tracking it and ignores it on later syncs. The login itself is not touched.",
+    "description": "ResetOwl stops tracking it and ignores it on later syncs. The login itself is not touched.",
     "title": "Remove {{name}}?"
   },
   "resets": {
@@ -82,9 +82,9 @@
     "left": "{{left}} left"
   },
   "settings": {
-    "browserDescription": "Switching the terminal's account and the live feed act on your computer, so they live in the Subtrack desktop app.",
+    "browserDescription": "Switching the terminal's account and the live feed act on your computer, so they live in the ResetOwl desktop app.",
     "browserTitle": "Open the desktop app",
-    "liveDescription": "Claude Code reports your limits to Subtrack as you work, through its status line. Off by default, and never replaces a status line you already have.",
+    "liveDescription": "Claude Code reports your limits to ResetOwl as you work, through its status line. Off by default, and never replaces a status line you already have.",
     "liveNone": "No Claude Code folders found on this computer.",
     "liveTaken": "This folder already has a status line of its own.",
     "liveTitle": "Live limits from Claude Code",
@@ -95,7 +95,7 @@
     "shellNotInstalled": "Not installed",
     "shellTitle": "Terminal integration",
     "title": "This computer",
-    "description": "How Subtrack works with the coding tools on this machine. Each change is opt-in and can be undone."
+    "description": "How ResetOwl works with the coding tools on this machine. Each change is opt-in and can be undone."
   },
   "table": {
     "account": "Account",
@@ -382,7 +382,7 @@
       "title": "Finish signing in to Claude",
       "description": "We opened claude.com in your browser. Sign in with the account you want to add.",
       "waiting": "Waiting for Claude…",
-      "expires": "Subtrack waits up to 15 minutes",
+      "expires": "ResetOwl waits up to 15 minutes",
       "otherTitle": "Signed in to a different account?",
       "otherText": "Copy the link and open it in a private window, so the account you use now stays signed in.",
       "useCode": "Use a code instead",
@@ -413,7 +413,7 @@
     "desktop": {
       "title": "Add it from the desktop app",
       "description": "Claude Code and Codex sign in on your computer.",
-      "text": "Subtrack’s desktop app runs the sign-in and reads the plan from it, so nothing from your login ever reaches a browser tab. Open the app and choose Add subscription there."
+      "text": "ResetOwl’s desktop app runs the sign-in and reads the plan from it, so nothing from your login ever reaches a browser tab. Open the app and choose Add subscription there."
     },
     "back": "Back",
     "failed": "Sign-in did not finish."

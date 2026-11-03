@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { chmod, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { homedir, hostname } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -16,6 +17,7 @@ import { postSync, type SyncedAccount } from './api-client';
 import { Collector } from './collector';
 import { resolveConfig } from './config';
 import { registerIpc } from './ipc';
+import { APP_NAME, migratePointers, userDataDir } from './legacy';
 import {
   installLiveFeed,
   type LiveFeedServer,
@@ -26,7 +28,12 @@ import {
 } from './live-feed';
 import { buildSyncInput, readLocalAccounts, sinceDayFor } from './local-logins';
 import { pointerTargets, readPointer, writePointer } from './pointers';
-import { installShellIntegration, type ShellEnv, shellIntegration } from './shell-integration';
+import {
+  installShellIntegration,
+  migrateShellIntegration,
+  type ShellEnv,
+  shellIntegration,
+} from './shell-integration';
 import { createTokenStore } from './token-store';
 import { createTray, type TrayController } from './tray';
 import { createMainWindow, registerAppScheme, rendererRoot, serveRenderer } from './window';
@@ -38,10 +45,12 @@ import { createMainWindow, registerAppScheme, rendererRoot, serveRenderer } from
  * `SMOKE_OK <title>`, exit).
  */
 
-const log = (line: string) => console.error(`[subtrack] ${line}`);
+const log = (line: string) => console.error(`[resetowl] ${line}`);
 
-app.setName('Subtrack');
-app.setPath('userData', join(app.getPath('appData'), 'Subtrack'));
+app.setName(APP_NAME);
+// An install from when the app was called Subtrack keeps its folder: the
+// logins it added live there, and moving them would sign them out (legacy.ts).
+app.setPath('userData', userDataDir(app.getPath('appData'), existsSync));
 
 const config = resolveConfig({
   env: process.env,
@@ -111,6 +120,15 @@ async function main(): Promise<void> {
     zdotdir: process.env.ZDOTDIR,
   };
 
+  // Take over what an install named Subtrack left, before anything reads it.
+  try {
+    const moved = await migratePointers(home);
+    if (moved.length) log(`moved the active pointers for ${moved.join(', ')} to ~/.resetowl`);
+    if (await migrateShellIntegration(shellEnv)) log('updated the shell integration block');
+  } catch (err) {
+    log(`migration skipped: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
   const tokens = createTokenStore({
     file: join(userData, 'session.bin'),
     encryptor: safeStorage,
@@ -172,7 +190,7 @@ async function main(): Promise<void> {
   const knownClaudeHome = (candidate: string) => {
     const target = resolve(candidate);
     if (!claudeHomes().some((h) => resolve(h) === target)) {
-      throw new Error('That folder is not a Claude Code login Subtrack found.');
+      throw new Error('That folder is not a Claude Code login ResetOwl found.');
     }
     return target;
   };
@@ -324,7 +342,7 @@ function runSmoke(win: BrowserWindow): void {
   win.webContents.once('did-finish-load', async () => {
     clearTimeout(timer);
     const bridge = await win.webContents
-      .executeJavaScript('typeof window.subtrack === "object" ? window.subtrack.apiUrl : "missing"')
+      .executeJavaScript('typeof window.resetowl === "object" ? window.resetowl.apiUrl : "missing"')
       .catch(() => 'error');
     process.stdout.write(`SMOKE_OK ${win.webContents.getTitle()} (bridge: ${bridge})\n`);
     app.exit(0);

@@ -8,7 +8,7 @@ import type { LiveFeedTarget } from '@flama/shared/desktop';
 /**
  * The live feed (opt-in, reversible): Claude Code runs a status-line command
  * after each turn and hands it a JSON blob that includes `rate_limits`.
- * Subtrack's command is a tiny sh script that posts that blob to a server on
+ * ResetOwl's command is a tiny sh script that posts that blob to a server on
  * 127.0.0.1 (random port, random bearer secret, both baked into the script
  * each launch) and prints an empty line, so the person's status bar shows
  * nothing extra. When the app is not running `curl` fails silently within
@@ -30,10 +30,10 @@ function shQuote(value: string): string {
 export function statuslineScript(port: number, secret: string): string {
   return [
     '#!/bin/sh',
-    '# Subtrack live feed: forwards Claude Code status-line JSON (which carries the',
-    '# rate-limit windows) to the Subtrack app on this machine. Prints an empty line,',
+    '# ResetOwl live feed: forwards Claude Code status-line JSON (which carries the',
+    '# rate-limit windows) to the ResetOwl app on this machine. Prints an empty line,',
     '# so nothing shows in the status bar. Remove `statusLine` from settings.json',
-    '# (or use "Live feed" in Subtrack) to turn it off.',
+    '# (or use "Live feed" in ResetOwl) to turn it off.',
     `curl -s -m 2 -o /dev/null -X POST \\`,
     `  -H ${shQuote(`Authorization: Bearer ${secret}`)} \\`,
     `  -H 'Content-Type: application/json' \\`,
@@ -56,7 +56,7 @@ function isRecord(value: unknown): value is Json {
 /**
  * The status-line command for the script: single-quoted, because Claude Code
  * runs it through a shell and the macOS path has a space in it
- * (`~/Library/Application Support/Subtrack/statusline.sh`).
+ * (`~/Library/Application Support/ResetOwl/statusline.sh`).
  */
 export function statusLineCommand(scriptPath: string): string {
   return `'${scriptPath.replaceAll("'", `'\\''`)}'`;

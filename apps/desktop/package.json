@@ -2,8 +2,8 @@
   "name": "@flama/desktop",
   "version": "0.1.0",
   "private": true,
-  "description": "Subtrack desktop: reads local Claude Code and Codex logins and syncs their usage.",
-  "author": "Subtrack",
+  "description": "ResetOwl desktop: reads local Claude Code and Codex logins and syncs their usage.",
+  "author": "ResetOwl",
   "main": "dist/main.js",
   "scripts": {
     "build": "node scripts/build.mjs",

@@ -6,11 +6,11 @@
 
 export const DEV_RENDERER_URL = 'http://localhost:3000';
 export const LOCAL_API_URL = 'http://127.0.0.1:3001';
-export const PRODUCTION_API_URL = 'https://api.subtrack.app';
+export const PRODUCTION_API_URL = 'https://api.resetowl.com';
 
 /** The origin the packaged screens are served from (`protocol.ts`). */
 export const APP_SCHEME = 'app';
-export const APP_HOST = 'subtrack';
+export const APP_HOST = 'resetowl';
 export const APP_ORIGIN = `${APP_SCHEME}://${APP_HOST}`;
 
 export type RunMode = 'app' | 'collect-once' | 'smoke';
@@ -20,11 +20,11 @@ export interface DesktopConfig {
   platform: NodeJS.Platform;
   /** API origin without a trailing slash. */
   apiUrl: string;
-  /** Honest: names Subtrack, never claude-code or codex. */
+  /** Honest: names ResetOwl, never claude-code or codex. */
   userAgent: string;
   /** A dev server to load instead of the bundled screens, or null. */
   rendererUrl: string | null;
-  /** The origin IPC is accepted from: the dev server's, or `app://subtrack`. */
+  /** The origin IPC is accepted from: the dev server's, or `app://resetowl`. */
   rendererOrigin: string;
   mode: RunMode;
 }
@@ -46,17 +46,17 @@ function cleanUrl(value: string): string {
 }
 
 export function userAgentFor(version: string, platform: string): string {
-  return `subtrack-desktop/${version} (${platform})`;
+  return `resetowl-desktop/${version} (${platform})`;
 }
 
 export function resolveConfig(input: ConfigInput): DesktopConfig {
   const { env, argv, isPackaged, version, platform } = input;
   const apiUrl = cleanUrl(
-    env.SUBTRACK_API_URL?.trim() || (isPackaged ? PRODUCTION_API_URL : LOCAL_API_URL),
+    env.RESETOWL_API_URL?.trim() || (isPackaged ? PRODUCTION_API_URL : LOCAL_API_URL),
   );
 
   let rendererUrl: string | null = null;
-  if (env.SUBTRACK_RENDERER_URL?.trim()) rendererUrl = cleanUrl(env.SUBTRACK_RENDERER_URL.trim());
+  if (env.RESETOWL_RENDERER_URL?.trim()) rendererUrl = cleanUrl(env.RESETOWL_RENDERER_URL.trim());
   else if (!isPackaged && argv.includes('--dev')) rendererUrl = DEV_RENDERER_URL;
 
   let mode: RunMode = 'app';

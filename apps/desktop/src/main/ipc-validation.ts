@@ -71,7 +71,7 @@ export function isTrustedSender(frameUrl: string | undefined, rendererOrigin: st
   if (!frameUrl) return false;
   try {
     const url = new URL(frameUrl);
-    // `app://subtrack` is a standard scheme, so URL gives it an origin of its own.
+    // `app://resetowl` is a standard scheme, so URL gives it an origin of its own.
     const origin = url.origin !== 'null' ? url.origin : `${url.protocol}//${url.host}`;
     return origin === rendererOrigin;
   } catch {

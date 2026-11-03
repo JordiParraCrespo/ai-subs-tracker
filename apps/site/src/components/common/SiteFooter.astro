@@ -9,6 +9,8 @@ import { guideSlug, guidesIn } from '@/lib/guides';
 import { currentLocale, localePath } from '@/lib/locale';
 import { headerNav } from '@/lib/nav';
 
+import OwlMark from './OwlMark.astro';
+
 const locale = currentLocale(Astro.currentLocale);
 const t = useTranslations(locale);
 const guides = await guidesIn(locale);
@@ -18,7 +20,7 @@ const product = headerNav(locale).slice(0, 2);
 <footer class="site-footer">
   <div class="ds-container site-footer__grid">
     <div class="site-footer__about">
-      <span class="site-footer__brand">Tokenaitor</span>
+      <span class="site-footer__brand"><OwlMark size={20} />ResetOwl</span>
       <p class="site-muted m-0">{t('footer.tagline')}</p>
     </div>
     <nav aria-label={t('footer.product')}>
@@ -54,7 +56,7 @@ const product = headerNav(locale).slice(0, 2);
     </nav>
   </div>
   <div class="ds-container site-footer__bar">
-    <span>© 2026 Tokenaitor · {t('footer.license')}</span>
+    <span>© 2026 ResetOwl · {t('footer.license')}</span>
     <span>{t('footer.disclaimer')}</span>
   </div>
 </footer>

@@ -3,7 +3,7 @@
 Reads the coding-agent logins on this machine — Claude Code config dirs and
 Codex homes — and turns each into a `SyncAccount`, the wire contract in
 `@flama/shared/schemas/accounts`: identity, plan, limit windows and tokens per
-local day. Pure Node (no Electron); the Subtrack desktop app calls it and
+local day. Pure Node (no Electron); the ResetOwl desktop app calls it and
 sends the result to the API. It never sends a credential anywhere but the
 provider that issued it.
 
@@ -14,7 +14,7 @@ import { collectAll, nodeProviderEnv } from '@flama/usage-providers';
 
 const env = nodeProviderEnv({
   managedRoot: '/path/to/app-data/homes',
-  userAgent: 'subtrack-desktop/0.1.0',
+  userAgent: 'resetowl-desktop/0.1.0',
 });
 const accounts = await collectAll(env, { sinceDay: '2026-10-01', fetchLimits: true });
 // [{ login: DetectedLogin, account: SyncAccount }, …]

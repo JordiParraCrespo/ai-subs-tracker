@@ -149,7 +149,7 @@ describe('codex read', () => {
     expect(calls[0]?.headers).toMatchObject({
       Authorization: 'Bearer codex-access',
       'ChatGPT-Account-Id': 'acct-1',
-      'User-Agent': 'subtrack-desktop/test',
+      'User-Agent': 'resetowl-desktop/test',
     });
     expect(calls[0]?.headers).not.toHaveProperty('originator');
     expect(account).toMatchObject({

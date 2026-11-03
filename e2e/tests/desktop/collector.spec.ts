@@ -45,7 +45,7 @@ const jsonl = (...lines: unknown[]) => lines.map((line) => JSON.stringify(line))
 
 /** A machine with two Claude Code logins and one Codex login, each used an hour ago. */
 async function machineHome(tag: string) {
-  const home = await mkdtemp(join(tmpdir(), 'subtrack-desktop-e2e-'));
+  const home = await mkdtemp(join(tmpdir(), 'resetowl-desktop-e2e-'));
   const at = new Date(Date.now() - 3_600_000);
   const day = at.toISOString().slice(0, 10).split('-');
   const expired = { accessToken: 'never-sent', expiresAt: Date.now() - 60_000 };
@@ -159,12 +159,12 @@ test('the desktop app finds the logins on disk, syncs them, and switches the ter
       XDG_CONFIG_HOME: join(home, '.config'),
       CLAUDE_CONFIG_DIR: '',
       CODEX_HOME: '',
-      SUBTRACK_API_URL: API_URL,
+      RESETOWL_API_URL: API_URL,
     },
   });
   try {
     const page = await app.firstWindow();
-    await expect(page).toHaveURL(/^app:\/\/subtrack\//);
+    await expect(page).toHaveURL(/^app:\/\/resetowl\//);
 
     // Signed in through the app's own screens, with the bearer token the shell keeps.
     await page.fill('#email', user.email);
@@ -199,7 +199,7 @@ test('the desktop app finds the logins on disk, syncs them, and switches the ter
     expect(usage.totals.apiCostCents).toBeGreaterThan(0);
 
     // Switching a login on writes the pointer file the shell integration reads.
-    await page.goto('app://subtrack/accounts/claude-code');
+    await page.goto('app://resetowl/accounts/claude-code');
     const inactive = accounts.find(
       (account) => account.provider === 'claude-code' && !account.isActive,
     );
@@ -210,7 +210,7 @@ test('the desktop app finds the logins on disk, syncs them, and switches the ter
     const expected = inactive?.email?.endsWith('@work.e2e') ? resolve(home, '.claude-work') : '';
     await expect
       .poll(() =>
-        readFile(join(home, '.subtrack', 'active', 'claude-code'), 'utf8').catch(() => null),
+        readFile(join(home, '.resetowl', 'active', 'claude-code'), 'utf8').catch(() => null),
       )
       .toBe(expected);
   } finally {
@@ -261,7 +261,7 @@ test('adds a Claude Code account through the add-subscription modal, by pasted c
       XDG_CONFIG_HOME: join(home, '.config'),
       CLAUDE_CONFIG_DIR: '',
       CODEX_HOME: '',
-      SUBTRACK_API_URL: API_URL,
+      RESETOWL_API_URL: API_URL,
     },
   });
   try {
@@ -271,7 +271,7 @@ test('adds a Claude Code account through the add-subscription modal, by pasted c
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 30_000 });
 
-    await page.goto('app://subtrack/accounts');
+    await page.goto('app://resetowl/accounts');
     await page.getByRole('button', { name: 'Add subscription' }).click();
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('button', { name: /Claude Code/ }).click();

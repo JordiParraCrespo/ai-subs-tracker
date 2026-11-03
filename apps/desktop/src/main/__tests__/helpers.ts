@@ -6,7 +6,7 @@ import { afterEach } from 'vitest';
 const dirs: string[] = [];
 
 /** A fresh temp directory, removed after each test. */
-export async function tempDir(prefix = 'subtrack-'): Promise<string> {
+export async function tempDir(prefix = 'resetowl-'): Promise<string> {
   const dir = await mkdtemp(join(tmpdir(), prefix));
   dirs.push(dir);
   return dir;
