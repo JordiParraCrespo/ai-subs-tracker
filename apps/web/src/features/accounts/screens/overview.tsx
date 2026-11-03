@@ -1,6 +1,7 @@
 import { useMyProfile } from '@flama/frontend-consumer/react';
 import { PageHead } from '@flama/frontend-web';
 import { useTranslation } from 'react-i18next';
+import { FirstRun } from '../sections/first-run';
 import { NeedsAttention } from '../sections/needs-attention';
 import { OverviewHeadline } from '../sections/overview-headline';
 import { UpcomingResets } from '../sections/upcoming-resets';
@@ -15,21 +16,20 @@ function partOfDay(hour: number): 'morning' | 'afternoon' | 'evening' {
 export function OverviewScreen() {
   const { t } = useTranslation();
   const { data: profile } = useMyProfile();
+  const greeting = t(`accounts.overview.greeting.${partOfDay(new Date().getHours())}`, {
+    name: profile?.firstName ?? '',
+  });
 
   return (
-    <div className="flex flex-col gap-6">
-      <PageHead
-        className="mb-0"
-        title={t(`accounts.overview.greeting.${partOfDay(new Date().getHours())}`, {
-          name: profile?.firstName ?? '',
-        })}
-        sub={t('accounts.overview.sub')}
-      />
-      <OverviewHeadline />
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,380px),1fr))] items-stretch gap-4">
-        <NeedsAttention />
-        <UpcomingResets />
+    <FirstRun page="overview" title={greeting}>
+      <div className="flex flex-col gap-6">
+        <PageHead className="mb-0" title={greeting} sub={t('accounts.overview.sub')} />
+        <OverviewHeadline />
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,380px),1fr))] items-stretch gap-4">
+          <NeedsAttention />
+          <UpcomingResets />
+        </div>
       </div>
-    </div>
+    </FirstRun>
   );
 }

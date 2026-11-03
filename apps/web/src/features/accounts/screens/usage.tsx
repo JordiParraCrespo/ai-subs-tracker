@@ -1,6 +1,7 @@
 import { PageHead } from '@flama/frontend-web';
 import { useTranslation } from 'react-i18next';
 import type { UsageQuery } from '../lib/usage-view';
+import { FirstRun } from '../sections/first-run';
 import { UsageBreakdown } from '../sections/usage-breakdown';
 import { UsageSpend } from '../sections/usage-spend';
 import { UsageToolbar } from '../sections/usage-toolbar';
@@ -20,16 +21,18 @@ export function UsageScreen({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col gap-6">
-      <PageHead
-        className="mb-0"
-        title={t('accounts.usage.title')}
-        sub={t('accounts.usage.sub', { days: query.days ?? 30 })}
-      />
-      <UsageToolbar query={query} onQuery={onQuery} />
-      <UsageSpend query={query} />
-      <UsageValue query={query} />
-      <UsageBreakdown query={query} onQuery={onQuery} />
-    </div>
+    <FirstRun page="usage" title={t('accounts.usage.title')}>
+      <div className="flex flex-col gap-6">
+        <PageHead
+          className="mb-0"
+          title={t('accounts.usage.title')}
+          sub={t('accounts.usage.sub', { days: query.days ?? 30 })}
+        />
+        <UsageToolbar query={query} onQuery={onQuery} />
+        <UsageSpend query={query} />
+        <UsageValue query={query} />
+        <UsageBreakdown query={query} onQuery={onQuery} />
+      </div>
+    </FirstRun>
   );
 }

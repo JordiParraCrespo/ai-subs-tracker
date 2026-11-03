@@ -3,6 +3,7 @@ import { PageHead } from '@flama/frontend-web';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EditAccountDialog } from '../dialogs/edit-account';
+import { FirstRun } from '../sections/first-run';
 import { RenewalsCalendar } from '../sections/renewals-calendar';
 import { RenewalsUpcoming } from '../sections/renewals-upcoming';
 
@@ -21,17 +22,19 @@ export function RenewalsScreen({
   const { t } = useTranslation();
   const [editing, setEditing] = useState<AccountEntity | null>(null);
   return (
-    <div className="flex flex-col gap-6">
-      <PageHead
-        className="mb-0"
-        title={t('accounts.renewals.title')}
-        sub={t('accounts.renewals.sub')}
-      />
-      <div className="flex flex-wrap items-stretch gap-4">
-        <RenewalsCalendar month={month} onMonth={onMonth} onOpen={setEditing} />
-        <RenewalsUpcoming onOpen={setEditing} />
+    <FirstRun page="renewals" title={t('accounts.renewals.title')}>
+      <div className="flex flex-col gap-6">
+        <PageHead
+          className="mb-0"
+          title={t('accounts.renewals.title')}
+          sub={t('accounts.renewals.sub')}
+        />
+        <div className="flex flex-wrap items-stretch gap-4">
+          <RenewalsCalendar month={month} onMonth={onMonth} onOpen={setEditing} />
+          <RenewalsUpcoming onOpen={setEditing} />
+        </div>
+        {editing && <EditAccountDialog account={editing} onClose={() => setEditing(null)} />}
       </div>
-      {editing && <EditAccountDialog account={editing} onClose={() => setEditing(null)} />}
-    </div>
+    </FirstRun>
   );
 }

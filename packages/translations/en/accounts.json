@@ -345,5 +345,32 @@
     "missingTitle": "No renewal day yet",
     "missingSub": "Providers do not report when a plan bills. Set the day from your receipt to put it on the calendar.",
     "setDay": "Set day"
+  },
+  "firstRun": {
+    "sub": "Nothing tracked yet",
+    "overview": {
+      "title": "No spend to show yet",
+      "text": "Add your first subscription to see monthly spend, renewals and who uses what."
+    },
+    "subscriptions": {
+      "title": "No subscriptions yet",
+      "text": "Add the AI tools your team pays for. Claude Code and Codex sign in through the browser."
+    },
+    "people": {
+      "title": "No one here yet",
+      "text": "Everyone who signs in to a subscription shows here, with what they use and what it costs."
+    },
+    "usage": {
+      "title": "No usage yet",
+      "text": "Usage and tokens appear after the first session on a tracked account."
+    },
+    "tokenmaxx": {
+      "title": "Nothing to rotate yet",
+      "text": "Add two or more plan accounts and Tokenmaxx tells you which one to use next."
+    },
+    "renewals": {
+      "title": "No renewals coming up",
+      "text": "Renewal dates show here once you add a subscription."
+    }
   }
 }

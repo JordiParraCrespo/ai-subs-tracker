@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import type { SubscriptionsQuery } from '../lib/subscriptions';
+import { FirstRun } from '../sections/first-run';
 import { SubscriptionsHead } from '../sections/subscriptions-head';
 import { SubscriptionsTable } from '../sections/subscriptions-table';
 
@@ -10,10 +12,13 @@ export function AccountsScreen({
   query: SubscriptionsQuery;
   onQuery: (next: SubscriptionsQuery) => void;
 }) {
+  const { t } = useTranslation();
   return (
-    <div className="flex flex-col gap-6">
-      <SubscriptionsHead />
-      <SubscriptionsTable query={query} onQuery={onQuery} />
-    </div>
+    <FirstRun page="subscriptions" title={t('accounts.list.title')}>
+      <div className="flex flex-col gap-6">
+        <SubscriptionsHead />
+        <SubscriptionsTable query={query} onQuery={onQuery} />
+      </div>
+    </FirstRun>
   );
 }

@@ -1,5 +1,6 @@
 import { PageHead } from '@flama/frontend-web';
 import { useTranslation } from 'react-i18next';
+import { FirstRun } from '../sections/first-run';
 import { TokenmaxxMoves } from '../sections/tokenmaxx-moves';
 import { TokenmaxxPick } from '../sections/tokenmaxx-pick';
 import { TokenmaxxQueue } from '../sections/tokenmaxx-queue';
@@ -8,15 +9,17 @@ import { TokenmaxxQueue } from '../sections/tokenmaxx-queue';
 export function TokenmaxxScreen() {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col gap-6">
-      <PageHead
-        className="mb-0"
-        title={t('accounts.tokenmaxx.title')}
-        sub={t('accounts.tokenmaxx.sub')}
-      />
-      <TokenmaxxPick />
-      <TokenmaxxQueue />
-      <TokenmaxxMoves />
-    </div>
+    <FirstRun page="tokenmaxx" title={t('accounts.tokenmaxx.title')}>
+      <div className="flex flex-col gap-6">
+        <PageHead
+          className="mb-0"
+          title={t('accounts.tokenmaxx.title')}
+          sub={t('accounts.tokenmaxx.sub')}
+        />
+        <TokenmaxxPick />
+        <TokenmaxxQueue />
+        <TokenmaxxMoves />
+      </div>
+    </FirstRun>
   );
 }

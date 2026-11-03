@@ -1,3 +1,4 @@
+export { useApiReachable } from './hooks/use-api-reachable';
 export { useCopy } from './hooks/use-copy';
 export { desktopBridge } from './lib/desktop-bridge';
 export { sanitizeRedirect } from './lib/sanitize-redirect';

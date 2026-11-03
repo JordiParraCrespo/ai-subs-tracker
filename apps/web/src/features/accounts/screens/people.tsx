@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import type { PeopleQuery } from '../lib/people';
+import { FirstRun } from '../sections/first-run';
 import { PeopleHead } from '../sections/people-head';
 import { PeopleTable } from '../sections/people-table';
 
@@ -10,10 +12,13 @@ export function PeopleScreen({
   query: PeopleQuery;
   onQuery: (next: PeopleQuery) => void;
 }) {
+  const { t } = useTranslation();
   return (
-    <div className="flex flex-col gap-6">
-      <PeopleHead />
-      <PeopleTable query={query} onQuery={onQuery} />
-    </div>
+    <FirstRun page="people" title={t('accounts.people.title')}>
+      <div className="flex flex-col gap-6">
+        <PeopleHead />
+        <PeopleTable query={query} onQuery={onQuery} />
+      </div>
+    </FirstRun>
   );
 }

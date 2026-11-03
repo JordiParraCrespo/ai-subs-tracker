@@ -146,3 +146,17 @@
 .ds-date-stack__mon{font:var(--ds-type-eyebrow);letter-spacing:var(--ds-tracking-eyebrow);text-transform:uppercase;color:var(--ds-text-subtle)}
 .ds-date-stack__day{font:600 16px/20px var(--ds-font-sans)}
 .ds-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:72px;padding:0 16px 0 24px;box-sizing:border-box}
+/* The state card (`DsStateCard`): first-run emptiness, and the pages that stand in for a page.
+   The export sizes its min-height on the content box; the 96px is its padding. */
+.ds-state{display:grid;place-items:center;padding:48px 24px;min-height:calc(420px + 96px)}
+.ds-state--status{min-height:calc(min(560px,70vh) + 96px)}
+.ds-state__body{display:flex;flex-direction:column;align-items:center;gap:20px;max-width:420px;text-align:center}
+.ds-state__disc{width:56px;height:56px}
+.ds-state__disc svg{width:24px;height:24px}
+.ds-state__text{display:flex;flex-direction:column;gap:6px}
+.ds-state__eyebrow{font:var(--ds-type-eyebrow);letter-spacing:var(--ds-tracking-eyebrow);text-transform:uppercase;color:var(--ds-text-subtle)}
+.ds-state__title{margin:0;font:var(--ds-type-card-title);letter-spacing:var(--ds-tracking-tight)}
+.ds-state--empty .ds-state__title{font:500 18px/24px var(--ds-font-sans)}
+.ds-state__line{margin:0;font:var(--ds-type-label);color:var(--ds-text-muted);text-wrap:pretty}
+.ds-state--empty .ds-state__line{font:500 16px/20px var(--ds-font-sans)}
+.ds-state__actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}

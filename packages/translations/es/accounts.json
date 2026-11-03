@@ -345,5 +345,32 @@
     "missingTitle": "Sin día de renovación",
     "missingSub": "Los proveedores no indican cuándo se cobra un plan. Pon el día de tu recibo para verlo en el calendario.",
     "setDay": "Poner día"
+  },
+  "firstRun": {
+    "sub": "Aún no hay nada",
+    "overview": {
+      "title": "Aún no hay gasto que mostrar",
+      "text": "Añade tu primera suscripción para ver el gasto mensual, las renovaciones y quién usa qué."
+    },
+    "subscriptions": {
+      "title": "Aún no hay suscripciones",
+      "text": "Añade las herramientas de IA que paga tu equipo. Claude Code y Codex inician sesión en el navegador."
+    },
+    "people": {
+      "title": "Aún no hay nadie",
+      "text": "Cada persona que inicia sesión en una suscripción aparece aquí, con lo que usa y lo que cuesta."
+    },
+    "usage": {
+      "title": "Aún no hay uso",
+      "text": "El uso y los tokens aparecen tras la primera sesión en una cuenta."
+    },
+    "tokenmaxx": {
+      "title": "Aún no hay nada que rotar",
+      "text": "Añade dos o más cuentas de un plan y Tokenmaxx te dice cuál usar después."
+    },
+    "renewals": {
+      "title": "No hay renovaciones próximas",
+      "text": "Las fechas de renovación aparecen aquí cuando añades una suscripción."
+    }
   }
 }
