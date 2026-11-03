@@ -1,0 +1,68 @@
+---
+/** The Overview and Tokenmaxx screens in miniature, on example figures. */
+import AreaChart from '@/components/ds/AreaChart.astro';
+import Avatar from '@/components/ds/Avatar.astro';
+import StatGrid from '@/components/ds/StatGrid.astro';
+import { useTranslations } from '@/i18n';
+import { currentLocale } from '@/lib/locale';
+import { apiValue, dollars, monthLabels, plansCost, useNext } from '@/lib/preview';
+
+const locale = currentLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+const money = (v: number) => dollars(v, locale);
+const pct = (v: number) =>
+  new Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: 2 }).format(v);
+const stats = [
+  { label: t('preview.plansCost'), value: `${money(plansCost)}${t('preview.perMonth')}` },
+  { label: t('preview.apiValue'), value: money(apiValue.at(-1) ?? 0), tone: 'positive' as const },
+  { label: t('preview.expired'), value: money(18) },
+];
+---
+
+<section class="ds-container site-section" aria-label={t('preview.label')}>
+  <figure class="m-0">
+    <div class="site-frame">
+      <div class="site-frame__grid">
+        <div class="ds-card">
+          <div class="site-frame__chart">
+            <AreaChart
+              title={t('preview.chartTitle')}
+              data={apiValue}
+              labels={monthLabels(locale)}
+              restLabel={t('preview.chartRest')}
+              format={money}
+              pct={pct}
+            />
+            <div class="site-frame__stats"><StatGrid items={stats} /></div>
+          </div>
+        </div>
+        <div class="ds-card">
+          <div class="ds-card-header">
+            <h2 class="ds-card-header__title">{t('preview.useNext')}</h2>
+            <span class="site-positive">{t('preview.useNextHint')}</span>
+          </div>
+          {
+            useNext.map((account) => (
+              <div class="ds-row ds-row--card ds-card-row">
+                <Avatar initials={account.initials} color={account.color} />
+                <div class="ds-row__txt">
+                  <span class="ds-card-row__title">{account.title}</span>
+                  <span class="ds-t-sub">
+                    {t(account.window === 'weekly' ? 'preview.weekly' : 'preview.session', {
+                      time: account.time,
+                    })}
+                  </span>
+                </div>
+                <div class="ds-row__end">
+                  <span class="ds-card-row__value">{account.left}%</span>
+                  <span class="ds-t-sub">{t('preview.left')}</span>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+    <figcaption class="site-note site-frame__caption">{t('preview.caption')}</figcaption>
+  </figure>
+</section>

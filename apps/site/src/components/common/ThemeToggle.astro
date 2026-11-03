@@ -1,0 +1,40 @@
+---
+/**
+ * Flips the theme `public/theme-init.js` applied and remembers the choice.
+ * Both icons render and the theme class on `<html>` picks one, so the static
+ * HTML is right in either theme before the script runs.
+ */
+import { Moon, Sun } from '@lucide/astro';
+
+import { useTranslations } from '@/i18n';
+import { currentLocale } from '@/lib/locale';
+
+const t = useTranslations(currentLocale(Astro.currentLocale));
+---
+
+<button
+  type="button"
+  class="ds-btn ds-btn--sm ds-btn--ghost site-theme-toggle"
+  aria-label={t('theme.label')}
+  title={t('theme.label')}
+  data-theme-toggle
+>
+  <Moon class="site-theme-toggle__moon" size={18} aria-hidden="true" />
+  <Sun class="site-theme-toggle__sun" size={18} aria-hidden="true" />
+</button>
+
+<script>
+  for (const button of document.querySelectorAll('[data-theme-toggle]')) {
+    button.addEventListener('click', () => {
+      const root = document.documentElement;
+      const next = root.classList.contains('light') ? 'dark' : 'light';
+      root.classList.remove('light', 'dark');
+      root.classList.add(next);
+      try {
+        localStorage.setItem('theme', next);
+      } catch {
+        // Storage blocked: the switch still applies for this visit.
+      }
+    });
+  }
+</script>

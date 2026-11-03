@@ -1,0 +1,49 @@
+---
+title: Precios de Codex en 2026 — planes de ChatGPT, Pro y límites
+description: Precios de Codex con ChatGPT Go, Plus, los tres niveles de Pro y Business, qué planes miden un límite de 5 horas y las tarifas de la API de OpenAI.
+heading: Precios de Codex, plan a plan
+eyebrow: Precios de Codex
+lede: Codex viene con los planes de ChatGPT. Esto es lo que cuesta cada plan, qué límites de uso mide desde que Pro se dividió en tres niveles y cómo se comparan con las tarifas de la API de OpenAI.
+summary: ChatGPT Go, Plus, los tres niveles de Pro y Business para Codex, sus límites y las tarifas de la API de OpenAI.
+order: 3
+checked: 2026-11-02
+related: [claude-code-pricing, claude-code-usage-limits, claude-code-usage-tracker]
+faq:
+  - q: ¿Cuánto cuesta Codex?
+    a: Codex viene con los planes de ChatGPT. Go cuesta 8 $ al mes, Plus 20 $ y Pro tiene tres niveles de 100 $, 200 $ y 500 $. Business cuesta 25 $ por usuario y mes, y Enterprise lo tarifica el equipo de ventas de OpenAI.
+  - q: ¿Cuándo se dividió ChatGPT Pro en tres niveles?
+    a: OpenAI dividió Pro en niveles de 100 $, 200 $ y 500 $ el 29 de septiembre de 2026. Los tres miden solo un límite semanal, sin límite de 5 horas.
+  - q: ¿En qué nivel de Pro está mi cuenta?
+    a: Codex informa de todos los niveles de Pro como "pro", así que Subtrack supone el de 200 $ hasta que indiques el plan y el precio que pagas de verdad.
+  - q: ¿Subtrack suma el uso de Codex con el de Claude Code?
+    a: Cada cuenta se sigue por separado, y todas, de Claude Code y de Codex, comparten una sola cola de qué cuenta usar ahora.
+---
+import ApiPriceTable from '@/components/guides/ApiPriceTable.astro';
+import Callout from '@/components/guides/Callout.astro';
+import PlanTable from '@/components/guides/PlanTable.astro';
+
+## Planes y precios de Codex
+
+El agente de programación de OpenAI, Codex, está incluido en los planes de ChatGPT. Estos son los planes y sus precios mensuales a la fecha indicada al principio de la página:
+
+<PlanTable provider="codex" />
+
+## Pro ahora tiene tres niveles
+
+El 29 de septiembre de 2026 OpenAI dividió ChatGPT Pro en niveles de **100 $, 200 $ y 500 $**. Los tres miden solo un límite semanal, sin límite de 5 horas.
+
+<Callout>
+  Codex informa de todos los niveles de Pro con el mismo nombre, así que Subtrack no puede distinguirlos. Supone 200 $ hasta que indiques lo que pagas de verdad, y ese precio alimenta todas las cifras que muestra.
+</Callout>
+
+## Lo que costaría el mismo uso en la API
+
+Estos son los precios de pago por uso de OpenAI en dólares por millón de tokens, la tabla con la que Subtrack valora el uso de Codex:
+
+<ApiPriceTable vendor="openai" />
+
+Subtrack cuenta los tokens en los propios registros de sesión de Codex (`~/.codex/sessions`), por modelo y por día, y los valora con estas tarifas. Así tienes una cifra comparable con el precio de cada plan.
+
+## Límites en Go, Plus y Business
+
+Go, Plus y Business miden un límite de **5 horas** y otro **semanal**. Cuando se agota cualquiera de los dos, Codex se para hasta que se reinicia, y ahí es donde ayuda una segunda cuenta. La [guía de límites de uso](/es/claude-code-usage-limits/) cubre los límites de los dos proveedores, y los [precios de Claude Code](/es/claude-code-pricing/) comparan los planes de Anthropic.

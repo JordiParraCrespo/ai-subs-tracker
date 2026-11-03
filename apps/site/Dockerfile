@@ -7,6 +7,7 @@ WORKDIR /app
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/site/package.json ./apps/site/
 COPY packages/tsconfig/package.json ./packages/tsconfig/
+COPY packages/shared/package.json ./packages/shared/
 COPY packages/frontend/design-system/web/package.json ./packages/frontend/design-system/web/
 COPY packages/frontend/react-hooks/package.json ./packages/frontend/react-hooks/
 RUN pnpm install --frozen-lockfile --filter @flama/site...
@@ -24,7 +25,8 @@ FROM nginx:alpine AS runner
 COPY --from=builder /app/apps/site/dist /usr/share/nginx/html
 # Precompress text assets once, so `gzip_static` serves them ready-made.
 RUN find /usr/share/nginx/html -type f \
-      \( -name '*.js' -o -name '*.css' -o -name '*.svg' -o -name '*.html' \) \
+      \( -name '*.js' -o -name '*.css' -o -name '*.svg' -o -name '*.html' \
+         -o -name '*.xml' -o -name '*.txt' \) \
       -exec sh -c 'gzip -9c "$1" > "$1.gz"' _ {} \;
 COPY apps/site/nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 3002

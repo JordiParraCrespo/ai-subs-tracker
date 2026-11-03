@@ -1,38 +1,54 @@
 # @flama/site — Agent Instructions
 
-The landing page (`designs/Marketing Page.dc.html`). Read the root
-[`AGENTS.md`](../../AGENTS.md) first; [`README.md`](README.md) describes the
-build.
+The website: the home page and the SEO guides, in English and Spanish, on
+Astro (scaffolded from astro-ignite's starter). Read the root
+[`AGENTS.md`](../../AGENTS.md) first; [`README.md`](README.md) lists the pages
+and the build.
 
 ## Rules
 
-- **It describes the product that exists.** Every claim is something
-  Subtrack does today (`README.md` at the root is the source); the preview's
-  figures are labelled as an example, and plan names and prices are the ones
-  in `packages/shared/src/subscriptions/plans.ts`. The design's own copy
-  described a team-spend tool and was rewritten for that reason; keep its
-  layout, not its sentences.
-- **Copy lives in `src/lib/content.ts`, links in `src/lib/links.ts`.** A
-  section file is markup over that data.
-- **The page must prerender.** Nothing may read `window`, `document` or
-  `localStorage` while rendering: put it in an event handler, as
-  `ThemeToggle` does. A render that depends on the visitor (their theme,
-  their viewport) is CSS, so the server's markup and the hydrated tree agree.
-  `pnpm test` renders the page the way the build does.
-- **Components come from `@flama/design-system-web`** (root export; icons from
-  `/icons`), under the same rules as `apps/web`:
-  [`.agents/rules/frontend-ui.md`](../../.agents/rules/frontend-ui.md). A
-  layout class goes on an element around a design-system component, not on
-  the component (`pnpm lint:design` holds this). Colours are `--ds-*` tokens,
-  never a raw value, except the closing band's white button, which the design
-  draws white in both themes.
-- **No inline script.** The page is served under `script-src 'self'`
-  (`nginx.conf`); anything that must run before React is a file in `public/`.
-- Check a change light and dark, at desktop and phone width, from a built
-  `dist/` (`pnpm build && pnpm preview`), since that is what ships.
+- **Say only what the product does.** The root `README.md` is the source for
+  Subtrack's behaviour. Prices, plan names and API rates come from
+  `@flama/shared/subscriptions` (`PlanTable`, `ApiPriceTable`); a price typed
+  into a guide's prose must be one the catalog holds, and `pnpm test` fails
+  otherwise. When the catalog changes, update the prose that names the old
+  value and the guides' `checked` date.
+- **Every page exists in every locale under the same slug.** A guide is
+  `src/content/guides/<locale>/<slug>.mdx` in each locale; a page is
+  `src/pages/<name>.astro` plus its twin in `src/pages/[lang]/`. Links inside a
+  guide include the locale prefix (`/es/codex-pricing/`); links in components
+  go through `localePath`. The tests and `scripts/check-seo.mjs` hold both.
+- **UI strings live in `src/i18n/<locale>.json`.** English is the key type, so
+  a key missing in Spanish fails `astro check`.
+- **A guide's metadata is its search snippet:** `title` ≤70 characters,
+  `description` 70–160 (the collection schema enforces both). `faq` renders
+  on the page and as FAQPage data, so never add a question the page does not
+  show.
+- **No framework, no inline script.** Components are `.astro`; a behaviour is a
+  small `<script>` Astro bundles to a same-origin file (the page is served
+  under `script-src 'self'`, `nginx.conf`). The theme bootstrap is
+  `public/theme-init.js`.
+- **Styling is the design system's.** Use its classes (`.ds-card`, `.ds-btn`,
+  `.ds-row`, `.ds-stats`) and `--ds-*` tokens; the site's own layout and type
+  are `site-*` classes in `src/styles/site.css`. No raw colours, except the
+  closing band's white button and the social card. The rules are
+  [`.agents/rules/frontend-ui.md`](../../.agents/rules/frontend-ui.md).
+- **Biome on `.astro`:** it reads the frontmatter only, so `noUnusedImports`,
+  `noUnusedVariables` and import sorting are off for `.astro` files in the
+  root `biome.json`. `astro check` covers what Biome cannot see.
+- Check a change from a built `dist/` (`pnpm build && pnpm preview`), light and
+  dark, at desktop and phone width, in both locales.
 
-## Not here
+## Adding a guide
 
-The site has no sign-in, no API calls and no router. When it needs a second
-page, add a router and prerender each route rather than serving one HTML for
-every URL.
+1. `src/content/guides/en/<slug>.mdx` and `src/content/guides/es/<slug>.mdx`,
+   with the same `order` and `related` slugs.
+2. Use `PlanTable` / `ApiPriceTable` for any price.
+3. `pnpm build && pnpm test`. The routes, sitemap, hreflang, footer, guide hub
+   and `llms.txt` pick it up from the collection.
+
+## Adding a locale
+
+Add it to `siteConfig.locales` and every locale-keyed record in
+`src/config/site.ts`, add `src/i18n/<locale>.json`, and a folder of every
+guide and legal page under `src/content/*/<locale>/`.

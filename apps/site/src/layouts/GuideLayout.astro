@@ -1,0 +1,108 @@
+---
+/**
+ * A guide: breadcrumbs, the header with the date its facts were checked, the
+ * MDX body, its FAQ, related guides and the closing call to action. The
+ * structured data mirrors what renders: BreadcrumbList, WebPage, FAQPage,
+ * and on the pillar page the app itself.
+ */
+import { Download } from '@lucide/astro';
+
+import Breadcrumbs from '@/components/common/Breadcrumbs.astro';
+import ButtonLink from '@/components/common/ButtonLink.astro';
+import Faq from '@/components/guides/Faq.astro';
+import CallToAction from '@/components/landing/CallToAction.astro';
+import GuideHub from '@/components/landing/GuideHub.astro';
+import { links } from '@/config/site';
+import { useTranslations } from '@/i18n';
+import { type Guide, guideBySlug, guideSlug } from '@/lib/guides';
+import {
+  breadcrumbListSchema,
+  faqPageSchema,
+  softwareApplicationSchema,
+  webPageSchema,
+} from '@/lib/jsonld';
+import { currentLocale, localePath } from '@/lib/locale';
+
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  entry: Guide;
+}
+
+const PILLAR = 'claude-code-usage-tracker';
+const { entry } = Astro.props;
+const locale = currentLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+const slug = guideSlug(entry);
+const url = localePath(locale, `/${slug}/`);
+const pillar = slug === PILLAR ? undefined : await guideBySlug(locale, PILLAR);
+
+const crumbs = [
+  { name: t('nav.home'), url: localePath(locale, '/') },
+  ...(pillar ? [{ name: pillar.data.heading, url: localePath(locale, `/${PILLAR}/`) }] : []),
+  { name: entry.data.heading, url },
+];
+const related = (
+  await Promise.all(entry.data.related.map((s: string) => guideBySlug(locale, s)))
+).filter((g): g is Guide => g !== undefined);
+
+const schemas = [
+  breadcrumbListSchema(crumbs),
+  webPageSchema({
+    url,
+    title: entry.data.title,
+    description: entry.data.description,
+    inLanguage: locale,
+    dateModified: entry.data.checked,
+  }),
+  ...(entry.data.faq.length ? [faqPageSchema(url, entry.data.faq)] : []),
+  ...(slug === PILLAR ? [softwareApplicationSchema(locale)] : []),
+];
+const checked = new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: 'UTC' }).format(
+  entry.data.checked,
+);
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description} schemas={schemas}>
+  <article class="site-guide">
+    <header class="ds-container site-guide__head">
+      <Breadcrumbs crumbs={crumbs} label={t('guide.breadcrumbs')} />
+      <span class="site-eyebrow">{entry.data.eyebrow}</span>
+      <h1 class="site-guide__title">{entry.data.heading}</h1>
+      <p class="site-hero__lede site-guide__lede">{entry.data.lede}</p>
+      <div class="site-guide__actions">
+        <ButtonLink href={links.download} variant="primary" size="md">
+          <Download slot="icon" size={16} aria-hidden="true" />
+          {t('hero.primary')}
+        </ButtonLink>
+        <span class="site-note">
+          {t('guide.checked')}: <time datetime={entry.data.checked.toISOString()}>{checked}</time>
+        </span>
+      </div>
+    </header>
+
+    <div class="ds-container site-guide__body">
+      <div class="site-prose"><slot /></div>
+      <Faq title={t('guide.faq')} faq={entry.data.faq} />
+      {
+        related.length > 0 && slug !== PILLAR && (
+          <nav class="site-related" aria-labelledby="related">
+            <h2 id="related" class="site-h2 site-h2--sm">{t('guide.related')}</h2>
+            <ul>
+              {related.map((g) => (
+                <li>
+                  <a href={localePath(locale, `/${guideSlug(g)}/`)} class="site-related__link">
+                    <span class="site-feature__title">{g.data.heading}</span>
+                    <span class="site-muted">{g.data.summary}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+    </div>
+  </article>
+  {slug === PILLAR && <GuideHub exclude={PILLAR} title={t('guides.pillarTitle')} />}
+  <CallToAction />
+</BaseLayout>

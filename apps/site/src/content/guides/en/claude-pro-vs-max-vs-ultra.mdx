@@ -1,0 +1,53 @@
+---
+title: Claude Pro vs Max vs Ultra for Claude Code — which plan to pick
+description: Claude Pro vs Max vs Ultra for Claude Code compared on price, usage and limit windows, and how to tell from your own usage which plan you need.
+heading: Claude Pro vs Max vs Ultra for Claude Code
+eyebrow: Plan comparison
+lede: The three individual Claude plans differ in price, in how much usage they allow and in which limits they meter. Here is how they compare, and how to decide from your own numbers rather than a guess.
+summary: Pro, Max and Ultra compared on price, usage and limit windows, and how to pick from your own usage.
+order: 5
+checked: 2026-11-02
+related: [claude-code-pricing, claude-code-usage-limits, claude-code-usage-tracker]
+faq:
+  - q: What is the difference between Claude Max and Ultra?
+    a: Max is $100 a month and meters a 5-hour window and a weekly one. Ultra, formerly Max 20x, is $200 and meters only a weekly limit on verified accounts, so long sessions only count against the week.
+  - q: How much more usage does Max give than Pro?
+    a: Anthropic sizes Max at five times Pro's usage, for five times the price.
+  - q: Should I upgrade or hold two accounts?
+    a: Read each vendor's terms first. If you legitimately hold more than one plan, such as a personal plan and a work seat, Subtrack lets you use both fully instead of upgrading one.
+  - q: How do I know which plan I need?
+    a: Look at how often you hit each window and what your usage would cost on the API. Subtrack shows both for every account.
+---
+import Callout from '@/components/guides/Callout.astro';
+
+## The three plans side by side
+
+| | Pro | Max | Ultra |
+| --- | --- | --- | --- |
+| Price | $20/month | $100/month | $200/month |
+| Usage | Baseline | 5× Pro | Highest |
+| 5-hour window | Yes | Yes | No |
+| Weekly window | Yes | Yes | Yes |
+| Formerly | — | Max 5x | Max 20x |
+
+Prices are Anthropic's monthly prices in US dollars; the full list, including Team seats, is in [Claude Code pricing](/claude-code-pricing/).
+
+## Pick Pro if you rarely hit a limit
+
+Pro is enough when Claude Code is one tool among several and your sessions are short. If you hit the 5-hour limit once in a while, waiting for it is cheaper than upgrading.
+
+## Pick Max if the 5-hour window is your ceiling
+
+Max multiplies Pro's usage by five. It suits daily, heavy use where the session window, not the week, is what stops you.
+
+## Pick Ultra if your sessions run long
+
+Ultra removes the 5-hour window. Long agent runs only count against the weekly limit, which is the main reason to choose it over Max.
+
+<Callout>
+  Before you change plan, check the numbers: how often each window ran out last month, and what your usage would have cost on the API. Subtrack shows both per account, so the decision comes from your own data.
+</Callout>
+
+## Count the allowance you are not using
+
+Upgrading is not the only lever. If you already hold more than one plan, the allowance that resets unused each week is money spent for nothing. The [usage limits guide](/claude-code-usage-limits/) explains how to order your accounts so that does not happen.

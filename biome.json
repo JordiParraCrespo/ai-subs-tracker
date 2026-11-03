@@ -57,6 +57,7 @@
       "!**/.next",
       "!**/.turbo",
       "!**/.docusaurus",
+      "!**/.astro",
       "!**/coverage",
       "!**/playwright-report",
       "!**/blob-report",
@@ -77,6 +78,15 @@
     ]
   },
   "overrides": [
+    {
+      "includes": ["**/*.astro"],
+      "assist": { "actions": { "source": { "organizeImports": "off" } } },
+      "linter": {
+        "rules": {
+          "correctness": { "noUnusedImports": "off", "noUnusedVariables": "off" }
+        }
+      }
+    },
     {
       "includes": [
         "packages/frontend/*/src/**",

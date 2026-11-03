@@ -1,0 +1,55 @@
+---
+title: Precios de Claude Code en 2026 — planes, límites y tarifas de API
+description: Precios de Claude Code para Pro, Max, Ultra y Team, qué planes tienen límite de 5 horas y cómo se comparan con las tarifas de la API de Anthropic.
+heading: Precios de Claude Code, plan a plan
+eyebrow: Precios de Claude Code
+lede: Todos los planes que incluyen Claude Code, cuánto cuestan al mes, qué límites de uso miden y cómo saber si un plan sale más barato que pagar los mismos tokens en la API.
+summary: Precios de Pro, Max, Ultra y Team, los límites que mide cada plan y cómo se compara un plan con la API de Anthropic.
+order: 2
+checked: 2026-11-02
+related: [claude-pro-vs-max-vs-ultra, claude-code-usage-limits, codex-pricing]
+faq:
+  - q: ¿Cuánto cuesta Claude Code?
+    a: Claude Code viene con los planes de Claude de Anthropic. Pro cuesta 20 $ al mes, Max 100 $ y Ultra 200 $; las licencias Team cuestan 25 $ (Standard) o 125 $ (Premium) por usuario y mes. Enterprise lo tarifica el equipo de ventas de Anthropic.
+  - q: ¿Qué ha pasado con Max 20x?
+    a: Anthropic cambió el nombre de Max 20x a Ultra el 30 de octubre de 2026. Mantiene el precio de 200 $ y, en las cuentas verificadas, no tiene límite de 5 horas, solo semanal.
+  - q: ¿Un plan de Claude sale más barato que la API?
+    a: Depende de cuánto lo uses. Valora tu uso real con las tarifas de la API de abajo y compáralo con el precio mensual del plan; Subtrack lo hace por ti a partir de las transcripciones de la CLI.
+  - q: ¿Estos precios son mensuales?
+    a: Sí, el precio mensual en dólares estadounidenses. Los precios Team son por usuario. No incluyen impuestos ni facturación anual.
+---
+import ApiPriceTable from '@/components/guides/ApiPriceTable.astro';
+import Callout from '@/components/guides/Callout.astro';
+import PlanTable from '@/components/guides/PlanTable.astro';
+
+## Planes y precios de Claude Code
+
+Claude Code está incluido en los planes de pago de Claude de Anthropic. Estos son los planes y sus precios mensuales a la fecha indicada al principio de la página:
+
+<PlanTable provider="claude-code" />
+
+**Max 20x ahora se llama Ultra.** Anthropic le cambió el nombre el 30 de octubre de 2026 y el precio se quedó en 200 $. Si una cuenta antigua aún informa del nombre anterior, Subtrack la muestra como Ultra.
+
+## Qué límites mide cada plan
+
+La mayoría de los planes miden dos límites: uno de **5 horas** y otro **semanal**. Ultra solo mide el semanal. La [guía de límites de uso](/es/claude-code-usage-limits/) explica cómo interactúan y qué pasa cuando llegas a uno.
+
+## Lo que costaría el mismo uso en la API
+
+La forma justa de juzgar un plan es valorar los tokens que usas de verdad a las tarifas de la API. Estos son los precios de pago por uso de Anthropic en dólares por millón de tokens, la misma tabla con la que Subtrack valora tu uso:
+
+<ApiPriceTable vendor="anthropic" />
+
+La escritura en caché cuesta 1,25 veces el precio de entrada. Una sesión de programación con agentes vuelve a leer su contexto muchas veces, así que la lectura de caché suele ser el mayor número de tokens del día.
+
+<Callout>
+  Subtrack cuenta los tokens en las propias transcripciones de Claude Code, por modelo y por día, y muestra lo que habría costado ese uso en la API junto a lo que te cuesta cada plan.
+</Callout>
+
+## Cómo elegir plan
+
+- **Pro** encaja con un uso constante y más ligero. Vigila el límite de 5 horas: es el primero que se agota.
+- **Max** da cinco veces el uso de Pro por cinco veces el precio, y compensa cuando te quedas sin margen a mitad de sesión a menudo.
+- **Ultra** elimina el límite de 5 horas, así que las sesiones largas solo cuentan para la semana.
+
+Para compararlos uno al lado del otro, mira la [guía Pro vs Max vs Ultra](/es/claude-pro-vs-max-vs-ultra/). Si también usas el agente de OpenAI, consulta los [precios de Codex](/es/codex-pricing/).

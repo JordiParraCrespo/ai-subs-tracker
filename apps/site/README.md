@@ -1,45 +1,66 @@
 # @flama/site
 
-Subtrack's landing page: one page that says what the desktop app does, shows
-the Overview and Tokenmaxx screens in miniature, and links to the download.
-It is built from `designs/Marketing Page.dc.html` on `@flama/design-system-web`,
-so it shares the app's tokens, type and both themes.
+Subtrack's website at **https://subtrackhq.com**: the home page and a set of
+guides on Claude Code and Codex plans, limits and prices, in English (`/`)
+and Spanish (`/es/`). Scaffolded from
+[astro-ignite](https://github.com/JordiParraCrespo/astro-ignite)'s starter
+(Astro 7) and cut down to static pages, styled with
+`@flama/design-system-web`'s tokens and classes. No framework ships: every
+page is static HTML plus two small scripts (the theme switch and the chart
+hover).
 
-The page is **prerendered**: `pnpm build` writes its full HTML into
-`dist/index.html`, so it reads (and indexes) before any script runs, and the
-client bundle then hydrates the same tree for the chart's hover and the theme
-switch.
+## Pages
+
+| URL | What it is |
+| --- | --- |
+| `/` | The home page (`designs/Marketing Page.dc.html`): hero, product preview, features, how it works, privacy, the guide hub |
+| `/claude-code-usage-tracker/` | The pillar page: what a Claude Code usage tracker should show, and how Subtrack tracks several accounts |
+| `/claude-code-pricing/` | Claude plans and prices, Anthropic's API rates |
+| `/codex-pricing/` | ChatGPT plans for Codex, the Pro tiers, OpenAI's API rates |
+| `/claude-code-usage-limits/` | The 5-hour and weekly windows on both vendors' plans |
+| `/claude-pro-vs-max-vs-ultra/` | The three individual Claude plans compared |
+| `/legal/privacy/`, `/legal/terms/` | Privacy and terms |
+
+Each exists under `/es/` too. Plus `sitemap-index.xml`, `robots.txt`,
+`llms.txt` and the social card `og.png`.
+
+**The plan tables and API prices are read from `@flama/shared/subscriptions`**,
+the catalog the app itself uses, so a price change there reaches every page.
 
 ## Commands
 
 ```bash
-pnpm --filter @flama/site dev       # http://localhost:3002, rendered in the browser
-pnpm --filter @flama/site build     # dist/: the prerendered page and its assets
+pnpm --filter @flama/site dev       # http://localhost:3002
+pnpm --filter @flama/site build     # astro check, astro build, then the SEO check over dist/
 pnpm --filter @flama/site preview   # serve dist/ on http://localhost:3002
-pnpm --filter @flama/site test      # the prerendered HTML: copy, anchors, links
-pnpm --filter @flama/site lint:design
+pnpm --filter @flama/site test      # the copy: locales agree, links land, prices are the catalog's
 ```
 
-## How the build works
+`scripts/check-seo.mjs` runs after every build and fails it when a page loses
+its single h1, its self-canonical, its reciprocal hreflang, its title or
+description length, its JSON-LD, or gains an inline script.
 
-1. `vite build` bundles `src/entry-client.tsx` and leaves `<!--app-->` in
-   `dist/index.html`.
-2. `vite build --ssr src/entry-server.tsx` bundles the same page for Node into
-   `dist-server/`.
-3. `scripts/prerender.mjs` renders it, writes the markup over the placeholder
-   and deletes `dist-server/`.
+The social card is `scripts/og.html` rendered to `public/og.png`:
+
+```bash
+CHROMIUM_PATH=/path/to/chrome node apps/site/scripts/render-og.cjs
+```
 
 ## Layout
 
 | Path | What it holds |
 | --- | --- |
-| `src/site.tsx` | The page: the sections in the design's order |
-| `src/sections/` | One file per section (header, hero, preview, features, how it works, privacy, closing band, footer) |
-| `src/components/` | What the sections share: a link styled as the design-system button, the theme switch, feature icons |
-| `src/lib/content.ts` | Every sentence and the preview's example figures |
-| `src/lib/links.ts` | Where the links go |
-| `src/styles.css` | Tailwind, the design system's styles, and the page's own display type and section layout |
-| `public/theme-init.js` | Applies the theme before first paint |
+| `src/config/site.ts` | The domain, locales, names, descriptions and where the links go |
+| `src/i18n/{en,es}.json` | Every UI string; English is the key type |
+| `src/content/guides/<locale>/<slug>.mdx` | The guides: frontmatter (title, description, FAQ, related) and body |
+| `src/content/legal/<locale>/` | Privacy and terms |
+| `src/components/landing/` | The home page's sections |
+| `src/components/guides/` | Plan and API-price tables, callout, FAQ |
+| `src/components/ds/` | The design system's chart, avatar and stat grid as Astro components |
+| `src/components/common/`, `seo/` | Header, footer, switchers, breadcrumbs; the head tags and JSON-LD |
+| `src/layouts/` | Base, guide and legal layouts |
+| `src/lib/` | Locale paths, the guide collection, JSON-LD builders, preview figures |
+| `src/styles/site.css` | Tailwind, the design system's styles, and the site's own layout and type |
 
 ## Configuration
 
@@ -47,16 +68,15 @@ pnpm --filter @flama/site lint:design
 | --- | --- |
 | `VITE_SITE_APP_URL` | Where "Sign in" goes: the web app's public URL. Empty means `http://localhost:3000` |
 
-It is read from the root `.env` at build time, like every `VITE_` value.
+Read from the root `.env` at build time.
 
 ## Deploying
 
-`apps/site/Dockerfile` builds the page and serves it with nginx on port 3002,
-under the same Content-Security-Policy as the web app (`nginx.conf`). Pass the
-sign-in URL as a build argument:
+`apps/site/Dockerfile` builds the site and serves it with nginx on port 3002
+under the same Content-Security-Policy as the web app (`nginx.conf`):
 
 ```bash
-docker build -f apps/site/Dockerfile --build-arg VITE_SITE_APP_URL=https://app.example.com -t subtrack-site .
+docker build -f apps/site/Dockerfile --build-arg VITE_SITE_APP_URL=https://app.subtrackhq.com -t subtrack-site .
 ```
 
 `dist/` is plain static files, so any static host serves it as well.

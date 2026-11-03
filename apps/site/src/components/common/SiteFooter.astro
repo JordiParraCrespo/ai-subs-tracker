@@ -1,0 +1,60 @@
+---
+/**
+ * Sitemap-style footer. The Guides column links every guide from every page,
+ * which is most of the internal linking the cluster gets.
+ */
+import { links } from '@/config/site';
+import { useTranslations } from '@/i18n';
+import { guideSlug, guidesIn } from '@/lib/guides';
+import { currentLocale, localePath } from '@/lib/locale';
+import { headerNav } from '@/lib/nav';
+
+const locale = currentLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+const guides = await guidesIn(locale);
+const product = headerNav(locale).slice(0, 2);
+---
+
+<footer class="site-footer">
+  <div class="ds-container site-footer__grid">
+    <div class="site-footer__about">
+      <span class="site-footer__brand">Subtrack</span>
+      <p class="site-muted m-0">{t('footer.tagline')}</p>
+    </div>
+    <nav aria-label={t('footer.product')}>
+      <h2 class="site-footer__heading">{t('footer.product')}</h2>
+      <ul class="site-footer__list">
+        {product.map((item) => <li><a href={item.href} class="site-link">{t(item.key)}</a></li>)}
+        <li><a href={links.download} class="site-link">{t('nav.download')}</a></li>
+        <li><a href={links.signIn} class="site-link">{t('nav.signIn')}</a></li>
+      </ul>
+    </nav>
+    <nav aria-label={t('nav.guides')}>
+      <h2 class="site-footer__heading">{t('nav.guides')}</h2>
+      <ul class="site-footer__list">
+        {
+          guides.map((guide) => (
+            <li>
+              <a href={localePath(locale, `/${guideSlug(guide)}/`)} class="site-link">
+                {guide.data.heading}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <nav aria-label={t('footer.project')}>
+      <h2 class="site-footer__heading">{t('footer.project')}</h2>
+      <ul class="site-footer__list">
+        <li><a href={links.source} class="site-link">{t('footer.source')}</a></li>
+        <li><a href={links.download} class="site-link">{t('footer.releases')}</a></li>
+        <li><a href={localePath(locale, '/legal/privacy/')} class="site-link">{t('footer.privacy')}</a></li>
+        <li><a href={localePath(locale, '/legal/terms/')} class="site-link">{t('footer.terms')}</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="ds-container site-footer__bar">
+    <span>© 2026 Subtrack · {t('footer.license')}</span>
+    <span>{t('footer.disclaimer')}</span>
+  </div>
+</footer>

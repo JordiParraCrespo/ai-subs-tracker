@@ -1,0 +1,108 @@
+---
+/**
+ * The design system's area chart (`.ds-chart`, after `DsAreaChart`) drawn at
+ * build time: no grid, no axes, the header is the legend. Hovering moves a
+ * crosshair and rewrites the value, the change and the label; the strings
+ * are formatted here, so the script only swaps text.
+ */
+interface Props {
+  title: string;
+  data: readonly number[];
+  labels: readonly string[];
+  restLabel: string;
+  format: (value: number) => string;
+  pct: (value: number) => string;
+}
+
+const { title, data, labels, restLabel, format, pct } = Astro.props;
+const W = 600;
+const H = 240;
+const n = data.length;
+const min = Math.min(...data);
+const max = Math.max(...data);
+const x = (i: number) => (n < 2 ? 0 : (i * W) / (n - 1));
+const y = (v: number) => 8 + (1 - (v - min) / (max - min || 1)) * H * 0.72;
+const line = data.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
+const area = `${line} L${W} ${H} L0 ${H} Z`;
+const first = data[0] ?? 0;
+const points = data.map((v, i) => {
+  const diff = v - first;
+  return {
+    value: format(v),
+    delta: `${diff >= 0 ? '▲' : '▼'} ${format(Math.abs(diff))} (${pct(first ? Math.abs(diff / first) : 0)})`,
+    label: labels[i] ?? '',
+    x: (x(i) / W) * 100,
+    y: (y(v) / H) * 100,
+  };
+});
+const last = points[n - 1];
+---
+
+<site-area-chart class="ds-chart site-chart" data-points={JSON.stringify(points)} data-rest={restLabel}>
+  <div class="ds-chart__top">
+    <div class="ds-chart__head">
+      <span class="ds-chart__label">{title}</span>
+      <span class="ds-chart__price" data-value>{last?.value}</span>
+      <span class="ds-chart__delta">
+        <span class="ds-t-up" data-delta>{last?.delta}</span>
+        <span data-label>{restLabel}</span>
+      </span>
+    </div>
+  </div>
+  <div class="site-chart__plot" data-plot>
+    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="site-chart-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="currentColor" stop-opacity=".25"></stop>
+          <stop offset="1" stop-color="currentColor" stop-opacity=".04"></stop>
+        </linearGradient>
+      </defs>
+      <path d={area} fill="url(#site-chart-fill)"></path>
+      <path
+        d={line}
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linejoin="round"
+        stroke-linecap="round"
+        vector-effect="non-scaling-stroke"></path>
+    </svg>
+    <span class="site-chart__cross" data-cross hidden></span>
+    <span class="site-chart__dot" data-dot hidden></span>
+  </div>
+</site-area-chart>
+
+<script>
+  type Point = { value: string; delta: string; label: string; x: number; y: number };
+
+  class SiteAreaChart extends HTMLElement {
+    connectedCallback() {
+      const points: Point[] = JSON.parse(this.dataset.points ?? '[]');
+      const rest = this.dataset.rest ?? '';
+      const plot = this.querySelector<HTMLElement>('[data-plot]');
+      const cross = this.querySelector<HTMLElement>('[data-cross]');
+      const dot = this.querySelector<HTMLElement>('[data-dot]');
+      const value = this.querySelector('[data-value]');
+      const delta = this.querySelector('[data-delta]');
+      const label = this.querySelector('[data-label]');
+      if (!plot || !cross || !dot || !value || !delta || !label || points.length < 2) return;
+      const last = points[points.length - 1] as Point;
+      const show = (p: Point, hovering: boolean) => {
+        value.textContent = p.value;
+        delta.textContent = p.delta;
+        label.textContent = hovering ? p.label : rest;
+        cross.hidden = dot.hidden = !hovering;
+        cross.style.left = dot.style.left = `${p.x}%`;
+        dot.style.top = `${p.y}%`;
+      };
+      plot.addEventListener('pointermove', (event) => {
+        const box = plot.getBoundingClientRect();
+        const i = Math.round(((event.clientX - box.left) / box.width) * (points.length - 1));
+        show(points[Math.max(0, Math.min(points.length - 1, i))] as Point, true);
+      });
+      plot.addEventListener('pointerleave', () => show(last, false));
+    }
+  }
+
+  customElements.define('site-area-chart', SiteAreaChart);
+</script>

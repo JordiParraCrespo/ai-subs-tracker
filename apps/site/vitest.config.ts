@@ -1,12 +1,11 @@
-import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vitest/config';
+/// <reference types="vitest/config" />
+import { getViteConfig } from 'astro/config';
 
 /**
- * The page is rendered to a string, the way the build prerenders it, so the
- * tests need no DOM: what they hold is that the static HTML says what the
- * product does and that every link goes somewhere.
+ * Astro's own Vite config, so the tests render components through the
+ * Container API with `astro:i18n`, the `@/` alias and the content layer
+ * resolved the way the build resolves them.
  */
-export default defineConfig({
-  plugins: [react()],
-  test: { environment: 'node', include: ['src/**/*.test.{ts,tsx}'] },
+export default getViteConfig({
+  test: { environment: 'node', include: ['src/**/*.test.ts'] },
 });

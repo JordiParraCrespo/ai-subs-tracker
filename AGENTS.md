@@ -41,7 +41,7 @@ subtrack/
 ├── apps/
 │   ├── api/              # NestJS REST API (accounts module: sync, limits, tokens)
 │   ├── desktop/          # Electron shell: collector, tray, bridge (@flama/desktop)
-│   ├── site/             # The landing page, prerendered on the web design system (@flama/site)
+│   ├── site/             # The website: Astro, home page + SEO guides, en/es (@flama/site)
 │   └── web/              # The screens, a Vite + TanStack Router SPA
 ├── packages/
 │   ├── auth/             # Shared Better Auth config + client helpers (@flama/auth)

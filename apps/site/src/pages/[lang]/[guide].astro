@@ -1,0 +1,25 @@
+---
+import { render } from 'astro:content';
+
+import { siteConfig } from '@/config/site';
+import GuideLayout from '@/layouts/GuideLayout.astro';
+import { type Guide, guideSlug, guidesIn } from '@/lib/guides';
+
+export async function getStaticPaths() {
+  const langs = siteConfig.locales.filter((lang) => lang !== siteConfig.defaultLocale);
+  const perLang = await Promise.all(
+    langs.map(async (lang) =>
+      (await guidesIn(lang)).map((entry) => ({
+        params: { lang, guide: guideSlug(entry) },
+        props: { entry },
+      })),
+    ),
+  );
+  return perLang.flat();
+}
+
+const { entry } = Astro.props as { entry: Guide };
+const { Content } = await render(entry);
+---
+
+<GuideLayout entry={entry}><Content /></GuideLayout>

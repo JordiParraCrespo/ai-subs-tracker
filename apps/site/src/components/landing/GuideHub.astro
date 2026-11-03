@@ -1,0 +1,44 @@
+---
+/**
+ * The guides as cards: on the home page, and at the end of the pillar page.
+ * `exclude` drops the page the hub sits on.
+ */
+import { ArrowRight } from '@lucide/astro';
+
+import { useTranslations } from '@/i18n';
+import { guideSlug, guidesIn } from '@/lib/guides';
+import { currentLocale, localePath } from '@/lib/locale';
+
+interface Props {
+  exclude?: string;
+  title?: string;
+}
+
+const locale = currentLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+const guides = (await guidesIn(locale)).filter((g) => guideSlug(g) !== Astro.props.exclude);
+---
+
+<section id="guides" class="ds-container site-section">
+  <div class="site-section__head">
+    <span class="site-eyebrow">{t('guides.eyebrow')}</span>
+    <h2 class="site-h2">{Astro.props.title ?? t('guides.title')}</h2>
+  </div>
+  <ul class="site-grid site-hub">
+    {
+      guides.map((guide) => (
+        <li class="ds-card site-hub__card">
+          <a href={localePath(locale, `/${guideSlug(guide)}/`)} class="site-hub__link">
+            <span class="site-eyebrow">{guide.data.eyebrow}</span>
+            <h3 class="site-feature__title">{guide.data.heading}</h3>
+            <p class="site-muted m-0">{guide.data.summary}</p>
+            <span class="site-hub__more">
+              {t('guides.read')}
+              <ArrowRight size={16} aria-hidden="true" />
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>

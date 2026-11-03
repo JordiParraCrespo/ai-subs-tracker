@@ -1,0 +1,51 @@
+---
+/**
+ * A vendor's plans from the catalog (`@flama/shared/subscriptions`), so a
+ * rename or a new price there reaches every page that shows it. Enterprise is
+ * priced by each vendor's sales team and left out.
+ */
+import { PROVIDER_LABELS, type ProviderId, plansFor } from '@flama/shared/subscriptions';
+
+import { useTranslations } from '@/i18n';
+import { currentLocale } from '@/lib/locale';
+import { dollars } from '@/lib/preview';
+
+interface Props {
+  provider: ProviderId;
+}
+
+const locale = currentLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+const { provider } = Astro.props;
+const plans = plansFor(provider).filter((plan) => !plan.id.endsWith('-enterprise'));
+const label = PROVIDER_LABELS[provider];
+const team = (id: string) => id.includes('team') || id.includes('business');
+---
+
+<div class="site-table-wrap">
+  <table class="site-table">
+    <caption>{t('table.plansCaption', { product: label.name, vendor: label.vendor })}</caption>
+    <thead>
+      <tr>
+        <th scope="col">{t('table.plan')}</th>
+        <th scope="col">{t('table.price')}</th>
+        <th scope="col">{t('table.windows')}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        plans.map((plan) => (
+          <tr>
+            <th scope="row">{plan.name}</th>
+            <td>
+              {plan.monthlyPriceCents === 0
+                ? t('table.free')
+                : `${dollars(plan.monthlyPriceCents / 100, locale)}${t(team(plan.id) ? 'table.perSeat' : 'table.perMonth')}`}
+            </td>
+            <td>{t(plan.windows === 'weekly' ? 'table.weeklyOnly' : 'table.sessionWeekly')}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

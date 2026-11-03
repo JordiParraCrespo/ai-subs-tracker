@@ -1,0 +1,27 @@
+---
+import { useTranslations } from '@/i18n';
+import { currentLocale } from '@/lib/locale';
+
+const t = useTranslations(currentLocale(Astro.currentLocale));
+const steps = ['install', 'accounts', 'queue'] as const;
+---
+
+<section id="how" class="ds-container site-section">
+  <div class="site-section__head">
+    <span class="site-eyebrow">{t('how.eyebrow')}</span>
+    <h2 class="site-h2">{t('how.title')}</h2>
+  </div>
+  <ol class="site-steps">
+    {
+      steps.map((step, i) => (
+        <li class="site-step">
+          <span class="site-step__n" aria-hidden="true">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <h3 class="site-step__title">{t(`how.${step}.title`)}</h3>
+          <p class="site-muted m-0">{t(`how.${step}.text`)}</p>
+        </li>
+      ))
+    }
+  </ol>
+</section>

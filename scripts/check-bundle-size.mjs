@@ -38,10 +38,10 @@ const APPS = [
   {
     name: '@flama/site',
     dist: 'apps/site/dist',
-    // 118KB measured: ~57KB of React, the design system's stylesheet (~32KB)
-    // and the few components the page renders. The page is prerendered, so
-    // this is what hydrates it, not what draws it.
-    budgetKB: 130,
+    // 13.8KB measured: the inlined stylesheet (~12.7KB, the design system's
+    // tokens and classes) and three small same-origin scripts. No framework
+    // ships; the page is static HTML.
+    budgetKB: 20,
   },
   // flama:end site
   // flama:plugins admin-web
@@ -97,6 +97,15 @@ for (const app of selected) {
     const gzipped = gzipSync(readFileSync(file), { level: 9 }).length;
     total += gzipped;
     rows.push([asset, gzipped]);
+  }
+
+  // A stylesheet inlined into the HTML (Astro's `inlineStylesheets`) is on the
+  // critical path as surely as a linked one.
+  const inline = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('');
+  if (inline) {
+    const gzipped = gzipSync(inline, { level: 9 }).length;
+    total += gzipped;
+    rows.push(['inline <style>', gzipped]);
   }
 
   const totalKB = total / 1024;

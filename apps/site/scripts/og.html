@@ -1,0 +1,44 @@
+<!doctype html>
+<!--
+  The social card (public/og.png, 1200×630). Re-render after editing:
+    node apps/site/scripts/render-og.cjs
+  Colours are the design system's dark theme (subtrack-ds.css).
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      html, body { margin: 0; }
+      body {
+        width: 1200px; height: 630px; box-sizing: border-box; padding: 72px 80px;
+        background: #171717; color: #fff;
+        font-family: "SF Pro Display", -apple-system, "Segoe UI", system-ui, sans-serif;
+        display: flex; flex-direction: column; justify-content: space-between;
+      }
+      .brand { font-size: 30px; font-weight: 700; line-height: 1; letter-spacing: -0.5px; display: flex; align-items: center; gap: 14px; }
+      .mark { width: 40px; height: 40px; border-radius: 10px; background: #7764d8; }
+      h1 { margin: 0; font-weight: 600; font-size: 72px; line-height: 1.04; letter-spacing: -2.5px; max-width: 900px; }
+      p { margin: 20px 0 0; font-size: 28px; line-height: 1.35; color: #a1a1a1; max-width: 860px; }
+      .row { display: flex; gap: 16px; }
+      .chip {
+        padding: 18px 24px; border-radius: 20px; background: #262626; border: 1px solid #333;
+        display: flex; flex-direction: column; gap: 6px; min-width: 200px;
+      }
+      .chip span { font-size: 18px; color: #a1a1a1; }
+      .chip strong { font-size: 30px; font-weight: 600; letter-spacing: -0.5px; }
+      .chip strong.up { color: #9a8cf0; }
+    </style>
+  </head>
+  <body>
+    <div class="brand"><span class="mark"></span>Subtrack</div>
+    <div>
+      <h1>Use up the AI coding plans you pay for</h1>
+      <p>Limits, the account to use next and usage at API prices for every Claude Code and Codex login.</p>
+    </div>
+    <div class="row">
+      <div class="chip"><span>Use next</span><strong>Claude Ultra · 58%</strong></div>
+      <div class="chip"><span>At API prices</span><strong class="up">$2,412</strong></div>
+      <div class="chip"><span>Price</span><strong>Free · MIT</strong></div>
+    </div>
+  </body>
+</html>

@@ -3,7 +3,6 @@ node_modules/
 
 # Build outputs
 dist/
-dist-server/
 build/
 .next/
 # What any Expo app generates: native projects from `expo prebuild`, and the
@@ -72,3 +71,6 @@ uploads/
 # flama:begin e2e
 e2e/tests/screens/local/
 # flama:end e2e
+
+# Astro
+.astro/
