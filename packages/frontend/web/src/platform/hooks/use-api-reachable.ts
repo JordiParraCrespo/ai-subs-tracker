@@ -19,14 +19,13 @@ export function useApiReachable(healthUrl: string) {
       return;
     }
     setChecking(true);
-    try {
-      const response = await fetch(healthUrl, { credentials: 'omit', cache: 'no-store' });
-      setReachable(response.ok);
-    } catch {
-      setReachable(false);
-    } finally {
-      setChecking(false);
-    }
+    // No `finally`: the React Compiler leaves a function with one uncompiled.
+    const ok = await fetch(healthUrl, { credentials: 'omit', cache: 'no-store' }).then(
+      (response) => response.ok,
+      () => false,
+    );
+    setReachable(ok);
+    setChecking(false);
   }, [healthUrl]);
 
   useEffect(() => {
