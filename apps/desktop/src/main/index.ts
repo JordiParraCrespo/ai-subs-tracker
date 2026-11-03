@@ -97,6 +97,8 @@ async function main(): Promise<void> {
   let win: BrowserWindow | null = null;
   /** The add-account sign-in in flight, which the screens can type a code into or stop. */
   let login: LoginHandle | null = null;
+  /** Bumped by every start and cancel, so a cancel during the PATH lookup still holds. */
+  let loginGeneration = 0;
   let tray: TrayController | null = null;
   let quitting = false;
   let lastSynced: SyncedAccount[] | null = null;
@@ -210,7 +212,10 @@ async function main(): Promise<void> {
         // One login at a time: a second "Add" stops the first, whose folder
         // is then removed like any sign-in that did not finish.
         login?.cancel();
+        const generation = ++loginGeneration;
         const path = await loginShellPath(process.env.SHELL, process.env.PATH);
+        // Back, a close or another pick while the shell answered: never start.
+        if (generation !== loginGeneration) return { ok: false, message: 'Sign-in cancelled.' };
         const handle = startLogin({
           managedRoot,
           provider,
@@ -229,7 +234,10 @@ async function main(): Promise<void> {
         return result;
       },
       submitLoginCode: (code) => login?.submitCode(code),
-      cancelLogin: () => login?.cancel(),
+      cancelLogin: () => {
+        loginGeneration++;
+        login?.cancel();
+      },
       async activate(provider, externalId) {
         const item = collector
           .localAccounts()

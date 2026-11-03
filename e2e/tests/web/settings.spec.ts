@@ -131,3 +131,35 @@ test('switches the language of the whole page', async ({ page }) => {
 
   await api.dispose();
 });
+
+test('two cards saved back to back both keep their change', async ({ page }) => {
+  // Each card saves the whole settings record: without saves running in
+  // order and carrying the change still in flight, the theme's save sent the
+  // old language back and undid the first.
+  const { user, api } = await provisionedUser('settingsrace');
+  await signInAs(page, user);
+  await openSettings(page);
+
+  // Hold the first save's answer, so the second card saves while it is in flight.
+  let held = false;
+  await page.route('**/api/v1/profile/settings', async (route) => {
+    if (route.request().method() === 'PUT' && !held) {
+      held = true;
+      await new Promise((resolve) => setTimeout(resolve, 1_500));
+    }
+    await route.continue();
+  });
+
+  await page.getByRole('button', { name: 'English' }).click();
+  await page.getByRole('button', { name: 'Español' }).click();
+  await page.getByRole('radio', { name: 'Oscuro' }).click();
+
+  await expect
+    .poll(async () => {
+      const settings = await (await api.get('/api/v1/profile/settings')).json();
+      return `${settings.locale} ${settings.theme}`;
+    })
+    .toBe('es dark');
+
+  await api.dispose();
+});

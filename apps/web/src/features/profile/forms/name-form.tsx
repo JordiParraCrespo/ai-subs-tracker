@@ -33,6 +33,8 @@ export function NameForm({
   } = useForm<NameFormValues>({
     resolver: useZodResolver(nameSchema),
     values: saved,
+    // A save landing refreshes `saved`; a field typed in meanwhile keeps its text.
+    resetOptions: { keepDirtyValues: true },
     mode: 'onBlur',
   });
   const save = handleSubmit((values) => {

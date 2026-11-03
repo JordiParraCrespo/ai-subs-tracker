@@ -19,6 +19,7 @@ export function WorkspaceNameForm({
   const { t } = useTranslation();
   const { register, handleSubmit } = useForm<WorkspaceNameValues>({
     values: { name: saved ?? '' },
+    resetOptions: { keepDirtyValues: true },
   });
   const save = handleSubmit(({ name }) => {
     const next = name.trim().slice(0, 80) || null;
