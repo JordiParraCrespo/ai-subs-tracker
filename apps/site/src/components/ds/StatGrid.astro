@@ -1,0 +1,20 @@
+---
+/** The design system's key-figure grid (`.ds-stats`): label over value. */
+interface Props {
+  items: { label: string; value: string; tone?: 'positive' }[];
+  columns?: number;
+}
+
+const { items, columns = 3 } = Astro.props;
+---
+
+<dl class="ds-stats" style={`--ds-cols:${columns}`}>
+  {
+    items.map((item) => (
+      <div>
+        <dt>{item.label}</dt>
+        <dd class={item.tone === 'positive' ? 'ds-t-up' : undefined}>{item.value}</dd>
+      </div>
+    ))
+  }
+</dl>

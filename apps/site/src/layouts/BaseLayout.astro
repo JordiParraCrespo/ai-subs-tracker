@@ -1,0 +1,75 @@
+---
+/**
+ * Every page's document: head (SEO, hreflang, JSON-LD), the header, `<main>`
+ * and the footer. astro-ignite's BaseLayout without the cookie banner and
+ * analytics (the site sets no cookies and loads no third-party script) and
+ * with the theme bootstrap as a file, so `script-src 'self'` holds.
+ */
+import type { Thing } from 'schema-dts';
+
+import '@/styles/site.css';
+import SiteFooter from '@/components/common/SiteFooter.astro';
+import SiteHeader from '@/components/common/SiteHeader.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import SEO from '@/components/seo/SEO.astro';
+import { siteConfig } from '@/config/site';
+import { useTranslations } from '@/i18n';
+import { siteSchemas } from '@/lib/jsonld';
+import { absolute, currentLocale, localePath, stripLocale } from '@/lib/locale';
+
+interface Props {
+  title: string;
+  description: string;
+  noindex?: boolean;
+  schemas?: Thing[];
+  /** Locales this page exists in; every locale unless told otherwise. */
+  locales?: string[];
+}
+
+const {
+  title,
+  description,
+  noindex = false,
+  schemas = [],
+  locales = siteConfig.locales,
+} = Astro.props;
+const locale = currentLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+const path = stripLocale(Astro.url.pathname);
+const alternates = locales.map((lang) => ({
+  lang: siteConfig.hreflang[lang] ?? lang,
+  href: absolute(localePath(lang, path)),
+}));
+---
+
+<!doctype html>
+<html lang={siteConfig.hreflang[locale] ?? locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content={siteConfig.themeColor} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <!-- Theme before first paint: a same-origin file, render-blocking in
+         <head>, so the policy needs no inline-script exception. -->
+    <script is:inline src="/theme-init.js"></script>
+    <SEO
+      title={title}
+      description={description}
+      noindex={noindex}
+      locale={locale}
+      canonical={absolute(localePath(locale, path))}
+      alternates={alternates}
+    />
+    <JsonLd schemas={[...siteSchemas(locale), ...schemas]} />
+  </head>
+  <body class="antialiased">
+    <a href="#main" class="site-skip">{t('nav.skipToContent')}</a>
+    <SiteHeader />
+    <main id="main">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

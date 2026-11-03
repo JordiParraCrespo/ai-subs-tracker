@@ -8,7 +8,7 @@ account to use next so nothing paid for expires unused, and what the usage is
 worth at API prices. `README.md` describes the product and how the data flows.
 
 The repository is built on the Flama boilerplate (Turborepo + pnpm). The
-starter was pruned to `api`, `web` and `e2e`; `apps/desktop` and
+starter was pruned to `api`, `web` and `e2e`; `apps/desktop`, `apps/site` and
 `packages/usage-providers` are this project's own. More apps and Stripe
 billing are available as Flama plugins (see [Plugins](#plugins)).
 
@@ -41,6 +41,7 @@ subtrack/
 ├── apps/
 │   ├── api/              # NestJS REST API (accounts module: sync, limits, tokens)
 │   ├── desktop/          # Electron shell: collector, tray, bridge (@flama/desktop)
+│   ├── site/             # The website: Astro, home page + SEO guides, en/es (@flama/site)
 │   └── web/              # The screens, a Vite + TanStack Router SPA
 ├── packages/
 │   ├── auth/             # Shared Better Auth config + client helpers (@flama/auth)
@@ -362,7 +363,7 @@ packages/backend/storage  → used by api
 packages/backend/queue    → used by api
 packages/translations        → used by web, api (email copy via backend/i18n)
 packages/frontend/react-hooks          → used by both design systems, frontend/web, web (React only)
-packages/frontend/design-system/web    → used by web, frontend/web
+packages/frontend/design-system/web    → used by web, frontend/web, site
 packages/frontend/api-client  → used by frontend/core, frontend/consumer
 packages/frontend/core        → used by every frontend package and app
 packages/frontend/consumer    → used by web

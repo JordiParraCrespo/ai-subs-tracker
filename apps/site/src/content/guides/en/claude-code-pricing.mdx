@@ -1,0 +1,55 @@
+---
+title: Claude Code pricing in 2026 — every plan, limit and API rate
+description: Claude Code pricing for Pro, Max, Ultra and Team, which plans have a 5-hour limit, and how plan prices compare with Anthropic's API rates per million tokens.
+heading: Claude Code pricing, plan by plan
+eyebrow: Claude Code pricing
+lede: Every plan that includes Claude Code, what it costs a month, which usage limits it meters, and how to tell whether a plan is cheaper than paying for the same tokens on the API.
+summary: Pro, Max, Ultra and Team prices, the limits each plan meters, and how a plan compares with Anthropic's API rates.
+order: 2
+checked: 2026-11-02
+related: [claude-pro-vs-max-vs-ultra, claude-code-usage-limits, codex-pricing]
+faq:
+  - q: How much does Claude Code cost?
+    a: Claude Code comes with Anthropic's Claude plans. Pro is $20 a month, Max $100 and Ultra $200; Team seats are $25 (Standard) or $125 (Premium) per seat per month. Enterprise is priced by Anthropic's sales team.
+  - q: What happened to Max 20x?
+    a: Anthropic renamed Max 20x to Ultra on 30 October 2026. It keeps the $200 price, and verified accounts on it have no 5-hour limit, only a weekly one.
+  - q: Is a Claude plan cheaper than the API?
+    a: It depends on how much you use. Price your real usage at the API rates below and compare it with the plan's monthly price; Tokenaitor does this for you from the CLI's own transcripts.
+  - q: Are these prices per month?
+    a: Yes, the monthly price in US dollars. Team prices are per seat. Taxes and annual billing are not included.
+---
+import ApiPriceTable from '@/components/guides/ApiPriceTable.astro';
+import Callout from '@/components/guides/Callout.astro';
+import PlanTable from '@/components/guides/PlanTable.astro';
+
+## Claude Code plans and prices
+
+Claude Code is included in Anthropic's paid Claude plans. These are the plans and monthly prices as of the date at the top of this page:
+
+<PlanTable provider="claude-code" />
+
+**Max 20x is now Ultra.** Anthropic renamed it on 30 October 2026; the price stayed at $200. If an older account still reports the old name, Tokenaitor shows it as Ultra.
+
+## Which limits each plan meters
+
+Most plans meter two windows: a **5-hour session window** and a **weekly** one. Ultra only meters the weekly window. The [usage limits guide](/claude-code-usage-limits/) explains how the two interact and what happens when you hit one.
+
+## What the same usage costs on the API
+
+The fair way to judge a plan is to price the tokens you actually use at the API rates. These are Anthropic's pay-as-you-go prices in US dollars per million tokens, the same table Tokenaitor prices your usage with:
+
+<ApiPriceTable vendor="anthropic" />
+
+Cache writes cost 1.25× the input price. An agentic coding session reads its own context back many times, so cache reads are often the largest number of tokens in a day.
+
+<Callout>
+  Tokenaitor counts tokens from Claude Code's own transcripts, per model and per day, and shows what that usage would have cost on the API next to what each plan costs you.
+</Callout>
+
+## How to choose a plan
+
+- **Pro** suits steady, lighter use. Watch the 5-hour window: it is the one you hit first.
+- **Max** gives five times Pro's usage for five times the price, which matters when you regularly run out mid-session.
+- **Ultra** drops the 5-hour window entirely, so long sessions only count against the week.
+
+Comparing them side by side is the [Pro vs Max vs Ultra guide](/claude-pro-vs-max-vs-ultra/). If you also use OpenAI's agent, see [Codex pricing](/codex-pricing/).

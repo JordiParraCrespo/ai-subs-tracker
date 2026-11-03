@@ -139,8 +139,9 @@ jobs:
       # What a first-time visitor downloads before anything renders, against a
       # committed budget. Vite's own chunk warning prints and passes.
       #
-      # `check:bundle` reads every SPA's dist folder at once, so each one that
-      # changed is built first — the one already built above is a cache hit.
+      # Each SPA that changed is built and then measured, and only those: an
+      # SPA the change did not touch has no dist on a fresh checkout. The one
+      # already built above is a cache hit.
       # Which SPAs those are is decided inside the block, next to the filter
       # that builds them, so a plugin that adds an SPA adds both in one place.
       - name: First-load budgets
@@ -150,10 +151,14 @@ jobs:
           # flama:begin web
           if changed @flama/web; then filters+=(--filter=@flama/web); fi
           # flama:end web
+          # flama:begin site
+          if changed @flama/site; then filters+=(--filter=@flama/site); fi
+          # flama:end site
           # flama:plugins admin-web
           if [[ ${#filters[@]} -eq 0 ]]; then exit 0; fi
           pnpm turbo run build "${filters[@]}"
-          pnpm check:bundle
+          # Only the SPAs built above: one this change did not affect has no dist.
+          pnpm check:bundle "${filters[@]#--filter=}"
       # flama:end web
       # flama:plugins bundle-budgets
 

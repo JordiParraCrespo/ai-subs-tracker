@@ -1,0 +1,61 @@
+---
+title: Límites de uso de Claude Code y Codex — el de 5 horas y el semanal
+description: Cómo funcionan los límites de uso de Claude Code y Codex, qué planes miden uno de 5 horas y uno semanal, qué pasa al llegar y cómo aprovechar lo que pagas.
+heading: Los límites de uso de Claude Code y Codex, explicados
+eyebrow: Límites de uso
+lede: Los dos agentes miden el uso en límites que se reinician a su propio ritmo. Saber en qué límite estás y cuándo se reinicia es la diferencia entre quedarte parado a mitad de una tarea y aprovechar todo lo que has pagado.
+summary: Cómo funcionan los límites de 5 horas y semanales en cada plan, qué pasa al llegar y cómo aprovechar todo lo que pagas.
+order: 4
+checked: 2026-11-02
+related: [claude-code-usage-tracker, claude-pro-vs-max-vs-ultra, codex-pricing]
+faq:
+  - q: ¿Qué es el límite de 5 horas de Claude Code?
+    a: La mayoría de los planes de Claude miden el uso en un límite de 5 horas además del semanal. Cuando se agota el de 5 horas tienes que esperar a que se reinicie, aunque a la semana aún le quede margen.
+  - q: ¿Qué planes no tienen límite de 5 horas?
+    a: Claude Ultra y los tres niveles de ChatGPT Pro miden solo un límite semanal. El resto de planes del catálogo miden los dos.
+  - q: ¿El límite semanal que no uso se acumula?
+    a: No. Cada límite empieza de cero al reiniciarse, así que lo que no usaste en la semana se pierde. Es justo ese margen el que la cola de Tokenaitor está pensada para gastar.
+  - q: ¿Cómo veo los límites de todas mis cuentas a la vez?
+    a: La CLI muestra la cuenta con la que has entrado. Tokenaitor lee todas las sesiones de tu ordenador y muestra los límites de cada una, sus horas de reinicio y la cuenta que toca usar.
+---
+import Callout from '@/components/guides/Callout.astro';
+
+## Dos límites, dos relojes
+
+Claude Code y Codex miden el uso en **límites por periodo**, no en una bolsa mensual:
+
+- El **límite de 5 horas** acota cuánto puedes hacer de una tirada. Empieza con tu uso y se reinicia cinco horas después.
+- El **límite semanal** acota la semana entera y se reinicia según su propio calendario.
+
+Un plan puede quedarse sin cualquiera de los dos. Puedes agotar el de 5 horas con casi toda la semana por delante, o agotar la semana con el de 5 horas intacto.
+
+## Qué límite mide cada plan
+
+| Plan | Límite de 5 horas | Límite semanal |
+| --- | --- | --- |
+| Claude Pro, Max, Team | Sí | Sí |
+| Claude Ultra | No | Sí |
+| ChatGPT Go, Plus, Business | Sí | Sí |
+| ChatGPT Pro (100 $, 200 $, 500 $) | No | Sí |
+
+Los precios de cada plan están en las guías de [precios de Claude Code](/es/claude-code-pricing/) y [precios de Codex](/es/codex-pricing/).
+
+## Qué pasa al llegar al límite
+
+Cuando se agota un límite, el agente deja de aceptar trabajo en esa cuenta hasta que se reinicia. La CLI te dice cuándo, pero solo de la cuenta que estás usando.
+
+## Usa primero el límite que caduca antes
+
+Si tienes más de una cuenta, el orden eficiente no es «la que tiene más margen». Es la que tiene más margen **por hora antes de reiniciarse**: un límite semanal con el 40 % libre que se reinicia mañana vale más ahora que otro con el 80 % y seis días por delante, porque el primero se pierde si no lo usas.
+
+<Callout>
+  Ese orden es la cola de Tokenaitor. Pone la cuenta que toca usar arriba de la lista y en la barra de menús, entre Claude Code y Codex, y lo revisa cada diez minutos.
+</Callout>
+
+## Evita quedarte sin límite de 5 horas a mitad de una tarea
+
+- Empieza las tareas largas con una cuenta cuyo límite de 5 horas se acabe de reiniciar.
+- Ten una segunda cuenta para cuando la primera vaya justa, y cambia antes de que se agote.
+- Mira lo que queda antes de una ejecución larga del agente, no cuando se para.
+
+La [guía del control de uso](/es/claude-code-usage-tracker/) explica cómo lee Tokenaitor estos límites sin tocar tus credenciales.

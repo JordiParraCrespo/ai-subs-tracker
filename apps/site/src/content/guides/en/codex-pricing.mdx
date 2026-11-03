@@ -1,0 +1,49 @@
+---
+title: Codex pricing in 2026 — ChatGPT plans, Pro tiers and limits
+description: Codex pricing for ChatGPT Go, Plus, the three Pro tiers and Business, which plans meter a 5-hour limit, and OpenAI's API rates per million tokens.
+heading: Codex pricing, plan by plan
+eyebrow: Codex pricing
+lede: Codex comes with ChatGPT plans. Here is what each plan costs, which usage limits it meters since Pro split into three tiers, and how plan prices compare with OpenAI's API rates.
+summary: ChatGPT Go, Plus, the three Pro tiers and Business for Codex, the limits each meters, and OpenAI's API rates.
+order: 3
+checked: 2026-11-02
+related: [claude-code-pricing, claude-code-usage-limits, claude-code-usage-tracker]
+faq:
+  - q: How much does Codex cost?
+    a: Codex comes with ChatGPT plans. Go is $8 a month, Plus $20, and Pro comes in three tiers at $100, $200 and $500. Business is $25 per seat per month, and Enterprise is priced by OpenAI's sales team.
+  - q: When did ChatGPT Pro split into three tiers?
+    a: OpenAI split Pro into $100, $200 and $500 tiers on 29 September 2026. All three meter a weekly limit only, with no 5-hour window.
+  - q: Which Pro tier is my account on?
+    a: Codex reports every Pro tier as plain "pro", so Tokenaitor assumes the $200 tier until you set the plan and price your account actually pays.
+  - q: Is Codex usage counted with Claude Code usage in Tokenaitor?
+    a: Each account is tracked separately, and all of them, Claude Code and Codex alike, share one queue of which account to use next.
+---
+import ApiPriceTable from '@/components/guides/ApiPriceTable.astro';
+import Callout from '@/components/guides/Callout.astro';
+import PlanTable from '@/components/guides/PlanTable.astro';
+
+## Codex plans and prices
+
+OpenAI's coding agent, Codex, is included in ChatGPT plans. These are the plans and monthly prices as of the date at the top of this page:
+
+<PlanTable provider="codex" />
+
+## Pro is now three tiers
+
+On 29 September 2026 OpenAI split ChatGPT Pro into **$100, $200 and $500** tiers. All three meter only a weekly limit, with no 5-hour window.
+
+<Callout>
+  Codex reports every Pro tier with the same name, so Tokenaitor cannot tell them apart. It assumes $200 until you set the price you actually pay, which then feeds every figure it shows.
+</Callout>
+
+## What the same usage costs on the API
+
+These are OpenAI's pay-as-you-go prices in US dollars per million tokens, the table Tokenaitor uses to price Codex usage:
+
+<ApiPriceTable vendor="openai" />
+
+Tokenaitor counts tokens from Codex's own session logs (`~/.codex/sessions`), per model and per day, and prices them with these rates. That gives you a like-for-like number to set against each plan's price.
+
+## Limits on Go, Plus and Business
+
+Go, Plus and Business meter both a **5-hour** window and a **weekly** one. When either runs out, Codex stops until it resets, which is where a second account helps. The [usage limits guide](/claude-code-usage-limits/) covers both vendors' windows, and [Claude Code pricing](/claude-code-pricing/) compares Anthropic's plans.

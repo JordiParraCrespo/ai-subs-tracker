@@ -1,0 +1,44 @@
+---
+/** What the design drew as pricing: where the logins go, from the README's "What it never does". */
+import { Check, Minus } from '@lucide/astro';
+
+import { useTranslations } from '@/i18n';
+import { currentLocale } from '@/lib/locale';
+
+const t = useTranslations(currentLocale(Astro.currentLocale));
+const local = ['tokens', 'content', 'settings'] as const;
+const api = ['identity', 'limits', 'tokens'] as const;
+---
+
+<section id="privacy" class="ds-container site-section">
+  <div class="site-section__head">
+    <span class="site-eyebrow">{t('privacy.eyebrow')}</span>
+    <h2 class="site-h2">{t('privacy.title')}</h2>
+    <p class="site-muted m-0">{t('privacy.lede')}</p>
+  </div>
+  <div class="site-grid site-grid--wide">
+    <div class="site-featured">
+      <div class="ds-card">
+        <div class="site-plan">
+          <div class="site-plan__head">
+            <h3 class="site-plan__title">{t('privacy.local.title')}</h3>
+            <span class="site-pill">{t('privacy.local.badge')}</span>
+          </div>
+          <ul class="site-checklist">
+            {local.map((key) => <li><Check size={16} aria-hidden="true" />{t(`privacy.local.${key}`)}</li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="ds-card">
+      <div class="site-plan">
+        <div class="site-plan__head">
+          <h3 class="site-plan__title">{t('privacy.api.title')}</h3>
+        </div>
+        <ul class="site-checklist site-checklist--muted">
+          {api.map((key) => <li><Minus size={16} aria-hidden="true" />{t(`privacy.api.${key}`)}</li>)}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

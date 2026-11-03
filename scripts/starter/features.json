@@ -30,6 +30,12 @@
         "scripts/scaffold-feature.mjs": ["admin-web", "web-templates"]
       }
     },
+    "site": {
+      "title": "Landing page",
+      "summary": "apps/site — the Astro website: home page and SEO guides, on the web design system",
+      "identifiers": ["apps/site", "@flama/site", "VITE_SITE_APP_URL"],
+      "paths": ["apps/site"]
+    },
     "e2e": {
       "title": "End-to-end tests",
       "summary": "e2e/ — Playwright suites against the running API and web app",
@@ -44,7 +50,7 @@
   "shared": {
     "packages/frontend/design-system/web": {
       "identifiers": ["packages/frontend/design-system/web", "@flama/design-system-web"],
-      "neededBy": ["web"]
+      "neededBy": ["web", "site"]
     },
     "packages/frontend/core": {
       "identifiers": ["packages/frontend/core", "@flama/frontend-core"],
@@ -56,7 +62,7 @@
     },
     "packages/frontend/react-hooks": {
       "identifiers": ["packages/frontend/react-hooks", "@flama/react-hooks"],
-      "neededBy": ["web"]
+      "neededBy": ["web", "site"]
     },
     "packages/frontend/web": {
       "identifiers": ["packages/frontend/web", "@flama/frontend-web"],

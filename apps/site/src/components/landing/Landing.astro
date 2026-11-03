@@ -1,0 +1,37 @@
+---
+/** The home page, shared by `/` and `/<lang>/`. */
+import { useTranslations } from '@/i18n';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { softwareApplicationSchema, webPageSchema } from '@/lib/jsonld';
+import { currentLocale, localePath } from '@/lib/locale';
+
+import CallToAction from './CallToAction.astro';
+import Features from './Features.astro';
+import GuideHub from './GuideHub.astro';
+import Hero from './Hero.astro';
+import HowItWorks from './HowItWorks.astro';
+import Privacy from './Privacy.astro';
+import ProductPreview from './ProductPreview.astro';
+
+const locale = currentLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+const schemas = [
+  webPageSchema({
+    url: localePath(locale, '/'),
+    title: t('seo.home.title'),
+    description: t('seo.home.description'),
+    inLanguage: locale,
+  }),
+  softwareApplicationSchema(locale),
+];
+---
+
+<BaseLayout title={t('seo.home.title')} description={t('seo.home.description')} schemas={schemas}>
+  <Hero />
+  <ProductPreview />
+  <Features />
+  <HowItWorks />
+  <Privacy />
+  <GuideHub />
+  <CallToAction />
+</BaseLayout>

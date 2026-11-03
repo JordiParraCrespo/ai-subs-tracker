@@ -71,3 +71,6 @@ uploads/
 # flama:begin e2e
 e2e/tests/screens/local/
 # flama:end e2e
+
+# Astro
+.astro/

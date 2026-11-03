@@ -1,0 +1,168 @@
+{
+  "seo": {
+    "home": {
+      "title": "Use up the AI coding plans you pay for",
+      "description": "Tokenaitor shows what every Claude Code and Codex plan on your computer has left, tells you which account to use next, and prices your usage at API rates."
+    },
+    "404": {
+      "title": "Page not found",
+      "description": "This page does not exist."
+    }
+  },
+  "nav": {
+    "skipToContent": "Skip to content",
+    "sections": "Sections",
+    "features": "Features",
+    "how": "How it works",
+    "privacy": "Privacy",
+    "signIn": "Sign in",
+    "download": "Download",
+    "home": "Home",
+    "guides": "Guides"
+  },
+  "theme": {
+    "label": "Switch between light and dark theme"
+  },
+  "locale": {
+    "switch": "Language"
+  },
+  "hero": {
+    "title": "Use up the AI coding plans you pay for",
+    "lede": "Tokenaitor watches every Claude Code and Codex login on your computer, shows what each plan’s 5-hour and weekly limits have left, and tells you which account to use next.",
+    "primary": "Download for desktop",
+    "secondary": "How it works",
+    "note": "Free and open source. macOS, Windows and Linux."
+  },
+  "preview": {
+    "label": "Example of the Tokenaitor screens",
+    "chartTitle": "Usage at API prices",
+    "chartRest": "Past 12 months",
+    "plansCost": "Plans cost",
+    "apiValue": "At API prices",
+    "expired": "Expired unused",
+    "perMonth": "/mo",
+    "useNext": "Use next",
+    "useNextHint": "Most headroom first",
+    "left": "left",
+    "weekly": "Weekly window resets in {time}",
+    "session": "5-hour window resets in {time}",
+    "caption": "Example figures. Plans and prices are the providers’ own."
+  },
+  "features": {
+    "eyebrow": "Features",
+    "title": "Know what every plan has left, and which one to use",
+    "limits": {
+      "title": "Every limit at a glance",
+      "text": "The 5-hour and weekly windows of each Claude Code and Codex login, read from the providers themselves."
+    },
+    "next": {
+      "title": "The account to use next",
+      "text": "Ranked by headroom per hour before each reset, so the allowance that expires first gets used first."
+    },
+    "value": {
+      "title": "Worth at API prices",
+      "text": "Tokens counted from the CLIs’ own transcripts and priced per model, so you see what each plan is worth."
+    },
+    "switch": {
+      "title": "Switch in one click",
+      "text": "Mark an account in use and the opt-in shell snippet points claude and codex in your terminal at it."
+    },
+    "renewals": {
+      "title": "Renewals and waste",
+      "text": "A calendar of when each plan bills, and how much paid allowance expired unused last month."
+    },
+    "tray": {
+      "title": "Right in the tray",
+      "text": "The account to use next sits in your menu bar, refreshed every ten minutes in the background."
+    }
+  },
+  "how": {
+    "eyebrow": "How it works",
+    "title": "Set up in a minute",
+    "install": {
+      "title": "Install the desktop app",
+      "text": "Tokenaitor finds the Claude Code and Codex logins already on your computer."
+    },
+    "accounts": {
+      "title": "Add your other accounts",
+      "text": "Each one signs into its own folder with the provider’s own CLI, so no login signs another out."
+    },
+    "queue": {
+      "title": "Follow the queue",
+      "text": "Work on the account at the top until it runs low. The tray tells you when to switch."
+    }
+  },
+  "privacy": {
+    "eyebrow": "Privacy",
+    "title": "Your logins never leave your computer",
+    "lede": "Tokenaitor never refreshes a provider’s token, talks to each provider as itself (subtrack-desktop), and never replaces a status line you already have.",
+    "local": {
+      "title": "Stays on your computer",
+      "badge": "Never sent",
+      "tokens": "Provider tokens and refresh tokens",
+      "content": "Your prompts, code and transcripts",
+      "settings": "Your shell and Claude settings, unless you opt in"
+    },
+    "api": {
+      "title": "Reaches Tokenaitor",
+      "identity": "Account emails and plan names",
+      "limits": "Limit percentages and reset times",
+      "tokens": "Token counts per model and day"
+    }
+  },
+  "cta": {
+    "title": "Stop leaving paid limits on the table",
+    "lede": "Install Tokenaitor and see which of your accounts to use next in under a minute.",
+    "button": "Download Tokenaitor"
+  },
+  "footer": {
+    "label": "Footer",
+    "source": "Source",
+    "releases": "Releases",
+    "legal": "Legal",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "license": "MIT licensed",
+    "tagline": "Limits, the account to use next and usage at API prices, for every Claude Code and Codex login on your computer.",
+    "product": "Product",
+    "project": "Project",
+    "disclaimer": "Not affiliated with Anthropic or OpenAI. Claude and Codex are their trademarks."
+  },
+  "legal": {
+    "lastUpdated": "Last updated",
+    "version": "Version"
+  },
+  "notFound": {
+    "title": "This page does not exist",
+    "text": "The link may be old, or the address mistyped.",
+    "back": "Back to the home page"
+  },
+  "guides": {
+    "eyebrow": "Guides",
+    "title": "Claude Code and Codex plans, limits and prices, explained",
+    "read": "Read the guide",
+    "pillarTitle": "Go deeper"
+  },
+  "guide": {
+    "breadcrumbs": "Breadcrumb",
+    "checked": "Prices and limits checked",
+    "faq": "Frequently asked questions",
+    "related": "Related guides"
+  },
+  "table": {
+    "plansCaption": "{product} plans from {vendor}, per month",
+    "plan": "Plan",
+    "price": "Price",
+    "windows": "Usage limits",
+    "free": "Free",
+    "perMonth": "/month",
+    "perSeat": "/seat/month",
+    "weeklyOnly": "Weekly limit only",
+    "sessionWeekly": "5-hour and weekly limits",
+    "apiCaption": "API prices in US dollars per million tokens",
+    "model": "Model",
+    "input": "Input",
+    "output": "Output",
+    "cacheRead": "Cache read"
+  }
+}

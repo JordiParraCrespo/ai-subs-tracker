@@ -1,0 +1,23 @@
+---
+import { Download } from '@lucide/astro';
+
+import ButtonLink from '@/components/common/ButtonLink.astro';
+import { links } from '@/config/site';
+import { useTranslations } from '@/i18n';
+import { currentLocale } from '@/lib/locale';
+
+const t = useTranslations(currentLocale(Astro.currentLocale));
+---
+
+<section id="top" class="ds-container site-hero">
+  <h1 class="site-hero__title">{t('hero.title')}</h1>
+  <p class="site-hero__lede">{t('hero.lede')}</p>
+  <div class="site-hero__actions">
+    <ButtonLink href={links.download} variant="primary" size="lg">
+      <Download slot="icon" size={18} aria-hidden="true" />
+      {t('hero.primary')}
+    </ButtonLink>
+    <ButtonLink href="#how" size="lg">{t('hero.secondary')}</ButtonLink>
+  </div>
+  <span class="site-note">{t('hero.note')}</span>
+</section>

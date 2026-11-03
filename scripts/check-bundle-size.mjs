@@ -34,6 +34,16 @@ const APPS = [
     budgetKB: 400,
   },
   // flama:end web
+  // flama:begin site
+  {
+    name: '@flama/site',
+    dist: 'apps/site/dist',
+    // 13.8KB measured: the inlined stylesheet (~12.7KB, the design system's
+    // tokens and classes) and three small same-origin scripts. No framework
+    // ships; the page is static HTML.
+    budgetKB: 20,
+  },
+  // flama:end site
   // flama:plugins admin-web
 ];
 
@@ -47,9 +57,20 @@ function initialAssets(html) {
   return [...urls].sort();
 }
 
+// With package names (`check-bundle-size.mjs @flama/site`), only those apps are
+// measured: CI builds just the SPAs a change affects, and an app it did not
+// build has no `dist` to read. With none, every app is, and each must be built.
+const only = process.argv.slice(2);
+const unknown = only.filter((name) => !APPS.some((app) => app.name === name));
+if (unknown.length > 0) {
+  console.error(`✗ no budget for ${unknown.join(', ')} — add it to APPS in this file.`);
+  process.exit(1);
+}
+const selected = only.length > 0 ? APPS.filter((app) => only.includes(app.name)) : APPS;
+
 let failed = false;
 
-for (const app of APPS) {
+for (const app of selected) {
   const dist = join(ROOT, app.dist);
   let html;
   try {
@@ -76,6 +97,15 @@ for (const app of APPS) {
     const gzipped = gzipSync(readFileSync(file), { level: 9 }).length;
     total += gzipped;
     rows.push([asset, gzipped]);
+  }
+
+  // A stylesheet inlined into the HTML (Astro's `inlineStylesheets`) is on the
+  // critical path as surely as a linked one.
+  const inline = [...html.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('');
+  if (inline) {
+    const gzipped = gzipSync(inline, { level: 9 }).length;
+    total += gzipped;
+    rows.push(['inline <style>', gzipped]);
   }
 
   const totalKB = total / 1024;

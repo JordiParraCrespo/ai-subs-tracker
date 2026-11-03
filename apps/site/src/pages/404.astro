@@ -1,0 +1,18 @@
+---
+import ButtonLink from '@/components/common/ButtonLink.astro';
+import { useTranslations } from '@/i18n';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { currentLocale, localePath } from '@/lib/locale';
+
+const locale = currentLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+---
+
+<BaseLayout title={t('seo.404.title')} description={t('seo.404.description')} noindex locales={[]}>
+  <section class="ds-container site-hero">
+    <span class="site-eyebrow">404</span>
+    <h1 class="site-hero__title">{t('notFound.title')}</h1>
+    <p class="site-hero__lede">{t('notFound.text')}</p>
+    <ButtonLink href={localePath(locale, '/')} variant="primary" size="lg">{t('notFound.back')}</ButtonLink>
+  </section>
+</BaseLayout>

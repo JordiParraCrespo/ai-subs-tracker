@@ -1,0 +1,52 @@
+---
+/**
+ * Pay-as-you-go API rates from the catalog Tokenaitor prices usage with
+ * (`MODEL_PRICES`), per million tokens.
+ */
+import { MODEL_PRICES } from '@flama/shared/subscriptions';
+
+import { useTranslations } from '@/i18n';
+import { currentLocale } from '@/lib/locale';
+
+interface Props {
+  vendor: 'anthropic' | 'openai';
+}
+
+const locale = currentLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+const rows = MODEL_PRICES.filter((m) =>
+  Astro.props.vendor === 'anthropic' ? m.label.startsWith('Claude') : m.label.startsWith('GPT'),
+);
+const usd = (v: number) =>
+  new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 2,
+  }).format(v);
+---
+
+<div class="site-table-wrap">
+  <table class="site-table">
+    <caption>{t('table.apiCaption')}</caption>
+    <thead>
+      <tr>
+        <th scope="col">{t('table.model')}</th>
+        <th scope="col">{t('table.input')}</th>
+        <th scope="col">{t('table.output')}</th>
+        <th scope="col">{t('table.cacheRead')}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((m) => (
+          <tr>
+            <th scope="row">{m.label}</th>
+            <td>{usd(m.input)}</td>
+            <td>{usd(m.output)}</td>
+            <td>{usd(m.cacheRead)}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

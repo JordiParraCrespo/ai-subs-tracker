@@ -32,6 +32,10 @@ const INTERNAL: Record<string, string> = {
 /** Who else reads a variable the example lists, and where to find the read. */
 const OTHER_READERS: { pattern: RegExp; reader: string; directory: string }[] = [
   { pattern: /_IMAGE$/, reader: 'the compose files', directory: 'docker' },
+  // Ahead of `^VITE_`: the first matching reader is the one held to the claim.
+  // flama:begin site
+  { pattern: /^VITE_SITE_/, reader: 'the landing page', directory: 'apps/site' },
+  // flama:end site
   { pattern: /^VITE_/, reader: 'the web app', directory: 'apps/web' },
   { pattern: /^EXPO_PUBLIC_/, reader: 'the mobile app', directory: 'apps/mobile' },
   { pattern: /^SUBTRACK_/, reader: 'the desktop app', directory: 'apps/desktop' },

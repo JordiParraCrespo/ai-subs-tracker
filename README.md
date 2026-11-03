@@ -62,6 +62,7 @@ Built on the [Flama](https://github.com/JordiParraCrespo/flama-ai) boilerplate
 | --- | --- |
 | `apps/desktop` | Electron shell: hosts the web build, collector, tray, token store, shell integration, live feed |
 | `apps/web` | The screens (Vite + TanStack Router). One build serves the desktop app and, later, the web |
+| `apps/site` | The website (Astro): the home page and SEO guides on Claude Code and Codex plans, limits and prices, in English and Spanish |
 | `apps/api` | NestJS API (Domain-Driven Hexagon): auth, and the `accounts` module |
 | `packages/usage-providers` | One `CodingAgentProvider` interface; Claude Code and Codex readers |
 | `packages/shared` | Wire contracts (`schemas/accounts`), plan catalog, model prices, Tokenmaxx ranking, desktop bridge types |
@@ -98,6 +99,7 @@ pnpm --filter @flama/desktop package    # dmg/zip, nsis, AppImage in apps/deskto
 | --- | --- |
 | Web | http://localhost:3000 |
 | API | http://localhost:3001 |
+| Landing page | http://localhost:3002 (`pnpm --filter @flama/site dev`) |
 | API docs (Swagger) | http://localhost:3001/api/docs |
 
 ## Scripts

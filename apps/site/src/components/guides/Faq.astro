@@ -1,0 +1,27 @@
+---
+/**
+ * The questions a guide answers, as native `<details>`. The same list is the
+ * page's FAQPage data, so the structured data never claims a question the
+ * reader cannot see.
+ */
+interface Props {
+  title: string;
+  faq: { q: string; a: string }[];
+}
+
+const { title, faq } = Astro.props;
+---
+
+{
+  faq.length > 0 && (
+    <section class="site-faq" aria-labelledby="faq">
+      <h2 id="faq" class="site-h2 site-h2--sm">{title}</h2>
+      {faq.map(({ q, a }) => (
+        <details class="site-faq__item">
+          <summary>{q}</summary>
+          <p>{a}</p>
+        </details>
+      ))}
+    </section>
+  )
+}

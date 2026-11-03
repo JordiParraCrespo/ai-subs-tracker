@@ -1,0 +1,29 @@
+---
+/** The visible trail; the page emits the same list as BreadcrumbList data. */
+import type { Breadcrumb } from '@/lib/jsonld';
+
+interface Props {
+  crumbs: Breadcrumb[];
+  label: string;
+}
+
+const { crumbs, label } = Astro.props;
+---
+
+<nav aria-label={label} class="site-breadcrumbs">
+  <ol>
+    {
+      crumbs.map((crumb, i) => (
+        <li>
+          {i < crumbs.length - 1 ? (
+            <a href={crumb.url} class="site-link">
+              {crumb.name}
+            </a>
+          ) : (
+            <span aria-current="page">{crumb.name}</span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>

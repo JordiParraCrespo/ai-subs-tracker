@@ -1,0 +1,168 @@
+{
+  "seo": {
+    "home": {
+      "title": "Aprovecha los planes de IA para programar que pagas",
+      "description": "Tokenaitor muestra lo que le queda a cada plan de Claude Code y Codex de tu ordenador, te dice qué cuenta usar ahora y valora tu uso a precios de API."
+    },
+    "404": {
+      "title": "Página no encontrada",
+      "description": "Esta página no existe."
+    }
+  },
+  "nav": {
+    "skipToContent": "Saltar al contenido",
+    "sections": "Secciones",
+    "features": "Funciones",
+    "how": "Cómo funciona",
+    "privacy": "Privacidad",
+    "signIn": "Iniciar sesión",
+    "download": "Descargar",
+    "home": "Inicio",
+    "guides": "Guías"
+  },
+  "theme": {
+    "label": "Cambiar entre tema claro y oscuro"
+  },
+  "locale": {
+    "switch": "Idioma"
+  },
+  "hero": {
+    "title": "Aprovecha los planes de IA para programar que pagas",
+    "lede": "Tokenaitor vigila cada sesión de Claude Code y Codex de tu ordenador, muestra lo que les queda a los límites de 5 horas y semanales de cada plan y te dice qué cuenta usar ahora.",
+    "primary": "Descargar para escritorio",
+    "secondary": "Cómo funciona",
+    "note": "Gratis y de código abierto. macOS, Windows y Linux."
+  },
+  "preview": {
+    "label": "Ejemplo de las pantallas de Tokenaitor",
+    "chartTitle": "Uso a precios de API",
+    "chartRest": "Últimos 12 meses",
+    "plansCost": "Coste de los planes",
+    "apiValue": "A precios de API",
+    "expired": "Caducado sin usar",
+    "perMonth": "/mes",
+    "useNext": "Usar ahora",
+    "useNextHint": "Primero el de más margen",
+    "left": "libre",
+    "weekly": "El límite semanal se reinicia en {time}",
+    "session": "El límite de 5 horas se reinicia en {time}",
+    "caption": "Cifras de ejemplo. Los planes y precios son los de cada proveedor."
+  },
+  "features": {
+    "eyebrow": "Funciones",
+    "title": "Sabe lo que le queda a cada plan y cuál usar",
+    "limits": {
+      "title": "Todos los límites de un vistazo",
+      "text": "Los límites de 5 horas y semanales de cada sesión de Claude Code y Codex, leídos del propio proveedor."
+    },
+    "next": {
+      "title": "La cuenta que toca usar",
+      "text": "Ordenadas por el margen por hora que les queda antes de reiniciarse, para gastar primero lo que caduca antes."
+    },
+    "value": {
+      "title": "Su valor a precios de API",
+      "text": "Los tokens se cuentan en las propias transcripciones de las CLI y se valoran por modelo, para que veas cuánto vale cada plan."
+    },
+    "switch": {
+      "title": "Cambia con un clic",
+      "text": "Marca una cuenta como en uso y el fragmento de shell opcional hace que claude y codex en tu terminal la usen."
+    },
+    "renewals": {
+      "title": "Renovaciones y desperdicio",
+      "text": "Un calendario de cuándo cobra cada plan y cuánto límite pagado caducó sin usar el mes pasado."
+    },
+    "tray": {
+      "title": "En la bandeja del sistema",
+      "text": "La cuenta que toca usar está en la barra de menús, actualizada cada diez minutos en segundo plano."
+    }
+  },
+  "how": {
+    "eyebrow": "Cómo funciona",
+    "title": "Listo en un minuto",
+    "install": {
+      "title": "Instala la app de escritorio",
+      "text": "Tokenaitor encuentra las sesiones de Claude Code y Codex que ya tienes en tu ordenador."
+    },
+    "accounts": {
+      "title": "Añade tus otras cuentas",
+      "text": "Cada una inicia sesión en su propia carpeta con la CLI del proveedor, así ninguna cierra la sesión de otra."
+    },
+    "queue": {
+      "title": "Sigue la cola",
+      "text": "Trabaja con la cuenta de arriba hasta que se agote. La bandeja te avisa cuándo cambiar."
+    }
+  },
+  "privacy": {
+    "eyebrow": "Privacidad",
+    "title": "Tus sesiones nunca salen de tu ordenador",
+    "lede": "Tokenaitor nunca renueva el token de un proveedor, se presenta ante cada proveedor con su propio nombre (subtrack-desktop) y nunca sustituye una línea de estado que ya tengas.",
+    "local": {
+      "title": "Se queda en tu ordenador",
+      "badge": "Nunca se envía",
+      "tokens": "Los tokens y tokens de renovación de los proveedores",
+      "content": "Tus prompts, tu código y tus transcripciones",
+      "settings": "Tu configuración de la shell y de Claude, salvo que lo actives"
+    },
+    "api": {
+      "title": "Llega a Tokenaitor",
+      "identity": "Correos de las cuentas y nombres de los planes",
+      "limits": "Porcentajes de los límites y horas de reinicio",
+      "tokens": "Recuento de tokens por modelo y día"
+    }
+  },
+  "cta": {
+    "title": "Deja de perder los límites que ya pagas",
+    "lede": "Instala Tokenaitor y sabrás qué cuenta usar en menos de un minuto.",
+    "button": "Descargar Tokenaitor"
+  },
+  "footer": {
+    "label": "Pie de página",
+    "source": "Código",
+    "releases": "Versiones",
+    "legal": "Legal",
+    "privacy": "Privacidad",
+    "terms": "Condiciones",
+    "license": "Licencia MIT",
+    "tagline": "Límites, la cuenta que toca usar y el uso a precios de API, para cada sesión de Claude Code y Codex de tu ordenador.",
+    "product": "Producto",
+    "project": "Proyecto",
+    "disclaimer": "Sin relación con Anthropic ni OpenAI. Claude y Codex son marcas suyas."
+  },
+  "legal": {
+    "lastUpdated": "Última actualización",
+    "version": "Versión"
+  },
+  "notFound": {
+    "title": "Esta página no existe",
+    "text": "Puede que el enlace sea antiguo o que la dirección esté mal escrita.",
+    "back": "Volver al inicio"
+  },
+  "guides": {
+    "eyebrow": "Guías",
+    "title": "Planes, límites y precios de Claude Code y Codex, explicados",
+    "read": "Leer la guía",
+    "pillarTitle": "Para saber más"
+  },
+  "guide": {
+    "breadcrumbs": "Ruta de navegación",
+    "checked": "Precios y límites revisados",
+    "faq": "Preguntas frecuentes",
+    "related": "Guías relacionadas"
+  },
+  "table": {
+    "plansCaption": "Planes de {product} de {vendor}, al mes",
+    "plan": "Plan",
+    "price": "Precio",
+    "windows": "Límites de uso",
+    "free": "Gratis",
+    "perMonth": "/mes",
+    "perSeat": "/usuario/mes",
+    "weeklyOnly": "Solo límite semanal",
+    "sessionWeekly": "Límites de 5 horas y semanal",
+    "apiCaption": "Precios de la API en dólares por millón de tokens",
+    "model": "Modelo",
+    "input": "Entrada",
+    "output": "Salida",
+    "cacheRead": "Lectura de caché"
+  }
+}

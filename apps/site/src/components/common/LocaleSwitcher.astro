@@ -1,0 +1,40 @@
+---
+/**
+ * Links to this page in each locale, each named in its own language (never a
+ * flag). A `<details>` menu, so it needs no script.
+ */
+import { Languages } from '@lucide/astro';
+
+import { siteConfig } from '@/config/site';
+import { useTranslations } from '@/i18n';
+import { currentLocale, localePath } from '@/lib/locale';
+
+const locale = currentLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+---
+
+{
+  siteConfig.locales.length > 1 && (
+    <details class="site-locale">
+      <summary class="ds-btn ds-btn--sm ds-btn--ghost" aria-label={t('locale.switch')}>
+        <Languages size={18} aria-hidden="true" />
+        <span>{locale.toUpperCase()}</span>
+      </summary>
+      <ul class="site-locale__menu">
+        {siteConfig.locales.map((lang) => (
+          <li>
+            <a
+              href={localePath(lang, Astro.url.pathname)}
+              hreflang={siteConfig.hreflang[lang] ?? lang}
+              lang={lang}
+              aria-current={lang === locale ? 'page' : undefined}
+              class="site-locale__item"
+            >
+              {siteConfig.localeNames[lang] ?? lang}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </details>
+  )
+}

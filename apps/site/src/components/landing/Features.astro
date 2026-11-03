@@ -1,0 +1,40 @@
+---
+import { AppWindow, Calendar, Gauge, ListOrdered, Receipt, Terminal } from '@lucide/astro';
+
+import { useTranslations } from '@/i18n';
+import { currentLocale } from '@/lib/locale';
+
+const t = useTranslations(currentLocale(Astro.currentLocale));
+const features = [
+  { key: 'limits', Icon: Gauge },
+  { key: 'next', Icon: ListOrdered },
+  { key: 'value', Icon: Receipt },
+  { key: 'switch', Icon: Terminal },
+  { key: 'renewals', Icon: Calendar },
+  { key: 'tray', Icon: AppWindow },
+] as const;
+---
+
+<section id="features" class="ds-container site-section">
+  <div class="site-section__head">
+    <span class="site-eyebrow">{t('features.eyebrow')}</span>
+    <h2 class="site-h2">{t('features.title')}</h2>
+  </div>
+  <div class="site-grid">
+    {
+      features.map(({ key, Icon }) => (
+        <div class="ds-card">
+          <div class="site-feature">
+            <span class="ds-disc site-feature__disc" aria-hidden="true">
+              <Icon size={20} />
+            </span>
+            <div class="site-feature__body">
+              <h3 class="site-feature__title">{t(`features.${key}.title`)}</h3>
+              <p class="site-muted m-0">{t(`features.${key}.text`)}</p>
+            </div>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>
