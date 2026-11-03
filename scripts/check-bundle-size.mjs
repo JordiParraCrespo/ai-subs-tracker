@@ -57,9 +57,20 @@ function initialAssets(html) {
   return [...urls].sort();
 }
 
+// With package names (`check-bundle-size.mjs @flama/site`), only those apps are
+// measured: CI builds just the SPAs a change affects, and an app it did not
+// build has no `dist` to read. With none, every app is, and each must be built.
+const only = process.argv.slice(2);
+const unknown = only.filter((name) => !APPS.some((app) => app.name === name));
+if (unknown.length > 0) {
+  console.error(`✗ no budget for ${unknown.join(', ')} — add it to APPS in this file.`);
+  process.exit(1);
+}
+const selected = only.length > 0 ? APPS.filter((app) => only.includes(app.name)) : APPS;
+
 let failed = false;
 
-for (const app of APPS) {
+for (const app of selected) {
   const dist = join(ROOT, app.dist);
   let html;
   try {
