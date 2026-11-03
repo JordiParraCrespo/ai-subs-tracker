@@ -39,23 +39,33 @@ test('the named screens, light and dark', async ({ browser }) => {
 
   for (const width of widths) {
     for (const theme of THEMES) {
-      const context = await browser.newContext({ viewport: { width, height: 1000 } });
-      await context.addInitScript((value) => localStorage.setItem('theme', value), theme);
-      const page = await context.newPage();
+      // Two contexts, so an `anon:` route named after a signed-in one is still
+      // taken signed out: sharing one, it landed on the dashboard.
+      const open = async () => {
+        const context = await browser.newContext({ viewport: { width, height: 1000 } });
+        await context.addInitScript((value) => localStorage.setItem('theme', value), theme);
+        return context;
+      };
+      const signed = await open();
+      const signedOut = await open();
+      const signedPage = await signed.newPage();
+      const anonPage = await signedOut.newPage();
       let signedIn = false;
       for (const route of routes) {
         const anon = route.startsWith('anon:');
         if (!anon && !signedIn) {
-          await signInAs(page, user);
+          await signInAs(signedPage, user);
           signedIn = true;
         }
+        const page = anon ? anonPage : signedPage;
         await page.goto(route.replace(/^anon:/, ''));
         await page.waitForLoadState('networkidle');
         const file = `${slug(route)}-${width}-${theme}.png`;
         await page.screenshot({ path: resolve(OUT, file), fullPage: true });
         files.push(file);
       }
-      await context.close();
+      await signed.close();
+      await signedOut.close();
     }
   }
 

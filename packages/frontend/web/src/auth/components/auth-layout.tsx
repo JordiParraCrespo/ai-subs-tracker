@@ -13,7 +13,8 @@ export interface AuthLayoutProps {
 
 /**
  * The design's auth frame: the wordmark and one contextual action in a top
- * bar, and a single 440px column centred on the frame's ground. An app's
+ * bar, and a single 440px column centred on the frame's ground, always in
+ * the dark palette. An app's
  * `_auth` route mounts this around its `Outlet`. It is chrome, not a gate: who
  * may be here is each child route's own `beforeLoad`, so one layout can cover
  * screens with opposite answers.
@@ -32,8 +33,11 @@ export function AuthLayout({ brandLabel, action, children }: AuthLayoutProps) {
     },
   });
 
+  // `dark` on the frame, whatever the app's theme: the design draws these
+  // screens on the dark frame only, and its light theme keeps that frame dark,
+  // so light-theme ink on it was unreadable.
   return (
-    <div className="flex h-svh w-full flex-col overflow-y-auto bg-frame text-ink-900">
+    <div className="dark flex h-svh w-full flex-col overflow-y-auto bg-frame text-ink-900 scheme-dark">
       <header className="flex items-center justify-between gap-4 px-6 py-6 sm:px-8">
         <span className="ds-wordmark">{brandLabel ?? t('common.appName')}</span>
         {action && <div className="flex items-center gap-2">{action}</div>}
