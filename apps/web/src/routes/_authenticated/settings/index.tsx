@@ -26,7 +26,21 @@ const SECTIONS = [
 
 type SectionKey = (typeof SECTIONS)[number]['key'];
 
-const PANES: readonly SectionKey[] = SECTIONS.map((section) => section.key);
+/**
+ * The keys alone, for `validateSearch`: the router keeps that on the first
+ * load, and deriving this from `SECTIONS` dragged every card (two-factor and
+ * its QR code included) into the entry chunk with it.
+ */
+const PANES: readonly SectionKey[] = [
+  'profile',
+  'security',
+  'workspace',
+  // flama:begin organizations
+  // flama:end organizations
+  'language',
+  'appearance',
+  'desktop',
+];
 
 /**
  * `?section=` is still accepted, so links into settings keep working: the
