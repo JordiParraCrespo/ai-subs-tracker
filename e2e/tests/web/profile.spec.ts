@@ -328,8 +328,8 @@ test.describe('the password pane', () => {
 
     await page.context().clearCookies();
     await loginThroughUi(page, user.email, user.password);
-    await expect(page.getByRole('heading', { name: 'Two-factor authentication' })).toBeVisible();
-    await page.getByLabel('Authentication code').fill(totpCode(secret));
+    await expect(page.getByRole('heading', { name: 'Enter your code' })).toBeVisible();
+    await page.getByLabel('6-digit code').fill(totpCode(secret));
     await page.getByRole('button', { name: 'Verify', exact: true }).click();
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 30_000 });
 

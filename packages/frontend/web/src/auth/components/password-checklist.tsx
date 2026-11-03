@@ -31,8 +31,11 @@ export function PasswordChecklist<TValues extends FieldValues>({
   confirmName?: Path<TValues>;
   rules: readonly PasswordRule[];
   className?: string;
-  /** Receives whether every rule is met; renders the control it gates. */
-  children: (satisfied: boolean) => ReactNode;
+  /**
+   * Receives whether every rule is met, and each rule's result (for a button
+   * that names what is missing); renders the control it gates.
+   */
+  children: (satisfied: boolean, results: Record<PasswordRule, boolean>) => ReactNode;
 }) {
   const watched = useWatch({
     control,
@@ -48,7 +51,7 @@ export function PasswordChecklist<TValues extends FieldValues>({
   return (
     <>
       <PasswordRequirements results={results} rules={rules} className={className} />
-      {children(satisfied)}
+      {children(satisfied, results)}
     </>
   );
 }
