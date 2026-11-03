@@ -35,12 +35,15 @@ function CommandDialog({
   children,
   className,
   showCloseButton = false,
+  filter,
   ...props
 }: Omit<React.ComponentProps<typeof Dialog>, "children"> & {
   title?: string;
   description?: string;
   className?: string;
   showCloseButton?: boolean;
+  /** How a row is matched to what is typed; cmdk's fuzzy score by default. */
+  filter?: React.ComponentProps<typeof CommandPrimitive>["filter"];
   children: React.ReactNode;
 }) {
   return (
@@ -58,7 +61,9 @@ function CommandDialog({
       >
         {/* The children are CommandInput/List/Item, which read cmdk's context —
             without this wrapper they throw on mount. */}
-        <Command className="rounded-none p-0">{children}</Command>
+        <Command className="rounded-none p-0" filter={filter}>
+          {children}
+        </Command>
       </DialogContent>
     </Dialog>
   );

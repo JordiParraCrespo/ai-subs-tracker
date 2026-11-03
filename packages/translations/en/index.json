@@ -681,6 +681,9 @@
       },
       "back": "Back",
       "failed": "Sign-in did not finish."
+    },
+    "search": {
+      "group": "Subscriptions"
     }
   },
   "home": {
@@ -711,9 +714,8 @@
     "menu": "Menu",
     "dashboard": "Overview",
     "logOut": "Sign out",
-    "commandEmpty": "No matches.",
-    "commandPlaceholder": "Search pages and actions…",
-    "goTo": "Go to",
+    "commandPlaceholder": "Search subscriptions and pages",
+    "goTo": "Pages",
     "primaryNavigation": "Main navigation",
     "profile": "Profile",
     "search": "Search",
@@ -726,7 +728,13 @@
     "tokenmaxx": "Tokenmaxx",
     "usage": "Usage & tokens",
     "people": "People",
-    "renewals": "Renewals"
+    "renewals": "Renewals",
+    "commandTitle": "Search",
+    "commandNoResults": "No results for “{{query}}”",
+    "commandTry": "Try a subscription or a page name.",
+    "commandMove": "↑ ↓ to move",
+    "commandOpen": "↵ to open",
+    "commandClose": "⌘K to close"
   },
   "control": {
     "accessDeniedTitle": "Control plane access required",

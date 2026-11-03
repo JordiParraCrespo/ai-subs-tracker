@@ -233,3 +233,22 @@
 .ds-link-field__value{flex:1;min-width:0;font:500 13px/20px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ds-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ds-stack-4{display:flex;flex-direction:column;gap:4px}
 .ds-stack-8{display:flex;flex-direction:column;gap:8px}
+
+/* ⌘K as the design draws it (`searchOpen`): 620px, a 60px search row, eyebrow groups, 48px rows, a hints footer. */
+.ds-palette{max-width:min(620px,calc(100% - 48px))!important;top:12vh;border-radius:24px!important;background:var(--ds-surface-overlay);color:var(--ds-text);outline:1px solid var(--ds-outline-card);border:0;box-shadow:var(--ds-shadow-overlay)}
+.ds-palette .ds-palette__search{height:60px;padding:0 20px;gap:12px;border-bottom:1px solid var(--ds-divider)}
+.ds-palette .ds-palette__search>svg{width:20px;height:20px;color:var(--ds-text-muted)}
+.ds-palette [cmdk-input]{font:var(--ds-type-body);color:var(--ds-text)}
+.ds-palette [cmdk-input]::placeholder{color:var(--ds-text-subtle)}
+.ds-palette__esc{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:6px;background:var(--ds-fill);color:var(--ds-text-muted);font:var(--ds-type-badge)}
+.ds-palette [cmdk-list]{max-height:min(480px,calc(70vh - 110px));padding:8px}
+.ds-palette [cmdk-group-heading]{padding:12px 12px 6px!important;font:var(--ds-type-eyebrow)!important;letter-spacing:var(--ds-tracking-eyebrow);text-transform:uppercase;color:var(--ds-text-subtle)!important}
+.ds-palette [cmdk-item]{height:48px;padding:0 12px;border-radius:12px!important;gap:12px;font:var(--ds-type-label-strong);color:var(--ds-text)}
+.ds-palette [cmdk-item][data-selected=true]{background:var(--ds-fill)}
+.ds-palette [cmdk-item]>svg:last-child{display:none}
+.ds-palette__disc{width:28px!important;height:28px!important;flex:none}
+.ds-palette__disc svg{width:16px!important;height:16px!important}
+.ds-palette__meta{margin-left:auto;white-space:nowrap}
+.ds-palette__label{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-palette [cmdk-empty]{padding:40px 24px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.ds-palette__foot{display:flex;gap:20px;padding:12px 20px;border-top:1px solid var(--ds-divider)}

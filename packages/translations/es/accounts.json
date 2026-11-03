@@ -417,5 +417,8 @@
     },
     "back": "Atrás",
     "failed": "No se completó el inicio de sesión."
+  },
+  "search": {
+    "group": "Suscripciones"
   }
 }

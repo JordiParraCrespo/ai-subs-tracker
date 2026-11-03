@@ -5,7 +5,7 @@ export {
 } from '@flama/frontend-core/react';
 export { AppShell } from './components/app-shell';
 export { AppSidebar } from './components/app-sidebar';
-export { CommandPalette } from './components/command-palette';
+export { COMMAND_VALUE_KEY, CommandPalette } from './components/command-palette';
 export { ErrorScreen } from './components/error-screen';
 export { NotFoundScreen } from './components/not-found-screen';
 export { OfflineScreen } from './components/offline-screen';

@@ -9,6 +9,7 @@ import {
 } from '@flama/frontend-web';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import type { ComponentType, ReactNode } from 'react';
+import { AccountSearchResults } from '@/features/accounts/sections/account-search-results';
 // flama:begin organizations
 // flama:end organizations
 import { apiBaseUrl } from '@/lib/auth-client';
@@ -45,7 +46,12 @@ function AuthenticatedShell() {
   // shell says so instead, and swaps the page back in once it answers.
   const api = useApiReachable(HEALTH_URL);
   const shell = (workspace?: ShellWorkspace) => (
-    <AppShell nav={NAV} userMenuLinks={USER_MENU_LINKS} workspace={workspace}>
+    <AppShell
+      nav={NAV}
+      userMenuLinks={USER_MENU_LINKS}
+      workspace={workspace}
+      commandResults={AccountSearchResults}
+    >
       {api.reachable ? (
         <Outlet />
       ) : (

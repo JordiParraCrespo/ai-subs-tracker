@@ -681,6 +681,9 @@
       },
       "back": "Atrás",
       "failed": "No se completó el inicio de sesión."
+    },
+    "search": {
+      "group": "Suscripciones"
     }
   },
   "home": {
@@ -711,9 +714,8 @@
     "menu": "Menú",
     "dashboard": "Resumen",
     "logOut": "Cerrar sesión",
-    "commandEmpty": "Sin resultados.",
-    "commandPlaceholder": "Busca páginas y acciones…",
-    "goTo": "Ir a",
+    "commandPlaceholder": "Busca suscripciones y páginas",
+    "goTo": "Páginas",
     "primaryNavigation": "Navegación principal",
     "profile": "Perfil",
     "search": "Buscar",
@@ -726,7 +728,13 @@
     "tokenmaxx": "Tokenmaxx",
     "usage": "Uso y tokens",
     "people": "Personas",
-    "renewals": "Renovaciones"
+    "renewals": "Renovaciones",
+    "commandTitle": "Buscar",
+    "commandNoResults": "Nada para «{{query}}»",
+    "commandTry": "Prueba con una suscripción o el nombre de una página.",
+    "commandMove": "↑ ↓ para moverte",
+    "commandOpen": "↵ para abrir",
+    "commandClose": "⌘K para cerrar"
   },
   "control": {
     "accessDeniedTitle": "Se necesita acceso al panel de control",

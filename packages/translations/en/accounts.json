@@ -417,5 +417,8 @@
     },
     "back": "Back",
     "failed": "Sign-in did not finish."
+  },
+  "search": {
+    "group": "Subscriptions"
   }
 }
