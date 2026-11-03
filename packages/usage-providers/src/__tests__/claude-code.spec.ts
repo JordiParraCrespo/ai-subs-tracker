@@ -199,7 +199,7 @@ describe('claude-code read', () => {
     expect(calls[0]?.headers).toMatchObject({
       Authorization: 'Bearer tok-work',
       'anthropic-beta': 'oauth-2025-04-20',
-      'User-Agent': 'subtrack-desktop/test',
+      'User-Agent': 'resetowl-desktop/test',
     });
     expect(account).toMatchObject({
       provider: 'claude-code',

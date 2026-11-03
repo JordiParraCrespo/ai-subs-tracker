@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "app.subtrack.desktop",
-  "productName": "Subtrack",
-  "copyright": "Subtrack",
+  "appId": "com.resetowl.desktop",
+  "productName": "ResetOwl",
+  "copyright": "ResetOwl",
   "directories": {
     "output": "release"
   },
@@ -30,7 +30,7 @@
   "linux": {
     "category": "Development",
     "target": ["AppImage"],
-    "executableName": "subtrack"
+    "executableName": "resetowl"
   },
   "publish": null
 }

@@ -20,7 +20,7 @@ describe('active pointers', () => {
     const home = await tempDir();
     const other = join(home, '.claude-work');
     await writePointer(home, { provider: 'claude-code', home: other, isDefault: false });
-    expect(await readFile(join(home, '.subtrack', 'active', 'claude-code'), 'utf8')).toBe(other);
+    expect(await readFile(join(home, '.resetowl', 'active', 'claude-code'), 'utf8')).toBe(other);
     expect(await readPointer(home, 'claude-code')).toBe(other);
   });
 

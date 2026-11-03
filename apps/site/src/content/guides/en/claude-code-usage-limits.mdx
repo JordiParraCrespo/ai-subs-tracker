@@ -14,9 +14,9 @@ faq:
   - q: Which plans have no 5-hour limit?
     a: Claude Ultra and the three ChatGPT Pro tiers meter only a weekly limit. Every other plan in the catalog meters both windows.
   - q: Does unused weekly allowance roll over?
-    a: No. Each window starts again when it resets, so allowance you did not use in a week is gone. That is the allowance Tokenaitor's queue is built to spend.
+    a: No. Each window starts again when it resets, so allowance you did not use in a week is gone. That is the allowance ResetOwl's queue is built to spend.
   - q: How do I see my limits for every account at once?
-    a: The CLI shows the account you are signed into. Tokenaitor reads every login on your computer and shows each one's windows, reset times and the account to use next.
+    a: The CLI shows the account you are signed into. ResetOwl reads every login on your computer and shows each one's windows, reset times and the account to use next.
 ---
 import Callout from '@/components/guides/Callout.astro';
 
@@ -49,7 +49,7 @@ When a window runs out, the agent stops accepting work on that account until the
 If you hold more than one account, the efficient order is not "the one with most left". It is the one with the most headroom **per hour before it resets**: a weekly window with 40% left that resets tomorrow is worth more right now than one with 80% left and six days to go, because the first will be lost if you don't use it.
 
 <Callout>
-  That ranking is Tokenaitor's queue. It puts the account to use next at the top of the list and in your menu bar, across Claude Code and Codex, and checks every ten minutes.
+  That ranking is ResetOwl's queue. It puts the account to use next at the top of the list and in your menu bar, across Claude Code and Codex, and checks every ten minutes.
 </Callout>
 
 ## Avoid hitting the 5-hour limit mid-task
@@ -58,4 +58,4 @@ If you hold more than one account, the efficient order is not "the one with most
 - Keep a second account for when the first runs low, and switch before it does.
 - Check what is left before a long agent run, not after it stops.
 
-The [usage tracker guide](/claude-code-usage-tracker/) covers how Tokenaitor reads these windows without touching your credentials.
+The [usage tracker guide](/claude-code-usage-tracker/) covers how ResetOwl reads these windows without touching your credentials.

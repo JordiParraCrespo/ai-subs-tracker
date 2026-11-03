@@ -1,5 +1,5 @@
-@import "./subtrack-ds.css";
-@import "./subtrack-ds-extras.css";
+@import "./resetowl-ds.css";
+@import "./resetowl-ds-extras.css";
 /* =============================================================================
    SF Pro — the brand typeface, self-hosted
    =============================================================================
@@ -44,7 +44,7 @@
   src: url("./fonts/SF-Pro-Display-Medium.woff2") format("woff2");
 }
 
-/* Figtree — the Subtrack design's typeface (designs/_ds), self-hosted.
+/* Figtree — the ResetOwl design's typeface (designs/_ds), self-hosted.
    One variable file covers every weight the design uses (500/600/700); Latin
    subset from Google Fonts. Licence: SIL Open Font License 1.1. */
 @font-face {
@@ -56,7 +56,7 @@
 }
 
 /* =============================================================================
-   Flama design tokens — Subtrack (ported from designs/_ds, the dashboard design system)
+   Flama design tokens — ResetOwl (ported from designs/_ds, the dashboard design system)
    =============================================================================
    Monochrome-first, flat productivity aesthetic:
      · three neutral inks over white/warm off-white surfaces
@@ -316,7 +316,7 @@
     --status-draft-bg: rgba(48, 128, 255, 0.15);
 
 
-    /* Subtrack: signals restated for the dark ground (purple up, coral down). */
+    /* ResetOwl: signals restated for the dark ground (purple up, coral down). */
     --data-up: #9d91e8;
     --data-down: #ff667f;
     --data-line: #9d91e8;

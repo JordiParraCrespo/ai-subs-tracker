@@ -19,7 +19,7 @@
  *   environment, which wins over `.env` (`@flama/env`). A checkout with no
  *   `.env` gets `.env.example`'s defaults the same way, never as a file.
  * - Postgres and Redis already listening are used, not replaced; only a
- *   Compose project this script started (`subtrack-stack`) is stopped.
+ *   Compose project this script started (`resetowl-stack`) is stopped.
  *
  * Everything it starts is recorded in `.stack/`, with a log per process;
  * `down` stops exactly that, and `down --api` only the API it started, which
@@ -45,7 +45,7 @@ const WEB_URL = process.env.WEB_URL ?? 'http://localhost:3000';
 const COMPOSE = [
   'compose',
   '--project-name',
-  'subtrack-stack',
+  'resetowl-stack',
   '-f',
   join(ROOT, 'docker', 'docker-compose.dev.yml'),
 ];

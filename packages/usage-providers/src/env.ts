@@ -3,9 +3,9 @@ import { homedir } from 'node:os';
 import type { ProviderEnv } from './types';
 
 export interface NodeProviderEnvOptions {
-  /** Where Subtrack keeps isolated homes for extra accounts. */
+  /** Where ResetOwl keeps isolated homes for extra accounts. */
   managedRoot: string;
-  /** Honest, e.g. `subtrack-desktop/0.1.0`. */
+  /** Honest, e.g. `resetowl-desktop/0.1.0`. */
   userAgent: string;
   home?: string;
   platform?: NodeJS.Platform;

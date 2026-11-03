@@ -1,7 +1,7 @@
 import { extname, join, normalize, sep } from 'node:path';
 
 /**
- * Maps an `app://subtrack/<path>` request onto the renderer's folder. Pure:
+ * Maps an `app://resetowl/<path>` request onto the renderer's folder. Pure:
  * `exists` is injected. A path that names no file is a client-side route of
  * the SPA and gets `index.html`, unless it looks like a file (null: a 404);
  * a path that tries to leave the root is null and never reaches the filesystem.

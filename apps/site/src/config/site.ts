@@ -30,17 +30,17 @@ export interface SiteConfig {
 const REPOSITORY = 'https://github.com/JordiParraCrespo/ai-subs-tracker';
 
 export const siteConfig: SiteConfig = {
-  url: 'https://tokenaitor.com',
+  url: 'https://resetowl.com',
   defaultLocale: 'en',
   locales: ['en', 'es'],
   hreflang: { en: 'en-US', es: 'es-ES' },
   localeNames: { en: 'English', es: 'Español' },
-  name: { en: 'Tokenaitor', es: 'Tokenaitor' },
+  name: { en: 'ResetOwl', es: 'ResetOwl' },
   description: {
-    en: 'Tokenaitor shows what every Claude Code and Codex plan on your computer has left, tells you which account to use next, and prices your usage at API rates.',
-    es: 'Tokenaitor muestra lo que le queda a cada plan de Claude Code y Codex de tu ordenador, te dice qué cuenta usar ahora y valora tu uso a precios de API.',
+    en: 'ResetOwl shows what every Claude Code and Codex plan on your computer has left, tells you which account to use next, and prices your usage at API rates.',
+    es: 'ResetOwl muestra lo que le queda a cada plan de Claude Code y Codex de tu ordenador, te dice qué cuenta usar ahora y valora tu uso a precios de API.',
   },
-  organization: { en: { name: 'Tokenaitor' }, es: { name: 'Tokenaitor' } },
+  organization: { en: { name: 'ResetOwl' }, es: { name: 'ResetOwl' } },
   social: { github: REPOSITORY },
   logo: '/favicon.svg',
   defaultOgImage: '/og.png',

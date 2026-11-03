@@ -12,7 +12,7 @@ import {
 import { mimeTypeFor, resolveRendererFile } from './renderer-files';
 
 /**
- * The window and the `app://subtrack/` origin it loads the screens from. The
+ * The window and the `app://resetowl/` origin it loads the screens from. The
  * scheme is standard and secure, so the screens get a real origin (storage,
  * fetch, CORS) without a local web server.
  */
@@ -35,7 +35,7 @@ function isFile(path: string): boolean {
   }
 }
 
-/** Serves `root` on `app://subtrack/`, index.html for any route, a CSP on HTML. */
+/** Serves `root` on `app://resetowl/`, index.html for any route, a CSP on HTML. */
 export function serveRenderer(root: string, apiUrl: string): void {
   const csp = contentSecurityPolicy(apiUrl);
   protocol.handle(APP_SCHEME, async (request) => {
@@ -90,7 +90,7 @@ export function createMainWindow(config: DesktopConfig, preloadPath: string): Br
     minWidth: 960,
     minHeight: 640,
     show: false,
-    title: 'Subtrack',
+    title: 'ResetOwl',
     backgroundColor: '#0b0b0c',
     webPreferences: {
       preload: preloadPath,
@@ -99,7 +99,7 @@ export function createMainWindow(config: DesktopConfig, preloadPath: string): Br
       sandbox: true,
       webSecurity: true,
       additionalArguments: [
-        `--subtrack-bridge=${Buffer.from(
+        `--resetowl-bridge=${Buffer.from(
           JSON.stringify({
             version: config.version,
             platform: config.platform,

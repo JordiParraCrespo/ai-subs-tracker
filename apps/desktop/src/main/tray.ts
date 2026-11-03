@@ -34,7 +34,7 @@ export function createTray(opts: {
         { label: model.headline, enabled: false },
         { type: 'separator' },
         { label: 'Refresh now', click: opts.onRefresh },
-        { label: 'Open Subtrack', click: opts.onOpen },
+        { label: 'Open ResetOwl', click: opts.onOpen },
         { type: 'separator' },
         { label: 'Quit', click: opts.onQuit },
       ]),

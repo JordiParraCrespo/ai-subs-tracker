@@ -3,7 +3,7 @@ import { syncTwoAccounts } from '../../support/accounts';
 import { provisionedUser, reloadFromServer, signInAs } from '../../support/web';
 
 /**
- * The Subtrack screens over what a desktop collector synced. Every check reads
+ * The ResetOwl screens over what a desktop collector synced. Every check reads
  * back from the API: the data arrives through `POST /accounts/sync`, the same
  * route the desktop app uses.
  */
@@ -114,9 +114,21 @@ test('a renewal day puts the plan on the renewals calendar', async ({ page }) =>
 test('in a browser, adding a subscription says the desktop app signs it in', async ({ page }) => {
   const { user, api } = await provisionedUser('addbrowser');
   await signInAs(page, user);
+  // A slow account list. Regression: the button was offered while the list
+  // loaded, and the empty state that replaced the page then unmounted the
+  // dialog it had opened. It failed only when CI was loaded enough to be slow.
+  // Without the persisted query cache, so the page really waits for the list.
+  await page.evaluate(() => localStorage.clear());
+  await page.route(/\/api\/v1\/accounts(\?.*)?$/, async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await route.continue();
+  });
+  const listed = page.waitForResponse(/\/api\/v1\/accounts(\?.*)?$/);
   await page.goto('/accounts');
 
   await page.getByRole('button', { name: 'Add subscription' }).first().click();
+  // The dialog must still be open once the list has arrived.
+  await listed;
   const dialog = page.getByRole('dialog');
   await expect(dialog.getByRole('heading', { name: 'Add subscription' })).toBeVisible();
   await expect(dialog.getByRole('button', { name: /Codex/ })).toBeVisible();

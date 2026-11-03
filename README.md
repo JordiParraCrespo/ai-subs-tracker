@@ -1,8 +1,8 @@
-# Subtrack
+# ResetOwl
 
 Use up the AI coding plans you pay for.
 
-Subtrack is a desktop app for people who run several personal **Claude Code**
+ResetOwl is a desktop app for people who run several personal **Claude Code**
 and **Codex** subscriptions. It finds the logins on your computer, shows how
 much of each plan's 5-hour and weekly allowance is left, and tells you which
 account to use next so nothing you paid for expires unused ("tokenmaxxing").
@@ -23,20 +23,20 @@ The screens follow the designs in [`designs/`](designs/).
 ## How it works
 
 ```
- your computer                                          Subtrack API
+ your computer                                          ResetOwl API
 ┌───────────────────────────────────────────────┐     ┌──────────────────┐
 │ apps/desktop (Electron)                       │     │ apps/api         │
 │  main: collector ── @flama/usage-providers ───┼──┐  │ /v1/accounts/*   │
 │        reads ~/.claude*, ~/.codex, Keychain   │  │  │ provider_account │
 │        tray: "use next"                       │  └─▶│ usage_snapshot   │
-│  renderer: apps/web build on app://subtrack   │────▶│ token_usage_daily│
+│  renderer: apps/web build on app://resetowl   │────▶│ token_usage_daily│
 └───────────────────────────────────────────────┘     └──────────────────┘
 ```
 
 - **Plans and limits.** For each login the collector reads the plan and asks
   the provider for its limit windows: Claude Code's OAuth usage endpoint, and
   Codex's ChatGPT usage endpoint, falling back to the rate limits Codex writes
-  in its session logs. It sends an honest `subtrack-desktop/<version>` client
+  in its session logs. It sends an honest `resetowl-desktop/<version>` client
   name. Every 10 minutes, with back-off, and a 15-minute pause after a 429.
 - **Tokens.** Counted from the CLIs' own transcripts (`~/.claude/projects`,
   `~/.codex/sessions`), per model and day, and priced with
@@ -45,7 +45,7 @@ The screens follow the designs in [`designs/`](designs/).
   names providers used before (Max 20x is now **Ultra**). You can override an
   account's plan and price in the app.
 - **Switching is a toggle.** Marking an account "in use" writes
-  `~/.subtrack/active/<provider>`. The opt-in shell snippet makes `claude` and
+  `~/.resetowl/active/<provider>`. The opt-in shell snippet makes `claude` and
   `codex` in your terminal follow it. **Add subscription** signs a new login into its
   own folder with the provider's CLI (`claude auth login`, `codex login --device-auth`).
 
@@ -91,7 +91,7 @@ To run the desktop app on the bundled screens, or to package it:
 ```bash
 pnpm --filter @flama/web build
 pnpm --filter @flama/desktop build
-pnpm --filter @flama/desktop start      # app://subtrack over the built screens
+pnpm --filter @flama/desktop start      # app://resetowl over the built screens
 pnpm --filter @flama/desktop package    # dmg/zip, nsis, AppImage in apps/desktop/release
 ```
 

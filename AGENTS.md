@@ -1,8 +1,8 @@
-# Subtrack — Agent Instructions
+# ResetOwl — Agent Instructions
 
 ## Project overview
 
-Subtrack is a desktop app that tracks several personal Claude Code and Codex
+ResetOwl is a desktop app that tracks several personal Claude Code and Codex
 subscriptions on one computer: what each plan's limits have left, which
 account to use next so nothing paid for expires unused, and what the usage is
 worth at API prices. `README.md` describes the product and how the data flows.
@@ -12,13 +12,13 @@ starter was pruned to `api`, `web` and `e2e`; `apps/desktop`, `apps/site` and
 `packages/usage-providers` are this project's own. More apps and Stripe
 billing are available as Flama plugins (see [Plugins](#plugins)).
 
-### Subtrack's own rules
+### ResetOwl's own rules
 
 - **Provider credentials never leave the machine** except to their own
   provider, and are never refreshed: Claude Code's refresh tokens rotate, so a
   refresh here would sign the CLI out. Only identity, limit windows and token
   counts reach the API (`packages/shared/src/schemas/accounts.schema.ts`).
-- **Name ourselves honestly** to every vendor (`subtrack-desktop/<version>`);
+- **Name ourselves honestly** to every vendor (`resetowl-desktop/<version>`);
   never pose as Claude Code or Codex.
 - **Plans are data.** Names and prices live in
   `packages/shared/src/subscriptions/plans.ts` with the old names as aliases;
@@ -27,7 +27,7 @@ billing are available as Flama plugins (see [Plugins](#plugins)).
 - **A new provider** is a folder in `packages/usage-providers` implementing
   `CodingAgentProvider`, its id in `PROVIDER_IDS`, its plans, and a line in the
   registry. Nothing in the API or the screens should need to change.
-- **The desktop bridge** (`window.subtrack`, typed in
+- **The desktop bridge** (`window.resetowl`, typed in
   `packages/shared/src/desktop/bridge.ts`) is the only way the screens reach
   the machine; in a browser it is absent and local features are not offered.
 - Anything that changes the user's machine (shell rc file, Claude's
@@ -37,7 +37,7 @@ billing are available as Flama plugins (see [Plugins](#plugins)).
 ## Monorepo structure
 
 ```
-subtrack/
+resetowl/
 ├── apps/
 │   ├── api/              # NestJS REST API (accounts module: sync, limits, tokens)
 │   ├── desktop/          # Electron shell: collector, tray, bridge (@flama/desktop)

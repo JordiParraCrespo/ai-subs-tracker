@@ -1,9 +1,9 @@
 import type { ProviderId } from '../subscriptions/plans';
 
 /**
- * The contract between the Subtrack desktop shell (`apps/desktop`, Electron)
+ * The contract between the ResetOwl desktop shell (`apps/desktop`, Electron)
  * and the screens it hosts (`apps/web`'s build). The preload script exposes
- * one object implementing `DesktopBridge` as `window.subtrack`; the web app
+ * one object implementing `DesktopBridge` as `window.resetowl`; the web app
  * finds it there and only there, so the same build runs in a browser (no
  * bridge: no local features) and in the desktop app.
  *
@@ -20,7 +20,7 @@ export interface LocalLogin {
   /** The config folder (`~/.claude`) or Codex home it lives in. */
   home: string;
   isDefault: boolean;
-  /** True for a login Subtrack created in its own folder ("Add account"). */
+  /** True for a login ResetOwl created in its own folder ("Add account"). */
   managed: boolean;
   /** True when terminals using the shell integration use this login. */
   active: boolean;
@@ -71,7 +71,7 @@ export interface LiveFeedTarget {
 export interface DesktopBridge {
   version: string;
   platform: string;
-  /** Absolute API origin, e.g. `https://api.subtrack.app`. */
+  /** Absolute API origin, e.g. `https://api.resetowl.com`. */
   apiUrl: string;
   auth: {
     getToken(): Promise<string | null>;
@@ -112,28 +112,35 @@ export interface DesktopBridge {
 }
 
 /**
- * The origin the desktop app serves its screens from (`app://subtrack/`). The
+ * The origin the desktop app serves its screens from (`app://resetowl/`). The
  * API admits it for CORS and as a trusted auth origin, so this one value is
  * what both sides must agree on.
  */
-export const DESKTOP_RENDERER_ORIGIN = 'app://subtrack';
+export const DESKTOP_RENDERER_ORIGIN = 'app://resetowl';
 
-/** IPC channel names, `subtrack:<area>:<verb>`. */
+/**
+ * The origin desktop builds served the screens from while the app was called
+ * Subtrack. The API keeps admitting it so an install that has not updated yet
+ * can still sign in; drop it once no such build is in use.
+ */
+export const LEGACY_DESKTOP_RENDERER_ORIGIN = 'app://subtrack';
+
+/** IPC channel names, `resetowl:<area>:<verb>`. */
 export const DESKTOP_CHANNELS = {
-  authGetToken: 'subtrack:auth:get-token',
-  authSetToken: 'subtrack:auth:set-token',
-  collectorStatus: 'subtrack:collector:status',
-  collectorRefresh: 'subtrack:collector:refresh',
-  collectorChanged: 'subtrack:collector:changed',
-  accountsAddLogin: 'subtrack:accounts:add-login',
-  accountsLoginProgress: 'subtrack:accounts:login-progress',
-  accountsLoginCode: 'subtrack:accounts:login-code',
-  accountsLoginCancel: 'subtrack:accounts:login-cancel',
-  accountsActivate: 'subtrack:accounts:activate',
-  shellIntegration: 'subtrack:shell:integration',
-  shellInstall: 'subtrack:shell:install',
-  liveFeedTargets: 'subtrack:live-feed:targets',
-  liveFeedInstall: 'subtrack:live-feed:install',
-  liveFeedUninstall: 'subtrack:live-feed:uninstall',
-  openExternal: 'subtrack:open-external',
+  authGetToken: 'resetowl:auth:get-token',
+  authSetToken: 'resetowl:auth:set-token',
+  collectorStatus: 'resetowl:collector:status',
+  collectorRefresh: 'resetowl:collector:refresh',
+  collectorChanged: 'resetowl:collector:changed',
+  accountsAddLogin: 'resetowl:accounts:add-login',
+  accountsLoginProgress: 'resetowl:accounts:login-progress',
+  accountsLoginCode: 'resetowl:accounts:login-code',
+  accountsLoginCancel: 'resetowl:accounts:login-cancel',
+  accountsActivate: 'resetowl:accounts:activate',
+  shellIntegration: 'resetowl:shell:integration',
+  shellInstall: 'resetowl:shell:install',
+  liveFeedTargets: 'resetowl:live-feed:targets',
+  liveFeedInstall: 'resetowl:live-feed:install',
+  liveFeedUninstall: 'resetowl:live-feed:uninstall',
+  openExternal: 'resetowl:open-external',
 } as const;

@@ -2,7 +2,7 @@
   "name": "@flama/usage-providers",
   "version": "0.1.0",
   "private": true,
-  "description": "Reads coding-agent logins on this machine (Claude Code, Codex) into Subtrack's account sync contract.",
+  "description": "Reads coding-agent logins on this machine (Claude Code, Codex) into ResetOwl's account sync contract.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

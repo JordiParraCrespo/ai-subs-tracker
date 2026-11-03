@@ -1,6 +1,6 @@
 // Bundles the main process and the preload into dist/ (CommonJS, Node
 // platform, `electron` external; workspace packages are bundled from source
-// through their `flama-source` export) and draws the tray icons.
+// through their `flama-source` export) and draws the owl icons.
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -45,7 +45,11 @@ await Promise.all([
   }),
 ]);
 
-// --- tray icons: a ring with a filled arc, as PNG, no image library ---
+// --- icons: the owl, as PNG, no image library ---
+//
+// One shape in coordinates from -1 to 1 (y down): ear tufts, a round body, two
+// eyes cut out with their pupils left in, and a small beak cut out. Each pixel
+// is sampled 4×4 times so the edges stay smooth at 16px.
 
 const crcTable = Array.from({ length: 256 }, (_, n) => {
   let c = n;
@@ -65,24 +69,75 @@ function chunk(type, data) {
   crc.writeUInt32BE(crc32(body));
   return Buffer.concat([len, body, crc]);
 }
-function png(size, [r, g, b]) {
+
+function inTriangle(x, y, [ax, ay], [bx, by], [cx, cy]) {
+  const s1 = (bx - ax) * (y - ay) - (by - ay) * (x - ax);
+  const s2 = (cx - bx) * (y - by) - (cy - by) * (x - bx);
+  const s3 = (ax - cx) * (y - cy) - (ay - cy) * (x - cx);
+  return (s1 >= 0 && s2 >= 0 && s3 >= 0) || (s1 <= 0 && s2 <= 0 && s3 <= 0);
+}
+
+/**
+ * True where the owl is ink, in owl coordinates. `simple` (16px) drops the
+ * pupils and the beak, which only blur at that size, and opens the eyes wider.
+ */
+function owl(x, y, simple = false) {
+  const body = (x / 0.8) ** 2 + ((y - 0.12) / 0.84) ** 2 <= 1;
+  const ears =
+    inTriangle(x, y, [-0.78, -0.98], [-0.2, -0.55], [-0.8, -0.3]) ||
+    inTriangle(x, y, [0.78, -0.98], [0.2, -0.55], [0.8, -0.3]);
+  if (!body && !ears) return false;
+  for (const ex of [-0.34, 0.34]) {
+    const d = Math.hypot(x - ex, y + 0.08);
+    if (d <= (simple ? 0.27 : 0.3)) return !simple && d <= 0.12; // a hole; the pupil stays
+  }
+  if (!simple && inTriangle(x, y, [-0.11, 0.14], [0.11, 0.14], [0, 0.36])) return false;
+  return true;
+}
+
+/**
+ * A square PNG. With `tile`, the owl is white on a rounded tile of `color`
+ * (the app icon); without, it is `color` on transparent (the tray).
+ */
+function png(size, color, { tile = false } = {}) {
+  const [r, g, b] = color;
   const raw = Buffer.alloc(size * (size * 4 + 1));
-  const c = (size - 1) / 2;
-  const outer = size / 2 - 0.5;
-  const inner = outer - Math.max(1.5, size / 7);
+  const S = 4;
+  const scale = tile ? 0.66 : 0.98; // owl size relative to the image
+  const radius = 0.22; // tile corner, as a fraction of the size
   for (let y = 0; y < size; y++) {
     raw[y * (size * 4 + 1)] = 0;
     for (let x = 0; x < size; x++) {
-      const d = Math.hypot(x - c, y - c);
-      const angle = (Math.atan2(x - c, c - y) + 2 * Math.PI) % (2 * Math.PI);
-      const ring = d <= outer && d >= inner;
-      const dot = d <= inner - Math.max(1.5, size / 8) && angle < Math.PI * 1.4;
-      const alpha = ring ? 255 : dot ? 200 : 0;
+      let ink = 0;
+      let ground = 0;
+      for (let sy = 0; sy < S; sy++) {
+        for (let sx = 0; sx < S; sx++) {
+          const px = (x + (sx + 0.5) / S) / size; // 0..1
+          const py = (y + (sy + 0.5) / S) / size;
+          const ox = (px * 2 - 1) / scale;
+          const oy = (py * 2 - 1) / scale;
+          if (owl(ox, oy, size <= 16)) ink++;
+          if (tile) {
+            const qx = Math.max(Math.abs(px - 0.5) - (0.5 - radius), 0);
+            const qy = Math.max(Math.abs(py - 0.5) - (0.5 - radius), 0);
+            if (Math.hypot(qx, qy) <= radius) ground++;
+          }
+        }
+      }
       const i = y * (size * 4 + 1) + 1 + x * 4;
-      raw[i] = r;
-      raw[i + 1] = g;
-      raw[i + 2] = b;
-      raw[i + 3] = alpha;
+      if (tile) {
+        // White owl over the coloured tile.
+        const a = ink / (S * S);
+        raw[i] = Math.round(r + (255 - r) * a);
+        raw[i + 1] = Math.round(g + (255 - g) * a);
+        raw[i + 2] = Math.round(b + (255 - b) * a);
+        raw[i + 3] = Math.round((255 * ground) / (S * S));
+      } else {
+        raw[i] = r;
+        raw[i + 1] = g;
+        raw[i + 2] = b;
+        raw[i + 3] = Math.round((255 * ink) / (S * S));
+      }
     }
   }
   const ihdr = Buffer.alloc(13);
@@ -100,12 +155,13 @@ function png(size, [r, g, b]) {
 
 const assets = join(dist, 'assets');
 mkdirSync(assets, { recursive: true });
-const brand = [0xf9, 0x73, 0x16];
+// The design system's brand purple (--ds-brand).
+const brand = [0x77, 0x64, 0xd8];
 writeFileSync(join(assets, 'tray.png'), png(16, brand));
 writeFileSync(join(assets, 'tray@2x.png'), png(32, brand));
 // macOS template images are black + alpha; the system tints them.
 writeFileSync(join(assets, 'trayTemplate.png'), png(16, [0, 0, 0]));
 writeFileSync(join(assets, 'trayTemplate@2x.png'), png(32, [0, 0, 0]));
-writeFileSync(join(assets, 'icon.png'), png(512, brand));
+writeFileSync(join(assets, 'icon.png'), png(512, brand, { tile: true }));
 
 console.log(`built ${pkg.name}@${pkg.version} → dist/`);

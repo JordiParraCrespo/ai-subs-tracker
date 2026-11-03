@@ -62,7 +62,7 @@ describe('IPC argument validation', () => {
 
   it('opens only http(s) URLs', () => {
     expect(parseExternalUrl('https://claude.ai/x')).toBe('https://claude.ai/x');
-    for (const bad of ['file:///etc/passwd', 'javascript:alert(1)', 'app://subtrack/', 'nope']) {
+    for (const bad of ['file:///etc/passwd', 'javascript:alert(1)', 'app://resetowl/', 'nope']) {
       expect(() => parseExternalUrl(bad)).toThrow(IpcArgumentError);
     }
   });
@@ -75,11 +75,11 @@ describe('IPC argument validation', () => {
   });
 
   it('trusts only frames from the renderer origin', () => {
-    expect(isTrustedSender('app://subtrack/accounts', 'app://subtrack')).toBe(true);
+    expect(isTrustedSender('app://resetowl/accounts', 'app://resetowl')).toBe(true);
     expect(isTrustedSender('http://localhost:3000/x', 'http://localhost:3000')).toBe(true);
-    expect(isTrustedSender('https://evil.example/', 'app://subtrack')).toBe(false);
-    expect(isTrustedSender('app://other/', 'app://subtrack')).toBe(false);
-    expect(isTrustedSender(undefined, 'app://subtrack')).toBe(false);
+    expect(isTrustedSender('https://evil.example/', 'app://resetowl')).toBe(false);
+    expect(isTrustedSender('app://other/', 'app://resetowl')).toBe(false);
+    expect(isTrustedSender(undefined, 'app://resetowl')).toBe(false);
   });
 });
 
@@ -108,18 +108,18 @@ describe('IPC handlers', () => {
     const handlers = new Map<string, (event: unknown, ...args: unknown[]) => unknown>();
     const s = services();
     registerIpc({ handle: (channel, fn) => handlers.set(channel, fn as never) }, s, {
-      rendererOrigin: 'app://subtrack',
+      rendererOrigin: 'app://resetowl',
       isAppWebContents: (id) => id === 1,
     });
     const getToken = handlers.get(DESKTOP_CHANNELS.authGetToken);
     if (!getToken) throw new Error('missing handler');
-    expect(() => getToken({ sender: { id: 2 }, senderFrame: { url: 'app://subtrack/' } })).toThrow(
+    expect(() => getToken({ sender: { id: 2 }, senderFrame: { url: 'app://resetowl/' } })).toThrow(
       /Refused/,
     );
     expect(() =>
       getToken({ sender: { id: 1 }, senderFrame: { url: 'https://evil.example/' } }),
     ).toThrow(/Refused/);
-    await getToken({ sender: { id: 1 }, senderFrame: { url: 'app://subtrack/dashboard' } });
+    await getToken({ sender: { id: 1 }, senderFrame: { url: 'app://resetowl/dashboard' } });
     expect(s.getToken).toHaveBeenCalledTimes(1);
   });
 });

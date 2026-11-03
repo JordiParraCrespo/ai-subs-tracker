@@ -11,7 +11,7 @@ import {
 } from '../live-feed';
 import { tempDir } from './helpers';
 
-const SCRIPT = '/data/Subtrack/statusline.sh';
+const SCRIPT = '/data/ResetOwl/statusline.sh';
 
 async function settings(home: string) {
   return JSON.parse(await readFile(join(home, 'settings.json'), 'utf8'));

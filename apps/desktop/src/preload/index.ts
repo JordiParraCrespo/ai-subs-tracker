@@ -7,9 +7,9 @@ import {
 import { contextBridge, type IpcRendererEvent, ipcRenderer } from 'electron';
 
 /**
- * Exposes `window.subtrack` (the `DesktopBridge`) to the screens. Sandboxed:
+ * Exposes `window.resetowl` (the `DesktopBridge`) to the screens. Sandboxed:
  * no Node, no fs — every call is an `ipcRenderer.invoke` the main process
- * validates. The static fields arrive as `--subtrack-bridge=<base64 JSON>`
+ * validates. The static fields arrive as `--resetowl-bridge=<base64 JSON>`
  * in `process.argv` (`webPreferences.additionalArguments`).
  */
 
@@ -20,11 +20,11 @@ interface StaticInfo {
 }
 
 function readStaticInfo(): StaticInfo {
-  const arg = process.argv.find((a) => a.startsWith('--subtrack-bridge='));
+  const arg = process.argv.find((a) => a.startsWith('--resetowl-bridge='));
   const fallback: StaticInfo = { version: '0.0.0', platform: process.platform, apiUrl: '' };
   if (!arg) return fallback;
   try {
-    const parsed = JSON.parse(atob(arg.slice('--subtrack-bridge='.length))) as Partial<StaticInfo>;
+    const parsed = JSON.parse(atob(arg.slice('--resetowl-bridge='.length))) as Partial<StaticInfo>;
     return {
       version: String(parsed.version ?? fallback.version),
       platform: String(parsed.platform ?? fallback.platform),
@@ -82,4 +82,4 @@ const bridge: DesktopBridge = {
   openExternal: (url) => invoke(DESKTOP_CHANNELS.openExternal, url),
 };
 
-contextBridge.exposeInMainWorld('subtrack', Object.freeze(bridge));
+contextBridge.exposeInMainWorld('resetowl', Object.freeze(bridge));

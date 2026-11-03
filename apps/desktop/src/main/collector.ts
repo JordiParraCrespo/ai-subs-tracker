@@ -258,7 +258,7 @@ export class Collector {
     this.failures += 1;
     const message =
       err instanceof NetworkError
-        ? `Could not reach the Subtrack API: ${err.message}`
+        ? `Could not reach the ResetOwl API: ${err.message}`
         : err instanceof Error
           ? err.message
           : String(err);

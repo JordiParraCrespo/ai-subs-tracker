@@ -25,7 +25,7 @@
 - **Never send a provider credential** anywhere but the provider that issued
   it, and never refresh one. The sync carries identity, plan, windows and
   token counts.
-- **Honest user agent**: `subtrack-desktop/<version> (<platform>)`. Never
+- **Honest user agent**: `resetowl-desktop/<version> (<platform>)`. Never
   impersonate claude-code or codex.
 - **Never log the API token.** It lives in `token-store.ts`, encrypted with
   `safeStorage`, memory-only when that is unavailable.

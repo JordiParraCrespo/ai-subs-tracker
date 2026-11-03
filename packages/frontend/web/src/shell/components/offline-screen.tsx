@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 const ICON = { className: 'size-4', strokeWidth: 1.5 } as const;
 
-/** The design's "Can't reach Subtrack": shown in place of the page while the API cannot be reached. */
+/** The design's "Can't reach ResetOwl": shown in place of the page while the API cannot be reached. */
 export function OfflineScreen({ onRetry, retrying }: { onRetry: () => void; retrying: boolean }) {
   const { t } = useTranslation();
   return (

@@ -1,6 +1,6 @@
 # @flama/site
 
-Tokenaitor's website at **https://tokenaitor.com**. Tokenaitor is the product's public name; the code, the desktop app and the rest of this repository still call it Subtrack (it identifies itself to vendors as `subtrack-desktop`).
+ResetOwl's website at **https://resetowl.com** (`tokenaitor.com` redirects to it).
 
 The site holds the home page and a set of
 guides on Claude Code and Codex plans, limits and prices, in English (`/`)
@@ -16,7 +16,7 @@ hover).
 | URL | What it is |
 | --- | --- |
 | `/` | The home page (`designs/Marketing Page.dc.html`): hero, product preview, features, how it works, privacy, the guide hub |
-| `/claude-code-usage-tracker/` | The pillar page: what a Claude Code usage tracker should show, and how Tokenaitor tracks several accounts |
+| `/claude-code-usage-tracker/` | The pillar page: what a Claude Code usage tracker should show, and how ResetOwl tracks several accounts |
 | `/claude-code-pricing/` | Claude plans and prices, Anthropic's API rates |
 | `/codex-pricing/` | ChatGPT plans for Codex, the Pro tiers, OpenAI's API rates |
 | `/claude-code-usage-limits/` | The 5-hour and weekly windows on both vendors' plans |
@@ -78,7 +78,7 @@ Read from the root `.env` at build time.
 under the same Content-Security-Policy as the web app (`nginx.conf`):
 
 ```bash
-docker build -f apps/site/Dockerfile --build-arg VITE_SITE_APP_URL=https://app.tokenaitor.com -t tokenaitor-site .
+docker build -f apps/site/Dockerfile --build-arg VITE_SITE_APP_URL=https://app.resetowl.com -t tokenaitor-site .
 ```
 
 `dist/` is plain static files, so any static host serves it as well.

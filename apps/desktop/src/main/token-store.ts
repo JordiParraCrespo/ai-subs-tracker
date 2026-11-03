@@ -1,5 +1,5 @@
 /**
- * The API session token — Subtrack's own, never a provider credential —
+ * The API session token — ResetOwl's own, never a provider credential —
  * encrypted at rest with the OS keystore (Electron's `safeStorage`) in
  * `userData/session.bin`. Without a keystore it stays in memory and the
  * person signs in again next launch. The token is never logged.

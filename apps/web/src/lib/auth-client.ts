@@ -19,7 +19,7 @@ import { createAuthClient } from 'better-auth/react';
 export const apiBaseUrl = desktop?.apiUrl ?? import.meta.env.VITE_API_URL ?? '';
 
 /**
- * Inside the desktop app the screens are served from `app://subtrack`, a
+ * Inside the desktop app the screens are served from `app://resetowl`, a
  * different origin from the API, so the session is a bearer token instead of
  * a cookie: the API hands it back in `set-auth-token` on sign-in, and the
  * desktop shell keeps it encrypted (`DesktopBridge.auth`). This holds the one

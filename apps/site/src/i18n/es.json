@@ -2,7 +2,7 @@
   "seo": {
     "home": {
       "title": "Aprovecha los planes de IA para programar que pagas",
-      "description": "Tokenaitor muestra lo que le queda a cada plan de Claude Code y Codex de tu ordenador, te dice qué cuenta usar ahora y valora tu uso a precios de API."
+      "description": "ResetOwl muestra lo que le queda a cada plan de Claude Code y Codex de tu ordenador, te dice qué cuenta usar ahora y valora tu uso a precios de API."
     },
     "404": {
       "title": "Página no encontrada",
@@ -28,13 +28,13 @@
   },
   "hero": {
     "title": "Aprovecha los planes de IA para programar que pagas",
-    "lede": "Tokenaitor vigila cada sesión de Claude Code y Codex de tu ordenador, muestra lo que les queda a los límites de 5 horas y semanales de cada plan y te dice qué cuenta usar ahora.",
+    "lede": "ResetOwl vigila cada sesión de Claude Code y Codex de tu ordenador, muestra lo que les queda a los límites de 5 horas y semanales de cada plan y te dice qué cuenta usar ahora.",
     "primary": "Descargar para escritorio",
     "secondary": "Cómo funciona",
     "note": "Gratis y de código abierto. macOS, Windows y Linux."
   },
   "preview": {
-    "label": "Ejemplo de las pantallas de Tokenaitor",
+    "label": "Ejemplo de las pantallas de ResetOwl",
     "chartTitle": "Uso a precios de API",
     "chartRest": "Últimos 12 meses",
     "plansCost": "Coste de los planes",
@@ -81,7 +81,7 @@
     "title": "Listo en un minuto",
     "install": {
       "title": "Instala la app de escritorio",
-      "text": "Tokenaitor encuentra las sesiones de Claude Code y Codex que ya tienes en tu ordenador."
+      "text": "ResetOwl encuentra las sesiones de Claude Code y Codex que ya tienes en tu ordenador."
     },
     "accounts": {
       "title": "Añade tus otras cuentas",
@@ -95,7 +95,7 @@
   "privacy": {
     "eyebrow": "Privacidad",
     "title": "Tus sesiones nunca salen de tu ordenador",
-    "lede": "Tokenaitor nunca renueva el token de un proveedor, se presenta ante cada proveedor con su propio nombre (subtrack-desktop) y nunca sustituye una línea de estado que ya tengas.",
+    "lede": "ResetOwl nunca renueva el token de un proveedor, se presenta ante cada proveedor con su propio nombre (resetowl-desktop) y nunca sustituye una línea de estado que ya tengas.",
     "local": {
       "title": "Se queda en tu ordenador",
       "badge": "Nunca se envía",
@@ -104,7 +104,7 @@
       "settings": "Tu configuración de la shell y de Claude, salvo que lo actives"
     },
     "api": {
-      "title": "Llega a Tokenaitor",
+      "title": "Llega a ResetOwl",
       "identity": "Correos de las cuentas y nombres de los planes",
       "limits": "Porcentajes de los límites y horas de reinicio",
       "tokens": "Recuento de tokens por modelo y día"
@@ -112,8 +112,8 @@
   },
   "cta": {
     "title": "Deja de perder los límites que ya pagas",
-    "lede": "Instala Tokenaitor y sabrás qué cuenta usar en menos de un minuto.",
-    "button": "Descargar Tokenaitor"
+    "lede": "Instala ResetOwl y sabrás qué cuenta usar en menos de un minuto.",
+    "button": "Descargar ResetOwl"
   },
   "footer": {
     "label": "Pie de página",

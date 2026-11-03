@@ -1,9 +1,9 @@
-# @flama/desktop — Subtrack
+# @flama/desktop — ResetOwl
 
-The Subtrack desktop app: an Electron shell for people with several personal
+The ResetOwl desktop app: an Electron shell for people with several personal
 Claude Code and Codex subscriptions who want to use up what they pay for. It
 reads the logins on this machine, sends their limits and token counts to the
-Subtrack API, keeps a tray entry saying which account to use next, and lets a
+ResetOwl API, keeps a tray entry saying which account to use next, and lets a
 terminal follow the account marked active.
 
 ## Architecture
@@ -12,8 +12,8 @@ terminal follow the account marked active.
 ┌──────────── main process (src/main) ────────────┐      ┌──── renderer ────┐
 │ collector ── usage-providers ── local logins    │      │ the web app's    │
 │     │  └── POST /api/v1/accounts/sync (bearer)  │ IPC  │ build, served on │
-│ pointers / shell integration / live feed / tray │◄────►│ app://subtrack/  │
-│ token store (safeStorage)                       │      │ window.subtrack  │
+│ pointers / shell integration / live feed / tray │◄────►│ app://resetowl/  │
+│ token store (safeStorage)                       │      │ window.resetowl  │
 └─────────────────────────────────────────────────┘      └──────────────────┘
                         ▲ preload (src/preload): contextBridge, ipcRenderer.invoke only
 ```
@@ -24,12 +24,12 @@ terminal follow the account marked active.
   | Module | Job |
   | --- | --- |
   | `config.ts` | API URL, renderer URL, honest user agent, run mode, CSP |
-  | `window.ts`, `renderer-files.ts` | the `app://subtrack/` scheme (SPA fallback, CSP on HTML), the window and its navigation guards |
+  | `window.ts`, `renderer-files.ts` | the `app://resetowl/` scheme (SPA fallback, CSP on HTML), the window and its navigation guards |
   | `token-store.ts` | the API session token, `safeStorage`-encrypted in `userData/session.bin` |
   | `local-logins.ts` | reads every login (`@flama/usage-providers`), builds `SyncAccountsInput` |
   | `api-client.ts` | `POST /api/v1/accounts/sync` |
   | `collector.ts` | the loop: every 10 min, refresh (≤1/min), backoff, 401, rate-limit pause, live sends |
-  | `pointers.ts` | `~/.subtrack/active/<provider>`, which login terminals use |
+  | `pointers.ts` | `~/.resetowl/active/<provider>`, which login terminals use |
   | `shell-integration.ts` | the `claude` / `codex` shell functions and the rc-file install |
   | `add-login.ts` | "Add subscription": runs the provider's CLI login into a folder of its own, reports the link and code it prints, types a pasted code into it |
   | `live-feed.ts` | the opt-in Claude Code status-line feed |
@@ -37,11 +37,11 @@ terminal follow the account marked active.
   | `ipc.ts`, `ipc-validation.ts` | one handler per channel, arguments parsed, sender checked |
   | `index.ts` | wiring, `--collect-once`, `--smoke` |
 
-- **Preload** (`src/preload/index.ts`) — sandboxed; exposes `window.subtrack`
+- **Preload** (`src/preload/index.ts`) — sandboxed; exposes `window.resetowl`
   (`DesktopBridge`) and nothing else. `version`, `platform` and `apiUrl`
-  arrive as a `--subtrack-bridge=` argument.
+  arrive as a `--resetowl-bridge=` argument.
 - **Renderer** — not in this package: the web app's static build, which finds
-  `window.subtrack` and talks to `apiUrl` with a bearer token.
+  `window.resetowl` and talks to `apiUrl` with a bearer token.
 
 ## The bridge
 
@@ -61,31 +61,31 @@ http(s)-only URLs).
   usage endpoint.
 - **Never** refreshes a provider credential, and **never** sends one anywhere:
   the API receives identity, plan, limit windows and token counts.
-- Introduces itself honestly: `subtrack-desktop/<version> (<platform>)`, never
+- Introduces itself honestly: `resetowl-desktop/<version> (<platform>)`, never
   as claude-code or codex.
-- The API token is Subtrack's own session, encrypted with the OS keystore;
+- The API token is ResetOwl's own session, encrypted with the OS keystore;
   without one it is kept in memory only. It is never logged.
 - **Opt-in and reversible:**
   - *Shell integration* is written only on `shell.install()`, inside
-    `# >>> subtrack >>>` / `# <<< subtrack <<<` in `~/.zshrc` or `~/.bashrc`
+    `# >>> resetowl >>>` / `# <<< resetowl <<<` in `~/.zshrc` or `~/.bashrc`
     (by `$SHELL`); a second install replaces the block, deleting it undoes it.
     On Windows the PowerShell snippet is returned for the person to paste.
   - *Live feed* sets `statusLine` in a Claude Code folder's `settings.json`
-    only when there is none, and removes it only when it is Subtrack's.
+    only when there is none, and removes it only when it is ResetOwl's.
 - Switching accounts is a pointer file, not a credential copy. The default
   login's pointer is an empty file: setting `CLAUDE_CONFIG_DIR` even to
   `~/.claude` would change the macOS Keychain item Claude Code reads.
 
 ### Active pointers and the shell
 
-`~/.subtrack/active/claude-code` and `~/.subtrack/active/codex` hold the
+`~/.resetowl/active/claude-code` and `~/.resetowl/active/codex` hold the
 absolute home of the active login, or nothing for the default. The shell
 functions read them on every call:
 
 ```sh
 function claude {
-  local _subtrack_home; _subtrack_home="$(cat ~/.subtrack/active/claude-code 2>/dev/null)"
-  if [ -n "$_subtrack_home" ]; then CLAUDE_CONFIG_DIR="$_subtrack_home" command claude "$@"
+  local _resetowl_home; _resetowl_home="$(cat ~/.resetowl/active/claude-code 2>/dev/null)"
+  if [ -n "$_resetowl_home" ]; then CLAUDE_CONFIG_DIR="$_resetowl_home" command claude "$@"
   else command claude "$@"; fi
 }
 ```
@@ -100,7 +100,7 @@ A server on `127.0.0.1:<random port>` with a random bearer secret accepts
 `POST /statusline/claude`. `userData/statusline.sh` (rewritten each launch with
 the port and secret, mode 0700) posts its stdin there with `curl -s -m 2` and
 the header `X-Claude-Config-Dir: ${CLAUDE_CONFIG_DIR:-$HOME/.claude}`, then
-prints an empty line — so the status bar shows nothing, and when Subtrack is
+prints an empty line — so the status bar shows nothing, and when ResetOwl is
 not running the script costs at most two seconds and fails silently. A payload
 with `rate_limits` becomes a sync for that login with `snapshot.source='live'`
 and no token rows, at most once a minute per login.
@@ -112,9 +112,9 @@ and no token rows, at most once a minute per login.
 pnpm --filter @flama/web build          # the screens, into apps/web/dist (needed by package and the default window)
 # flama:end web
 pnpm --filter @flama/desktop build      # bundle main + preload into dist/ (esbuild), draw tray icons
-pnpm --filter @flama/desktop dev        # build, then open loading SUBTRACK_RENDERER_URL (default http://localhost:3000)
+pnpm --filter @flama/desktop dev        # build, then open loading RESETOWL_RENDERER_URL (default http://localhost:3000)
 pnpm desktop:dev                        # the same, from the root
-pnpm --filter @flama/desktop start      # open, serving the built screens on app://subtrack/
+pnpm --filter @flama/desktop start      # open, serving the built screens on app://resetowl/
 pnpm --filter @flama/desktop test       # vitest
 pnpm --filter @flama/desktop typecheck
 pnpm --filter @flama/desktop package    # electron-builder: mac dmg+zip, win nsis, linux AppImage → release/
@@ -144,8 +144,8 @@ desktop app; set them in the shell that launches it).
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| `SUBTRACK_API_URL` | `http://127.0.0.1:3001` unpackaged, `https://api.subtrack.app` packaged | The API the collector syncs to and the screens call |
-| `SUBTRACK_RENDERER_URL` | unset (`http://localhost:3000` with `--dev`) | Load the screens from a dev server instead of `app://subtrack/` |
+| `RESETOWL_API_URL` | `http://127.0.0.1:3001` unpackaged, `https://api.resetowl.com` packaged | The API the collector syncs to and the screens call |
+| `RESETOWL_RENDERER_URL` | unset (`http://localhost:3000` with `--dev`) | Load the screens from a dev server instead of `app://resetowl/` |
 
-The API must allow the origin `app://subtrack` (CORS and Better Auth trusted
+The API must allow the origin `app://resetowl` (CORS and Better Auth trusted
 origins).

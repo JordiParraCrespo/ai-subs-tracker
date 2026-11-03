@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Subtrack",
+    "appName": "ResetOwl",
     "controlAppName": "Flama Control",
     "loading": "Cargando...",
     "error": "Algo salió mal",
@@ -136,7 +136,7 @@
     "firstName": "Nombre",
     "lastName": "Apellido",
     "login": {
-      "title": "Inicia sesión en Subtrack",
+      "title": "Inicia sesión en ResetOwl",
       "description": "Controla tus planes de IA para programar, sus límites y lo que valen.",
       "submit": "Iniciar sesión",
       "submitting": "Iniciando sesión...",
@@ -335,7 +335,7 @@
     },
     "remove": {
       "confirm": "Quitar",
-      "description": "Subtrack deja de seguirla y la ignora en las próximas sincronizaciones. La sesión en sí no se toca.",
+      "description": "ResetOwl deja de seguirla y la ignora en las próximas sincronizaciones. La sesión en sí no se toca.",
       "title": "¿Quitar {{name}}?"
     },
     "resets": {
@@ -347,9 +347,9 @@
       "left": "Queda {{left}}"
     },
     "settings": {
-      "browserDescription": "Cambiar la cuenta de la terminal y los límites en directo actúan sobre tu ordenador, así que están en la app de escritorio de Subtrack.",
+      "browserDescription": "Cambiar la cuenta de la terminal y los límites en directo actúan sobre tu ordenador, así que están en la app de escritorio de ResetOwl.",
       "browserTitle": "Abre la app de escritorio",
-      "liveDescription": "Claude Code informa de tus límites a Subtrack mientras trabajas, mediante su línea de estado. Desactivado por defecto y nunca sustituye una línea de estado que ya tengas.",
+      "liveDescription": "Claude Code informa de tus límites a ResetOwl mientras trabajas, mediante su línea de estado. Desactivado por defecto y nunca sustituye una línea de estado que ya tengas.",
       "liveNone": "No se han encontrado carpetas de Claude Code en este ordenador.",
       "liveTaken": "Esta carpeta ya tiene su propia línea de estado.",
       "liveTitle": "Límites en directo de Claude Code",
@@ -360,7 +360,7 @@
       "shellNotInstalled": "No instalado",
       "shellTitle": "Integración con la terminal",
       "title": "Este ordenador",
-      "description": "Cómo trabaja Subtrack con las herramientas de programación de este equipo. Cada cambio es opcional y reversible."
+      "description": "Cómo trabaja ResetOwl con las herramientas de programación de este equipo. Cada cambio es opcional y reversible."
     },
     "table": {
       "account": "Cuenta",
@@ -647,7 +647,7 @@
         "title": "Termina de iniciar sesión en Claude",
         "description": "Abrimos claude.com en tu navegador. Inicia sesión con la cuenta que quieres añadir.",
         "waiting": "Esperando a Claude…",
-        "expires": "Subtrack espera hasta 15 minutos",
+        "expires": "ResetOwl espera hasta 15 minutos",
         "otherTitle": "¿Tienes otra cuenta abierta?",
         "otherText": "Copia el enlace y ábrelo en una ventana privada, así la cuenta que usas ahora sigue con la sesión iniciada.",
         "useCode": "Usar un código",
@@ -678,7 +678,7 @@
       "desktop": {
         "title": "Añádela desde la app de escritorio",
         "description": "Claude Code y Codex inician sesión en tu ordenador.",
-        "text": "La app de escritorio de Subtrack inicia la sesión y lee el plan, así nada de tu inicio de sesión llega a una pestaña del navegador. Abre la app y elige Añadir suscripción."
+        "text": "La app de escritorio de ResetOwl inicia la sesión y lee el plan, así nada de tu inicio de sesión llega a una pestaña del navegador. Abre la app y elige Añadir suscripción."
       },
       "back": "Atrás",
       "failed": "No se completó el inicio de sesión."

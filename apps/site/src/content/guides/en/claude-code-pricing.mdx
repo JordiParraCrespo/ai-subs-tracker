@@ -14,7 +14,7 @@ faq:
   - q: What happened to Max 20x?
     a: Anthropic renamed Max 20x to Ultra on 30 October 2026. It keeps the $200 price, and verified accounts on it have no 5-hour limit, only a weekly one.
   - q: Is a Claude plan cheaper than the API?
-    a: It depends on how much you use. Price your real usage at the API rates below and compare it with the plan's monthly price; Tokenaitor does this for you from the CLI's own transcripts.
+    a: It depends on how much you use. Price your real usage at the API rates below and compare it with the plan's monthly price; ResetOwl does this for you from the CLI's own transcripts.
   - q: Are these prices per month?
     a: Yes, the monthly price in US dollars. Team prices are per seat. Taxes and annual billing are not included.
 ---
@@ -28,7 +28,7 @@ Claude Code is included in Anthropic's paid Claude plans. These are the plans an
 
 <PlanTable provider="claude-code" />
 
-**Max 20x is now Ultra.** Anthropic renamed it on 30 October 2026; the price stayed at $200. If an older account still reports the old name, Tokenaitor shows it as Ultra.
+**Max 20x is now Ultra.** Anthropic renamed it on 30 October 2026; the price stayed at $200. If an older account still reports the old name, ResetOwl shows it as Ultra.
 
 ## Which limits each plan meters
 
@@ -36,14 +36,14 @@ Most plans meter two windows: a **5-hour session window** and a **weekly** one. 
 
 ## What the same usage costs on the API
 
-The fair way to judge a plan is to price the tokens you actually use at the API rates. These are Anthropic's pay-as-you-go prices in US dollars per million tokens, the same table Tokenaitor prices your usage with:
+The fair way to judge a plan is to price the tokens you actually use at the API rates. These are Anthropic's pay-as-you-go prices in US dollars per million tokens, the same table ResetOwl prices your usage with:
 
 <ApiPriceTable vendor="anthropic" />
 
 Cache writes cost 1.25× the input price. An agentic coding session reads its own context back many times, so cache reads are often the largest number of tokens in a day.
 
 <Callout>
-  Tokenaitor counts tokens from Claude Code's own transcripts, per model and per day, and shows what that usage would have cost on the API next to what each plan costs you.
+  ResetOwl counts tokens from Claude Code's own transcripts, per model and per day, and shows what that usage would have cost on the API next to what each plan costs you.
 </Callout>
 
 ## How to choose a plan

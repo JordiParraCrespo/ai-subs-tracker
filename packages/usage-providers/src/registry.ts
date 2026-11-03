@@ -15,7 +15,7 @@ export function defineProviders(
   return Object.freeze([...providers]);
 }
 
-/** Every provider Subtrack reads, in display order. */
+/** Every provider ResetOwl reads, in display order. */
 export const PROVIDERS: readonly CodingAgentProvider[] = defineProviders([
   claudeCodeProvider,
   codexProvider,
