@@ -1,0 +1,73 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+# What any Expo app generates: native projects from `expo prebuild`, and the
+# dev server's state
+apps/*/ios/
+apps/*/android/
+.expo/
+# flama:plugins docs
+*.tsbuildinfo
+node-compile-cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Turbo
+.turbo/
+
+# Docker
+docker/**/*.log
+
+# Test
+coverage/
+
+# sentry-cli's local config, which holds an auth token
+.sentryclirc
+
+# pnpm
+.pnpm-debug.log
+
+# Claude Code scratchpad (temp workflow scripts, not part of the repo)
+scratchpad/
+
+# Design handoff material — reference deliverables used to build the brand,
+# not part of the codebase. Large, and carries third-party branding.
+/Alpaca Labs Design System.zip
+/CRM SaaS Design Pages.zip
+/Adri Rodrigo - Design System.html
+
+# flama:plugins qa
+
+# Redis snapshot, written when a local redis-server is used instead of docker.
+dump.rdb
+
+# Claude Code agent worktrees (isolated checkouts, never repo content)
+.claude/worktrees/
+
+# Local storage (STORAGE_PROVIDER=local, UPLOAD_DIR=./uploads): files the API and the e2e suite write
+uploads/
+
+# The local stack (scripts/stack/stack.mjs), its screenshots and the local CI report
+.stack/
+.screenshots/
+.ci-local/
+# flama:begin e2e
+e2e/tests/screens/local/
+# flama:end e2e

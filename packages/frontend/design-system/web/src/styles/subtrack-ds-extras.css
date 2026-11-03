@@ -1,0 +1,148 @@
+/* =============================================================================
+   Subtrack design system — the markup the export writes inline
+   =============================================================================
+   The Claude Design export styles some recurring pieces inline in its pages
+   (the card header, the Filter Select, the up/down tone of a figure). The
+   React components name them with classes instead; the values are the
+   export's, copied from `designs/AI Subscription Tracker.dc.html` and
+   `designs/Filter Select.dc.html`.                                             */
+
+.ds-t-up{color:var(--ds-positive)}
+.ds-t-down{color:var(--ds-negative)}
+.ds-chart__crosshair{stroke:var(--ds-chart-crosshair)}
+.ds-chart__dot{stroke:var(--ds-bg-app)}
+
+/* Badges by tone: info is the default `.ds-badge`. */
+.ds-badge[data-tone="review"]{background:var(--ds-review-wash);color:var(--ds-review)}
+.ds-badge[data-tone="negative"]{background:rgba(255,102,127,.12);color:var(--ds-negative)}
+.ds-badge[data-tone="neutral"]{background:var(--ds-fill);color:var(--ds-text-muted)}
+
+/* Card header: 56px, title at body-strong, an action on the right. */
+.ds-card-header{display:flex;align-items:center;justify-content:space-between;gap:12px;height:56px;padding:0 16px 0 24px;box-sizing:border-box}
+.ds-card-header__title{margin:0;font:var(--ds-type-body-strong);letter-spacing:var(--ds-tracking-tight)}
+.ds-card-row{padding:16px 24px;border-top:1px solid var(--ds-divider)}
+.ds-card-row__title{font:var(--ds-type-label-strong)}
+.ds-card-row__value{font:500 14px/20px var(--ds-font-sans);letter-spacing:var(--ds-tracking-tighter)}
+
+/* Filter Select: the toolbar's 36px dropdown. */
+.ds-fselect{position:relative;display:inline-flex;font-family:var(--ds-font-sans)}
+.ds-fselect__trigger{all:unset;box-sizing:border-box;height:36px;padding:0 8px 0 10px;border-radius:8px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;font:500 14px/20px var(--ds-font-sans);white-space:nowrap;transition:background-color 150ms;background:var(--ds-fill);color:var(--ds-text);outline:1px solid transparent;outline-offset:-1px}
+.ds-fselect__trigger:hover{background:var(--ds-fill-hover)}
+.ds-fselect__trigger[data-active]{background:var(--ds-fill-hover);outline-color:var(--ds-outline-focus)}
+.ds-fselect__icon{display:flex;color:var(--ds-text-muted)}
+.ds-fselect__icon svg{width:16px;height:16px;stroke-width:1.5}
+.ds-fselect__chevron{width:16px;height:16px;color:var(--ds-text-subtle);stroke-width:1.5}
+.ds-fselect__scrim{all:unset;position:fixed;inset:0;z-index:60}
+.ds-fselect__menu{position:absolute;top:calc(100% + 6px);left:0;z-index:61;min-width:max(100%,200px);width:max-content;max-width:300px;background:var(--ds-surface-overlay);color:var(--ds-text);border-radius:12px;outline:1px solid var(--ds-outline-card);box-shadow:var(--ds-shadow-float);overflow:hidden;display:flex;flex-direction:column;padding:4px}
+.ds-fselect__menu[data-align="right"]{left:auto;right:0}
+.ds-fselect__divider{flex:none;height:1px;background:var(--ds-divider);margin:4px}
+.ds-fselect__item{all:unset;box-sizing:border-box;flex:none;height:32px;padding:0 8px 0 10px;border-radius:6px;display:flex;align-items:center;gap:12px;cursor:pointer;font:500 14px/20px var(--ds-font-sans);white-space:nowrap;color:var(--ds-text-secondary);transition:background-color 150ms}
+.ds-fselect__item:hover,.ds-fselect__item[data-selected]{color:var(--ds-text)}
+.ds-fselect__item:hover{background:var(--ds-fill-ghost-hover)}
+.ds-fselect__check{width:16px;display:flex;color:var(--ds-accent)}
+
+/* Page header (the panel's first block). */
+
+/* The list table on the grid (Subscriptions, the Tokenmaxx queue). */
+.ds-gtable-scroll{overflow-x:auto;overflow-y:hidden}
+.ds-gtable{border-radius:16px;background:var(--ds-fill-table-head);overflow:hidden}
+.ds-gtable__head{display:grid;gap:12px;padding:10px 24px;font:var(--ds-type-label);color:var(--ds-text-secondary)}
+.ds-gtable__body{border:1px solid var(--ds-table-border);border-radius:16px;background:var(--ds-surface-nested);overflow:hidden}
+.ds-gtable__group{border-bottom:1px solid var(--ds-table-border)}
+.ds-gtable__body>.ds-gtable__group:last-child{border-bottom:0}
+.ds-gtable__group>.ds-gtable__row{border-bottom:0}
+.ds-gtable__expand{padding:0 24px 12px 76px;display:flex;flex-direction:column}
+.ds-gtable__expand-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--ds-divider)}
+.ds-gtable__row{display:grid;gap:12px;align-items:center;padding:12px 24px;border-bottom:1px solid var(--ds-table-border);transition:background-color 150ms}
+.ds-gtable__row[data-clickable]{cursor:pointer}
+.ds-gtable__row[data-clickable]:hover{background:var(--ds-surface-hover)}
+.ds-gtable__cell{min-width:0;display:flex;flex-direction:column;gap:2px}
+.ds-gtable [data-align="right"]{text-align:right;align-items:flex-end}
+.ds-gtable__foot{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:10px 16px 10px 24px;box-sizing:border-box;font:var(--ds-type-label);color:var(--ds-text-secondary)}
+.ds-pager{display:flex;align-items:center;gap:2px}
+.ds-pager button{all:unset;box-sizing:border-box;min-width:32px;height:32px;padding:0 8px;border-radius:8px;display:grid;place-items:center;cursor:pointer;font:500 14px/20px var(--ds-font-sans);color:var(--ds-text-muted);transition:background-color 150ms}
+.ds-pager button:hover:not(:disabled){background:var(--ds-fill-hover);color:var(--ds-text)}
+.ds-pager button[data-current]{background:var(--ds-fill);color:var(--ds-text)}
+.ds-pager button:disabled{opacity:.4;cursor:default}
+
+/* Text bits of the table cells. */
+.ds-cell-strong{font:var(--ds-type-label-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-cell{font:var(--ds-type-label)}
+.ds-cell-money{font:500 14px/20px var(--ds-font-sans);letter-spacing:var(--ds-tracking-tighter)}
+.ds-cell-sub{font:500 14px/20px var(--ds-font-sans);color:var(--ds-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-review-pill{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:6px;background:var(--ds-review-wash);color:var(--ds-review);font:var(--ds-type-badge)}
+.ds-negative-pill{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:6px;background:rgba(255,102,127,.12);color:var(--ds-negative);font:var(--ds-type-badge)}
+.ds-result{display:flex;align-items:center;gap:8px;min-height:28px;font:var(--ds-type-label);color:var(--ds-text-muted)}
+.ds-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* Type helpers the pages use inline in the export. */
+.ds-eyebrow{font:var(--ds-type-eyebrow);letter-spacing:var(--ds-tracking-eyebrow);text-transform:uppercase}
+.ds-title-lg{font:var(--ds-type-title-lg);letter-spacing:var(--ds-tracking-tight)}
+.ds-section-value{font:var(--ds-type-section);letter-spacing:var(--ds-tracking-tight)}
+.ds-body-lg{font:var(--ds-type-body-lg)}
+.ds-text-label{font:var(--ds-type-label)}
+.ds-label-strong{font:var(--ds-type-label-strong)}
+.ds-card-title{font:var(--ds-type-card-title)}
+.ds-body-strong{font:var(--ds-type-body-strong);letter-spacing:var(--ds-tracking-tight)}
+.ds-muted{color:var(--ds-text-muted)}
+/* The shared-accounts meter: an 8px track, the fill, the average mark. */
+.ds-meter{position:relative;height:8px;border-radius:999px;background:var(--ds-fill)}
+.ds-meter__fill{height:100%;border-radius:999px;background:var(--ds-chart-up)}
+.ds-meter__fill[data-hot]{background:var(--ds-negative)}
+.ds-meter__mark{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;border-radius:1px;background:var(--ds-text-muted)}
+.ds-disc--review{background:var(--ds-review-wash);color:var(--ds-review)}
+
+/* Tokenmaxx: the queue's statuses, its pace mark and legend, "In use". */
+.ds-review{color:var(--ds-review)}
+.ds-secondary{color:var(--ds-text-secondary)}
+.ds-meter__fill--accent{background:var(--ds-accent)}
+.ds-meter__mark--pace{background:var(--ds-text)}
+.ds-tm-status{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:6px;font:var(--ds-type-badge);white-space:nowrap;background:var(--ds-fill);color:var(--ds-positive)}
+.ds-tm-status[data-status="limit"]{background:var(--ds-fill);color:var(--ds-negative)}
+.ds-tm-status[data-status="expiring"],.ds-tm-status[data-status="under"]{background:var(--ds-review-wash);color:var(--ds-review)}
+.ds-tm-status[data-status="hot"]{background:var(--ds-info-badge);color:var(--ds-info-text)}
+.ds-in-use{display:inline-flex;align-items:center;gap:6px;font:var(--ds-type-label-strong);color:var(--ds-positive)}
+.ds-legend-used{width:10px;height:10px;border-radius:3px;background:var(--ds-accent)}
+.ds-legend-pace{width:2px;height:12px;border-radius:1px;background:var(--ds-text)}
+/* Usage: paid against API value on one track, the legend swatches, the share bar. */
+.ds-vbar{position:relative;height:8px;border-radius:999px;background:var(--ds-fill);overflow:hidden}
+.ds-vbar__api,.ds-vbar__paid{position:absolute;left:0;top:0;bottom:0;border-radius:999px;width:var(--ds-w,0%)}
+.ds-vbar__api{background:var(--ds-text-faint)}
+.ds-vbar__paid{background:var(--ds-accent)}
+.ds-vbar__paid[data-over]{background:var(--ds-negative)}
+.ds-swatch{width:10px;height:10px;border-radius:3px;background:var(--ds-accent)}
+.ds-swatch[data-faint]{background:var(--ds-text-faint)}
+.ds-share{flex:1;height:6px;border-radius:999px;background:var(--ds-fill);overflow:hidden}
+.ds-share__fill{height:100%;border-radius:999px;background:var(--ds-accent);width:var(--ds-w,0%)}
+/* A bare <input> drawn as the design's text field (`.ds-input`), for forms that register() the element itself. */
+.ds-text-field{width:100%;height:var(--ds-control-md);padding:0 var(--ds-space-3);border:0;border-radius:var(--ds-radius-field);background:var(--ds-field);outline:1px solid var(--ds-outline-field);outline-offset:-1px;box-shadow:none;font:500 16px/20px var(--ds-font-sans);color:var(--ds-text);box-sizing:border-box}
+.ds-text-field::placeholder{color:var(--ds-text-subtle)}
+.ds-text-field:focus,.ds-text-field:focus-visible{outline:2px solid var(--ds-outline-focus);outline-offset:-2px;box-shadow:none}
+.ds-text-field[aria-invalid="true"]{outline-color:var(--ds-error-outline)}
+.ds-text-field:disabled{opacity:.6}
+.ds-subtle{color:var(--ds-text-subtle)}
+.ds-hairline{flex:1;height:1px;background:var(--ds-divider)}
+.ds-text-field--trailing{padding-right:44px}
+.ds-wordmark{font:700 20px/28px var(--ds-font-sans);letter-spacing:var(--ds-tracking-tight);color:var(--ds-text)}
+/* A primary action waiting on its form: the quiet fill, not a faded white. */
+.ds-btn--primary:disabled{opacity:1;background:var(--ds-fill);color:var(--ds-text-subtle)}
+.ds-disc--lg{width:52px;height:52px}
+/* Overlapping marks (the people table's plans), each ringed in the row's ground. */
+.ds-stack{display:flex;padding-left:6px}
+.ds-stack>*{display:flex;margin-left:-6px;border-radius:999px;box-shadow:0 0 0 2px var(--ds-surface-nested)}
+/* Renewals: the month grid, Monday first; a day's charges as small chips. */
+.ds-cal-head,.ds-cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--ds-divider)}
+.ds-cal-head span{padding:8px 12px;font:var(--ds-type-eyebrow);letter-spacing:var(--ds-tracking-eyebrow);text-transform:uppercase;color:var(--ds-text-subtle)}
+.ds-cal{gap:1px;background:var(--ds-divider)}
+.ds-cal__cell{min-height:92px;padding:6px;display:flex;flex-direction:column;gap:4px;background:var(--ds-surface);min-width:0}
+.ds-cal__cell[data-out]{background:var(--ds-surface-nested)}
+.ds-cal__day{height:24px;padding-left:6px;display:flex;align-items:center;font:var(--ds-type-label);color:var(--ds-text-muted)}
+.ds-cal__today{width:24px;height:24px;border-radius:999px;display:grid;place-items:center;background:var(--ds-primary);color:var(--ds-on-primary);font:var(--ds-type-label-strong)}
+.ds-cal__event{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;padding:4px 6px;border-radius:6px;background:var(--ds-fill);color:var(--ds-text);min-width:0}
+.ds-cal__event:hover{background:var(--ds-fill-hover)}
+.ds-cal__event-name{font:600 12px/16px var(--ds-font-sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ds-cal__event-amount{font:500 12px/16px var(--ds-font-sans);opacity:.8;white-space:nowrap}
+.ds-date-stack{width:32px;display:flex;flex-direction:column;align-items:center;flex:none}
+.ds-date-stack__mon{font:var(--ds-type-eyebrow);letter-spacing:var(--ds-tracking-eyebrow);text-transform:uppercase;color:var(--ds-text-subtle)}
+.ds-date-stack__day{font:600 16px/20px var(--ds-font-sans)}
+.ds-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:72px;padding:0 16px 0 24px;box-sizing:border-box}

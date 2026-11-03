@@ -1,0 +1,12 @@
+import { paginationSchema } from '@flama/backend-core';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
+
+export const findUsersSchema = paginationSchema.extend({
+  // Roles are dynamic; filter by any role name.
+  role: z.string().optional(),
+  // Bounded: the term is matched against every row.
+  search: z.string().trim().max(100).optional(),
+});
+
+export class FindUsersRequest extends createZodDto(findUsersSchema) {}

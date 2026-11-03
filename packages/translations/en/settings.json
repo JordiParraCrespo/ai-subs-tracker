@@ -1,0 +1,29 @@
+{
+  "general": {
+    "description": "How your workspace is named and shown to everyone on the team.",
+    "logo": "Logo",
+    "logoHint": "Square PNG or SVG, at least 128×128",
+    "logoUrl": "Logo URL",
+    "name": "Organisation name",
+    "nameHint": "Shown in the sidebar and to everyone in the workspace",
+    "remove": "Remove",
+    "save": "Save changes",
+    "saveSuccess": "Organization settings saved",
+    "title": "General"
+  },
+  "nav": {
+    "general": "General",
+    "integrations": "Integrations",
+    "label": "Settings sections",
+    "notifications": "Notifications",
+    "security": "Security",
+    "desktop": "This computer"
+  },
+  "security": {
+    "description": "Every device signed in to your account, and a way to end any of them.",
+    "sessions": "Active sessions",
+    "title": "Security"
+  },
+  "subtitle": "Your account and its security.",
+  "title": "Settings"
+}

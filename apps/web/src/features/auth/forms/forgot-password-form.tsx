@@ -1,0 +1,52 @@
+import { DsButton, FieldGroup, Input } from '@flama/design-system-web';
+import { AuthField, AuthFormError, authInputClass, useZodResolver } from '@flama/frontend-web';
+import { type ForgotPasswordDto, forgotPasswordSchema } from '@flama/shared/schemas/auth';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+
+export function ForgotPasswordForm({
+  isPending,
+  error,
+  onSubmit,
+}: {
+  isPending: boolean;
+  /** The resolved failure message, if the last attempt failed. */
+  error?: string;
+  onSubmit: (values: ForgotPasswordDto) => void;
+}) {
+  const { t } = useTranslation();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ForgotPasswordDto>({
+    resolver: useZodResolver(forgotPasswordSchema),
+    defaultValues: { email: '' },
+  });
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <FieldGroup className="gap-4">
+        {error && <AuthFormError>{error}</AuthFormError>}
+
+        <AuthField label={t('auth.email')} htmlFor="email" error={errors.email}>
+          <Input
+            {...register('email')}
+            id="email"
+            type="email"
+            autoComplete="email"
+            placeholder={t('auth.emailPlaceholder')}
+            aria-invalid={Boolean(errors.email)}
+            disabled={isPending}
+            className={authInputClass}
+          />
+        </AuthField>
+
+        <DsButton type="submit" variant="primary" size="md" block disabled={isPending}>
+          {isPending ? t('auth.forgotPassword.submitting') : t('auth.forgotPassword.submit')}
+        </DsButton>
+      </FieldGroup>
+    </form>
+  );
+}

@@ -1,0 +1,22 @@
+[
+  "common",
+  "validation",
+  "errors",
+  "auth",
+  "accounts",
+  "home",
+  "nav",
+  "control",
+  "extension",
+  "language",
+  "consent",
+  "onboarding",
+  "pages",
+  "profile",
+  "public",
+  "settings",
+  "table",
+  "theme",
+  "toasts",
+  "emails"
+]

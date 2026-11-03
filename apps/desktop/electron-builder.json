@@ -1,0 +1,36 @@
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "app.subtrack.desktop",
+  "productName": "Subtrack",
+  "copyright": "Subtrack",
+  "directories": {
+    "output": "release"
+  },
+  "files": ["dist/**/*", "!dist/**/*.map", "package.json"],
+  "extraResources": [
+    {
+      "from": "../web/dist",
+      "to": "renderer",
+      "filter": ["**/*"]
+    }
+  ],
+  "npmRebuild": false,
+  "icon": "dist/assets/icon.png",
+  "mac": {
+    "category": "public.app-category.developer-tools",
+    "target": ["dmg", "zip"]
+  },
+  "win": {
+    "target": ["nsis"]
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false
+  },
+  "linux": {
+    "category": "Development",
+    "target": ["AppImage"],
+    "executableName": "subtrack"
+  },
+  "publish": null
+}

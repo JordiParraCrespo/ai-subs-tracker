@@ -1,0 +1,349 @@
+{
+  "attention": {
+    "title": "Requiere atención",
+    "toSave": "{{value}}/mes por ahorrar",
+    "empty": "Nada requiere tu atención ahora.",
+    "detail": "Queda {{left}} · se renueva {{reset}}",
+    "signinTitle": "Vuelve a iniciar sesión en {{name}}",
+    "signinEnd": "sin sincronizar",
+    "expiringTitle": "Usa {{name}} antes de que se renueve",
+    "expiringEnd": "en riesgo",
+    "behindTitle": "{{name}} va por debajo del ritmo",
+    "behindEnd": "sin usar",
+    "limitTitle": "{{name}} está en su límite",
+    "limitEnd": "queda",
+    "showAll": "Ver las {{count}}",
+    "showLess": "Ver menos"
+  },
+  "desktop": {
+    "add": "Añadir {{provider}}",
+    "addFailed": "El inicio de sesión no terminó.",
+    "lastSync": "Última sincronización {{when}}",
+    "never": "nunca",
+    "phase": {
+      "collecting": "Leyendo las sesiones de este ordenador…",
+      "error": "La última sincronización falló",
+      "idle_one": "{{count}} sesión en este ordenador",
+      "idle_other": "{{count}} sesiones en este ordenador",
+      "signed_out": "Vuelve a iniciar sesión para seguir sincronizando",
+      "syncing": "Sincronizando…"
+    },
+    "refresh": "Actualizar"
+  },
+  "edit": {
+    "description": "Ponle nombre e indica el plan, el precio y el día de cobro que tienes.",
+    "label": "Nombre",
+    "plan": "Plan",
+    "planAuto": "El informado ({{plan}})",
+    "price": "Precio mensual (USD)",
+    "pricePlaceholder": "El precio de lista del plan",
+    "title": "Editar cuenta",
+    "renewalDay": "Se renueva el día del mes",
+    "renewalPlaceholder": "Del 1 al 31, según tu recibo"
+  },
+  "list": {
+    "title": "Suscripciones",
+    "sub_one": "{{count}} cuenta · {{spend}}/mes",
+    "sub_other": "{{count}} cuentas · {{spend}}/mes",
+    "add": "Añadir cuenta"
+  },
+  "models": {
+    "input": "Entrada",
+    "output": "Salida",
+    "cost": "Coste",
+    "share": "Parte del gasto"
+  },
+  "overview": {
+    "greeting": {
+      "morning": "Buenos días, {{name}}",
+      "afternoon": "Buenas tardes, {{name}}",
+      "evening": "Buenas noches, {{name}}"
+    },
+    "sub": "Así va tu gasto en IA",
+    "past12": "Últimos 12 meses",
+    "subscriptions": "Suscripciones",
+    "savings": "Ahorro posible",
+    "perMonth": "{{value}}/mes",
+    "accountCount_one": "{{count}} cuenta",
+    "accountCount_other": "{{count}} cuentas",
+    "monthlySpend": "Gasto mensual",
+    "runRate": "Gasto anual",
+    "valuePerDollar": "Valor por dólar"
+  },
+  "remove": {
+    "confirm": "Quitar",
+    "description": "Subtrack deja de seguirla y la ignora en las próximas sincronizaciones. La sesión en sí no se toca.",
+    "title": "¿Quitar {{name}}?"
+  },
+  "resets": {
+    "title": "Próximas",
+    "viewAll": "Ver todas",
+    "when": "Se renueva {{when}}",
+    "leftLabel": "queda",
+    "empty": "Aún no se ha informado de ninguna renovación semanal.",
+    "left": "Queda {{left}}"
+  },
+  "settings": {
+    "browserDescription": "Cambiar la cuenta de la terminal y los límites en directo actúan sobre tu ordenador, así que están en la app de escritorio de Subtrack.",
+    "browserTitle": "Abre la app de escritorio",
+    "liveDescription": "Claude Code informa de tus límites a Subtrack mientras trabajas, mediante su línea de estado. Desactivado por defecto y nunca sustituye una línea de estado que ya tengas.",
+    "liveNone": "No se han encontrado carpetas de Claude Code en este ordenador.",
+    "liveTaken": "Esta carpeta ya tiene su propia línea de estado.",
+    "liveTitle": "Límites en directo de Claude Code",
+    "liveToggle": "Límites en directo para {{home}}",
+    "shellDescription": "Hace que claude y codex en tu terminal usen la cuenta que esté activada.",
+    "shellInstall": "Añadir a mi shell",
+    "shellInstalled": "Instalado en {{file}}",
+    "shellNotInstalled": "No instalado",
+    "shellTitle": "Integración con la terminal",
+    "title": "Este ordenador",
+    "description": "Cómo trabaja Subtrack con las herramientas de programación de este equipo. Cada cambio es opcional y reversible."
+  },
+  "table": {
+    "account": "Cuenta",
+    "cost": "Coste mensual",
+    "edit": "Editar",
+    "empty": "Aún no hay cuentas. Abre la app de escritorio para encontrar las sesiones de tu ordenador.",
+    "inUse": "En uso",
+    "provider": "Proveedor",
+    "remove": "Quitar",
+    "session": "Sesión",
+    "status": "Estado",
+    "useAccount": "Usar {{name}} en las terminales",
+    "weekly": "Usado esta semana",
+    "weeklySub": "del límite semanal",
+    "sessionSub": "ventana de 5 horas",
+    "noSession": "solo semanal",
+    "yourPrice": "tu precio",
+    "listPrice": "precio de lista",
+    "resets": "Se renueva",
+    "range": "{{from}}–{{to}} de {{total}}"
+  },
+  "tokenmaxx": {
+    "title": "Tokenmaxx",
+    "sub": "Lleva cada plan a su límite antes de que se reinicie.",
+    "nothingUsable": "Todas las cuentas están en un límite o necesitan iniciar sesión."
+  },
+  "usage": {
+    "title": "Uso y tokens",
+    "sub": "Tokens de todas las cuentas, a precios de API · últimos {{days}} días",
+    "allAccounts": "Todas las cuentas",
+    "period": "Últimos {{days}} días",
+    "search": "Buscar",
+    "clear": "Limpiar",
+    "metric": {
+      "spend": "Gasto",
+      "tokens": "Tokens"
+    },
+    "kpi": {
+      "paid": "Pagado en planes",
+      "api": "Valor a precios de API",
+      "tokens": "Tokens",
+      "perMillion": "Valor por 1M de tokens"
+    },
+    "chart": {
+      "spend": "Valor diario a precios de API",
+      "tokens": "Tokens diarios"
+    },
+    "pastDays": "Últimos {{days}} días",
+    "groupBy": "Agrupar por",
+    "group": {
+      "model": "Modelo",
+      "account": "Cuenta",
+      "provider": "Proveedor"
+    },
+    "groupCount": {
+      "model_one": "{{count}} modelo",
+      "model_other": "{{count}} modelos",
+      "account_one": "{{count}} cuenta",
+      "account_other": "{{count}} cuentas",
+      "provider_one": "{{count}} proveedor",
+      "provider_other": "{{count}} proveedores"
+    },
+    "accountCount_one": "{{count}} cuenta",
+    "accountCount_other": "{{count}} cuentas",
+    "modelCount_one": "{{count}} modelo",
+    "modelCount_other": "{{count}} modelos",
+    "messages": "Mensajes",
+    "noResults": "Sin resultados",
+    "noMatch": "Ningún uso coincide con estos filtros."
+  },
+  "value": {
+    "title": "Lo que pagarías a precios de API",
+    "sub": "El uso de los planes a las tarifas de pago por uso de cada proveedor",
+    "paid": "Pagaste en planes",
+    "api": "El mismo uso vía API",
+    "saved": "Ahorrado",
+    "over": "Pagado de más",
+    "multiple": "Valor por dólar",
+    "chart": "Coste equivalente en API",
+    "legendPaid": "Pagado",
+    "legendApi": "A precios de API",
+    "noUsage": "Sin uso",
+    "bar": "Pagado frente a valor de API de {{name}}"
+  },
+  "status": {
+    "active": "Activa",
+    "review": "Revisar",
+    "limit": "En el límite",
+    "signin": "Vuelve a entrar"
+  },
+  "toolbar": {
+    "search": "Buscar cuentas",
+    "status": {
+      "all": "Cualquier estado",
+      "active": "Activa",
+      "review": "Revisar",
+      "limit": "En el límite"
+    },
+    "allProviders": "Todos los proveedores",
+    "sort": {
+      "cost": "Mayor coste",
+      "reset": "Próxima renovación",
+      "left": "Más margen",
+      "name": "Nombre A–Z"
+    },
+    "result": "Mostrando {{shown}} de {{total}} cuentas",
+    "clear": "Quitar filtros"
+  },
+  "group": {
+    "title": "Cuentas de {{provider}}",
+    "sub": "Todas las sesiones de este proveedor y cómo se reparte la semana entre ellas",
+    "pickNext": "Elige la siguiente",
+    "used": "{{used}} usado",
+    "headroom": "{{left}} de margen esta semana · se renueva {{reset}}",
+    "weeklyTitle": "Límite semanal usado, esta semana",
+    "busiest": "La más usada: {{name}} al {{used}} · media {{average}}",
+    "weeklyHint": "La marca de cada barra es la media. Intenta mantener cada cuenta cerca de ella.",
+    "next": "Siguiente",
+    "resets": "Se renueva {{at}}",
+    "terminals": "Terminales",
+    "inUse": "En uso",
+    "use": "Usar",
+    "moves": "Movimientos sugeridos",
+    "apply": "Aplicar",
+    "switchTitle": "Cambia tus terminales a {{name}}",
+    "switchSub": "Le queda un {{left}} de la semana antes de renovarse",
+    "hotTitle": "{{name}} está al {{used}} por sí sola",
+    "hotSub": "Repartir trabajo no ayuda a una cuenta que se usa sola. Un plan superior sí.",
+    "noMoves": "Nada que mover: tus cuentas se usan por igual."
+  },
+  "tm": {
+    "pickFor": "Elegir siguiente para",
+    "anyTool": "Cualquier herramienta",
+    "allTools": "Todas las herramientas",
+    "goal": {
+      "expiring": "Úsalo o piérdelo",
+      "headroom": "Más margen",
+      "value": "Más $ sin usar",
+      "pace": "Ritmo más seguro"
+    },
+    "min": {
+      "0": "Cualquier cantidad",
+      "20": "20%+ libre",
+      "40": "40%+ libre",
+      "60": "60%+ libre"
+    },
+    "reset": "Restablecer",
+    "matching": "{{index}} de {{count}} coincidencias",
+    "noneMatching": "Ninguna coincidencia",
+    "useNext": "Usar a continuación",
+    "noneName": "Nada que elegir",
+    "pickLine": "{{left}} libre · se reinicia {{when}}",
+    "loosen": "Ninguna cuenta cumple estos filtros. Amplíalos para ver una sugerencia.",
+    "why": {
+      "headroom": "La que más margen tiene: {{left}}% de su semana sigue sin usar.",
+      "value": "Unos {{value}} de lo que pagaste esta semana siguen sin usar aquí.",
+      "pace": "El ritmo más tranquilo para agotarla: {{need}}% por hora hasta que se reinicie.",
+      "expiring": "Le queda {{left}}% y se reinicia {{when}}. Úsalo o piérdelo.",
+      "need": "Necesita {{need}}%/h para agotarla; cerca de {{waste}}% caducará sin usar."
+    },
+    "inMinutes_one": "en {{count}} min",
+    "inMinutes_other": "en {{count}} min",
+    "inHours_one": "en {{count}} h",
+    "inHours_other": "en {{count}} h",
+    "inDays_one": "en {{count}} día",
+    "inDays_other": "en {{count}} días",
+    "inUse": "En uso",
+    "switch": "Cambiar a esta",
+    "skip": "Saltar",
+    "stats": {
+      "risk": "Capacidad en riesgo",
+      "riskSub": "Caducará sin usar",
+      "util": "Uso medio",
+      "utilSub_one": "En {{count}} cuenta",
+      "utilSub_other": "En {{count}} cuentas",
+      "limit": "Cuentas en el límite",
+      "limitSub": "Esperando un reinicio",
+      "soon": "Se reinician en 24 h",
+      "soonSub": "Úsalas primero"
+    },
+    "usageWindow": "Uso en esta ventana",
+    "left": "Libre",
+    "weeklyLimit": "Límite semanal",
+    "neededPace": "Ritmo necesario",
+    "perHour": "{{value}}%/h",
+    "status": {
+      "limit": "En el límite",
+      "expiring": "Usar ya",
+      "under": "Infrautilizada",
+      "hot": "Va rápida",
+      "track": "Al ritmo"
+    },
+    "queue": "Cola",
+    "used": "Usado",
+    "paceMark": "Marca de ritmo",
+    "moves": {
+      "title": "Movimientos para aprovechar esta semana",
+      "wasteTitle": "Usa {{name}}: cerca de {{waste}}% caducaría sin usar",
+      "wasteSub": "Se reinicia {{when}} · {{value}} del plan en juego",
+      "limitTitle": "{{name}} está en su límite",
+      "hotTitle": "{{name}} va demasiado rápida",
+      "hotSub": "Pasa trabajo a {{other}} hasta que se reinicie {{when}}",
+      "hotSubAlone": "Baja el ritmo hasta que se reinicie {{when}}",
+      "none": "Todas las cuentas van al ritmo. Nada que mover esta semana."
+    }
+  },
+  "people": {
+    "title": "Personas",
+    "sub_one": "{{count}} identidad · quién tiene cada plan y cuánto cuesta · {{cost}}/mes",
+    "sub_other": "{{count}} identidades · quién tiene cada plan y cuánto cuesta · {{cost}}/mes",
+    "search": "Buscar personas",
+    "status": {
+      "all": "Cualquier estado",
+      "idle": "Con planes sin uso"
+    },
+    "sort": {
+      "cost": "Mayor coste",
+      "name": "Nombre A–Z"
+    },
+    "result": "Mostrando {{shown}} de {{total}} personas",
+    "clear": "Limpiar filtros",
+    "person": "Persona",
+    "tools": "Planes",
+    "idle": "Planes sin uso",
+    "cost": "Coste mensual",
+    "planCount_one": "{{count}} plan",
+    "planCount_other": "{{count}} planes",
+    "weekUsed": "{{used}} de la semana usado",
+    "resets": "se reinicia {{when}}",
+    "noReading": "Aún sin lectura",
+    "idleTag": "Sin uso esta semana",
+    "noMatch": "Nada coincide con estos filtros. Límpialos para ver a todos."
+  },
+  "renewals": {
+    "title": "Renovaciones",
+    "sub": "Cuándo se cobra cada plan, por fecha",
+    "monthTotal": "{{value}} en renovaciones",
+    "previous": "Mes anterior",
+    "next": "Mes siguiente",
+    "today": "Hoy",
+    "next30": "Próximos 30 días",
+    "due_one": "{{value}} a pagar · {{count}} renovación",
+    "due_other": "{{value}} a pagar · {{count}} renovaciones",
+    "none": "No hay planes de pago que renovar.",
+    "missingTitle": "Sin día de renovación",
+    "missingSub": "Los proveedores no indican cuándo se cobra un plan. Pon el día de tu recibo para verlo en el calendario.",
+    "setDay": "Poner día"
+  }
+}

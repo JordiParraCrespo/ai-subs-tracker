@@ -1,0 +1,29 @@
+{
+  "general": {
+    "description": "Cómo se llama tu espacio de trabajo y cómo lo ve todo el equipo.",
+    "logo": "Logotipo",
+    "logoHint": "PNG o SVG cuadrado, de al menos 128×128",
+    "logoUrl": "URL del logotipo",
+    "name": "Nombre de la organización",
+    "nameHint": "Se muestra en la barra lateral y a todos los miembros del espacio de trabajo",
+    "remove": "Quitar",
+    "save": "Guardar cambios",
+    "saveSuccess": "Configuración de la organización guardada",
+    "title": "General"
+  },
+  "nav": {
+    "general": "General",
+    "integrations": "Integraciones",
+    "label": "Secciones de configuración",
+    "notifications": "Notificaciones",
+    "security": "Seguridad",
+    "desktop": "Este ordenador"
+  },
+  "security": {
+    "description": "Todos los dispositivos con sesión iniciada en tu cuenta, y una forma de cerrar cualquiera de ellas.",
+    "sessions": "Sesiones activas",
+    "title": "Seguridad"
+  },
+  "subtitle": "Tu cuenta y su seguridad.",
+  "title": "Configuración"
+}

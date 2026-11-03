@@ -1,0 +1,349 @@
+{
+  "attention": {
+    "title": "Needs attention",
+    "toSave": "{{value}}/mo to save",
+    "empty": "Nothing needs you right now.",
+    "detail": "{{left}} left · resets {{reset}}",
+    "signinTitle": "Sign in again to {{name}}",
+    "signinEnd": "not syncing",
+    "expiringTitle": "Use {{name}} before it resets",
+    "expiringEnd": "at risk",
+    "behindTitle": "{{name}} is behind pace",
+    "behindEnd": "unused so far",
+    "limitTitle": "{{name}} is at its limit",
+    "limitEnd": "left",
+    "showAll": "Show all {{count}}",
+    "showLess": "Show less"
+  },
+  "desktop": {
+    "add": "Add {{provider}}",
+    "addFailed": "The sign-in did not finish.",
+    "lastSync": "Last synced {{when}}",
+    "never": "never",
+    "phase": {
+      "collecting": "Reading the logins on this computer…",
+      "error": "The last sync failed",
+      "idle_one": "{{count}} login on this computer",
+      "idle_other": "{{count}} logins on this computer",
+      "signed_out": "Sign in again to keep syncing",
+      "syncing": "Syncing…"
+    },
+    "refresh": "Refresh"
+  },
+  "edit": {
+    "description": "Name it, and set the plan, price and billing day you actually have.",
+    "label": "Name",
+    "plan": "Plan",
+    "planAuto": "As reported ({{plan}})",
+    "price": "Monthly price (USD)",
+    "pricePlaceholder": "The plan's list price",
+    "title": "Edit account",
+    "renewalDay": "Renews on day of month",
+    "renewalPlaceholder": "1 to 31, from your receipt"
+  },
+  "list": {
+    "title": "Subscriptions",
+    "sub_one": "{{count}} account · {{spend}}/mo",
+    "sub_other": "{{count}} accounts · {{spend}}/mo",
+    "add": "Add account"
+  },
+  "models": {
+    "input": "Input",
+    "output": "Output",
+    "cost": "Cost",
+    "share": "Share of spend"
+  },
+  "overview": {
+    "greeting": {
+      "morning": "Good morning, {{name}}",
+      "afternoon": "Good afternoon, {{name}}",
+      "evening": "Good evening, {{name}}"
+    },
+    "sub": "Here’s where your AI spend stands",
+    "past12": "Past 12 months",
+    "subscriptions": "Subscriptions",
+    "savings": "Potential savings",
+    "perMonth": "{{value}}/mo",
+    "accountCount_one": "{{count}} account",
+    "accountCount_other": "{{count}} accounts",
+    "monthlySpend": "Monthly spend",
+    "runRate": "Annual run rate",
+    "valuePerDollar": "Value per dollar"
+  },
+  "remove": {
+    "confirm": "Remove",
+    "description": "Subtrack stops tracking it and ignores it on later syncs. The login itself is not touched.",
+    "title": "Remove {{name}}?"
+  },
+  "resets": {
+    "title": "Next up",
+    "viewAll": "View all",
+    "when": "Resets {{when}}",
+    "leftLabel": "left",
+    "empty": "No weekly resets reported yet.",
+    "left": "{{left}} left"
+  },
+  "settings": {
+    "browserDescription": "Switching the terminal's account and the live feed act on your computer, so they live in the Subtrack desktop app.",
+    "browserTitle": "Open the desktop app",
+    "liveDescription": "Claude Code reports your limits to Subtrack as you work, through its status line. Off by default, and never replaces a status line you already have.",
+    "liveNone": "No Claude Code folders found on this computer.",
+    "liveTaken": "This folder already has a status line of its own.",
+    "liveTitle": "Live limits from Claude Code",
+    "liveToggle": "Live limits for {{home}}",
+    "shellDescription": "Makes claude and codex in your terminal use whichever account is switched on.",
+    "shellInstall": "Add to my shell",
+    "shellInstalled": "Installed in {{file}}",
+    "shellNotInstalled": "Not installed",
+    "shellTitle": "Terminal integration",
+    "title": "This computer",
+    "description": "How Subtrack works with the coding tools on this machine. Each change is opt-in and can be undone."
+  },
+  "table": {
+    "account": "Account",
+    "cost": "Monthly cost",
+    "edit": "Edit",
+    "empty": "No accounts yet. Open the desktop app to find the logins on your computer.",
+    "inUse": "In use",
+    "provider": "Provider",
+    "remove": "Remove",
+    "session": "Session",
+    "status": "Status",
+    "useAccount": "Use {{name}} in terminals",
+    "weekly": "Used this week",
+    "weeklySub": "of the weekly limit",
+    "sessionSub": "5-hour window",
+    "noSession": "weekly only",
+    "yourPrice": "your price",
+    "listPrice": "list price",
+    "resets": "Resets",
+    "range": "{{from}}–{{to}} of {{total}}"
+  },
+  "tokenmaxx": {
+    "title": "Tokenmaxx",
+    "sub": "Use every plan to its limit before it resets",
+    "nothingUsable": "Every account is at a limit or needs a sign-in."
+  },
+  "usage": {
+    "title": "Usage & tokens",
+    "sub": "Tokens across every account, priced at API rates · past {{days}} days",
+    "allAccounts": "All accounts",
+    "period": "Last {{days}} days",
+    "search": "Search",
+    "clear": "Clear",
+    "metric": {
+      "spend": "Spend",
+      "tokens": "Tokens"
+    },
+    "kpi": {
+      "paid": "Paid for plans",
+      "api": "Value at API prices",
+      "tokens": "Tokens",
+      "perMillion": "Value per 1M tokens"
+    },
+    "chart": {
+      "spend": "Daily value at API prices",
+      "tokens": "Daily tokens"
+    },
+    "pastDays": "Past {{days}} days",
+    "groupBy": "Group by",
+    "group": {
+      "model": "Model",
+      "account": "Account",
+      "provider": "Provider"
+    },
+    "groupCount": {
+      "model_one": "{{count}} model",
+      "model_other": "{{count}} models",
+      "account_one": "{{count}} account",
+      "account_other": "{{count}} accounts",
+      "provider_one": "{{count}} provider",
+      "provider_other": "{{count}} providers"
+    },
+    "accountCount_one": "{{count}} account",
+    "accountCount_other": "{{count}} accounts",
+    "modelCount_one": "{{count}} model",
+    "modelCount_other": "{{count}} models",
+    "messages": "Messages",
+    "noResults": "No results",
+    "noMatch": "No usage matches these filters."
+  },
+  "value": {
+    "title": "What you'd pay at API prices",
+    "sub": "Plan usage priced at each provider's pay-as-you-go rates",
+    "paid": "You paid for plans",
+    "api": "Same usage via API",
+    "saved": "Saved",
+    "over": "Paid over API",
+    "multiple": "Value per dollar",
+    "chart": "API-equivalent cost",
+    "legendPaid": "Paid",
+    "legendApi": "At API prices",
+    "noUsage": "No usage",
+    "bar": "Paid against API value for {{name}}"
+  },
+  "status": {
+    "active": "Active",
+    "review": "Needs review",
+    "limit": "At limit",
+    "signin": "Sign in again"
+  },
+  "toolbar": {
+    "search": "Search accounts",
+    "status": {
+      "all": "Any status",
+      "active": "Active",
+      "review": "Needs review",
+      "limit": "At limit"
+    },
+    "allProviders": "All providers",
+    "sort": {
+      "cost": "Highest cost",
+      "reset": "Next reset",
+      "left": "Most left",
+      "name": "Name A–Z"
+    },
+    "result": "Showing {{shown}} of {{total}} accounts",
+    "clear": "Clear filters"
+  },
+  "group": {
+    "title": "{{provider}} accounts",
+    "sub": "Every login of this provider, and how evenly the week is spread across them",
+    "pickNext": "Pick next",
+    "used": "{{used}} used",
+    "headroom": "{{left}} headroom this week · resets {{reset}}",
+    "weeklyTitle": "Weekly limit used, this week",
+    "busiest": "Busiest {{name}} at {{used}} · average {{average}}",
+    "weeklyHint": "The marker on each bar is the average. Aim to keep every account near it.",
+    "next": "Next",
+    "resets": "Resets {{at}}",
+    "terminals": "Terminals",
+    "inUse": "In use",
+    "use": "Use",
+    "moves": "Suggested moves",
+    "apply": "Apply",
+    "switchTitle": "Switch your terminals to {{name}}",
+    "switchSub": "{{left}} of its week is left before it resets",
+    "hotTitle": "{{name}} is at {{used}} on its own",
+    "hotSub": "Spreading work won’t help an account used alone. A higher plan would.",
+    "noMoves": "Nothing to move: your accounts are evenly used."
+  },
+  "tm": {
+    "pickFor": "Pick next for",
+    "anyTool": "Any tool",
+    "allTools": "All tools",
+    "goal": {
+      "expiring": "Use it or lose it",
+      "headroom": "Most headroom",
+      "value": "Most $ unused",
+      "pace": "Safest pace"
+    },
+    "min": {
+      "0": "Any amount left",
+      "20": "20%+ left",
+      "40": "40%+ left",
+      "60": "60%+ left"
+    },
+    "reset": "Reset",
+    "matching": "{{index}} of {{count}} matching",
+    "noneMatching": "None matching",
+    "useNext": "Use next",
+    "noneName": "Nothing to pick",
+    "pickLine": "{{left}} left · resets {{when}}",
+    "loosen": "No account matches these filters. Loosen them to see a pick.",
+    "why": {
+      "headroom": "The most room left: {{left}}% of its week is still unused.",
+      "value": "About {{value}} of what you paid for this week is still unused here.",
+      "pace": "The calmest pace to use it up: {{need}}% an hour until it resets.",
+      "expiring": "{{left}}% left and it resets {{when}}. Use it or lose it.",
+      "need": "Needs {{need}}%/h to use it all; about {{waste}}% is on track to expire unused."
+    },
+    "inMinutes_one": "in {{count}}m",
+    "inMinutes_other": "in {{count}}m",
+    "inHours_one": "in {{count}}h",
+    "inHours_other": "in {{count}}h",
+    "inDays_one": "in {{count}} day",
+    "inDays_other": "in {{count}} days",
+    "inUse": "In use",
+    "switch": "Switch to it",
+    "skip": "Skip",
+    "stats": {
+      "risk": "Capacity at risk",
+      "riskSub": "Projected to expire unused",
+      "util": "Average utilization",
+      "utilSub_one": "Across {{count}} account",
+      "utilSub_other": "Across {{count}} accounts",
+      "limit": "Accounts at limit",
+      "limitSub": "Waiting for a reset",
+      "soon": "Resetting in 24h",
+      "soonSub": "Use these first"
+    },
+    "usageWindow": "Usage this window",
+    "left": "Left",
+    "weeklyLimit": "Weekly limit",
+    "neededPace": "Needed pace",
+    "perHour": "{{value}}%/h",
+    "status": {
+      "limit": "At limit",
+      "expiring": "Use now",
+      "under": "Underused",
+      "hot": "Running hot",
+      "track": "On track"
+    },
+    "queue": "Queue",
+    "used": "Used",
+    "paceMark": "On-pace mark",
+    "moves": {
+      "title": "Moves to max out this week",
+      "wasteTitle": "Use {{name}}: about {{waste}}% would expire unused",
+      "wasteSub": "Resets {{when}} · {{value}} of the plan at stake",
+      "limitTitle": "{{name}} is at its limit",
+      "hotTitle": "{{name}} is running hot",
+      "hotSub": "Move work to {{other}} until it resets {{when}}",
+      "hotSubAlone": "Slow down until it resets {{when}}",
+      "none": "Every account is on track. Nothing to move this week."
+    }
+  },
+  "people": {
+    "title": "People",
+    "sub_one": "{{count}} identity · who holds which plan, and what it costs · {{cost}}/mo",
+    "sub_other": "{{count}} identities · who holds which plan, and what it costs · {{cost}}/mo",
+    "search": "Search people",
+    "status": {
+      "all": "Any status",
+      "idle": "Has idle plans"
+    },
+    "sort": {
+      "cost": "Highest cost",
+      "name": "Name A–Z"
+    },
+    "result": "Showing {{shown}} of {{total}} people",
+    "clear": "Clear filters",
+    "person": "Person",
+    "tools": "Plans",
+    "idle": "Idle plans",
+    "cost": "Monthly cost",
+    "planCount_one": "{{count}} plan",
+    "planCount_other": "{{count}} plans",
+    "weekUsed": "{{used}} of the week used",
+    "resets": "resets {{when}}",
+    "noReading": "No reading yet",
+    "idleTag": "Idle this week",
+    "noMatch": "Nothing matches these filters. Clear them to see everyone."
+  },
+  "renewals": {
+    "title": "Renewals",
+    "sub": "When each plan bills, by date",
+    "monthTotal": "{{value}} in renewals",
+    "previous": "Previous month",
+    "next": "Next month",
+    "today": "Today",
+    "next30": "Next 30 days",
+    "due_one": "{{value}} due · {{count}} renewal",
+    "due_other": "{{value}} due · {{count}} renewals",
+    "none": "No paid plans to renew.",
+    "missingTitle": "No renewal day yet",
+    "missingSub": "Providers do not report when a plan bills. Set the day from your receipt to put it on the calendar.",
+    "setDay": "Set day"
+  }
+}

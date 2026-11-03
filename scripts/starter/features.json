@@ -1,0 +1,128 @@
+{
+  "$comment": "Read by scripts/starter/prune.mjs, scripts/plugins/plugin.mjs and pnpm starter:init. Every optional piece of the starter is a feature here; the paths are what goes when it is dropped, and every other place that mentions it is wrapped in `flama:begin <id>` / `flama:end <id>` markers. `pnpm starter:check` (CI) fails when a feature is referenced outside its paths and markers, so this file cannot go stale silently. A `json` edit's `set` value is a copy of the file it edits — the version an install writes back — so bumping that dependency means bumping it here too; `starter:check` names both values until they agree. `keeps` names what a feature deliberately leaves behind when it goes, and why.",
+  "features": {
+    "web": {
+      "title": "Consumer web app",
+      "summary": "apps/web — Vite + TanStack Router SPA for end users",
+      "identifiers": ["apps/web", "@flama/web", "flama-web"],
+      "paths": [
+        "apps/web",
+        "e2e/tests/web",
+        "e2e/tests/screens",
+        "scripts/check-singletons.test.mjs",
+        ".agents/skills/shadcn/evals/evals.json",
+        ".agents/skills/scaffold-feature/evals"
+      ],
+      "slots": {
+        ".agents/hooks/arch-check.sh": ["admin-web"],
+        ".env.example": ["admin-web", "web-env"],
+        ".github/workflows/ci.yml": [
+          "admin-web",
+          "bundle-budgets",
+          "design-lint",
+          "frontend-structure"
+        ],
+        "docker/docker-compose.prod.yml": ["services"],
+        "scripts/check-bundle-size.mjs": ["admin-web"],
+        "scripts/check-frontend-structure.mjs": ["admin-web", "web-kits"],
+        "scripts/check-react-compiler.baseline.mjs": ["compiler-baseline"],
+        "scripts/check-react-compiler.mjs": ["compiler-targets"],
+        "scripts/scaffold-feature.mjs": ["admin-web", "web-templates"]
+      }
+    },
+    "e2e": {
+      "title": "End-to-end tests",
+      "summary": "e2e/ — Playwright suites against the running API and web app",
+      "identifiers": ["@flama/e2e", "e2e/"],
+      "paths": ["e2e", "scripts/ci/e2e-stage.mjs", "scripts/ci/e2e-stage.test.mjs"],
+      "slots": {
+        "pnpm-workspace.yaml": ["qa"]
+      },
+      "scripts": ["test:e2e"]
+    }
+  },
+  "shared": {
+    "packages/frontend/design-system/web": {
+      "identifiers": ["packages/frontend/design-system/web", "@flama/design-system-web"],
+      "neededBy": ["web"]
+    },
+    "packages/frontend/core": {
+      "identifiers": ["packages/frontend/core", "@flama/frontend-core"],
+      "neededBy": ["web"]
+    },
+    "packages/frontend/consumer": {
+      "identifiers": ["packages/frontend/consumer", "@flama/frontend-consumer"],
+      "neededBy": ["web"]
+    },
+    "packages/frontend/react-hooks": {
+      "identifiers": ["packages/frontend/react-hooks", "@flama/react-hooks"],
+      "neededBy": ["web"]
+    },
+    "packages/frontend/web": {
+      "identifiers": ["packages/frontend/web", "@flama/frontend-web"],
+      "neededBy": ["web"]
+    },
+    "packages/frontend/api-client": {
+      "identifiers": ["packages/frontend/api-client", "@flama/api-client"],
+      "neededBy": ["web"],
+      "scripts": ["generate:api-client"]
+    },
+    "scripts/check-bundle-size.mjs": {
+      "identifiers": ["check-bundle-size", "check:bundle"],
+      "neededBy": ["web"],
+      "scripts": ["check:bundle"]
+    },
+    "scripts/stack/screens.mjs": {
+      "identifiers": ["stack/screens", "pnpm screens"],
+      "neededBy": ["web"],
+      "scripts": ["screens"]
+    },
+    "scripts/check-singletons.mjs": {
+      "identifiers": ["check-singletons", "check:singletons"],
+      "neededBy": ["web"],
+      "scripts": ["check:singletons"]
+    },
+    "scripts/check-frontend-structure.mjs": {
+      "identifiers": ["check-frontend-structure", "check:structure"],
+      "neededBy": ["web"],
+      "scripts": ["check:structure"]
+    },
+    "scripts/check-react-compiler.mjs": {
+      "identifiers": ["check-react-compiler", "check:compiler"],
+      "neededBy": ["web"],
+      "scripts": ["check:compiler"]
+    },
+    "scripts/check-react-compiler.baseline.mjs": {
+      "identifiers": [],
+      "neededBy": ["web"]
+    },
+    "scripts/check-react-compiler.test.mjs": {
+      "identifiers": [],
+      "neededBy": ["web"]
+    },
+    ".agents/skills/tanstack-routing": {
+      "identifiers": [".agents/skills/tanstack-routing", "/tanstack-routing"],
+      "neededBy": ["web"]
+    },
+    "scripts/scaffold-feature.mjs": {
+      "identifiers": ["scaffold-feature.mjs"],
+      "neededBy": ["web"]
+    },
+    ".agents/skills/design-export-port": {
+      "identifiers": [".agents/skills/design-export-port", "/design-export-port"],
+      "neededBy": ["web"]
+    },
+    ".agents/skills/scaffold-feature": {
+      "identifiers": [".agents/skills/scaffold-feature", "/scaffold-feature"],
+      "neededBy": ["web"]
+    },
+    "packages/tsconfig/depcruise/frontend-app.cjs": {
+      "identifiers": ["depcruise/frontend-app"],
+      "neededBy": ["web"]
+    },
+    "packages/tsconfig/depcruise/frontend-kit.cjs": {
+      "identifiers": ["depcruise/frontend-kit"],
+      "neededBy": ["web"]
+    }
+  }
+}

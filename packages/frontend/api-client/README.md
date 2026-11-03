@@ -1,0 +1,50 @@
+# @flama/api-client
+
+Typed HTTP client for `apps/api`, **generated** from the API's OpenAPI schema.
+Do not hand-edit `src/generated/` — it is overwritten on every regeneration.
+The legacy class client under `src/data-access/api/openapi` is no longer
+generated (see below), so a change to an endpoint it wraps is made there by
+hand, matching `apps/api/openapi.json`.
+
+## Regenerating
+
+```bash
+pnpm generate:api-client   # from the repo root
+```
+
+This runs `@hey-api/openapi-ts` against `apps/api/openapi.json` (config in
+`openapi-ts.config.ts`). Output lands in `src/generated/` (SDK, types, TanStack
+Query `queryOptions` / `queryKeys`). Screens still go through
+`@flama/frontend-core`, `-consumer` and `-admin` wrappers so persist policy
+and entity mapping stay in one place.
+
+Regenerate after any change to an API endpoint or its Swagger decorators. It
+needs no database, Redis or `.env`: the API boots its module graph without
+connecting and stands in a placeholder `BETTER_AUTH_SECRET` when none is set
+(the `generate:openapi` script), and `openapi.json` is formatted with Biome, so a
+regeneration with no API change leaves git clean. The
+legacy class client under `src/data-access/` remains until call sites finish
+moving to the SDK; nothing regenerates its services, and they import their
+DTOs from `src/generated/types.gen.ts`. The post-processing step
+(`scripts/openapi-postprocess.mjs`) writes `src/index.ts`, which exports every
+DTO the API describes by name, so a plugin that adds an endpoint reaches
+consumers through its `regenerate` step without anyone editing this package.
+
+## What's inside
+
+| Export path                  | Contents                                   |
+| ---------------------------- | ------------------------------------------ |
+| `@flama/api-client`          | Client entry point and every generated DTO |
+| `@flama/api-client/services` | Generated per-tag service classes (`*Api`) |
+
+## One runtime dependency — by design
+
+`package.json` declares exactly one `dependencies` entry:
+`@hey-api/client-fetch`, the platform-`fetch`-based client the generated SDK is
+built on. Please keep it that way — don't add a second HTTP library (e.g.
+axios) here. This is deliberate; see the `"//"` note in `package.json`.
+
+## Consumed by
+
+`@flama/frontend-core`, `@flama/frontend-consumer` and `@flama/frontend-admin`
+(each wires the client into its own data-access layer).

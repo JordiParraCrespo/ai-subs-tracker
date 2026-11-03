@@ -1,0 +1,117 @@
+{
+  "name": "@flama/shared",
+  "version": "0.2.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "flama-source": "./src/index.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./schemas": {
+      "types": "./dist/schemas/index.d.ts",
+      "flama-source": "./src/schemas/index.ts",
+      "import": "./dist/schemas/index.js",
+      "require": "./dist/schemas/index.js",
+      "default": "./dist/schemas/index.js"
+    },
+    "./schemas/auth": {
+      "types": "./dist/schemas/auth.schema.d.ts",
+      "flama-source": "./src/schemas/auth.schema.ts",
+      "import": "./dist/schemas/auth.schema.js",
+      "require": "./dist/schemas/auth.schema.js",
+      "default": "./dist/schemas/auth.schema.js"
+    },
+    "./schemas/profile": {
+      "types": "./dist/schemas/profile.schema.d.ts",
+      "flama-source": "./src/schemas/profile.schema.ts",
+      "import": "./dist/schemas/profile.schema.js",
+      "require": "./dist/schemas/profile.schema.js",
+      "default": "./dist/schemas/profile.schema.js"
+    },
+    "./schemas/organization": {
+      "types": "./dist/schemas/organization.schema.d.ts",
+      "flama-source": "./src/schemas/organization.schema.ts",
+      "import": "./dist/schemas/organization.schema.js",
+      "require": "./dist/schemas/organization.schema.js",
+      "default": "./dist/schemas/organization.schema.js"
+    },
+    "./schemas/role": {
+      "types": "./dist/schemas/role.schema.d.ts",
+      "flama-source": "./src/schemas/role.schema.ts",
+      "import": "./dist/schemas/role.schema.js",
+      "require": "./dist/schemas/role.schema.js",
+      "default": "./dist/schemas/role.schema.js"
+    },
+    "./schemas/accounts": {
+      "types": "./dist/schemas/accounts.schema.d.ts",
+      "flama-source": "./src/schemas/accounts.schema.ts",
+      "import": "./dist/schemas/accounts.schema.js",
+      "require": "./dist/schemas/accounts.schema.js",
+      "default": "./dist/schemas/accounts.schema.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "flama-source": "./src/types/index.ts",
+      "import": "./dist/types/index.js",
+      "require": "./dist/types/index.js",
+      "default": "./dist/types/index.js"
+    },
+    "./permissions": {
+      "types": "./dist/permissions/index.d.ts",
+      "flama-source": "./src/permissions/index.ts",
+      "import": "./dist/permissions/index.js",
+      "require": "./dist/permissions/index.js",
+      "default": "./dist/permissions/index.js"
+    },
+    "./constants": {
+      "types": "./dist/constants/index.d.ts",
+      "flama-source": "./src/constants/index.ts",
+      "import": "./dist/constants/index.js",
+      "require": "./dist/constants/index.js",
+      "default": "./dist/constants/index.js"
+    },
+    "./scopes": {
+      "types": "./dist/scopes/index.d.ts",
+      "flama-source": "./src/scopes/index.ts",
+      "import": "./dist/scopes/index.js",
+      "require": "./dist/scopes/index.js",
+      "default": "./dist/scopes/index.js"
+    },
+    "./subscriptions": {
+      "types": "./dist/subscriptions/index.d.ts",
+      "flama-source": "./src/subscriptions/index.ts",
+      "import": "./dist/subscriptions/index.js",
+      "require": "./dist/subscriptions/index.js",
+      "default": "./dist/subscriptions/index.js"
+    },
+    "./desktop": {
+      "types": "./dist/desktop/index.d.ts",
+      "flama-source": "./src/desktop/index.ts",
+      "import": "./dist/desktop/index.js",
+      "require": "./dist/desktop/index.js",
+      "default": "./dist/desktop/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "clean": "rm -rf dist",
+    "lint": "biome check src/",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@casl/ability": "^7.0.2",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@flama/tsconfig": "workspace:^",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5"
+  }
+}

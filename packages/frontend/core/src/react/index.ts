@@ -1,0 +1,65 @@
+// The sign-in challenge's error, here as well as at the root, for the web
+// apps: their critical path imports this entry, and the root's would pull the
+// whole kernel's module graph along with it.
+export { isTwoFactorRequired, TwoFactorRequiredError } from '../modules/auth/auth.errors';
+export { type AbilityState, useAbility, useAbilityState } from './ability';
+export {
+  analyticsKeys,
+  type CaptureEventVariables,
+  type CapturePageViewVariables,
+  useAnalytics,
+  useCaptureEvent,
+  useCaptureOnMount,
+  useCapturePageView,
+  usePageView,
+} from './analytics.queries';
+export {
+  authKeys,
+  type SocialLoginVariables,
+  useChangePassword,
+  useForgotPassword,
+  useLogin,
+  useLogout,
+  useResetPassword,
+  useSessionRestore,
+  useSocialLogin,
+  useSocialProviders,
+  useVerifyTwoFactor,
+} from './auth.queries';
+export {
+  capabilitiesKeys,
+  useDeploymentCapabilities,
+} from './capabilities.queries';
+export { FlamaProvider, useFlamaApp } from './context';
+export { type EntityQueryOptions, useEntityQuery } from './entity-query';
+export { type ResolvedErrorMessage, useErrorMessage } from './error-message';
+export { useAuthState } from './hooks';
+export { useLocale } from './locale';
+export {
+  type HookMutationOptions,
+  refetchEverythingForNewIdentity,
+  withCacheOnSuccess,
+} from './mutations';
+export {
+  cacheOwnerKey,
+  createQueryPersistOptions,
+  defaultQueryClientOptions,
+  KERNEL_NON_PERSISTED_FEATURES,
+  QUERY_PERSIST_GC_TIME,
+  QUERY_PERSIST_MAX_AGE,
+  type QueryPersistConfig,
+  reconcileCacheOwner,
+  shouldDehydrateQuery,
+} from './persistence';
+export { MEMBER_LISTS_KEY, withFeaturePrefix } from './query-keys';
+export { shareEntities } from './share-entities';
+export { userSettingsKeys, useUpdateUserSettings, useUserSettings } from './user-settings.queries';
+export {
+  useDeleteUser,
+  useMyPermissions,
+  useProfile,
+  usersKeys,
+  useUpdateUser,
+  useUser,
+  useUsers,
+} from './users.queries';

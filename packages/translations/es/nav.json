@@ -1,0 +1,22 @@
+{
+  "menu": "Menú",
+  "dashboard": "Resumen",
+  "logOut": "Cerrar sesión",
+  "commandEmpty": "Sin resultados.",
+  "commandPlaceholder": "Busca páginas y acciones…",
+  "goTo": "Ir a",
+  "primaryNavigation": "Navegación principal",
+  "profile": "Perfil",
+  "search": "Buscar",
+  "settings": "Ajustes",
+  "team": "Equipo",
+  "users": "Usuarios",
+  "roles": "Roles",
+  "toggleSidebar": "Mostrar u ocultar el menú",
+  "viewProfile": "Ver perfil",
+  "accounts": "Suscripciones",
+  "tokenmaxx": "Tokenmaxx",
+  "usage": "Uso y tokens",
+  "people": "Personas",
+  "renewals": "Renovaciones"
+}

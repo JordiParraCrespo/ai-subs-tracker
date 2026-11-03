@@ -1,0 +1,22 @@
+{
+  "menu": "Menu",
+  "dashboard": "Overview",
+  "logOut": "Sign out",
+  "commandEmpty": "No matches.",
+  "commandPlaceholder": "Search pages and actions…",
+  "goTo": "Go to",
+  "primaryNavigation": "Main navigation",
+  "profile": "Profile",
+  "search": "Search",
+  "settings": "Settings",
+  "team": "Team",
+  "users": "Users",
+  "roles": "Roles",
+  "toggleSidebar": "Toggle sidebar",
+  "viewProfile": "View profile",
+  "accounts": "Subscriptions",
+  "tokenmaxx": "Tokenmaxx",
+  "usage": "Usage & tokens",
+  "people": "People",
+  "renewals": "Renewals"
+}

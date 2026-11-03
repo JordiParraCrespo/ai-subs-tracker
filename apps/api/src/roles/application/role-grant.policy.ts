@@ -1,0 +1,112 @@
+import { canAccessRow, describePermission, ungrantablePermissions } from '@flama/backend-authz';
+import { AppError } from '@flama/backend-core';
+import type { PermissionDefinition } from '@flama/shared';
+import { Inject, Injectable } from '@nestjs/common';
+import type { AbilityPort } from '../../auth/application/ability.port';
+import { ABILITY } from '../../auth/auth.di-tokens';
+import type { RoleEntity } from '../domain/role.entity';
+import { RoleErrors } from '../domain/role.errors';
+
+/** Who is performing a role write, and in which organization. */
+export interface RoleActor {
+  id: string;
+  role?: string;
+  activeOrganizationId?: string | null;
+}
+
+/**
+ * Enforces that a role write never grants more than its author holds.
+ *
+ * `grantableScopes` already stops a credential exceeding its creator; this is
+ * the same invariant on the other escalation path. Without it, `update Role`
+ * is effectively `manage all`: an org admin could write themselves a role that
+ * outranks them and assign it in the same session.
+ */
+@Injectable()
+export class RoleGrantPolicy {
+  constructor(@Inject(ABILITY) private readonly abilities: AbilityPort) {}
+
+  async assertGrantable(
+    actor: RoleActor | undefined,
+    permissions: readonly PermissionDefinition[],
+  ): Promise<void> {
+    if (permissions.length === 0) return;
+
+    // No actor means an internal caller (a seed, a migration backfill) rather
+    // than a request. Those are trusted by construction — they are the code
+    // that defines the system roles in the first place.
+    if (!actor) return;
+
+    const ability = await this.abilities.createForUser(
+      { id: actor.id, role: actor.role },
+      { activeOrganizationId: actor.activeOrganizationId ?? null },
+    );
+
+    const ungrantable = ungrantablePermissions(ability, permissions);
+    if (ungrantable.length === 0) return;
+
+    throw new AppError(RoleErrors.PERMISSION_NOT_GRANTABLE, {
+      detail: `You do not hold: ${ungrantable.map(describePermission).join(', ')}`,
+      extensions: { ungrantable },
+    });
+  }
+
+  /**
+   * Whether the actor may write *this* role row, not just "a Role".
+   *
+   * `@CheckPolicies` is a type-level check, and a role lookup scoped to the
+   * active organization returns the platform's global roles alongside the
+   * tenant's own. The tenant `owner` role's `manage Role` is conditioned on
+   * `organizationId = ${activeOrganizationId}`, so a global role (`null`) does
+   * not match it — without this check an organization owner could rewrite the
+   * default `user` role for every tenant. A platform admin's `manage all`
+   * matches any row.
+   */
+  async assertCanModify(actor: RoleActor | undefined, role: RoleEntity): Promise<void> {
+    if (!actor) return;
+
+    const ability = await this.abilities.createForUser(
+      { id: actor.id, role: actor.role },
+      { activeOrganizationId: actor.activeOrganizationId ?? null },
+    );
+
+    const row = { id: role.id, organizationId: role.organizationId };
+    if (canAccessRow(ability, 'update', 'Role', row)) return;
+
+    throw new AppError(RoleErrors.CROSS_ORGANIZATION_ROLE, {
+      detail: role.isGlobal()
+        ? 'Global roles are managed by the platform, not from within an organization.'
+        : 'That role belongs to another organization.',
+    });
+  }
+
+  /**
+   * Whether the actor may create a **global** role: one with no organization,
+   * which every tenant's ability reads. That is platform-wide reach, so it
+   * takes `manage all` in the platform scope (no active organization), not the
+   * tenant `owner`'s conditioned `manage Role`. No actor is an internal caller
+   * (a seed), trusted as `assertGrantable` trusts it.
+   *
+   * An actor with no role rights at all in that scope is just someone with no
+   * organization selected (ROLE_008); one who holds some but not `manage all`
+   * is refused the reach (ROLE_005).
+   */
+  async assertCanCreateGlobal(actor: RoleActor | undefined): Promise<void> {
+    if (!actor) return;
+
+    const ability = await this.abilities.createForUser(
+      { id: actor.id, role: actor.role },
+      { activeOrganizationId: null },
+    );
+    if (ability.can('manage', 'all')) return;
+
+    if (!ability.can('create', 'Role')) {
+      throw new AppError(RoleErrors.ORGANIZATION_REQUIRED, {
+        detail: 'Switch to an organization to create a role in it.',
+      });
+    }
+    throw new AppError(RoleErrors.PERMISSION_NOT_GRANTABLE, {
+      detail: 'Creating a global role takes "manage all" on the platform.',
+    });
+  }
+}

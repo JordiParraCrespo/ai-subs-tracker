@@ -1,0 +1,109 @@
+import { NO_POLICY_KEY } from '@flama/backend-authz';
+import { AppError } from '@flama/backend-core';
+import { type CanActivate, type ExecutionContext, Inject, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { AuthzErrors } from '../../authz/domain/authz.errors';
+import {
+  type AbilityHttpRequest,
+  type AbilityPort,
+  abilityRequestOf,
+} from '../application/ability.port';
+import { ABILITY } from '../auth.di-tokens';
+import { CHECK_POLICIES_KEY, type PolicyRule } from '../decorators/check-policies.decorator';
+import { ORGANIZATION_PARAM_KEY } from '../decorators/organization-scoped.decorator';
+import { AuthErrors } from '../domain/auth.errors';
+
+/**
+ * Authorization guard. Resolves the caller's effective CASL ability from their
+ * database-backed roles and checks it against the `@CheckPolicies` rules on the
+ * route. The ability is attached to `request.ability` so handlers can perform
+ * instance-level checks.
+ *
+ * **Fails closed.** A route that declares neither `@CheckPolicies` nor an
+ * explicit `@NoPolicy('reason')` is rejected. The previous behaviour — allow
+ * any authenticated caller — meant a forgotten decorator silently opened an
+ * endpoint, which is the opposite of how `ScopesGuard` treats the same
+ * omission. `route-policy-coverage.spec.ts` turns that rejection into a build
+ * failure so it is caught when the route is written.
+ */
+@Injectable()
+export class PoliciesGuard implements CanActivate {
+  constructor(
+    private readonly reflector: Reflector,
+    @Inject(ABILITY)
+    private readonly abilities: AbilityPort,
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const rules = this.reflector.getAllAndOverride<PolicyRule[]>(CHECK_POLICIES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    const exemption = this.reflector.getAllAndOverride<string>(NO_POLICY_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (!rules || rules.length === 0) {
+      if (exemption) return true;
+      // A programming error, not a client one: the route reached production
+      // without saying what it requires.
+      throw new AppError(AuthzErrors.ROUTE_HAS_NO_POLICY);
+    }
+
+    const request = context
+      .switchToHttp()
+      .getRequest<AbilityHttpRequest & { params?: Record<string, unknown> }>();
+    const subject = abilityRequestOf(request);
+
+    // No principal at all is an *authentication* failure, not a permission
+    // one — 401 tells a client to re-authenticate, where a 403 would have it
+    // give up on a request that a fresh session would satisfy.
+    if (!subject) {
+      throw new AppError(AuthErrors.UNAUTHENTICATED, {
+        detail: 'This endpoint requires an authenticated caller.',
+      });
+    }
+
+    // The port gets `{ user, session }` and the request's memo, never the
+    // request itself; the memo is keyed by the organization resolved here, so
+    // a later caller asking about another organization builds its own.
+    const ability = await this.abilities.forRequest(
+      subject,
+      this.routeOrganizationId(context, request),
+    );
+    // Handlers that load a row check it against this ability (`assertCanAccessUser`).
+    request.ability = ability;
+
+    // Returning `false` would hand back Nest's own codeless 403; throw the
+    // catalog error instead so the response carries `AUTH_002` like every other
+    // failure. The rule that failed is deliberately not named — see the catalog.
+    if (!rules.every((rule) => ability.can(rule.action, rule.subject))) {
+      throw new AppError(AuthErrors.FORBIDDEN);
+    }
+
+    return true;
+  }
+
+  /**
+   * The organization an `@OrganizationScoped` route acts on, from its path.
+   *
+   * The caller's roles in *that* organization decide, not in the session's
+   * active one: a session may have another organization selected, and a
+   * token's delegated session has none unless the token is pinned to one.
+   * Someone who is not a member there holds no roles in it, so only their
+   * global roles count.
+   */
+  private routeOrganizationId(
+    context: ExecutionContext,
+    request: { params?: Record<string, unknown> },
+  ): string | null {
+    const param = this.reflector.getAllAndOverride<string>(ORGANIZATION_PARAM_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    const value = param ? request.params?.[param] : undefined;
+    return typeof value === 'string' ? value : null;
+  }
+}
