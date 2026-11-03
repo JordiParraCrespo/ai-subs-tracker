@@ -3,22 +3,22 @@ title: Control de uso de Claude Code para todas tus cuentas y planes
 description: Controla el uso de Claude Code y Codex en todas las sesiones de tu ordenador, mira los límites de 5 horas y semanales de cada plan y sabe qué cuenta usar.
 heading: El control de uso de Claude Code para quien tiene más de un plan
 eyebrow: Control de uso de Claude Code
-lede: Subtrack lee cada sesión de Claude Code y Codex de tu ordenador, muestra lo que les queda a los límites de cada plan y ordena las cuentas para gastar primero lo que caduca antes.
-summary: Qué debe mostrar un control de uso de Claude Code y cómo Subtrack sigue varias cuentas de Claude Code y Codex desde tu escritorio.
+lede: Tokenaitor lee cada sesión de Claude Code y Codex de tu ordenador, muestra lo que les queda a los límites de cada plan y ordena las cuentas para gastar primero lo que caduca antes.
+summary: Qué debe mostrar un control de uso de Claude Code y cómo Tokenaitor sigue varias cuentas de Claude Code y Codex desde tu escritorio.
 order: 1
 checked: 2026-11-02
 related: [claude-code-usage-limits, claude-code-pricing, claude-pro-vs-max-vs-ultra]
 faq:
-  - q: ¿Subtrack envía mis credenciales de Claude Code a algún sitio?
-    a: No. Los tokens de los proveedores nunca salen de tu ordenador salvo hacia su propio proveedor, y Subtrack nunca los renueva. A Subtrack solo llegan los correos de las cuentas, los nombres de los planes, los porcentajes de los límites, las horas de reinicio y el recuento de tokens.
+  - q: ¿Tokenaitor envía mis credenciales de Claude Code a algún sitio?
+    a: No. Los tokens de los proveedores nunca salen de tu ordenador salvo hacia su propio proveedor, y Tokenaitor nunca los renueva. A Tokenaitor solo llegan los correos de las cuentas, los nombres de los planes, los porcentajes de los límites, las horas de reinicio y el recuento de tokens.
   - q: ¿Puedo seguir Claude Code y Codex en el mismo sitio?
-    a: Sí. Subtrack lee las sesiones de las dos CLI y pone todas las cuentas en una sola cola, ordenadas por el margen por hora que les queda antes de su próximo reinicio.
-  - q: ¿Cada cuánto actualiza Subtrack mi uso?
+    a: Sí. Tokenaitor lee las sesiones de las dos CLI y pone todas las cuentas en una sola cola, ordenadas por el margen por hora que les queda antes de su próximo reinicio.
+  - q: ¿Cada cuánto actualiza Tokenaitor mi uso?
     a: Cada diez minutos, con espera progresiva, y hace una pausa de 15 minutos cuando un proveedor responde con un límite de peticiones.
   - q: ¿Funciona con el plan Ultra, que no tiene límite de 5 horas?
     a: Sí. El catálogo de planes sabe qué planes miden un límite de 5 horas y cuáles solo uno semanal, y la cola usa los límites que tenga cada plan.
   - q: ¿Cuánto cuesta?
-    a: Subtrack es gratis y de código abierto con licencia MIT, para macOS, Windows y Linux.
+    a: Tokenaitor es gratis y de código abierto con licencia MIT, para macOS, Windows y Linux.
 ---
 import Callout from '@/components/guides/Callout.astro';
 
@@ -37,19 +37,19 @@ Un buen control responde cuatro preguntas para cada cuenta, no solo para la actu
 3. **Qué cuenta usar ahora**, teniendo en cuenta las dos cosas.
 4. **Cuánto vale el uso**, para saber si un plan compensa.
 
-## Cómo sigue Subtrack tu uso
+## Cómo sigue Tokenaitor tu uso
 
-Subtrack es una app de escritorio. Encuentra las sesiones de Claude Code y Codex que ya tienes en tu ordenador y, para cada una, pide sus límites al proveedor: al endpoint de uso de Claude Code y al de uso de ChatGPT para Codex, y si no responde, a los límites que Codex escribe en sus registros de sesión. Ante cada proveedor se identifica con su propio nombre, `subtrack-desktop`.
+Tokenaitor es una app de escritorio. Encuentra las sesiones de Claude Code y Codex que ya tienes en tu ordenador y, para cada una, pide sus límites al proveedor: al endpoint de uso de Claude Code y al de uso de ChatGPT para Codex, y si no responde, a los límites que Codex escribe en sus registros de sesión. Ante cada proveedor se identifica con su propio nombre, `subtrack-desktop`.
 
 Los tokens se cuentan en las propias transcripciones de las CLI, por modelo y por día, y se valoran a los precios de la API de cada proveedor. Así la [guía de precios](/es/claude-code-pricing/) puede comparar el precio de un plan con lo que costaría el mismo uso en la API.
 
 <Callout>
-  Subtrack nunca renueva el token de un proveedor. Los tokens de renovación de Claude Code rotan, así que una renovación desde otra app cerraría la sesión de la CLI. Subtrack solo lee.
+  Tokenaitor nunca renueva el token de un proveedor. Los tokens de renovación de Claude Code rotan, así que una renovación desde otra app cerraría la sesión de la CLI. Tokenaitor solo lee.
 </Callout>
 
 ## La cuenta que toca usar
 
-La cola ordena las cuentas por **margen por hora antes de su reinicio**: una cuenta con el 40 % libre que se reinicia en dos horas va antes que otra con el 70 % que se reinicia en cinco días. Subtrack pone esa cuenta arriba de la lista y en la barra de menús.
+La cola ordena las cuentas por **margen por hora antes de su reinicio**: una cuenta con el 40 % libre que se reinicia en dos horas va antes que otra con el 70 % que se reinicia en cinco días. Tokenaitor pone esa cuenta arriba de la lista y en la barra de menús.
 
 Cuando decides cambiar, marcar una cuenta como en uso escribe un pequeño archivo de referencia. Un fragmento de shell opcional hace que `claude` y `codex` en tu terminal lo sigan, y puedes quitarlo cuando quieras.
 
@@ -59,4 +59,4 @@ Cuando decides cambiar, marcar una cuenta como en uso escribe un pequeño archiv
 
 ## Renovaciones y lo que caducó sin usar
 
-Los proveedores no informan del día de cobro, así que lo indicas una vez por cuenta. Subtrack muestra entonces un calendario de renovaciones y, en el resumen, cuánto límite pagado caducó sin usar el último mes.
+Los proveedores no informan del día de cobro, así que lo indicas una vez por cuenta. Tokenaitor muestra entonces un calendario de renovaciones y, en el resumen, cuánto límite pagado caducó sin usar el último mes.

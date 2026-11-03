@@ -5,10 +5,15 @@ Astro (scaffolded from astro-ignite's starter). Read the root
 [`AGENTS.md`](../../AGENTS.md) first; [`README.md`](README.md) lists the pages
 and the build.
 
+**The name:** the site says Tokenaitor, the product's public name
+(tokenaitor.com). The code and the rest of the repo say Subtrack, and the app
+identifies itself to vendors as `subtrack-desktop`; keep that literal where the
+copy quotes it, since it is what the app sends.
+
 ## Rules
 
 - **Say only what the product does.** The root `README.md` is the source for
-  Subtrack's behaviour. Prices, plan names and API rates come from
+  Tokenaitor's behaviour. Prices, plan names and API rates come from
   `@flama/shared/subscriptions` (`PlanTable`, `ApiPriceTable`); a price typed
   into a guide's prose must be one the catalog holds, and `pnpm test` fails
   otherwise. When the catalog changes, update the prose that names the old

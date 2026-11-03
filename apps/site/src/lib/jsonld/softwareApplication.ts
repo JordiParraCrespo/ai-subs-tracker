@@ -9,7 +9,7 @@ export function softwareApplicationSchema(locale: string): SoftwareApplication {
   return {
     '@type': 'SoftwareApplication',
     '@id': entityId('app'),
-    name: 'Subtrack',
+    name: 'Tokenaitor',
     description: siteConfig.description[locale] ?? siteConfig.description[siteConfig.defaultLocale],
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'macOS, Windows, Linux',

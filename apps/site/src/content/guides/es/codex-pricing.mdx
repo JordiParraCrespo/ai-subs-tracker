@@ -14,8 +14,8 @@ faq:
   - q: ¿Cuándo se dividió ChatGPT Pro en tres niveles?
     a: OpenAI dividió Pro en niveles de 100 $, 200 $ y 500 $ el 29 de septiembre de 2026. Los tres miden solo un límite semanal, sin límite de 5 horas.
   - q: ¿En qué nivel de Pro está mi cuenta?
-    a: Codex informa de todos los niveles de Pro como "pro", así que Subtrack supone el de 200 $ hasta que indiques el plan y el precio que pagas de verdad.
-  - q: ¿Subtrack suma el uso de Codex con el de Claude Code?
+    a: Codex informa de todos los niveles de Pro como "pro", así que Tokenaitor supone el de 200 $ hasta que indiques el plan y el precio que pagas de verdad.
+  - q: ¿Tokenaitor suma el uso de Codex con el de Claude Code?
     a: Cada cuenta se sigue por separado, y todas, de Claude Code y de Codex, comparten una sola cola de qué cuenta usar ahora.
 ---
 import ApiPriceTable from '@/components/guides/ApiPriceTable.astro';
@@ -33,16 +33,16 @@ El agente de programación de OpenAI, Codex, está incluido en los planes de Cha
 El 29 de septiembre de 2026 OpenAI dividió ChatGPT Pro en niveles de **100 $, 200 $ y 500 $**. Los tres miden solo un límite semanal, sin límite de 5 horas.
 
 <Callout>
-  Codex informa de todos los niveles de Pro con el mismo nombre, así que Subtrack no puede distinguirlos. Supone 200 $ hasta que indiques lo que pagas de verdad, y ese precio alimenta todas las cifras que muestra.
+  Codex informa de todos los niveles de Pro con el mismo nombre, así que Tokenaitor no puede distinguirlos. Supone 200 $ hasta que indiques lo que pagas de verdad, y ese precio alimenta todas las cifras que muestra.
 </Callout>
 
 ## Lo que costaría el mismo uso en la API
 
-Estos son los precios de pago por uso de OpenAI en dólares por millón de tokens, la tabla con la que Subtrack valora el uso de Codex:
+Estos son los precios de pago por uso de OpenAI en dólares por millón de tokens, la tabla con la que Tokenaitor valora el uso de Codex:
 
 <ApiPriceTable vendor="openai" />
 
-Subtrack cuenta los tokens en los propios registros de sesión de Codex (`~/.codex/sessions`), por modelo y por día, y los valora con estas tarifas. Así tienes una cifra comparable con el precio de cada plan.
+Tokenaitor cuenta los tokens en los propios registros de sesión de Codex (`~/.codex/sessions`), por modelo y por día, y los valora con estas tarifas. Así tienes una cifra comparable con el precio de cada plan.
 
 ## Límites en Go, Plus y Business
 

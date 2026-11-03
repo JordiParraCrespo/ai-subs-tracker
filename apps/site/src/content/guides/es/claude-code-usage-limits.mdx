@@ -14,9 +14,9 @@ faq:
   - q: ¿Qué planes no tienen límite de 5 horas?
     a: Claude Ultra y los tres niveles de ChatGPT Pro miden solo un límite semanal. El resto de planes del catálogo miden los dos.
   - q: ¿El límite semanal que no uso se acumula?
-    a: No. Cada límite empieza de cero al reiniciarse, así que lo que no usaste en la semana se pierde. Es justo ese margen el que la cola de Subtrack está pensada para gastar.
+    a: No. Cada límite empieza de cero al reiniciarse, así que lo que no usaste en la semana se pierde. Es justo ese margen el que la cola de Tokenaitor está pensada para gastar.
   - q: ¿Cómo veo los límites de todas mis cuentas a la vez?
-    a: La CLI muestra la cuenta con la que has entrado. Subtrack lee todas las sesiones de tu ordenador y muestra los límites de cada una, sus horas de reinicio y la cuenta que toca usar.
+    a: La CLI muestra la cuenta con la que has entrado. Tokenaitor lee todas las sesiones de tu ordenador y muestra los límites de cada una, sus horas de reinicio y la cuenta que toca usar.
 ---
 import Callout from '@/components/guides/Callout.astro';
 
@@ -49,7 +49,7 @@ Cuando se agota un límite, el agente deja de aceptar trabajo en esa cuenta hast
 Si tienes más de una cuenta, el orden eficiente no es «la que tiene más margen». Es la que tiene más margen **por hora antes de reiniciarse**: un límite semanal con el 40 % libre que se reinicia mañana vale más ahora que otro con el 80 % y seis días por delante, porque el primero se pierde si no lo usas.
 
 <Callout>
-  Ese orden es la cola de Subtrack. Pone la cuenta que toca usar arriba de la lista y en la barra de menús, entre Claude Code y Codex, y lo revisa cada diez minutos.
+  Ese orden es la cola de Tokenaitor. Pone la cuenta que toca usar arriba de la lista y en la barra de menús, entre Claude Code y Codex, y lo revisa cada diez minutos.
 </Callout>
 
 ## Evita quedarte sin límite de 5 horas a mitad de una tarea
@@ -58,4 +58,4 @@ Si tienes más de una cuenta, el orden eficiente no es «la que tiene más marge
 - Ten una segunda cuenta para cuando la primera vaya justa, y cambia antes de que se agote.
 - Mira lo que queda antes de una ejecución larga del agente, no cuando se para.
 
-La [guía del control de uso](/es/claude-code-usage-tracker/) explica cómo lee Subtrack estos límites sin tocar tus credenciales.
+La [guía del control de uso](/es/claude-code-usage-tracker/) explica cómo lee Tokenaitor estos límites sin tocar tus credenciales.
