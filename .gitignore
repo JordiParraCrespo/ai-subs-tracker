@@ -3,6 +3,7 @@ node_modules/
 
 # Build outputs
 dist/
+dist-server/
 build/
 .next/
 # What any Expo app generates: native projects from `expo prebuild`, and the

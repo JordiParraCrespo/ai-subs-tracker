@@ -150,6 +150,9 @@ jobs:
           # flama:begin web
           if changed @flama/web; then filters+=(--filter=@flama/web); fi
           # flama:end web
+          # flama:begin site
+          if changed @flama/site; then filters+=(--filter=@flama/site); fi
+          # flama:end site
           # flama:plugins admin-web
           if [[ ${#filters[@]} -eq 0 ]]; then exit 0; fi
           pnpm turbo run build "${filters[@]}"

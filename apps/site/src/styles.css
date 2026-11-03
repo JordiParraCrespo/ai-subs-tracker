@@ -1,0 +1,397 @@
+@import "tailwindcss";
+@import "@flama/design-system-web/styles";
+
+@source "./**/*.{ts,tsx}";
+@source "../../../packages/frontend/design-system/web/src/**/*.{ts,tsx}";
+
+@custom-variant dark (&:where(.dark, .dark *, [data-theme='dark'], [data-theme='dark'] *));
+
+/* =============================================================================
+   The marketing page (designs/Marketing Page.dc.html).
+   The design system owns the components and the tokens; what is here is the
+   page's own type scale (the display sizes the app screens never use) and
+   its section layout. Every colour is a `--ds-*` token, so both themes hold.
+   ========================================================================== */
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+body {
+  margin: 0;
+  background: var(--ds-bg-app);
+  color: var(--ds-text);
+  font-family: var(--ds-font-sans);
+}
+
+.site-link {
+  color: var(--ds-text-muted);
+  text-decoration: none;
+  transition: color var(--ds-duration-fast);
+}
+.site-link:hover {
+  color: var(--ds-text);
+}
+.site-link:focus-visible,
+.site-brand:focus-visible {
+  outline: 2px solid var(--ds-text);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* ---- Header ------------------------------------------------------------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--ds-bg-app);
+  border-bottom: 1px solid var(--ds-divider);
+}
+.site-header__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 72px;
+}
+.site-brand {
+  font: 700 20px/1 var(--ds-font-sans);
+  letter-spacing: var(--ds-tracking-tight);
+  color: var(--ds-text);
+  text-decoration: none;
+}
+.site-nav {
+  display: none;
+  align-items: center;
+  gap: 32px;
+  font: var(--ds-type-label);
+}
+@media (min-width: 768px) {
+  .site-nav {
+    display: flex;
+  }
+}
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.site-header__signin {
+  display: none;
+}
+@media (min-width: 480px) {
+  .site-header__signin {
+    display: inline-flex;
+  }
+}
+
+/* The toggle draws both icons and the theme class picks one, so the
+   prerendered markup never depends on a theme only the browser knows. */
+.site-theme-toggle {
+  width: var(--ds-control-sm);
+  padding: 0;
+}
+.site-theme-toggle .site-theme-toggle__sun,
+.light .site-theme-toggle .site-theme-toggle__moon {
+  display: none;
+}
+.light .site-theme-toggle .site-theme-toggle__sun {
+  display: block;
+}
+
+/* ---- Sections ----------------------------------------------------------- */
+.site-hero {
+  padding-top: 96px;
+  padding-bottom: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+}
+.site-hero__title {
+  margin: 0;
+  max-width: 860px;
+  font: 600 clamp(40px, 6vw, 72px) / 1.04 var(--ds-font-sans);
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+.site-hero__lede {
+  margin: 0;
+  max-width: 580px;
+  font: 500 18px/28px var(--ds-font-sans);
+  color: var(--ds-text-muted);
+  text-wrap: pretty;
+}
+.site-hero__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-top: 8px;
+}
+.site-note {
+  font: var(--ds-type-label);
+  color: var(--ds-text-subtle);
+}
+
+.site-section {
+  padding-bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+.site-section__head {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 640px;
+}
+.site-eyebrow {
+  font: var(--ds-type-eyebrow);
+  letter-spacing: var(--ds-tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--ds-text-subtle);
+}
+.site-h2 {
+  margin: 0;
+  font: 600 clamp(32px, 4vw, 44px) / 1.1 var(--ds-font-sans);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.site-muted {
+  font: var(--ds-type-label);
+  color: var(--ds-text-muted);
+  text-wrap: pretty;
+}
+
+/* ---- Product preview ---------------------------------------------------- */
+.site-frame {
+  border-radius: 24px;
+  outline: 1px solid var(--ds-outline-card);
+  background: var(--ds-bg-frame);
+  padding: clamp(12px, 2vw, 24px);
+}
+.site-frame__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 16px;
+}
+.site-frame__chart {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.site-frame__stats {
+  border-top: 1px solid var(--ds-divider);
+  padding-top: 20px;
+}
+.site-frame__caption {
+  margin: 12px 0 0;
+  text-align: center;
+}
+.site-positive {
+  font: var(--ds-type-label);
+  color: var(--ds-positive);
+}
+
+/* ---- Grids -------------------------------------------------------------- */
+.site-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
+}
+.site-grid--wide {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+}
+.site-feature {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.site-feature__disc {
+  width: 44px;
+  height: 44px;
+}
+.site-feature__body,
+.site-step {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.site-feature__title {
+  margin: 0;
+  font: var(--ds-type-body-strong);
+  letter-spacing: var(--ds-tracking-tight);
+}
+
+.site-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  border-top: 1px solid var(--ds-divider);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.site-step {
+  padding: 28px 32px 0 0;
+  gap: 12px;
+}
+.site-step__n {
+  font: 600 14px/20px var(--ds-font-sans);
+  color: var(--ds-accent);
+}
+.site-step__title {
+  margin: 0;
+  font: 600 20px/28px var(--ds-font-sans);
+  letter-spacing: var(--ds-tracking-tight);
+}
+.site-step .site-muted {
+  max-width: 340px;
+}
+
+/* ---- Privacy ------------------------------------------------------------ */
+.site-plan {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+/* The brand ring the design draws round the first card, on a wrapper so the
+   card itself keeps the design system's own outline. */
+.site-featured {
+  border-radius: var(--ds-radius-2xl);
+  outline: 2px solid var(--ds-brand);
+  outline-offset: -2px;
+}
+.site-featured > .ds-card {
+  height: 100%;
+}
+.site-plan__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.site-plan__title {
+  margin: 0;
+  font: var(--ds-type-body-strong);
+}
+.site-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--ds-fill);
+  color: var(--ds-positive);
+  font: var(--ds-type-badge);
+}
+.site-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.site-checklist li {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font: var(--ds-type-label);
+}
+.site-checklist svg {
+  flex: none;
+  color: var(--ds-accent);
+}
+.site-checklist--muted svg {
+  color: var(--ds-text-subtle);
+}
+
+/* ---- Closing band ------------------------------------------------------- */
+.site-band {
+  border-radius: 24px;
+  background: var(--ds-brand);
+  color: var(--ds-on-brand);
+  padding: clamp(40px, 6vw, 72px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+.site-band__text {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 560px;
+}
+.site-band__title {
+  margin: 0;
+  font: 600 clamp(28px, 3.5vw, 40px) / 1.1 var(--ds-font-sans);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.site-band__lede {
+  font: 500 16px/24px var(--ds-font-sans);
+  opacity: 0.85;
+}
+/* White on the brand in both themes, as the design draws it. */
+.site-band__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 24px;
+  border-radius: 12px;
+  background: #fff;
+  color: #171717;
+  font: 600 15px/1 var(--ds-font-sans);
+  letter-spacing: var(--ds-tracking-tight);
+  text-decoration: none;
+}
+.site-band__cta:hover {
+  background: #ececec;
+}
+.site-band__cta:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* ---- Footer ------------------------------------------------------------- */
+.site-footer {
+  border-top: 1px solid var(--ds-divider);
+}
+.site-footer__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 28px;
+  padding-bottom: 28px;
+  font: var(--ds-type-label);
+  color: var(--ds-text-subtle);
+}
+.site-footer__brand {
+  font: 700 16px/1 var(--ds-font-sans);
+  color: var(--ds-text);
+}
+.site-footer__links {
+  display: flex;
+  gap: 24px;
+}
+.site-footer .site-link {
+  color: var(--ds-text-subtle);
+}
+.site-footer .site-link:hover {
+  color: var(--ds-text);
+}

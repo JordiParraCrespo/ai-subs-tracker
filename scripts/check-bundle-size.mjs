@@ -34,6 +34,16 @@ const APPS = [
     budgetKB: 400,
   },
   // flama:end web
+  // flama:begin site
+  {
+    name: '@flama/site',
+    dist: 'apps/site/dist',
+    // 118KB measured: ~57KB of React, the design system's stylesheet (~32KB)
+    // and the few components the page renders. The page is prerendered, so
+    // this is what hydrates it, not what draws it.
+    budgetKB: 130,
+  },
+  // flama:end site
   // flama:plugins admin-web
 ];
 
