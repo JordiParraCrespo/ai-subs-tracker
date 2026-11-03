@@ -152,12 +152,15 @@ export { DsAvatar } from './components/ds-avatar';
 export { DsBadge, DsStatusBadge } from './components/ds-badge';
 export { DsButton } from './components/ds-button';
 export { DsCard, DsCardHeader, DsCardRow } from './components/ds-card';
+export { DsCheckbox } from './components/ds-checkbox';
 export { DsChipGroup, DsSegmented } from './components/ds-chips';
 export { type DsFilterOption, DsFilterSelect } from './components/ds-filter-select';
 export { type DsGridColumn, DsGridTable } from './components/ds-grid-table';
-export { DsStateCard } from './components/ds-state-card';
 export { DsInput } from './components/ds-input';
+export { DsModal, DsModalBody, DsModalFooter, DsModalHeader } from './components/ds-modal';
+export { DsOptionTile, DsSettingsCard } from './components/ds-settings-card';
 export { type DsStat, DsStatGrid } from './components/ds-stat-grid';
+export { DsStateCard } from './components/ds-state-card';
 export { DsTable, type DsTableColumn } from './components/ds-table';
 export {
   Empty,

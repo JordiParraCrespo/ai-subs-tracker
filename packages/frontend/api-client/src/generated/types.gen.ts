@@ -61,6 +61,7 @@ export type UserSettingsResponseDto = {
     density: 'comfortable' | 'compact';
     weeklyDigest: boolean;
     productUpdates: boolean;
+    workspaceName: string | null;
     createdAt: string;
     updatedAt: string;
 };
@@ -71,6 +72,7 @@ export type UpdateUserSettingsRequest = {
     density: 'comfortable' | 'compact';
     weeklyDigest: boolean;
     productUpdates: boolean;
+    workspaceName?: string | null;
 };
 
 export type ProfileResponseDto = {

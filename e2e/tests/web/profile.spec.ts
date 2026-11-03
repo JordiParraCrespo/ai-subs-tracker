@@ -3,7 +3,8 @@ import { totpCode } from '../../support/totp';
 import { loginThroughUi, provisionedUser, reloadFromServer, signInAs } from '../../support/web';
 
 /**
- * The profile screen, end to end.
+ * The person's own account in Settings, end to end: the Profile card and the
+ * Security dialog it opens.
  *
  * Every assertion goes through the real API: a save is followed by
  * `reloadFromServer`, so a test only passes if the value came back from the
@@ -11,188 +12,67 @@ import { loginThroughUi, provisionedUser, reloadFromServer, signInAs } from '../
  * its own account, so nothing here contends with another test's rows.
  */
 
-/** The profile sub-nav, addressed by its accessible name. */
-function sectionNav(page: Page) {
-  return page.getByRole('navigation', { name: 'My profile' });
-}
-
-async function openPane(page: Page, label: string, heading: string) {
-  await sectionNav(page).getByRole('button', { name: label, exact: true }).click();
-  await expect(page.getByRole('heading', { name: heading, level: 2 })).toBeVisible();
-}
-
-/** Every row of the session list. */
-function sessionRows(page: Page) {
-  return page.locator('[data-slot=section-row]');
-}
-
-/** The card above the sub-nav, as opposed to the sidebar's account row. */
-function hero(page: Page) {
-  return page
-    .locator('[data-slot=card]')
-    .filter({ has: page.getByRole('button', { name: 'Change photo' }) });
-}
-
-async function openProfile(page: Page) {
-  await page.goto('/profile');
-  await expect(page.getByRole('heading', { name: 'My profile', level: 1 })).toBeVisible({
+async function openSettings(page: Page) {
+  await page.goto('/settings');
+  await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible({
     timeout: 30_000,
   });
 }
 
-test('shows the signed-in account, read from the API', async ({ page }) => {
-  const { user, api } = await provisionedUser('profile');
+/** Opens the Security dialog from its card. */
+async function openSecurity(page: Page) {
+  await page.getByRole('button', { name: 'Manage' }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('heading', { name: 'Security' })).toBeVisible();
+  return dialog;
+}
+
+/** Every device row of the Security dialog. */
+function deviceRows(page: Page) {
+  return page.getByRole('dialog').getByTestId('device-row');
+}
+
+test('the old profile URL lands on Settings', async ({ page }) => {
+  const { user, api } = await provisionedUser('profileurl');
   await signInAs(page, user);
-  await openProfile(page);
-
-  const card = hero(page);
-  await expect(card.getByRole('heading', { name: user.name })).toBeVisible();
-  await expect(card.getByText(user.email)).toBeVisible();
-  await expect(card.getByText(/Joined \w+ \d{4}/)).toBeVisible();
-
-  await api.dispose();
-});
-
-test('lists every pane and moves between them', async ({ page }) => {
-  const { user, api } = await provisionedUser('profilenav');
-  await signInAs(page, user);
-  await openProfile(page);
-
-  const nav = sectionNav(page);
-  for (const label of ['Profile', 'Password', 'Sessions', 'Preferences']) {
-    await expect(nav.getByRole('button', { name: label, exact: true })).toBeVisible();
-  }
-
+  await page.goto('/profile');
+  await expect(page).toHaveURL(/\/settings$/);
   await expect(page.getByRole('heading', { name: 'Profile', level: 2 })).toBeVisible();
-  await openPane(page, 'Password', 'Password');
-  await openPane(page, 'Sessions', 'Sessions');
-  await openPane(page, 'Preferences', 'Preferences');
-  await openPane(page, 'Profile', 'Profile');
-
   await api.dispose();
 });
 
-test.describe('the avatar', () => {
-  // A 1×1 PNG is enough: the point is not the pixels but that the stored image
-  // is fetched and *decoded* (`naturalWidth > 0`), which only holds if the API
-  // actually serves the `/uploads` path the upload hands back.
-  const PNG = Buffer.from(
-    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
-    'base64',
-  );
-
-  const avatarImage = (page: Page) => hero(page).locator('[data-slot=avatar-image]');
-
-  test('uploads a picture and renders it, read back from the API', async ({ page }) => {
-    const { user, api } = await provisionedUser('avatar');
-    await signInAs(page, user);
-    await openProfile(page);
-
-    // The initials fallback, with no <img> committed to the DOM.
-    const fallback = hero(page).locator('[data-slot=avatar-fallback]');
-    await expect(fallback).toBeVisible();
-    await expect(fallback).toHaveText('TU');
-    await expect(avatarImage(page)).toHaveCount(0);
-
-    await hero(page).locator('input[type=file]').setInputFiles({
-      name: 'avatar.png',
-      mimeType: 'image/png',
-      buffer: PNG,
-    });
-
-    // The picture actually renders: Base UI commits the <img> only once the src
-    // loads, and a decoded image has a non-zero natural width.
-    const img = avatarImage(page);
-    await expect(img).toBeVisible();
-    await expect
-      .poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth))
-      .toBeGreaterThan(0);
-
-    // And it survives a reload with the cache thrown away, so the src is the
-    // server's and not the mutation response the page just wrote.
-    await reloadFromServer(page);
-    await expect(hero(page).getByRole('button', { name: 'Change photo' })).toBeVisible({
-      timeout: 30_000,
-    });
-    const reloaded = avatarImage(page);
-    await expect(reloaded).toBeVisible();
-    await expect
-      .poll(() => reloaded.evaluate((el: HTMLImageElement) => el.naturalWidth))
-      .toBeGreaterThan(0);
-
-    await api.dispose();
-  });
-
-  test('rejects a file that is not an accepted image type', async ({ page }) => {
-    const { user, api } = await provisionedUser('avatarbad');
-    await signInAs(page, user);
-    await openProfile(page);
-
-    await hero(page)
-      .locator('input[type=file]')
-      .setInputFiles({
-        name: 'not-an-image.txt',
-        mimeType: 'text/plain',
-        buffer: Buffer.from('this is not an image'),
-      });
-
-    // The upload error surfaces as an alert beside the card, and the avatar
-    // stays on its fallback.
-    await expect(page.getByRole('alert')).toBeVisible();
-    await expect(avatarImage(page)).toHaveCount(0);
-
-    await api.dispose();
-  });
-});
-
-test.describe('the profile form', () => {
+test.describe('the profile card', () => {
   test('fills itself from the saved account and keeps the email read-only', async ({ page }) => {
     const { user, api } = await provisionedUser('profileform');
     await signInAs(page, user);
-    await openProfile(page);
+    await openSettings(page);
 
     await expect(page.getByLabel('First name')).toHaveValue(user.firstName);
     await expect(page.getByLabel('Last name')).toHaveValue(user.lastName);
-
-    const email = page.getByLabel('Email');
-    await expect(email).toHaveValue(user.email);
-    await expect(email).toHaveAttribute('readonly', '');
-    await expect(page.getByText('Managed by your workspace')).toBeVisible();
+    await expect(page.getByLabel('Email')).toHaveValue(user.email);
+    await expect(page.getByLabel('Email')).toHaveAttribute('readonly', '');
 
     await api.dispose();
   });
 
-  test('saves an edit, and the server is the one that remembers it', async ({ page }) => {
+  test('saves a name as the field is left, and the server is the one that remembers it', async ({
+    page,
+  }) => {
     const { user, api } = await provisionedUser('profilesave');
     await signInAs(page, user);
-    await openProfile(page);
+    await openSettings(page);
 
-    await page.getByLabel('Job title').fill('Head of Everything');
-    await page.getByLabel('Phone').fill('+34 600 111 222');
-    await page.getByRole('button', { name: 'Save changes' }).click();
-    await expect(page.getByRole('button', { name: 'Cancel' })).toBeDisabled();
-
-    await reloadFromServer(page);
-    await expect(page.getByLabel('Job title')).toHaveValue('Head of Everything');
-    await expect(page.getByLabel('Phone')).toHaveValue('+34 600 111 222');
+    await page.getByLabel('First name').fill('Renamed');
+    await page.getByLabel('First name').blur();
+    await expect(page.getByText('Profile saved')).toBeVisible();
 
     // The shell reads the name from its own query; renaming has to reach it.
-    await page.getByLabel('First name').fill('Renamed');
-    await page.getByRole('button', { name: 'Save changes' }).click();
-    await expect(
-      hero(page).getByRole('heading', { name: `Renamed ${user.lastName}` }),
-    ).toBeVisible();
     await expect(
       page.getByRole('button', { name: 'Profile' }).getByText(`Renamed ${user.lastName}`),
     ).toBeVisible();
 
-    // A cleared optional field is `null` over the wire, not `""` — the API
-    // draws that distinction, and only a reload proves which one it stored.
-    await page.getByLabel('Job title').fill('');
-    await page.getByRole('button', { name: 'Save changes' }).click();
-    await expect(page.getByRole('button', { name: 'Cancel' })).toBeDisabled();
     await reloadFromServer(page);
-    await expect(page.getByLabel('Job title')).toHaveValue('');
+    await expect(page.getByLabel('First name')).toHaveValue('Renamed');
 
     await api.dispose();
   });
@@ -200,62 +80,40 @@ test.describe('the profile form', () => {
   test('refuses an empty name and leaves the saved one alone', async ({ page }) => {
     const { user, api } = await provisionedUser('profileempty');
     await signInAs(page, user);
-    await openProfile(page);
+    await openSettings(page);
 
-    await page.getByLabel('First name').fill('');
-    await page.getByRole('button', { name: 'Save changes' }).click();
-
-    await expect(page.getByText('This field is required')).toBeVisible();
+    await page.getByLabel('Last name').fill('');
+    await page.getByLabel('Last name').blur();
+    await expect(page.getByLabel('Last name')).toHaveAttribute('aria-invalid', 'true');
 
     await reloadFromServer(page);
-    await expect(page.getByLabel('First name')).toHaveValue(user.firstName);
-
-    await api.dispose();
-  });
-
-  test('cancel puts the saved values back', async ({ page }) => {
-    const { user, api } = await provisionedUser('profilecancel');
-    await signInAs(page, user);
-    await openProfile(page);
-
-    await page.getByLabel('First name').fill('Someone else');
-    await page.getByRole('button', { name: 'Cancel' }).click();
-
-    await expect(page.getByLabel('First name')).toHaveValue(user.firstName);
+    await expect(page.getByLabel('Last name')).toHaveValue(user.lastName);
 
     await api.dispose();
   });
 });
 
-test.describe('the password pane', () => {
-  test('will not submit two passwords that differ', async ({ page }) => {
-    const { user, api } = await provisionedUser('pwmismatch');
+test.describe('the password', () => {
+  test('says what the new password still needs before it can be saved', async ({ page }) => {
+    const { user, api } = await provisionedUser('pwrules');
     await signInAs(page, user);
-    await openProfile(page);
-    await openPane(page, 'Password', 'Password');
+    await openSettings(page);
+    const dialog = await openSecurity(page);
+    await dialog.getByRole('button', { name: 'Change' }).click();
 
-    await page.getByLabel('Current password').fill(user.password);
-    await page.getByLabel('New password').fill('battery-staple');
-    await page.getByLabel('Confirm password').fill('battery-stapler');
-    await page.getByRole('button', { name: 'Update password' }).click();
-
-    await expect(page.getByText('Both passwords must be the same.')).toBeVisible();
-
-    await api.dispose();
-  });
-
-  test('will not submit a new password that is too short', async ({ page }) => {
-    const { user, api } = await provisionedUser('pwshort');
-    await signInAs(page, user);
-    await openProfile(page);
-    await openPane(page, 'Password', 'Password');
-
-    await page.getByLabel('Current password').fill(user.password);
-    await page.getByLabel('New password').fill('short');
-    await page.getByLabel('Confirm password').fill('short');
-    await page.getByRole('button', { name: 'Update password' }).click();
-
-    await expect(page.getByText(/at least 8/i).first()).toBeVisible();
+    const submit = dialog.locator('button[type=submit]');
+    await expect(submit).toHaveText('Enter current password');
+    await dialog.getByLabel('Current password').fill(user.password);
+    await expect(submit).toHaveText('Use at least 8 characters');
+    await dialog.getByLabel('New password', { exact: true }).fill('battery-staple');
+    await expect(submit).toHaveText('Add a number');
+    await dialog.getByLabel('New password', { exact: true }).fill('battery-staple-9');
+    await expect(submit).toHaveText('Confirm new password');
+    await dialog.getByLabel('Confirm new password').fill('battery-staple-8');
+    await expect(submit).toBeDisabled();
+    await dialog.getByLabel('Confirm new password').fill('battery-staple-9');
+    await expect(submit).toHaveText('Change password');
+    await expect(submit).toBeEnabled();
 
     await api.dispose();
   });
@@ -263,15 +121,16 @@ test.describe('the password pane', () => {
   test('reports a wrong current password in the reader’s language', async ({ page }) => {
     const { user, api } = await provisionedUser('pwwrong');
     await signInAs(page, user);
-    await openProfile(page);
-    await openPane(page, 'Password', 'Password');
+    await openSettings(page);
+    const dialog = await openSecurity(page);
+    await dialog.getByRole('button', { name: 'Change' }).click();
 
-    await page.getByLabel('Current password').fill('not-my-password');
-    await page.getByLabel('New password').fill('battery-staple');
-    await page.getByLabel('Confirm password').fill('battery-staple');
-    await page.getByRole('button', { name: 'Update password' }).click();
+    await dialog.getByLabel('Current password').fill('not-my-password');
+    await dialog.getByLabel('New password', { exact: true }).fill('battery-staple-9');
+    await dialog.getByLabel('Confirm new password').fill('battery-staple-9');
+    await dialog.getByRole('button', { name: 'Change password' }).click();
 
-    await expect(page.getByRole('alert')).toContainText('That current password is not right.');
+    await expect(page.getByText('That current password is not right.')).toBeVisible();
 
     await api.dispose();
   });
@@ -283,48 +142,52 @@ test.describe('the password pane', () => {
     await signInAs(await other.newPage(), user);
 
     await signInAs(page, user);
-    await openProfile(page);
-    await openPane(page, 'Password', 'Password');
+    await openSettings(page);
+    const dialog = await openSecurity(page);
+    await dialog.getByRole('button', { name: 'Change' }).click();
 
     const next = 'Rotated!Password9';
-    await page.getByLabel('Current password').fill(user.password);
-    await page.getByLabel('New password').fill(next);
-    await page.getByLabel('Confirm password').fill(next);
-    await page.getByRole('button', { name: 'Update password' }).click();
+    await dialog.getByLabel('Current password').fill(user.password);
+    await dialog.getByLabel('New password', { exact: true }).fill(next);
+    await dialog.getByLabel('Confirm new password').fill(next);
+    await dialog.getByRole('button', { name: 'Change password' }).click();
     await expect(page.getByText(/password updated/i).first()).toBeVisible();
 
-    await openPane(page, 'Sessions', 'Sessions');
-    await expect(sessionRows(page)).toHaveCount(1);
+    // Back on the overview, only this browser is left.
+    await expect(deviceRows(page)).toHaveCount(1);
 
     await other.close();
     await api.dispose();
   });
+});
 
+test.describe('two-factor', () => {
   test('sets up two-factor, which the next sign-in then asks for', async ({ page }) => {
     const { user, api } = await provisionedUser('pw2fa');
     await signInAs(page, user);
-    await openProfile(page);
-    await openPane(page, 'Password', 'Password');
+    await openSettings(page);
+    const dialog = await openSecurity(page);
+    await expect(dialog.getByText('Off', { exact: true })).toBeVisible();
+    await dialog.getByRole('button', { name: 'Set up' }).click();
 
-    const toggle = page.getByRole('switch', { name: 'Two-factor authentication' });
-    await expect(toggle).not.toBeChecked();
-    await toggle.click();
-
-    const dialog = page.getByRole('dialog');
+    await expect(dialog.getByText('Step 1 of 3')).toBeVisible();
     await dialog.getByLabel('Password').fill(user.password);
     await dialog.getByRole('button', { name: 'Continue' }).click();
 
-    // The key printed under the QR code, as someone who cannot scan would type it.
+    // The key printed beside the QR code, as someone who cannot scan would type it.
     await expect(dialog.getByRole('img', { name: /QR code/ })).toBeVisible();
-    const secret = (await dialog.locator('code').textContent()) ?? '';
-    await dialog.getByLabel('Code from your app').fill(totpCode(secret));
-    await dialog.getByRole('button', { name: 'Turn on' }).click();
+    const secret = ((await dialog.locator('code').textContent()) ?? '').replaceAll(' ', '');
+    await dialog.getByLabel('6-digit code from your app').fill(totpCode(secret));
+    await dialog.getByRole('button', { name: 'Verify' }).click();
 
     await expect(
       dialog.getByRole('list', { name: 'Backup codes' }).getByRole('listitem'),
     ).toHaveCount(10);
+    const done = dialog.getByRole('button', { name: 'Confirm you saved them' });
+    await expect(done).toBeDisabled();
+    await dialog.getByText('I saved these somewhere safe').click();
     await dialog.getByRole('button', { name: 'Done' }).click();
-    await expect(toggle).toBeChecked();
+    await expect(dialog.getByText('On', { exact: true })).toBeVisible();
 
     await page.context().clearCookies();
     await loginThroughUi(page, user.email, user.password);
@@ -337,14 +200,14 @@ test.describe('the password pane', () => {
   });
 });
 
-test.describe('the sessions pane', () => {
-  test('marks the browser reading the page, and refuses to revoke it', async ({ page }) => {
+test.describe('the devices', () => {
+  test('marks the browser reading the page, and offers no way to sign it out', async ({ page }) => {
     const { user, api } = await provisionedUser('sessions');
     await signInAs(page, user);
-    await openProfile(page);
-    await openPane(page, 'Sessions', 'Sessions');
+    await openSettings(page);
+    await openSecurity(page);
 
-    const current = sessionRows(page).filter({ hasText: 'This device' });
+    const current = deviceRows(page).filter({ hasText: 'This device' });
     await expect(current).toHaveCount(1);
     await expect(current.getByRole('button', { name: 'Sign out' })).toHaveCount(0);
     await expect(current).toContainText(/Chrome|Chromium|Safari|Firefox/);
@@ -358,26 +221,25 @@ test.describe('the sessions pane', () => {
     await signInAs(await other.newPage(), user);
 
     await signInAs(page, user);
-    await openProfile(page);
-    await openPane(page, 'Sessions', 'Sessions');
+    await openSettings(page);
+    const dialog = await openSecurity(page);
 
     // The API context that provisioned the account holds a session too, so
     // there are at least three rows before anything is revoked.
-    // `count()` does not wait: let the list load before reading it.
-    await expect(sessionRows(page).first()).toBeVisible();
-    const before = await sessionRows(page).count();
+    await expect(deviceRows(page).first()).toBeVisible();
+    const before = await deviceRows(page).count();
     expect(before).toBeGreaterThan(1);
 
-    // A row's "Sign out" only asks; the dialog is what revokes.
-    await page.getByRole('button', { name: 'Sign out', exact: true }).first().click();
-    await page.getByRole('dialog').getByRole('button', { name: 'Sign out', exact: true }).click();
-    await expect(sessionRows(page)).toHaveCount(before - 1);
+    // A row's "Sign out" only asks; the confirm step is what revokes.
+    await dialog.getByRole('button', { name: 'Sign out', exact: true }).first().click();
+    await dialog.getByRole('button', { name: 'Sign out', exact: true }).click();
+    await expect(deviceRows(page)).toHaveCount(before - 1);
 
     // The row is gone because the server dropped it, not because the list
     // re-rendered without it.
     await reloadFromServer(page);
-    await openPane(page, 'Sessions', 'Sessions');
-    await expect(sessionRows(page)).toHaveCount(before - 1);
+    await openSecurity(page);
+    await expect(deviceRows(page)).toHaveCount(before - 1);
 
     await other.close();
     await api.dispose();
@@ -392,110 +254,23 @@ test.describe('the sessions pane', () => {
     await signInAs(await other.newPage(), user);
 
     await signInAs(page, user);
-    await openProfile(page);
-    await openPane(page, 'Sessions', 'Sessions');
+    await openSettings(page);
+    const dialog = await openSecurity(page);
 
-    await page.getByRole('button', { name: 'Sign out all other sessions' }).click();
-    await page
-      .getByRole('dialog')
-      .getByRole('button', { name: 'Sign out all other sessions' })
-      .click();
+    await dialog.getByRole('button', { name: 'Sign out all other devices' }).click();
+    await dialog.getByRole('button', { name: /^Sign out \d+ devices?$/ }).click();
 
     // Only the browser reading the page survives, and the button has nothing
     // left to do.
-    await expect(sessionRows(page)).toHaveCount(1);
-    await expect(sessionRows(page).filter({ hasText: 'This device' })).toHaveCount(1);
-    await expect(page.getByRole('button', { name: 'Sign out all other sessions' })).toBeDisabled();
+    await expect(deviceRows(page)).toHaveCount(1);
+    await expect(deviceRows(page).filter({ hasText: 'This device' })).toHaveCount(1);
+    await expect(dialog.getByRole('button', { name: 'Sign out all other devices' })).toHaveCount(0);
 
     await reloadFromServer(page);
-    await openPane(page, 'Sessions', 'Sessions');
-    await expect(sessionRows(page)).toHaveCount(1);
+    await openSecurity(page);
+    await expect(deviceRows(page)).toHaveCount(1);
 
     await other.close();
-    await api.dispose();
-  });
-});
-
-test.describe('the preferences pane', () => {
-  test('repaints the workspace on the dark theme, and remembers it per device', async ({
-    page,
-  }) => {
-    const { user, api } = await provisionedUser('prefstheme');
-    await signInAs(page, user);
-    await openProfile(page);
-    await openPane(page, 'Preferences', 'Preferences');
-
-    await page.getByRole('switch', { name: 'Dark theme' }).click();
-    await expect(page.locator('html')).toHaveClass(/dark/);
-
-    // The saved document is the server's: a cache-less reload still shows it.
-    await reloadFromServer(page);
-    await openPane(page, 'Preferences', 'Preferences');
-    await expect(page.getByRole('switch', { name: 'Dark theme' })).toBeChecked();
-
-    await page.getByRole('switch', { name: 'Dark theme' }).click();
-    await expect(page.locator('html')).toHaveClass(/light/);
-
-    await api.dispose();
-  });
-
-  test('saves the table density, and the server is the one that remembers it', async ({ page }) => {
-    const { user, api } = await provisionedUser('prefsdensity');
-    await signInAs(page, user);
-    await openProfile(page);
-    await openPane(page, 'Preferences', 'Preferences');
-
-    const density = page.getByRole('combobox', { name: 'Table density' });
-    await density.click();
-    await page.getByRole('option', { name: 'Compact' }).click();
-    await expect(density).toContainText('Compact');
-
-    await reloadFromServer(page);
-    await openPane(page, 'Preferences', 'Preferences');
-    await expect(page.getByRole('combobox', { name: 'Table density' })).toContainText('Compact');
-
-    await api.dispose();
-  });
-
-  test('saves a notification preference', async ({ page }) => {
-    const { user, api } = await provisionedUser('prefsdigest');
-    await signInAs(page, user);
-    await openProfile(page);
-    await openPane(page, 'Preferences', 'Preferences');
-
-    const digest = page.getByRole('switch', { name: 'Weekly digest' });
-    // The seeded default is on; the first click switches it off.
-    await expect(digest).toBeChecked();
-    await digest.click();
-    await expect(digest).not.toBeChecked();
-
-    await reloadFromServer(page);
-    await openPane(page, 'Preferences', 'Preferences');
-    await expect(page.getByRole('switch', { name: 'Weekly digest' })).not.toBeChecked();
-
-    await api.dispose();
-  });
-
-  test('switches the language of the whole page', async ({ page }) => {
-    const { user, api } = await provisionedUser('prefslang');
-    await signInAs(page, user);
-    await openProfile(page);
-    await openPane(page, 'Preferences', 'Preferences');
-
-    await page.getByRole('combobox', { name: 'Language' }).click();
-    await page.getByRole('option', { name: 'Español' }).click();
-    await expect(page.getByRole('heading', { name: 'Preferencias', level: 2 })).toBeVisible();
-
-    // The saved locale is the account's default on a device that has not
-    // chosen for itself: a fresh context signs in and reads a Spanish page.
-    const fresh = await page.context().browser()?.newContext();
-    if (fresh) {
-      const other = await fresh.newPage();
-      await signInAs(other, user);
-      await expect(other.getByRole('link', { name: 'Resumen', exact: true })).toBeVisible();
-      await fresh.close();
-    }
-
     await api.dispose();
   });
 });

@@ -32,6 +32,7 @@ export class UpdateUserSettingsCommandHandler
       density: command.density,
       weeklyDigest: command.weeklyDigest,
       productUpdates: command.productUpdates,
+      workspaceName: command.workspaceName,
     });
 
     await this.settingsRepository.save(settings);

@@ -60,6 +60,7 @@ describe('ProfileMapper', () => {
           density: 'compact',
           weeklyDigest: false,
           productUpdates: true,
+          workspaceName: null,
         },
       });
 
@@ -79,6 +80,7 @@ describe('ProfileMapper', () => {
       record.density = 'comfortable';
       record.weeklyDigest = true;
       record.productUpdates = false;
+      record.workspaceName = 'Side projects';
       record.createdAt = new Date('2026-01-01');
       record.updatedAt = new Date('2026-01-02');
 
@@ -89,6 +91,7 @@ describe('ProfileMapper', () => {
         density: 'comfortable',
         weeklyDigest: true,
         productUpdates: false,
+        workspaceName: 'Side projects',
         createdAt: new Date('2026-01-01'),
         updatedAt: new Date('2026-01-02'),
       });

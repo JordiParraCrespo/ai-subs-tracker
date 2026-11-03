@@ -59,6 +59,7 @@ describe('UpdateUserSettingsCommandHandler', () => {
         density: 'compact',
         weeklyDigest: true,
         productUpdates: true,
+        workspaceName: null,
       },
     });
     repo.findOneById = vi.fn().mockResolvedValue(Some(existing));

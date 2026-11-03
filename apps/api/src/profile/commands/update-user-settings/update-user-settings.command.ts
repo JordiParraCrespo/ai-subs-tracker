@@ -13,6 +13,8 @@ export class UpdateUserSettingsCommand extends CommandBase {
   readonly density: TableDensity;
   readonly weeklyDigest: boolean;
   readonly productUpdates: boolean;
+  /** Left out keeps the saved name; `null` clears it. */
+  readonly workspaceName?: string | null;
 
   constructor(props: CommandProps<UpdateUserSettingsCommand>) {
     super(props);
@@ -22,5 +24,6 @@ export class UpdateUserSettingsCommand extends CommandBase {
     this.density = props.density;
     this.weeklyDigest = props.weeklyDigest;
     this.productUpdates = props.productUpdates;
+    this.workspaceName = props.workspaceName;
   }
 }

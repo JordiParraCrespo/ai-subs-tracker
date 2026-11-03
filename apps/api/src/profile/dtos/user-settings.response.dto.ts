@@ -24,6 +24,9 @@ export class UserSettingsResponseDto {
   @ApiProperty()
   productUpdates!: boolean;
 
+  @ApiProperty({ type: String, nullable: true, maxLength: 80 })
+  workspaceName!: string | null;
+
   @ApiProperty()
   createdAt!: Date;
 

@@ -11,7 +11,6 @@ import language from './en/language.json';
 import nav from './en/nav.json';
 import onboarding from './en/onboarding.json';
 import pages from './en/pages.json';
-import profile from './en/profile.json';
 import publicCopy from './en/public.json';
 import settings from './en/settings.json';
 import table from './en/table.json';
@@ -34,7 +33,6 @@ const en = {
   consent,
   onboarding,
   pages,
-  profile,
   public: publicCopy,
   settings,
   table,

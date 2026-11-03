@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
-import { provisionedUser, signInAs } from '../../support/web';
+import { provisionedUser, reloadFromServer, signInAs } from '../../support/web';
 
 /**
  * The settings screen, end to end.
@@ -22,8 +22,10 @@ test('lists every section', async ({ page }) => {
   // Every section is a card on the one page, in the design's single column.
   // flama:begin organizations
   // flama:end organizations
+  for (const name of ['Profile', 'Security', 'Workspace', 'Language', 'Appearance']) {
+    await expect(page.getByRole('heading', { name, level: 2 })).toBeVisible();
+  }
   await expect(page.getByRole('heading', { name: 'This computer', level: 2 })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Security', level: 2 })).toBeVisible();
 
   await api.dispose();
 });
@@ -48,25 +50,84 @@ test('survives a warm start with a persisted query cache', async ({ page }) => {
   const { user, api } = await provisionedUser('settingswarm');
   await signInAs(page, user);
 
-  await page.goto('/settings?section=security');
-  await expect(page.getByRole('heading', { name: 'Security', level: 2 })).toBeVisible();
-  await expect(page.getByText('This device')).toBeVisible();
+  await openSettings(page);
+  await page.getByRole('button', { name: 'Manage' }).click();
+  await expect(page.getByRole('dialog').getByText('This device')).toBeVisible();
 
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Security', level: 2 })).toBeVisible();
-  await expect(page.getByText('This device')).toBeVisible();
+  await page.getByRole('button', { name: 'Manage' }).click();
+  await expect(page.getByRole('dialog').getByText('This device')).toBeVisible();
   await expect(page.getByText('Something went wrong!')).toBeHidden();
 
   await api.dispose();
 });
 
-test('Security shows this device among the account’s sessions', async ({ page }) => {
-  const { user, api } = await provisionedUser('settingssec');
+test('names the workspace, which the sidebar and the page then show', async ({ page }) => {
+  const { user, api } = await provisionedUser('settingsws');
   await signInAs(page, user);
   await openSettings(page);
 
-  await expect(page.getByRole('heading', { name: 'Active sessions', level: 3 })).toBeVisible();
-  await expect(page.getByText('This device')).toBeVisible();
+  const name = page.getByLabel('Workspace name');
+  await expect(name).toHaveValue('');
+  await name.fill('Side projects');
+  await name.blur();
+  await expect(page.getByText('Workspace renamed')).toBeVisible();
+
+  // The account card puts the workspace over the person once it has a name.
+  const account = page.getByRole('button', { name: 'Profile' });
+  await expect(account.getByText('Side projects')).toBeVisible();
+  await expect(account.getByText(`${user.firstName} ${user.lastName}`)).toBeVisible();
+
+  await reloadFromServer(page);
+  await expect(page.getByLabel('Workspace name')).toHaveValue('Side projects');
+  await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible();
+  await expect(page.getByText('Side projects').first()).toBeVisible();
+
+  // An emptied field clears the name rather than saving a blank one.
+  await page.getByLabel('Workspace name').fill('');
+  await page.getByLabel('Workspace name').blur();
+  await expect(page.getByText('Workspace renamed')).toBeVisible();
+  await reloadFromServer(page);
+  await expect(page.getByLabel('Workspace name')).toHaveValue('');
+
+  await api.dispose();
+});
+
+test('repaints on the dark theme, and the server remembers the choice', async ({ page }) => {
+  const { user, api } = await provisionedUser('settingstheme');
+  await signInAs(page, user);
+  await openSettings(page);
+
+  await page.getByRole('radio', { name: 'Dark' }).click();
+  await expect(page.locator('html')).toHaveClass(/dark/);
+
+  await reloadFromServer(page);
+  await expect(page.getByRole('radio', { name: 'Dark' })).toHaveAttribute('aria-checked', 'true');
+
+  await page.getByRole('radio', { name: 'Light' }).click();
+  await expect(page.locator('html')).toHaveClass(/light/);
+
+  await api.dispose();
+});
+
+test('switches the language of the whole page', async ({ page }) => {
+  const { user, api } = await provisionedUser('settingslang');
+  await signInAs(page, user);
+  await openSettings(page);
+
+  await page.getByRole('button', { name: 'English' }).click();
+  await page.getByRole('button', { name: 'Español' }).click();
+  await expect(page.getByRole('heading', { name: 'Idioma', level: 2 })).toBeVisible();
+
+  // The saved locale is the account's default on a device that has not
+  // chosen for itself: a fresh context signs in and reads a Spanish page.
+  const fresh = await page.context().browser()?.newContext();
+  if (fresh) {
+    const other = await fresh.newPage();
+    await signInAs(other, user);
+    await expect(other.getByRole('link', { name: 'Resumen', exact: true })).toBeVisible();
+    await fresh.close();
+  }
 
   await api.dispose();
 });

@@ -677,7 +677,6 @@
     "users": "Users",
     "roles": "Roles",
     "toggleSidebar": "Toggle sidebar",
-    "viewProfile": "View profile",
     "accounts": "Subscriptions",
     "tokenmaxx": "Tokenmaxx",
     "usage": "Usage & tokens",
@@ -1009,100 +1008,6 @@
       }
     }
   },
-  "profile": {
-    "changePhoto": "Change photo",
-    "details": {
-      "cancel": "Cancel",
-      "description": "Your personal information. This is how teammates see you across the workspace.",
-      "email": "Email",
-      "emailDescription": "Used to sign in and receive alerts",
-      "emailHint": "Managed by your workspace — contact an admin to change.",
-      "firstName": "First name",
-      "jobTitle": "Job title",
-      "jobTitleDescription": "Shown on your profile card",
-      "lastName": "Last name",
-      "phone": "Phone",
-      "save": "Save changes",
-      "title": "Profile"
-    },
-    "joined": "Joined {{date}}",
-    "password": {
-      "confirm": "Confirm password",
-      "confirmPlaceholder": "Re-enter new password",
-      "current": "Current password",
-      "description": "Keep your account secure with a strong password and two-factor authentication.",
-      "mismatch": "Both passwords must be the same.",
-      "new": "New password",
-      "newDescription": "At least 8 characters",
-      "newPlaceholder": "New password",
-      "submit": "Update password",
-      "title": "Password",
-      "twoFactor": "Two-factor authentication",
-      "twoFactorDescription": "Require a code from your authenticator app when signing in.",
-      "twoFactorOn": "On"
-    },
-    "sections": {
-      "details": "Profile",
-      "password": "Password",
-      "sessions": "Sessions",
-      "preferences": "Preferences"
-    },
-    "sessions": {
-      "activeNow": "Active now",
-      "credentialsNote": "Only devices appear here. API keys and connected apps are revoked under API & webhooks — signing out a device leaves them working.",
-      "description": "Devices currently signed in to your account. Sign out anything you don't recognise.",
-      "empty": "No devices are signed in.",
-      "revokeDescription": "That device will have to sign in again before it can reach your account.",
-      "revokeOthersDescription": "Every device but this one will have to sign in again. API keys and connected apps keep working.",
-      "revokeOthersTitle": "Sign out every other device?",
-      "revokeTitle": "Sign out {{device}}?",
-      "signOut": "Sign out",
-      "signOutAll": "Sign out all other sessions",
-      "thisDevice": "This device",
-      "title": "Sessions",
-      "unknownDevice": "Unrecognised device",
-      "unknownLocation": "Unknown address"
-    },
-    "preferences": {
-      "title": "Preferences",
-      "description": "How the workspace looks and what lands in your inbox.",
-      "darkTheme": "Dark theme",
-      "darkThemeDescription": "Switch the whole workspace to a dark palette.",
-      "language": "Language",
-      "density": "Table density",
-      "densityDescription": "Row height in the workspace tables",
-      "densities": {
-        "comfortable": "Comfortable",
-        "compact": "Compact"
-      },
-      "weeklyDigest": "Weekly digest",
-      "weeklyDigestDescription": "Monday summary of what happened in your workspace.",
-      "productUpdates": "Product updates",
-      "productUpdatesDescription": "Occasional emails about new features."
-    },
-    "twoFactor": {
-      "enableTitle": "Set up two-factor authentication",
-      "enablePasswordStep": "Enter your password to start. Signing in with a password will then also ask for a code from your authenticator app.",
-      "enableScanStep": "Scan the QR code with your authenticator app, then enter the 6-digit code it shows.",
-      "enableCodesStep": "Save these backup codes somewhere safe. Each one signs you in once if you lose your authenticator app, and they are not shown again.",
-      "password": "Password",
-      "code": "Code from your app",
-      "qrLabel": "QR code for your authenticator app",
-      "manualEntry": "Can't scan it? Enter this key instead:",
-      "backupCodesLabel": "Backup codes",
-      "copyCodes": "Copy codes",
-      "continue": "Continue",
-      "verify": "Turn on",
-      "done": "Done",
-      "disableTitle": "Turn off two-factor authentication?",
-      "disableDescription": "Signing in will only need your password, and devices you chose to trust will ask again if you turn it back on. Enter your password to confirm.",
-      "disable": "Turn off",
-      "regenerateTitle": "New backup codes",
-      "regenerateDescription": "Your current backup codes will stop working. Enter your password to get new ones.",
-      "regenerate": "New backup codes",
-      "needsPassword": "Needs a password sign-in"
-    }
-  },
   "public": {
     "footer": {
       "legalNavigation": "Legal information",
@@ -1273,13 +1178,121 @@
       "security": "Security",
       "desktop": "This computer"
     },
-    "security": {
-      "description": "Every device signed in to your account, and a way to end any of them.",
-      "sessions": "Active sessions",
-      "title": "Security"
+    "subtitle": "Your account",
+    "title": "Settings",
+    "profile": {
+      "title": "Profile",
+      "description": "Your name and the email you sign in with.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "saved": "Profile saved"
     },
-    "subtitle": "Your account and its security.",
-    "title": "Settings"
+    "security": {
+      "title": "Security",
+      "description": "Password, two-factor and the devices signed in to your account.",
+      "manage": "Manage",
+      "dialogTitle": "Security",
+      "dialogDescription": "Your password, two-factor and where you’re signed in.",
+      "password": "Password",
+      "passwordSub": "Used with your email to sign in",
+      "noPassword": "You sign in through Google or GitHub",
+      "change": "Change",
+      "twoFactor": "Two-factor authentication",
+      "twoFactorOff": "Add a code from your phone when you sign in",
+      "twoFactorOn": "Asks for a code from your app when you sign in",
+      "twoFactorNeedsPassword": "Protects password sign-in, which this account doesn’t use",
+      "on": "On",
+      "off": "Off",
+      "setUp": "Set up",
+      "turnOff": "Turn off",
+      "devices": "Devices",
+      "thisDevice": "This device",
+      "signOut": "Sign out",
+      "signOutAll": "Sign out all other devices",
+      "activeNow": "Active now",
+      "unknownDevice": "Unrecognised device",
+      "unknownLocation": "Unknown address",
+      "noDevices": "No devices are signed in.",
+      "back": "Back",
+      "cancel": "Cancel",
+      "step": "Step {{step}} of 3"
+    },
+    "changePassword": {
+      "title": "Change password",
+      "description": "Use at least 8 characters with a number.",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password",
+      "note": "Other devices are signed out when you change it.",
+      "cta": {
+        "current": "Enter current password",
+        "length": "Use at least 8 characters",
+        "number": "Add a number",
+        "match": "Confirm new password"
+      },
+      "submit": "Change password"
+    },
+    "twoFactorSetup": {
+      "passwordTitle": "Set up two-factor",
+      "passwordDescription": "Confirm it’s you to start.",
+      "password": "Password",
+      "passwordPlaceholder": "Your password",
+      "passwordEmpty": "Enter your password",
+      "continue": "Continue",
+      "scanTitle": "Scan the code",
+      "scanDescription": "Use any authenticator app, then enter the code it shows.",
+      "qrLabel": "QR code for your authenticator app",
+      "cantScan": "Can’t scan it?",
+      "enterKey": "Enter this key in your app instead.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "code": "6-digit code from your app",
+      "codeEmpty": "Enter the 6-digit code",
+      "verify": "Verify",
+      "codesTitle": "Save your backup codes",
+      "codesDescription": "Each works once if you lose your phone. This is the only time they’re shown.",
+      "codesLabel": "Backup codes",
+      "download": "Download",
+      "saved": "I saved these somewhere safe",
+      "savedEmpty": "Confirm you saved them",
+      "done": "Done"
+    },
+    "twoFactorOff": {
+      "title": "Turn off two-factor?",
+      "description": "Signing in will only need your password. Enter it to confirm.",
+      "password": "Password",
+      "cta": "Turn off"
+    },
+    "signOutOne": {
+      "title": "Sign out {{device}}?",
+      "description": "That device has to sign in again to reach your account.",
+      "cta": "Sign out"
+    },
+    "signOutOthers": {
+      "title": "Sign out all other devices?",
+      "description": "Every device except this one is signed out. Desktop apps stop syncing until they sign in again.",
+      "cta_one": "Sign out {{count}} device",
+      "cta_other": "Sign out {{count}} devices"
+    },
+    "workspace": {
+      "title": "Workspace",
+      "description": "What you call this set of subscriptions. It shows in the sidebar.",
+      "name": "Workspace name",
+      "placeholder": "e.g. Side projects",
+      "saved": "Workspace renamed"
+    },
+    "language": {
+      "title": "Language",
+      "description": "Interface language and date format."
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Choose how the app looks. Select a theme or let it follow your system settings.",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
   },
   "table": {
     "clearFilter": "Clear filter",

@@ -1,21 +1,27 @@
-import { PageHead } from '@flama/frontend-web';
 import { createFileRoute } from '@tanstack/react-router';
-import { useTranslation } from 'react-i18next';
 // flama:begin organizations
 // flama:end organizations
 import { DesktopSettings } from '@/features/accounts/sections/desktop-settings';
-import { SecuritySection } from '@/features/profile/sections/security';
+import { ProfileCard } from '@/features/profile/sections/profile-card';
+import { SecurityCard } from '@/features/profile/sections/security-card';
+import { AppearanceCard } from '@/features/user-settings/sections/appearance-card';
+import { LanguageCard } from '@/features/user-settings/sections/language-card';
+import { SettingsHead } from '@/features/user-settings/sections/settings-head';
+import { WorkspaceCard } from '@/features/user-settings/sections/workspace-card';
 
 /**
- * The sections, in the order the page stacks them, each a card in the
- * design's single 720px column: a module that adds a pane adds its row here
- * and nothing else.
+ * The cards, in the order the design stacks them in its single 720px column:
+ * a module that adds a card adds its row here and nothing else.
  */
 const SECTIONS = [
+  { key: 'profile', Card: ProfileCard },
+  { key: 'security', Card: SecurityCard },
+  { key: 'workspace', Card: WorkspaceCard },
   // flama:begin organizations
   // flama:end organizations
-  { key: 'desktop', Pane: DesktopSettings },
-  { key: 'security', Pane: SecuritySection },
+  { key: 'language', Card: LanguageCard },
+  { key: 'appearance', Card: AppearanceCard },
+  { key: 'desktop', Card: DesktopSettings },
 ] as const;
 
 type SectionKey = (typeof SECTIONS)[number]['key'];
@@ -24,13 +30,12 @@ const PANES: readonly SectionKey[] = SECTIONS.map((section) => section.key);
 
 /**
  * `?section=` is still accepted, so links into settings keep working: the
- * page carries every section, so a link that names one lands on it.
+ * page carries every card, each with its key as its id, so a link that names
+ * one lands on it.
  *
- * Everything else in the search string is carried through untouched. What
+ * Everything else in the search string is carried through untouched: what
  * `validateSearch` returns *becomes* the search, so narrowing it to `section`
- * would delete a table's page (`<prefix>_page`) on the next navigation — the table
- * would write it and the router would take it away. `section` is still the
- * only key this route reads or trusts.
+ * would delete what another reader of the URL wrote there.
  */
 export const Route = createFileRoute('/_authenticated/settings/')({
   validateSearch: (
@@ -45,16 +50,14 @@ export const Route = createFileRoute('/_authenticated/settings/')({
 });
 
 function SettingsPage() {
-  const { t } = useTranslation();
-
   return (
-    <div className="flex max-w-180 flex-col gap-6">
-      <PageHead className="mb-0" title={t('settings.title')} sub={t('settings.subtitle')} />
-      {SECTIONS.map(({ key, Pane }) => (
-        <section key={key} id={key} className="ds-card flex scroll-mt-6 flex-col p-6">
-          <Pane />
-        </section>
-      ))}
-    </div>
+    <>
+      <SettingsHead />
+      <div className="mx-auto flex w-full max-w-180 flex-col gap-6">
+        {SECTIONS.map(({ key, Card }) => (
+          <Card key={key} />
+        ))}
+      </div>
+    </>
   );
 }

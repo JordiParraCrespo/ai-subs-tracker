@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@flama/design-system-web';
 import { ChevronUp, LogOut, Moon, Sun, User } from '@flama/design-system-web/icons';
-import { useLogout, useProfile } from '@flama/frontend-core/react';
+import { useLogout, useProfile, useUserSettings } from '@flama/frontend-core/react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../theme';
@@ -18,13 +18,16 @@ const ROW = 'h-10 gap-2.5 rounded-[10px] px-2.5 text-sm font-medium [&_svg]:size
 
 /**
  * The account card at the foot of the sidebar (`.ds-account`): the brand tile,
- * the person's name and email, and a chevron. It opens the design's menu
+ * the workspace's name over the person's (or the person's over their email
+ * before the workspace is named), and a chevron. It opens the design's menu
  * above it: who is signed in, the account links, the theme switch, sign out.
  */
 export function UserMenu({ collapsed = false }: { collapsed?: boolean }) {
   const { t } = useTranslation();
   const { userMenuLinks = [] } = useShell();
   const { data: user } = useProfile();
+  // `|| null`: a settings record cached before the field existed has none.
+  const workspace = useUserSettings().data?.workspaceName || null;
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const logout = useLogout({ onSuccess: () => navigate({ to: '/login' }) });
@@ -54,8 +57,12 @@ export function UserMenu({ collapsed = false }: { collapsed?: boolean }) {
         {!collapsed && (
           <>
             <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <span className="truncate text-sm font-semibold">{name}</span>
-              <span className="truncate text-xs text-sidebar-ink-muted">{user?.email}</span>
+              {/* The design's workspace over its person; without a workspace
+                  name, the person over the email they sign in with. */}
+              <span className="truncate text-sm font-semibold">{workspace ?? name}</span>
+              <span className="truncate text-xs text-sidebar-ink-muted">
+                {workspace ? name : user?.email}
+              </span>
             </span>
             <ChevronUp className="size-4 flex-none text-sidebar-ink-muted" strokeWidth={1.5} />
           </>

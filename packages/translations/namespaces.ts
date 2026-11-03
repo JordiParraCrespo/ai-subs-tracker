@@ -23,7 +23,6 @@ export const namespaces = namespaceList as unknown as readonly [
   'consent',
   'onboarding',
   'pages',
-  'profile',
   'public',
   'settings',
   'table',

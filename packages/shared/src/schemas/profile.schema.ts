@@ -63,6 +63,12 @@ export const updateUserSettingsSchema = z.object({
   density: z.enum(TABLE_DENSITIES),
   weeklyDigest: z.boolean(),
   productUpdates: z.boolean(),
+  /**
+   * What the person calls their set of subscriptions, shown above their name
+   * in the sidebar. `null` clears it; leaving it out keeps the saved one, so a
+   * client that never shows the field cannot wipe it.
+   */
+  workspaceName: z.string().trim().min(1).max(80).nullable().optional(),
 });
 
 /** Alias kept for callers that think of the whole record as "the settings". */
@@ -104,6 +110,7 @@ export const userSessionResponseSchema = z.object({
 });
 
 export const userSettingsResponseSchema = updateUserSettingsSchema.extend({
+  workspaceName: z.string().nullable(),
   userId: z.string().uuid(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -128,4 +135,5 @@ export const DEFAULT_USER_SETTINGS: UpdateUserSettingsDto = {
   density: 'comfortable',
   weeklyDigest: true,
   productUpdates: false,
+  workspaceName: null,
 };
