@@ -1,4 +1,4 @@
-import { DsSettingsCard, Skeleton, toast } from '@flama/design-system-web';
+import { Alert, AlertDescription, DsSettingsCard, Skeleton, toast } from '@flama/design-system-web';
 import { User } from '@flama/design-system-web/icons';
 import { useMyProfile, useUpdateMyProfile } from '@flama/frontend-consumer/react';
 import { useErrorMessage } from '@flama/frontend-web';
@@ -12,7 +12,6 @@ export function ProfileCard() {
   const profile = useMyProfile();
   const update = useUpdateMyProfile({
     onSuccess: () => toast.success(t('settings.profile.saved')),
-    onError: (error) => toast.error(resolveError(error).message),
   });
 
   return (
@@ -22,6 +21,11 @@ export function ProfileCard() {
       title={t('settings.profile.title')}
       description={t('settings.profile.description')}
     >
+      {update.error && (
+        <Alert variant="destructive">
+          <AlertDescription>{resolveError(update.error).message}</AlertDescription>
+        </Alert>
+      )}
       {profile.data ? (
         <NameForm
           saved={{ firstName: profile.data.firstName, lastName: profile.data.lastName }}

@@ -13,7 +13,6 @@ export function useSaveSettings(saved?: string) {
   const settings = useUserSettings();
   const update = useUpdateUserSettings({
     onSuccess: () => saved && toast.success(saved),
-    onError: (error) => toast.error(resolveError(error).message),
   });
 
   const save = (change: Partial<UpdateUserSettingsDto>) => {
@@ -28,5 +27,6 @@ export function useSaveSettings(saved?: string) {
     });
   };
 
-  return { settings, save, isPending: update.isPending };
+  const failure = update.error ? resolveError(update.error).message : null;
+  return { settings, save, failure, isPending: update.isPending };
 }

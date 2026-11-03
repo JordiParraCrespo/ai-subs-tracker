@@ -1,8 +1,9 @@
-import { DsButton, DsModalFooter, DsModalHeader, toast } from '@flama/design-system-web';
+import { DsButton, DsModalFooter, DsModalHeader } from '@flama/design-system-web';
 import type { UserSessionEntity } from '@flama/frontend-consumer';
 import { useRevokeProfileSession } from '@flama/frontend-consumer/react';
 import { useErrorMessage } from '@flama/frontend-web';
 import { useTranslation } from 'react-i18next';
+import { StepError } from '@/features/profile/components/step-error';
 
 /** Asks before signing one device out, and owns the revoke. */
 export function SignOutDeviceStep({
@@ -17,7 +18,6 @@ export function SignOutDeviceStep({
   const device = session.deviceLabel ?? t('settings.security.unknownDevice');
   const revoke = useRevokeProfileSession({
     onSuccess: onBack,
-    onError: (error) => toast.error(resolveError(error).message),
   });
 
   return (
@@ -26,6 +26,7 @@ export function SignOutDeviceStep({
         title={t('settings.signOutOne.title', { device })}
         description={t('settings.signOutOne.description')}
       />
+      <StepError message={revoke.error ? resolveError(revoke.error).message : null} />
       <div className="h-2" />
       <DsModalFooter>
         <DsButton variant="ghost" size="sm" onClick={onBack}>

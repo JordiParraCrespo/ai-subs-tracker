@@ -1,4 +1,4 @@
-import { DsOptionTile, DsSettingsCard } from '@flama/design-system-web';
+import { Alert, AlertDescription, DsOptionTile, DsSettingsCard } from '@flama/design-system-web';
 import { Contrast, Monitor, Moon, Sun } from '@flama/design-system-web/icons';
 import { useTheme } from '@flama/frontend-web';
 import { THEMES, type Theme } from '@flama/shared/schemas/profile';
@@ -13,7 +13,7 @@ const ICONS = { light: Sun, dark: Moon, system: Monitor } as const satisfies Rec
  */
 export function AppearanceCard() {
   const { t } = useTranslation();
-  const { settings, save } = useSaveSettings();
+  const { settings, save, failure } = useSaveSettings();
   const { theme, setTheme } = useTheme();
   const chosen: Theme = settings.data?.theme ?? theme;
 
@@ -24,6 +24,11 @@ export function AppearanceCard() {
       title={t('settings.appearance.title')}
       description={t('settings.appearance.description')}
     >
+      {failure && (
+        <Alert variant="destructive">
+          <AlertDescription>{failure}</AlertDescription>
+        </Alert>
+      )}
       <div role="radiogroup" aria-label={t('settings.appearance.title')} className="ds-option-grid">
         {THEMES.map((value) => {
           const Icon = ICONS[value];

@@ -11,6 +11,7 @@ import { useConfirmTwoFactor, useEnableTwoFactor } from '@flama/frontend-consume
 import { useCopy, useErrorMessage } from '@flama/frontend-web';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { StepError } from '@/features/profile/components/step-error';
 import { TotpQrCode } from '@/features/profile/components/totp-qr-code';
 import { ConfirmPasswordForm } from '@/features/profile/forms/confirm-password-form';
 import { TotpCodeForm } from '@/features/profile/forms/totp-code-form';
@@ -29,16 +30,18 @@ export function TwoFactorOnStep({ onBack }: { onBack: () => void }) {
   const keyCopy = useCopy();
   const codesCopy = useCopy();
   const [saved, setSaved] = useState(false);
-  const onError = (error: Error) => toast.error(resolveError(error, t('common.error')).message);
-  const enable = useEnableTwoFactor({ onError });
+  const enable = useEnableTwoFactor();
   const confirm = useConfirmTwoFactor({
     onSuccess: () => toast.success(t('toasts.twoFactorEnabled')),
-    onError,
   });
 
   const enrolment = enable.data;
   const step = !enrolment ? 1 : !confirm.isSuccess ? 2 : 3;
   const eyebrow = t('settings.security.step', { step });
+  const failed = step === 1 ? enable.error : confirm.error;
+  const error = failed ? (
+    <StepError message={resolveError(failed, t('common.error')).message} />
+  ) : null;
 
   if (step === 1 || !enrolment) {
     return (
@@ -48,6 +51,7 @@ export function TwoFactorOnStep({ onBack }: { onBack: () => void }) {
           title={t('settings.twoFactorSetup.passwordTitle')}
           description={t('settings.twoFactorSetup.passwordDescription')}
         />
+        {error}
         <ConfirmPasswordForm
           label={t('settings.twoFactorSetup.password')}
           emptyLabel={t('settings.twoFactorSetup.passwordEmpty')}
@@ -69,6 +73,7 @@ export function TwoFactorOnStep({ onBack }: { onBack: () => void }) {
           title={t('settings.twoFactorSetup.scanTitle')}
           description={t('settings.twoFactorSetup.scanDescription')}
         />
+        {error}
         <TotpCodeForm
           isPending={confirm.isPending}
           onBack={() => enable.reset()}

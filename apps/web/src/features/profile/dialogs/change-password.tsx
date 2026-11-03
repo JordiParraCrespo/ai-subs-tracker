@@ -2,6 +2,7 @@ import { DsModalHeader, toast } from '@flama/design-system-web';
 import { useChangeOwnPassword } from '@flama/frontend-consumer/react';
 import { useErrorMessage } from '@flama/frontend-web';
 import { useTranslation } from 'react-i18next';
+import { StepError } from '@/features/profile/components/step-error';
 import { ChangePasswordForm } from '@/features/profile/forms/change-password-form';
 
 /**
@@ -17,7 +18,6 @@ export function ChangePasswordStep({ onBack }: { onBack: () => void }) {
       toast.success(t('toasts.passwordChanged'));
       onBack();
     },
-    onError: (error) => toast.error(resolveError(error).message),
   });
 
   return (
@@ -26,6 +26,7 @@ export function ChangePasswordStep({ onBack }: { onBack: () => void }) {
         title={t('settings.changePassword.title')}
         description={t('settings.changePassword.description')}
       />
+      <StepError message={change.error ? resolveError(change.error).message : null} />
       <ChangePasswordForm
         isPending={change.isPending}
         onBack={onBack}

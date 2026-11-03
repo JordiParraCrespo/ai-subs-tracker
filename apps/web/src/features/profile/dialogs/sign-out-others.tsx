@@ -1,7 +1,8 @@
-import { DsButton, DsModalFooter, DsModalHeader, toast } from '@flama/design-system-web';
+import { DsButton, DsModalFooter, DsModalHeader } from '@flama/design-system-web';
 import { useRevokeOtherProfileSessions } from '@flama/frontend-consumer/react';
 import { useErrorMessage } from '@flama/frontend-web';
 import { useTranslation } from 'react-i18next';
+import { StepError } from '@/features/profile/components/step-error';
 
 /** Asks before signing every other device out, and owns the revoke. */
 export function SignOutOthersStep({ count, onBack }: { count: number; onBack: () => void }) {
@@ -9,7 +10,6 @@ export function SignOutOthersStep({ count, onBack }: { count: number; onBack: ()
   const resolveError = useErrorMessage();
   const revoke = useRevokeOtherProfileSessions({
     onSuccess: onBack,
-    onError: (error) => toast.error(resolveError(error).message),
   });
 
   return (
@@ -18,6 +18,7 @@ export function SignOutOthersStep({ count, onBack }: { count: number; onBack: ()
         title={t('settings.signOutOthers.title')}
         description={t('settings.signOutOthers.description')}
       />
+      <StepError message={revoke.error ? resolveError(revoke.error).message : null} />
       <div className="h-2" />
       <DsModalFooter>
         <DsButton variant="ghost" size="sm" onClick={onBack}>

@@ -1,4 +1,4 @@
-import { DsFilterSelect, DsSettingsCard } from '@flama/design-system-web';
+import { Alert, AlertDescription, DsFilterSelect, DsSettingsCard } from '@flama/design-system-web';
 import { Languages } from '@flama/design-system-web/icons';
 import { chooseLocale, useLocale } from '@flama/frontend-web';
 import { DEFAULT_USER_SETTINGS, LOCALES, type Locale } from '@flama/shared/schemas/profile';
@@ -12,7 +12,7 @@ import { useSaveSettings } from '../hooks/use-save-settings';
  */
 export function LanguageCard() {
   const { t } = useTranslation();
-  const { save } = useSaveSettings();
+  const { save, failure } = useSaveSettings();
   const shown = useLocale();
   const locale = (LOCALES as readonly string[]).includes(shown)
     ? (shown as Locale)
@@ -25,6 +25,11 @@ export function LanguageCard() {
       title={t('settings.language.title')}
       description={t('settings.language.description')}
     >
+      {failure && (
+        <Alert variant="destructive">
+          <AlertDescription>{failure}</AlertDescription>
+        </Alert>
+      )}
       <div className="flex">
         <DsFilterSelect
           neutral

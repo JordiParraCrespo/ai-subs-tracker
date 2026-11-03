@@ -2,6 +2,7 @@ import { DsModalHeader, toast } from '@flama/design-system-web';
 import { useDisableTwoFactor } from '@flama/frontend-consumer/react';
 import { useErrorMessage } from '@flama/frontend-web';
 import { useTranslation } from 'react-i18next';
+import { StepError } from '@/features/profile/components/step-error';
 import { ConfirmPasswordForm } from '@/features/profile/forms/confirm-password-form';
 
 /** Turns two-factor off behind the password, and owns that mutation. */
@@ -13,7 +14,6 @@ export function TwoFactorOffStep({ onBack }: { onBack: () => void }) {
       toast.success(t('toasts.twoFactorDisabled'));
       onBack();
     },
-    onError: (error) => toast.error(resolveError(error, t('common.error')).message),
   });
 
   return (
@@ -21,6 +21,9 @@ export function TwoFactorOffStep({ onBack }: { onBack: () => void }) {
       <DsModalHeader
         title={t('settings.twoFactorOff.title')}
         description={t('settings.twoFactorOff.description')}
+      />
+      <StepError
+        message={disable.error ? resolveError(disable.error, t('common.error')).message : null}
       />
       <ConfirmPasswordForm
         label={t('settings.twoFactorOff.password')}
