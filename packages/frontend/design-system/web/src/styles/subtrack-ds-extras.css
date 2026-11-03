@@ -252,3 +252,9 @@
 .ds-palette__label{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ds-palette [cmdk-empty]{padding:40px 24px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
 .ds-palette__foot{display:flex;gap:20px;padding:12px 20px;border-top:1px solid var(--ds-divider)}
+
+/* The design's toast (`toastOn`): a 48px pill in the text colour on the page's, centred, a 16px icon then the line. */
+[data-sonner-toaster] [data-sonner-toast].cn-toast{left:0;right:0;margin:0 auto;width:fit-content;max-width:calc(100vw - 48px);height:48px;padding:0 20px;gap:10px;border:0;border-radius:999px;background:var(--ds-text);color:var(--ds-bg-app);box-shadow:var(--ds-shadow-float);font:var(--ds-type-label-strong);white-space:nowrap}
+[data-sonner-toaster] [data-sonner-toast].cn-toast [data-icon]{margin:0;width:16px;height:16px;color:inherit}
+[data-sonner-toaster] [data-sonner-toast].cn-toast [data-content]{min-width:0}
+[data-sonner-toaster] [data-sonner-toast].cn-toast [data-title]{font:inherit;color:inherit;overflow:hidden;text-overflow:ellipsis}
