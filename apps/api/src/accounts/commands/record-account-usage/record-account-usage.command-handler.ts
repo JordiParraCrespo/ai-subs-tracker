@@ -6,7 +6,7 @@ import { ACCOUNT_REPOSITORY, USAGE_REPOSITORY } from '../../account.di-tokens';
 import type { AccountRepositoryPort } from '../../database/account.repository.port';
 import type { UsageRepositoryPort } from '../../database/usage.repository.port';
 import { AccountErrors } from '../../domain/account.errors';
-import { manualSnapshot } from '../../domain/manual-usage';
+import { manualSnapshot } from '../../domain/manual-usage.factory';
 import { RecordAccountUsageCommand } from './record-account-usage.command';
 
 /** How long limit readings are kept; the same retention a sync applies. */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { manualSnapshot } from '../domain/manual-usage';
+import { manualSnapshot } from '../domain/manual-usage.factory';
 
 const AT = new Date('2026-11-04T10:00:00Z');
 
