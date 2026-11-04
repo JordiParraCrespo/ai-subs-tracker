@@ -25,6 +25,8 @@ export class ActivateAccountCommandHandler
     const found = await this.accounts.findOwned(command.userId, command.accountId);
     if (found.isNone()) throw new AppError(AccountErrors.NOT_FOUND);
     const target = found.unwrap();
+    // A hand-tracked subscription has no login on the machine to point a terminal at.
+    if (target.isManual) throw new AppError(AccountErrors.NOT_SWITCHABLE);
     const now = new Date();
     const siblings = (await this.accounts.findForUser(command.userId)).filter(
       (account) => account.provider === target.provider && account.id !== target.id,

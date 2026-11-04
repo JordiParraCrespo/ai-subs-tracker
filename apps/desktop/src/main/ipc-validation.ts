@@ -1,5 +1,5 @@
 import { isAbsolute } from 'node:path';
-import { PROVIDER_IDS, type ProviderId } from '@flama/shared/subscriptions';
+import { LOCAL_PROVIDER_IDS, type LocalProviderId } from '@flama/shared/subscriptions';
 
 /**
  * Argument checks for every IPC handler: the renderer is web content, so
@@ -24,9 +24,10 @@ export function parseLoginCode(value: unknown): string {
   return code;
 }
 
-export function parseProvider(value: unknown): ProviderId {
-  if (typeof value === 'string' && (PROVIDER_IDS as readonly string[]).includes(value)) {
-    return value as ProviderId;
+/** A provider with a login on this machine; a hand-tracked one (Z.AI) has none. */
+export function parseProvider(value: unknown): LocalProviderId {
+  if (typeof value === 'string' && (LOCAL_PROVIDER_IDS as readonly string[]).includes(value)) {
+    return value as LocalProviderId;
   }
   throw new IpcArgumentError('Unknown provider.');
 }

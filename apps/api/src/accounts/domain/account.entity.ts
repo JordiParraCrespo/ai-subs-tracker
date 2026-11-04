@@ -6,6 +6,8 @@ import {
 } from '@flama/backend-ddd';
 import {
   findPlan,
+  isManualProvider,
+  type ManualProviderId,
   type PlanDefinition,
   type ProviderId,
   resolvePlan,
@@ -85,6 +87,52 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
     });
   }
 
+  /**
+   * A subscription the person adds by hand, for a provider no machine reports
+   * (Z.AI). Its externalId is `manual:<id>`, which no login can collide with;
+   * the plan is the person's choice, so it is stored as chosen. Never seen by
+   * a collector, so `lastSyncedAt` stays null.
+   */
+  static addManual(
+    id: string,
+    input: {
+      userId: string;
+      provider: ManualProviderId;
+      label: string;
+      email: string | null;
+      planId: string;
+      monthlyPriceCents: number | null;
+      renewalDay: number | null;
+    },
+  ): AccountEntity {
+    const plan = findPlan(input.planId);
+    if (plan?.provider !== input.provider) {
+      throw new ArgumentInvalidException(`Plan ${input.planId} is not a ${input.provider} plan`);
+    }
+    const account = new AccountEntity({
+      id,
+      props: {
+        userId: input.userId,
+        provider: input.provider,
+        externalId: `manual:${id}`,
+        email: input.email,
+        organization: null,
+        reportedPlan: null,
+        location: null,
+        label: input.label,
+        planId: input.planId,
+        monthlyPriceCents: input.monthlyPriceCents,
+        renewalDay: input.renewalDay,
+        isActive: false,
+        activatedAt: null,
+        lastSyncedAt: null,
+        archivedAt: null,
+      },
+    });
+    account.validate();
+    return account;
+  }
+
   static create(create: CreateEntityProps<AccountProps>): AccountEntity {
     return new AccountEntity(create);
   }
@@ -137,6 +185,10 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
   }
   get isArchived() {
     return this.props.archivedAt !== null;
+  }
+  /** Added and tracked by hand: no collector reads it and no terminal switches to it. */
+  get isManual(): boolean {
+    return isManualProvider(this.props.provider);
   }
 
   /** The person's chosen plan, else the one the provider reports, else unknown. */
@@ -214,6 +266,16 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
     }
     if (this.props.monthlyPriceCents !== null && this.props.monthlyPriceCents < 0) {
       throw new ArgumentInvalidException('Account price cannot be negative');
+    }
+    if (this.isManual) {
+      // Nothing reports a hand-tracked plan, so the person's choice is all there is.
+      const plan = findPlan(this.props.planId);
+      if (!plan) throw new ArgumentNotProvidedException('A hand-tracked account needs a plan');
+      if (plan.monthlyPriceCents === null && this.props.monthlyPriceCents === null) {
+        throw new ArgumentInvalidException(
+          `Plan ${plan.id} has no published price; the account needs the one paid`,
+        );
+      }
     }
     const day = this.props.renewalDay;
     if (day !== null && (!Number.isInteger(day) || day < 1 || day > 31)) {

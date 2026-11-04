@@ -155,6 +155,7 @@
     "price": "Precio",
     "windows": "Límites de uso",
     "free": "Gratis",
+    "unpublished": "Precio no publicado",
     "perMonth": "/mes",
     "perSeat": "/usuario/mes",
     "weeklyOnly": "Solo límite semanal",

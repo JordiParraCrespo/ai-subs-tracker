@@ -120,7 +120,7 @@ export function TokenmaxxQueue() {
       label: '',
       render: (row) => (
         <div className="flex flex-row justify-end">
-          {row.account.isActive ? (
+          {row.account.isManual ? null : row.account.isActive ? (
             <span className="ds-in-use">
               <Flame className="size-3.5" strokeWidth={1.5} />
               {t('accounts.tm.inUse')}

@@ -49,4 +49,27 @@ describe('ActivateAccountCommandHandler', () => {
       handler.execute(new ActivateAccountCommand({ userId: 'user-1', accountId: 'x' })),
     ).rejects.toBeInstanceOf(AppError);
   });
+
+  it('refuses to point terminals at a subscription tracked by hand', async () => {
+    const zai = AccountEntity.addManual('z', {
+      userId: 'user-1',
+      provider: 'zai',
+      label: 'GLM',
+      email: null,
+      planId: 'zai-lite',
+      monthlyPriceCents: null,
+      renewalDay: null,
+    });
+    const repo = {
+      findOwned: vi.fn().mockResolvedValue(Some(zai)),
+      findForUser: vi.fn(),
+      saveAll: vi.fn(),
+    };
+    const handler = new ActivateAccountCommandHandler(repo as unknown as AccountRepositoryPort);
+    await expect(
+      handler.execute(new ActivateAccountCommand({ userId: 'user-1', accountId: 'z' })),
+    ).rejects.toMatchObject({ code: 'ACCOUNT_003' });
+    expect(zai.isActive).toBe(false);
+    expect(repo.saveAll).not.toHaveBeenCalled();
+  });
 });

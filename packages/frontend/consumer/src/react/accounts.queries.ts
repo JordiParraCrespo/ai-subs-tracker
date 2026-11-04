@@ -6,7 +6,11 @@ import {
   useEntityQuery,
   withCacheOnSuccess,
 } from '@flama/frontend-core/react';
-import type { UpdateAccountInput } from '@flama/shared/schemas/accounts';
+import type {
+  CreateAccountInput,
+  RecordUsageInput,
+  UpdateAccountInput,
+} from '@flama/shared/schemas/accounts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { AccountEntity, UsageSummary } from '../modules/accounts/accounts.entity';
 import { useConsumerApp } from './context';
@@ -43,6 +47,41 @@ export function useUsageSummary(days: number) {
     queryKey: accountsKeys.usage(days),
     queryFn: () => app.accounts.usage(days),
     refetchInterval: ACCOUNTS_REFETCH_MS * 5,
+  });
+}
+
+/** Adds a subscription tracked by hand; the list gains it at once. */
+export function useCreateAccount(
+  options?: HookMutationOptions<AccountEntity, Error, CreateAccountInput>,
+) {
+  const app = useConsumerApp();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: CreateAccountInput) => app.accounts.create(input),
+    ...withCacheOnSuccess(options, (created) => {
+      queryClient.setQueryData<AccountEntity[]>(accountsKeys.list(), (list) =>
+        list ? [...list, created] : [created],
+      );
+    }),
+  });
+}
+
+/** Records a usage reading on a hand-tracked subscription; answers with the account. */
+export function useRecordAccountUsage(
+  options?: HookMutationOptions<AccountEntity, Error, { id: string; input: RecordUsageInput }>,
+) {
+  const app = useConsumerApp();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: RecordUsageInput }) =>
+      app.accounts.recordUsage(id, input),
+    ...withCacheOnSuccess(options, (saved) => {
+      queryClient.setQueryData<AccountEntity[]>(accountsKeys.list(), (list) =>
+        list?.map((account) => (account.id === saved.id ? saved : account)),
+      );
+    }),
   });
 }
 

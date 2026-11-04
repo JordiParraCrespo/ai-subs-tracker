@@ -21,4 +21,12 @@ export const AccountsErrors = {
     code: 'ACCOUNTS_CLIENT_005',
     message: 'Failed to load token usage',
   },
+  CREATE_FAILED: {
+    code: 'ACCOUNTS_CLIENT_006',
+    message: 'Failed to add the subscription',
+  },
+  RECORD_USAGE_FAILED: {
+    code: 'ACCOUNTS_CLIENT_007',
+    message: 'Failed to record the usage',
+  },
 } as const satisfies Record<string, ErrorDefinition>;

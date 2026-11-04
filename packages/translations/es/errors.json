@@ -4,6 +4,8 @@
   "correlationId": "Referencia: {{id}}",
   "byCode": {
     "ACCOUNT_001": "No se ha encontrado esa cuenta.",
+    "ACCOUNT_002": "El uso de esta cuenta se lee de tu ordenador, no se registra a mano.",
+    "ACCOUNT_003": "Esta suscripción no se usa desde una terminal.",
     "ACCOUNT_TEMPORARILY_LOCKED": "Demasiados códigos incorrectos. La verificación en dos pasos está bloqueada durante 15 minutos.",
     "AUTHZ_001": "No eres miembro de esa organización.",
     "AUTHZ_002": "Hay un problema de configuración en el servidor. Inténtalo más tarde.",
@@ -79,6 +81,8 @@
     "ACCOUNTS_CLIENT_002": "No hemos podido guardar la cuenta.",
     "ACCOUNTS_CLIENT_003": "No hemos podido cambiar de cuenta.",
     "ACCOUNTS_CLIENT_004": "No hemos podido quitar la cuenta.",
-    "ACCOUNTS_CLIENT_005": "No hemos podido cargar el uso de tokens."
+    "ACCOUNTS_CLIENT_005": "No hemos podido cargar el uso de tokens.",
+    "ACCOUNTS_CLIENT_006": "No hemos podido añadir la suscripción.",
+    "ACCOUNTS_CLIENT_007": "No hemos podido registrar el uso."
   }
 }

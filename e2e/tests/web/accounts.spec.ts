@@ -139,3 +139,44 @@ test('in a browser, adding a subscription says the desktop app signs it in', asy
 
   await api.dispose();
 });
+
+test('a Z.AI Coding Plan is added by hand and its usage recorded', async ({ page }) => {
+  const { user, api } = await provisionedUser('zaiadd');
+  await syncTwoAccounts(api);
+  await signInAs(page, user);
+
+  // Works in a browser too: there is nothing to sign in to on the machine.
+  await page.goto('/accounts');
+  await page.getByRole('button', { name: 'Add subscription' }).click();
+  await page.getByRole('button', { name: /Z\.AI/ }).click();
+  await expect(page.getByText('No API key needed')).toBeVisible();
+
+  // Pro has no published price, so the form asks for the one paid.
+  await page.getByLabel('Name', { exact: true }).fill('GLM side project');
+  await page.locator('#add-manual-account-plan').click();
+  await page.getByRole('option', { name: /^Pro/ }).click();
+  await expect(page.getByText('Z.AI does not publish this tier’s price')).toBeVisible();
+  await page.getByLabel('Monthly price (USD)').fill('72');
+  await page.getByLabel('Renews on day of month').fill('9');
+  await page.getByRole('button', { name: 'Add subscription' }).last().click();
+  await expect(page.getByText('Subscription added')).toBeVisible();
+
+  await reloadFromServer(page);
+  await page.goto('/accounts/zai');
+  await expect(page.getByText('GLM side project').first()).toBeVisible();
+  // No terminal switch for a plan with no login on the machine.
+  await expect(page.getByRole('button', { name: 'Use', exact: true })).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Record', exact: true }).click();
+  await page.getByLabel('Weekly allowance used (%)').fill('35');
+  await page.getByRole('button', { name: 'Record', exact: true }).last().click();
+  await expect(page.getByText('Usage recorded')).toBeVisible();
+
+  await reloadFromServer(page);
+  await page.goto('/accounts');
+  await expect(page.getByText('Z.AI · Pro').first()).toBeVisible();
+  await expect(page.getByText('$72').first()).toBeVisible();
+  await expect(page.getByText('recorded by you').first()).toBeVisible();
+
+  await api.dispose();
+});

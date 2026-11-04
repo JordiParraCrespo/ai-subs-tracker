@@ -1,4 +1,4 @@
-import type { ProviderId } from '@flama/shared/subscriptions';
+import type { LocalProviderId } from '@flama/shared/subscriptions';
 import { claudeCodeProvider } from './claude-code';
 import { codexProvider } from './codex';
 import type { CodingAgentProvider } from './types';
@@ -7,7 +7,7 @@ import type { CodingAgentProvider } from './types';
 export function defineProviders(
   providers: readonly CodingAgentProvider[],
 ): readonly CodingAgentProvider[] {
-  const seen = new Set<ProviderId>();
+  const seen = new Set<LocalProviderId>();
   for (const provider of providers) {
     if (seen.has(provider.id)) throw new Error(`Duplicate coding-agent provider "${provider.id}"`);
     seen.add(provider.id);
@@ -21,6 +21,6 @@ export const PROVIDERS: readonly CodingAgentProvider[] = defineProviders([
   codexProvider,
 ]);
 
-export function getProvider(id: ProviderId): CodingAgentProvider | undefined {
+export function getProvider(id: LocalProviderId): CodingAgentProvider | undefined {
   return PROVIDERS.find((provider) => provider.id === id);
 }

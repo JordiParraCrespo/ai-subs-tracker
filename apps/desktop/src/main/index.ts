@@ -4,7 +4,7 @@ import { homedir, hostname } from 'node:os';
 import { join, resolve } from 'node:path';
 import { DESKTOP_CHANNELS, type LiveFeedTarget } from '@flama/shared/desktop';
 import { syncAccountsSchema } from '@flama/shared/schemas/accounts';
-import { PROVIDER_IDS, type ProviderId } from '@flama/shared/subscriptions';
+import { LOCAL_PROVIDER_IDS, type LocalProviderId } from '@flama/shared/subscriptions';
 import {
   getProvider,
   nodeProviderEnv,
@@ -137,8 +137,8 @@ async function main(): Promise<void> {
   });
 
   const readPointers = async () => {
-    const out: Partial<Record<ProviderId, string>> = {};
-    for (const id of PROVIDER_IDS) out[id] = await readPointer(home, id);
+    const out: Partial<Record<LocalProviderId, string>> = {};
+    for (const id of LOCAL_PROVIDER_IDS) out[id] = await readPointer(home, id);
     return out;
   };
 

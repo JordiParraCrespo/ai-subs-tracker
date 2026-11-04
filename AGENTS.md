@@ -25,8 +25,15 @@ billing are available as Flama plugins (see [Plugins](#plugins)).
   model prices in `model-prices.ts`. Check the vendors' pricing pages when
   touching them.
 - **A new provider** is a folder in `packages/usage-providers` implementing
-  `CodingAgentProvider`, its id in `PROVIDER_IDS`, its plans, and a line in the
-  registry. Nothing in the API or the screens should need to change.
+  `CodingAgentProvider`, its id in `LOCAL_PROVIDER_IDS`, its plans, and a line
+  in the registry. Nothing in the API or the screens should need to change.
+  A provider with no login to read and no documented usage API (Z.AI's Coding
+  Plan) is a **manual** one instead: its id in `MANUAL_PROVIDER_IDS`, its
+  plans, no folder. It is added with `POST /v1/accounts`, its usage recorded
+  with `POST /v1/accounts/:id/usage`, it is never synced and never activated
+  for terminals, and it holds no credential. Never invent a price or an
+  endpoint the vendor does not document: a tier without a published price has
+  `monthlyPriceCents: null` and the account carries the price paid.
 - **The desktop bridge** (`window.resetowl`, typed in
   `packages/shared/src/desktop/bridge.ts`) is the only way the screens reach
   the machine; in a browser it is absent and local features are not offered.

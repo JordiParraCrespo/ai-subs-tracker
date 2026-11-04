@@ -7,6 +7,10 @@ import { ActivateAccountCommandHandler } from './commands/activate-account/activ
 import { ActivateAccountHttpController } from './commands/activate-account/activate-account.http.controller';
 import { ArchiveAccountCommandHandler } from './commands/archive-account/archive-account.command-handler';
 import { ArchiveAccountHttpController } from './commands/archive-account/archive-account.http.controller';
+import { CreateAccountCommandHandler } from './commands/create-account/create-account.command-handler';
+import { CreateAccountHttpController } from './commands/create-account/create-account.http.controller';
+import { RecordAccountUsageCommandHandler } from './commands/record-account-usage/record-account-usage.command-handler';
+import { RecordAccountUsageHttpController } from './commands/record-account-usage/record-account-usage.http.controller';
 import { SyncAccountsCommandHandler } from './commands/sync-accounts/sync-accounts.command-handler';
 import { SyncAccountsHttpController } from './commands/sync-accounts/sync-accounts.http.controller';
 import { UpdateAccountCommandHandler } from './commands/update-account/update-account.command-handler';
@@ -26,14 +30,18 @@ const httpControllers = [
   FindAccountsHttpController,
   GetUsageSummaryHttpController,
   SyncAccountsHttpController,
+  CreateAccountHttpController,
   UpdateAccountHttpController,
   ActivateAccountHttpController,
+  RecordAccountUsageHttpController,
   ArchiveAccountHttpController,
 ];
 
 const commandHandlers: Provider[] = [
   SyncAccountsCommandHandler,
+  CreateAccountCommandHandler,
   UpdateAccountCommandHandler,
+  RecordAccountUsageCommandHandler,
   ActivateAccountCommandHandler,
   ArchiveAccountCommandHandler,
 ];
@@ -42,7 +50,7 @@ const queryHandlers: Provider[] = [FindAccountsQueryHandler, GetUsageSummaryQuer
 
 /**
  * The coding-agent accounts a person tracks: what the desktop collector
- * syncs, and what the overview, accounts, tokenmaxx and usage screens read.
+ * syncs, the subscriptions added by hand (Z.AI), and what the overview, accounts, tokenmaxx and usage screens read.
  */
 @Module({
   imports: [

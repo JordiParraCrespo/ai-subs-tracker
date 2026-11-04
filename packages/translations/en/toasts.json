@@ -6,5 +6,7 @@
   "twoFactorEnabled": "Two-factor authentication is on.",
   "twoFactorDisabled": "Two-factor authentication is off.",
   "accountAdded": "Account added",
-  "accountSaved": "Account saved"
+  "accountSaved": "Account saved",
+  "subscriptionAdded": "Subscription added",
+  "usageRecorded": "Usage recorded"
 }

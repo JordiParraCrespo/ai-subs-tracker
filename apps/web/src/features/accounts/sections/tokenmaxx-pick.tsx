@@ -152,15 +152,18 @@ export function TokenmaxxPick() {
           <span className="ds-text-label text-pretty">{reason}</span>
           {pick && (
             <div className="mt-auto flex flex-wrap gap-2">
-              <DsButton
-                variant="primary"
-                size="sm"
-                icon={pick.account.isActive ? <Check {...ICON} /> : <Flame {...ICON} />}
-                disabled={pick.account.isActive || switcher.isPending}
-                onClick={() => switcher.switchTo(pick.account)}
-              >
-                {pick.account.isActive ? t('accounts.tm.inUse') : t('accounts.tm.switch')}
-              </DsButton>
+              {/* A hand-tracked plan has no login for a terminal to switch to. */}
+              {!pick.account.isManual && (
+                <DsButton
+                  variant="primary"
+                  size="sm"
+                  icon={pick.account.isActive ? <Check {...ICON} /> : <Flame {...ICON} />}
+                  disabled={pick.account.isActive || switcher.isPending}
+                  onClick={() => switcher.switchTo(pick.account)}
+                >
+                  {pick.account.isActive ? t('accounts.tm.inUse') : t('accounts.tm.switch')}
+                </DsButton>
+              )}
               <DsButton
                 size="sm"
                 icon={<SkipForward {...ICON} />}

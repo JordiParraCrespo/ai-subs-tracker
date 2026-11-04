@@ -96,7 +96,8 @@ function SelectContent({
         align={align}
         alignOffset={alignOffset}
         alignItemWithTrigger={alignItemWithTrigger}
-        className="isolate z-50"
+        // Above `.ds-modal` (z-index 71): a select inside a dialog opens over it.
+        className="isolate z-80"
       >
         <SelectPrimitive.Popup
           data-slot="select-content"

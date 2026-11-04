@@ -1,6 +1,10 @@
 import { type AccountResponseDto, heyApiSdk } from '@flama/api-client';
 import { MapApiError } from '@flama/frontend-core';
-import type { UpdateAccountInput } from '@flama/shared/schemas/accounts';
+import type {
+  CreateAccountInput,
+  RecordUsageInput,
+  UpdateAccountInput,
+} from '@flama/shared/schemas/accounts';
 import { injectable } from 'inversify';
 import { AccountEntity, type UsageSummary } from './accounts.entity';
 import { AccountsErrors } from './accounts.errors';
@@ -48,6 +52,22 @@ export class AccountsRepository {
   async list(): Promise<AccountEntity[]> {
     const { data } = await heyApiSdk.listAccounts({ throwOnError: true });
     return data.map(toAccount);
+  }
+
+  @MapApiError(AccountsErrors.CREATE_FAILED)
+  async create(input: CreateAccountInput): Promise<AccountEntity> {
+    const { data } = await heyApiSdk.createAccount({ body: input, throwOnError: true });
+    return toAccount(data);
+  }
+
+  @MapApiError(AccountsErrors.RECORD_USAGE_FAILED)
+  async recordUsage(id: string, input: RecordUsageInput): Promise<AccountEntity> {
+    const { data } = await heyApiSdk.recordAccountUsage({
+      path: { id },
+      body: input,
+      throwOnError: true,
+    });
+    return toAccount(data);
   }
 
   @MapApiError(AccountsErrors.UPDATE_FAILED)

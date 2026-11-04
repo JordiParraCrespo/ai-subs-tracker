@@ -45,6 +45,11 @@ export class ActivateAccountHttpController {
   })
   @ApiResponse({ status: 200, type: [AccountResponseDto] })
   @ApiProblemResponse({ status: 404, description: 'Account not found', code: 'ACCOUNT_001' })
+  @ApiProblemResponse({
+    status: 409,
+    description: 'A hand-tracked subscription is not used from a terminal',
+    code: 'ACCOUNT_003',
+  })
   async activate(
     @CurrentUser('id') userId: string,
     @Param('id', ParseUUIDPipe) accountId: string,

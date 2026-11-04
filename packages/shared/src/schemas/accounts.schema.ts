@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import { PROVIDER_IDS } from '../subscriptions/plans';
+import {
+  findPlan,
+  LOCAL_PROVIDER_IDS,
+  MANUAL_PROVIDER_IDS,
+  PROVIDER_IDS,
+} from '../subscriptions/plans';
 
 /**
  * The wire contract between the desktop collector, the API and the screens.
@@ -10,6 +15,10 @@ import { PROVIDER_IDS } from '../subscriptions/plans';
  */
 
 export const providerIdSchema = z.enum(PROVIDER_IDS);
+/** A provider the desktop collector reads; only these arrive by sync. */
+export const localProviderIdSchema = z.enum(LOCAL_PROVIDER_IDS);
+/** A provider a person adds and tracks by hand. */
+export const manualProviderIdSchema = z.enum(MANUAL_PROVIDER_IDS);
 
 /** What a limit window meters; `weekly_model` is a weekly cap on one model family. */
 export const WINDOW_KINDS = ['session', 'weekly', 'weekly_model', 'monthly', 'other'] as const;
@@ -45,8 +54,11 @@ export const SNAPSHOT_STATUSES = [
 ] as const;
 export type SnapshotStatus = (typeof SNAPSHOT_STATUSES)[number];
 
-/** `poll`: the collector asked the provider; `live`: a running session reported it. */
-export const SNAPSHOT_SOURCES = ['poll', 'live'] as const;
+/**
+ * `poll`: the collector asked the provider; `live`: a running session
+ * reported it; `manual`: the person recorded it (providers with no usage API).
+ */
+export const SNAPSHOT_SOURCES = ['poll', 'live', 'manual'] as const;
 export type SnapshotSource = (typeof SNAPSHOT_SOURCES)[number];
 
 export const usageSnapshotSchema = z.object({
@@ -72,7 +84,7 @@ export const dailyTokensSchema = z.object({
 export type DailyTokens = z.infer<typeof dailyTokensSchema>;
 
 export const syncAccountSchema = z.object({
-  provider: providerIdSchema,
+  provider: localProviderIdSchema,
   /** Stable id of the login at the provider (account uuid, ChatGPT account id). */
   externalId: z.string().min(1).max(200),
   email: z.string().max(320).nullable(),
@@ -104,6 +116,55 @@ export const updateAccountSchema = z.object({
 });
 export type UpdateAccountInput = z.infer<typeof updateAccountSchema>;
 
+/**
+ * A subscription the person adds by hand, for a provider ResetOwl cannot read
+ * on the machine (Z.AI). No credential: only what the person would write on a
+ * list of what they pay for. The plan is required (it is what is tracked);
+ * the price is required when the vendor publishes no list price for it.
+ */
+export const createAccountSchema = z
+  .object({
+    provider: manualProviderIdSchema,
+    label: z.string().trim().min(1).max(80),
+    email: z.email().max(320).nullable().optional(),
+    planId: z.string().min(1).max(60),
+    monthlyPriceCents: z.number().int().min(0).max(1_000_000).nullable().optional(),
+    renewalDay: z.number().int().min(1).max(31).nullable().optional(),
+  })
+  .superRefine((input, ctx) => {
+    const plan = findPlan(input.planId);
+    if (plan?.provider !== input.provider) {
+      ctx.addIssue({ code: 'custom', path: ['planId'], params: { i18nKey: 'validation.choice' } });
+      return;
+    }
+    if (plan.monthlyPriceCents === null && (input.monthlyPriceCents ?? null) === null) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['monthlyPriceCents'],
+        // The plan has no published price: the person says what they pay.
+        params: { i18nKey: 'validation.required' },
+      });
+    }
+  });
+export type CreateAccountInput = z.infer<typeof createAccountSchema>;
+
+/**
+ * A usage reading the person copied from the vendor's own usage page, for an
+ * account tracked by hand. Percentages of each window used; `weeklyResetsAt`
+ * is when the vendor says the weekly allowance resets.
+ */
+export const recordUsageSchema = z
+  .object({
+    sessionUtilization: z.number().min(0).max(100).nullable(),
+    weeklyUtilization: z.number().min(0).max(100).nullable(),
+    weeklyResetsAt: z.iso.datetime({ offset: true }).nullable(),
+  })
+  .refine((input) => input.sessionUtilization !== null || input.weeklyUtilization !== null, {
+    path: ['weeklyUtilization'],
+    params: { i18nKey: 'validation.required' },
+  });
+export type RecordUsageInput = z.infer<typeof recordUsageSchema>;
+
 export const usageSummaryQuerySchema = z.object({
   days: z.coerce.number().int().min(1).max(90).default(30),
 });
@@ -129,3 +190,46 @@ export const editAccountFormSchema = z.object({
     .regex(/^([1-9]|[12]\d|3[01])?$/),
 });
 export type EditAccountFormValues = z.infer<typeof editAccountFormSchema>;
+
+const percentField = z
+  .string()
+  .trim()
+  .regex(/^((100(\.0{1,2})?)|(\d{1,2}(\.\d{1,2})?))?$/);
+
+/**
+ * The add-a-subscription form for a manual provider, as typed. An empty
+ * email or renewal day means "not set"; an empty price means the plan's list
+ * price, which a plan without one does not allow.
+ */
+export const addManualAccountFormSchema = z
+  .object({
+    label: z.string().trim().min(1).max(80),
+    email: z.union([z.literal(''), z.email().max(320)]),
+    planId: z.string().min(1).max(60),
+    price: editAccountFormSchema.shape.price,
+    renewalDay: editAccountFormSchema.shape.renewalDay,
+  })
+  .refine((values) => values.price !== '' || findPlan(values.planId)?.monthlyPriceCents != null, {
+    path: ['price'],
+    params: { i18nKey: 'validation.required' },
+  });
+export type AddManualAccountFormValues = z.infer<typeof addManualAccountFormSchema>;
+
+/**
+ * The record-usage form as typed: percentages 0–100 (empty skips the window)
+ * and the weekly reset as a local `datetime-local` value (empty: unknown).
+ */
+export const recordUsageFormSchema = z
+  .object({
+    session: percentField,
+    weekly: percentField,
+    weeklyResetsAt: z
+      .string()
+      .trim()
+      .regex(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})?$/),
+  })
+  .refine((values) => values.session !== '' || values.weekly !== '', {
+    path: ['weekly'],
+    params: { i18nKey: 'validation.required' },
+  });
+export type RecordUsageFormValues = z.infer<typeof recordUsageFormSchema>;

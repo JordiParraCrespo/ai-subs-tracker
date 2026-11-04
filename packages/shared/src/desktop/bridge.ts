@@ -1,4 +1,4 @@
-import type { ProviderId } from '../subscriptions/plans';
+import type { LocalProviderId } from '../subscriptions/plans';
 
 /**
  * The contract between the ResetOwl desktop shell (`apps/desktop`, Electron)
@@ -14,7 +14,7 @@ import type { ProviderId } from '../subscriptions/plans';
 
 /** A login the collector found on this machine. */
 export interface LocalLogin {
-  provider: ProviderId;
+  provider: LocalProviderId;
   externalId: string;
   email: string | null;
   /** The config folder (`~/.claude`) or Codex home it lives in. */
@@ -89,7 +89,7 @@ export interface DesktopBridge {
      * Signs a new account into its own folder by running the provider's CLI
      * login; resolves when the CLI exits. One login runs at a time.
      */
-    addLogin(provider: ProviderId): Promise<AddLoginResult>;
+    addLogin(provider: LocalProviderId): Promise<AddLoginResult>;
     /** What the running login printed: its link and, for Codex, its code. */
     onLoginProgress(listener: (progress: LoginProgress) => void): () => void;
     /** Types a code the person pasted into the running login's prompt. */
@@ -97,7 +97,7 @@ export interface DesktopBridge {
     /** Stops the running login; `addLogin` then resolves as cancelled. */
     cancelLogin(): Promise<void>;
     /** Points terminals at the login with this provider and external id. */
-    activate(provider: ProviderId, externalId: string): Promise<void>;
+    activate(provider: LocalProviderId, externalId: string): Promise<void>;
   };
   shell: {
     integration(): Promise<ShellIntegration>;

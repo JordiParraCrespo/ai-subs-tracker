@@ -46,13 +46,17 @@ export function EditAccountForm({
     resolver: useZodResolver(editAccountFormSchema),
     defaultValues: {
       label: account.label ?? '',
-      planId: account.planOverridden ? (account.planId ?? AUTO_PLAN) : AUTO_PLAN,
+      planId:
+        account.planOverridden || account.isManual ? (account.planId ?? AUTO_PLAN) : AUTO_PLAN,
       price: account.priceOverridden ? (account.monthlyPriceCents / 100).toFixed(2) : '',
       renewalDay: account.renewalDay === null ? '' : String(account.renewalDay),
     },
   });
+  // A hand-tracked plan has no reported one to fall back on.
   const planLabels: Record<string, string> = {
-    [AUTO_PLAN]: t('accounts.edit.planAuto', { plan: account.reportedPlan ?? '—' }),
+    ...(account.isManual
+      ? {}
+      : { [AUTO_PLAN]: t('accounts.edit.planAuto', { plan: account.reportedPlan ?? '—' }) }),
     ...Object.fromEntries(plans.map((plan) => [plan.id, plan.name])),
   };
 

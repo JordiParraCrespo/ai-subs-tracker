@@ -4,7 +4,11 @@ import type {
   SnapshotSource,
   SnapshotStatus,
 } from '@flama/shared/schemas/accounts';
-import type { ProviderId, RankableAccount } from '@flama/shared/subscriptions';
+import {
+  isManualProvider,
+  type ProviderId,
+  type RankableAccount,
+} from '@flama/shared/subscriptions';
 
 export interface WeeklyPeak {
   resetsAt: Date;
@@ -56,6 +60,14 @@ export class AccountEntity implements RankableAccount {
 
   get windows(): readonly LimitWindow[] {
     return this.latest?.windows ?? [];
+  }
+
+  /**
+   * Added and tracked by hand (Z.AI): usage is what the person records, and no
+   * terminal switches to it, since there is no login on the machine.
+   */
+  get isManual(): boolean {
+    return isManualProvider(this.provider);
   }
 
   window(kind: LimitWindow['kind']): LimitWindow | undefined {

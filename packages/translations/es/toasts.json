@@ -6,5 +6,7 @@
   "twoFactorEnabled": "La verificación en dos pasos está activada.",
   "twoFactorDisabled": "La verificación en dos pasos está desactivada.",
   "accountAdded": "Cuenta añadida",
-  "accountSaved": "Cuenta guardada"
+  "accountSaved": "Cuenta guardada",
+  "subscriptionAdded": "Suscripción añadida",
+  "usageRecorded": "Uso registrado"
 }

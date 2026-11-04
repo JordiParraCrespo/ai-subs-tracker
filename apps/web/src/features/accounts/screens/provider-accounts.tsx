@@ -1,7 +1,7 @@
 import { DsButton } from '@flama/design-system-web';
 import { ArrowLeft } from '@flama/design-system-web/icons';
 import { PageHead } from '@flama/frontend-web';
-import type { ProviderId } from '@flama/shared/subscriptions';
+import { isManualProvider, type ProviderId } from '@flama/shared/subscriptions';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { PROVIDER_NAMES } from '../lib/providers';
@@ -25,7 +25,7 @@ export function ProviderAccountsScreen({ provider }: { provider: ProviderId }) {
       <PageHead
         className="mb-0"
         title={t('accounts.group.title', { provider: PROVIDER_NAMES[provider] })}
-        sub={t('accounts.group.sub')}
+        sub={t(isManualProvider(provider) ? 'accounts.group.subManual' : 'accounts.group.sub')}
       />
       <ProviderAccounts provider={provider} />
     </div>

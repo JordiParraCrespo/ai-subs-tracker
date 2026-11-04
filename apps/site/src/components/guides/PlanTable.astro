@@ -2,7 +2,8 @@
 /**
  * A vendor's plans from the catalog (`@flama/shared/subscriptions`), so a
  * rename or a new price there reaches every page that shows it. Enterprise is
- * priced by each vendor's sales team and left out.
+ * priced by each vendor's sales team and left out; a tier whose vendor
+ * publishes no price says so rather than showing one.
  */
 import { PROVIDER_LABELS, type ProviderId, plansFor } from '@flama/shared/subscriptions';
 
@@ -38,9 +39,11 @@ const team = (id: string) => id.includes('team') || id.includes('business');
           <tr>
             <th scope="row">{plan.name}</th>
             <td>
-              {plan.monthlyPriceCents === 0
-                ? t('table.free')
-                : `${dollars(plan.monthlyPriceCents / 100, locale)}${t(team(plan.id) ? 'table.perSeat' : 'table.perMonth')}`}
+              {plan.monthlyPriceCents === null
+                ? t('table.unpublished')
+                : plan.monthlyPriceCents === 0
+                  ? t('table.free')
+                  : `${dollars(plan.monthlyPriceCents / 100, locale)}${t(team(plan.id) ? 'table.perSeat' : 'table.perMonth')}`}
             </td>
             <td>{t(plan.windows === 'weekly' ? 'table.weeklyOnly' : 'table.sessionWeekly')}</td>
           </tr>
