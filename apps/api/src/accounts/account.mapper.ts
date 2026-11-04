@@ -1,7 +1,9 @@
 import type { Mapper } from '@flama/backend-ddd';
 import type {
+  CreateAccountInput,
   DailyTokens,
   LimitWindow,
+  RecordUsageInput,
   SyncAccount,
   UsageSnapshot,
 } from '@flama/shared/schemas/accounts';
@@ -11,7 +13,8 @@ import { AccountOrmEntity } from './database/account.orm-entity';
 import { TokenUsageDailyOrmEntity } from './database/token-usage-daily.orm-entity';
 import type { AccountDailyTokens, WeeklyPeak } from './database/usage.repository.port';
 import { UsageSnapshotOrmEntity } from './database/usage-snapshot.orm-entity';
-import { AccountEntity, type Sighting } from './domain/account.entity';
+import { AccountEntity, type ManualAccountInput, type Sighting } from './domain/account.entity';
+import type { ManualUsage } from './domain/manual-usage.factory';
 import { AccountResponseDto, UsageSnapshotResponseDto } from './dtos/account.response.dto';
 import type {
   TokenTotalsResponseDto,
@@ -139,6 +142,28 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
       reportedPlan: input.reportedPlan,
       location: input.location,
       at,
+    };
+  }
+
+  /** The create request, with its optional fields made explicit: absent means not set. */
+  toManualAccountInput(userId: string, body: CreateAccountInput): ManualAccountInput {
+    return {
+      userId,
+      provider: body.provider,
+      label: body.label,
+      email: body.email ?? null,
+      planId: body.planId,
+      monthlyPriceCents: body.monthlyPriceCents ?? null,
+      renewalDay: body.renewalDay ?? null,
+    };
+  }
+
+  /** A recorded reading as the domain takes it: the weekly reset as an instant. */
+  toManualUsage(body: RecordUsageInput): ManualUsage {
+    return {
+      sessionUtilization: body.sessionUtilization,
+      weeklyUtilization: body.weeklyUtilization,
+      weeklyResetsAt: body.weeklyResetsAt ? new Date(body.weeklyResetsAt) : null,
     };
   }
 

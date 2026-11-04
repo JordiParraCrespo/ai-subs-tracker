@@ -34,7 +34,7 @@ export class RecordAccountUsageCommandHandler
     if (found.isNone()) throw new AppError(AccountErrors.NOT_FOUND);
     const account = found.unwrap();
     if (!account.isManual) throw new AppError(AccountErrors.USAGE_READ_AUTOMATICALLY);
-    const snapshot = manualSnapshot(command, new Date());
+    const snapshot = manualSnapshot(command.usage, new Date());
     await this.usage.recordSnapshot(account.id, snapshot, SNAPSHOT_RETENTION_DAYS);
     return account.id;
   }

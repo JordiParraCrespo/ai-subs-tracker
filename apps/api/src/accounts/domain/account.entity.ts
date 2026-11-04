@@ -46,6 +46,17 @@ export interface Sighting {
   at: Date;
 }
 
+/** What a person gives to add a subscription by hand. */
+export interface ManualAccountInput {
+  userId: string;
+  provider: ManualProviderId;
+  label: string;
+  email: string | null;
+  planId: string;
+  monthlyPriceCents: number | null;
+  renewalDay: number | null;
+}
+
 export interface AccountEdit {
   label?: string | null;
   planId?: string | null;
@@ -93,18 +104,7 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
    * the plan is the person's choice, so it is stored as chosen. Never seen by
    * a collector, so `lastSyncedAt` stays null.
    */
-  static addManual(
-    id: string,
-    input: {
-      userId: string;
-      provider: ManualProviderId;
-      label: string;
-      email: string | null;
-      planId: string;
-      monthlyPriceCents: number | null;
-      renewalDay: number | null;
-    },
-  ): AccountEntity {
+  static addManual(id: string, input: ManualAccountInput): AccountEntity {
     const plan = findPlan(input.planId);
     if (plan?.provider !== input.provider) {
       throw new ArgumentInvalidException(`Plan ${input.planId} is not a ${input.provider} plan`);

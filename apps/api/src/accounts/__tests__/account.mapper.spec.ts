@@ -37,3 +37,29 @@ describe('AccountMapper.toUsageSummary', () => {
     expect(summary.rows.reduce((total, r) => total + r.input, 0)).toBe(summary.totals.input);
   });
 });
+
+describe('AccountMapper: hand-tracked accounts', () => {
+  const mapper = new AccountMapper();
+
+  it('makes a create request’s absent fields explicit, and carries nothing else', () => {
+    expect(
+      mapper.toManualAccountInput('user-1', { provider: 'zai', label: 'GLM', planId: 'zai-lite' }),
+    ).toEqual({
+      userId: 'user-1',
+      provider: 'zai',
+      label: 'GLM',
+      email: null,
+      planId: 'zai-lite',
+      monthlyPriceCents: null,
+      renewalDay: null,
+    });
+  });
+
+  it('reads the weekly reset as an instant, and leaves an unknown one unknown', () => {
+    const usage = { sessionUtilization: 10, weeklyUtilization: null };
+    expect(mapper.toManualUsage({ ...usage, weeklyResetsAt: '2026-11-09T08:00:00+01:00' })).toEqual(
+      { ...usage, weeklyResetsAt: new Date('2026-11-09T07:00:00Z') },
+    );
+    expect(mapper.toManualUsage({ ...usage, weeklyResetsAt: null }).weeklyResetsAt).toBeNull();
+  });
+});

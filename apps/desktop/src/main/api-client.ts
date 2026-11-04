@@ -1,5 +1,6 @@
 import type {
   LimitWindow,
+  SnapshotSource,
   SnapshotStatus,
   SyncAccountsInput,
 } from '@flama/shared/schemas/accounts';
@@ -18,7 +19,13 @@ export interface SyncedAccount {
   externalId: string;
   displayName: string;
   isActive: boolean;
-  latest: { status: SnapshotStatus; windows: LimitWindow[] } | null;
+  latest: {
+    status: SnapshotStatus;
+    windows: LimitWindow[];
+    /** Where the reading came from and when; the tray drops a hand-recorded one once it expires. */
+    source?: SnapshotSource;
+    capturedAt?: string;
+  } | null;
 }
 
 export type SyncResult =

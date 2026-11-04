@@ -13,7 +13,7 @@ function setup() {
   };
 }
 
-const input = {
+const base = {
   userId: 'user-1',
   provider: 'zai' as const,
   label: 'Side project',
@@ -27,7 +27,7 @@ describe('CreateAccountCommandHandler', () => {
   it('adds a Z.AI subscription with the plan and billing day the person gave', async () => {
     const { repo, handler } = setup();
 
-    const id = await handler.execute(new CreateAccountCommand(input));
+    const id = await handler.execute(new CreateAccountCommand({ input: base }));
 
     const saved = repo.insert.mock.calls[0][0] as AccountEntity;
     expect(saved.id).toBe(id);
@@ -46,12 +46,12 @@ describe('CreateAccountCommandHandler', () => {
   it('refuses a tier without a published price unless the person gives one', async () => {
     const { repo, handler } = setup();
     await expect(
-      handler.execute(new CreateAccountCommand({ ...input, planId: 'zai-pro' })),
+      handler.execute(new CreateAccountCommand({ input: { ...base, planId: 'zai-pro' } })),
     ).rejects.toBeInstanceOf(ArgumentInvalidException);
     expect(repo.insert).not.toHaveBeenCalled();
 
     await handler.execute(
-      new CreateAccountCommand({ ...input, planId: 'zai-pro', monthlyPriceCents: 7200 }),
+      new CreateAccountCommand({ input: { ...base, planId: 'zai-pro', monthlyPriceCents: 7200 } }),
     );
     expect((repo.insert.mock.calls[0][0] as AccountEntity).effectivePriceCents).toBe(7200);
   });
@@ -59,7 +59,7 @@ describe('CreateAccountCommandHandler', () => {
   it('refuses another provider’s plan', async () => {
     const { handler } = setup();
     await expect(
-      handler.execute(new CreateAccountCommand({ ...input, planId: 'claude-pro' })),
+      handler.execute(new CreateAccountCommand({ input: { ...base, planId: 'claude-pro' } })),
     ).rejects.toBeInstanceOf(ArgumentInvalidException);
   });
 });
@@ -70,7 +70,7 @@ describe('editing a hand-tracked account', () => {
   it('keeps a plan, and a price where the plan has no published one', async () => {
     const { repo, handler } = setup();
     await handler.execute(
-      new CreateAccountCommand({ ...input, planId: 'zai-max', monthlyPriceCents: 16000 }),
+      new CreateAccountCommand({ input: { ...base, planId: 'zai-max', monthlyPriceCents: 16000 } }),
     );
     const account = repo.insert.mock.calls[0][0] as AccountEntity;
 

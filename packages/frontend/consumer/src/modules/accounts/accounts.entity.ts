@@ -5,6 +5,7 @@ import type {
   SnapshotStatus,
 } from '@flama/shared/schemas/accounts';
 import {
+  currentWindows,
   isManualProvider,
   type ProviderId,
   type RankableAccount,
@@ -60,6 +61,15 @@ export class AccountEntity implements RankableAccount {
 
   get windows(): readonly LimitWindow[] {
     return this.latest?.windows ?? [];
+  }
+
+  get reading(): RankableAccount['reading'] {
+    return this.latest ? { source: this.latest.source, capturedAt: this.latest.capturedAt } : null;
+  }
+
+  /** A window that still holds at `now`: an expired hand-recorded one is unknown. */
+  currentWindow(kind: LimitWindow['kind'], now: Date): LimitWindow | undefined {
+    return currentWindows(this, now).find((w) => w.kind === kind && w.utilization !== null);
   }
 
   /**

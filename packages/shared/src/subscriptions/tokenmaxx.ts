@@ -1,4 +1,4 @@
-import type { LimitWindow, SnapshotStatus } from '../schemas/accounts.schema';
+import type { LimitWindow, SnapshotSource, SnapshotStatus } from '../schemas/accounts.schema';
 
 /**
  * Tokenmaxx: get the most out of every plan you pay for.
@@ -26,6 +26,8 @@ export interface RankableAccount {
   id: string;
   status: SnapshotStatus | null;
   windows: readonly LimitWindow[];
+  /** Where the windows came from and when; a `manual` reading is never refreshed by a sync. */
+  reading?: { source: SnapshotSource; capturedAt: Date | string } | null;
 }
 
 export interface AccountPace {
@@ -62,9 +64,30 @@ function hoursUntil(iso: string | null, now: Date): number | null {
   return Math.max(0, (new Date(iso).getTime() - now.getTime()) / 3_600_000);
 }
 
+/**
+ * The windows that still describe `now`. A collected reading is replaced
+ * every sync, so it is taken as it is. A reading the person recorded by hand
+ * is not: once a window has reset — or, with no reset given, once a whole
+ * window has passed since it was recorded — what it said no longer holds,
+ * and the window is unknown until a fresh reading.
+ */
+export function currentWindows(account: RankableAccount, now: Date): readonly LimitWindow[] {
+  if (account.reading?.source !== 'manual') return account.windows;
+  const recordedAt = new Date(account.reading.capturedAt).getTime();
+  return account.windows.filter((window) => {
+    const endsAt = window.resetsAt
+      ? new Date(window.resetsAt).getTime()
+      : window.windowMinutes
+        ? recordedAt + window.windowMinutes * 60_000
+        : Number.POSITIVE_INFINITY;
+    return endsAt > now.getTime();
+  });
+}
+
 export function paceOf(account: RankableAccount, now: Date): AccountPace {
-  const weekly = pick(account.windows, 'weekly');
-  const session = pick(account.windows, 'session');
+  const windows = currentWindows(account, now);
+  const weekly = pick(windows, 'weekly');
+  const session = pick(windows, 'session');
   const weeklyUsed = weekly?.utilization ?? null;
   const sessionUsed = session?.utilization ?? null;
   const hoursToReset = hoursUntil(weekly?.resetsAt ?? null, now);

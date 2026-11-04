@@ -43,15 +43,7 @@ export class CreateAccountHttpController {
     @Body() body: CreateAccountRequest,
   ): Promise<AccountResponseDto> {
     const accountId = await this.commandBus.execute<CreateAccountCommand, string>(
-      new CreateAccountCommand({
-        userId,
-        provider: body.provider,
-        label: body.label,
-        email: body.email ?? null,
-        planId: body.planId,
-        monthlyPriceCents: body.monthlyPriceCents ?? null,
-        renewalDay: body.renewalDay ?? null,
-      }),
+      new CreateAccountCommand({ input: this.mapper.toManualAccountInput(userId, body) }),
     );
     const views = await this.queryBus.execute<FindAccountsQuery, AccountView[]>(
       new FindAccountsQuery(userId),

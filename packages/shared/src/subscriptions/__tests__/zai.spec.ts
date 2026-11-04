@@ -12,6 +12,7 @@ import {
   plansFor,
   resolvePlan,
 } from '../plans';
+import { paceOf } from '../tokenmaxx';
 
 describe('Z.AI Coding Plan catalog', () => {
   // Regression: Z.AI documents credits per window (docs.z.ai/devpack/overview);
@@ -130,5 +131,62 @@ describe('recordUsageSchema', () => {
       recordUsageFormSchema.safeParse({ session: '100', weekly: '', weeklyResetsAt: 'tomorrow' })
         .success,
     ).toBe(false);
+  });
+});
+
+describe('a hand-recorded reading over time', () => {
+  const RECORDED = new Date('2026-11-04T10:00:00Z');
+  const hoursLater = (h: number) => new Date(RECORDED.getTime() + h * 3_600_000);
+  const manual = (weeklyResetsAt: string | null) => ({
+    id: 'zai',
+    status: 'ok' as const,
+    reading: { source: 'manual' as const, capturedAt: RECORDED.toISOString() },
+    windows: [
+      {
+        key: 'five_hour',
+        kind: 'session' as const,
+        label: '5-hour',
+        utilization: 100,
+        resetsAt: hoursLater(5).toISOString(),
+        windowMinutes: 300,
+      },
+      {
+        key: 'weekly',
+        kind: 'weekly' as const,
+        label: 'Weekly',
+        utilization: 40,
+        resetsAt: weeklyResetsAt,
+        windowMinutes: 10080,
+      },
+    ],
+  });
+
+  // Regression: no sync ever replaces a manual reading, so a full 5-hour
+  // window kept the account "at limit" forever, and a weekly reading past its
+  // reset stayed the most urgent pick days later.
+  it('forgets a 5-hour reading once its credits have come back', () => {
+    const account = manual(hoursLater(48).toISOString());
+    expect(paceOf(account, hoursLater(1))).toMatchObject({ sessionUsed: 100, status: 'limit' });
+    expect(paceOf(account, hoursLater(6))).toMatchObject({ sessionUsed: null, weeklyUsed: 40 });
+  });
+
+  it('treats the week as unknown once it has reset', () => {
+    const account = manual(hoursLater(24).toISOString());
+    expect(paceOf(account, hoursLater(30))).toMatchObject({
+      weeklyUsed: null,
+      status: 'unknown',
+      usable: false,
+    });
+  });
+
+  it('lets a weekly reading with no reset given last at most a week', () => {
+    const account = manual(null);
+    expect(paceOf(account, hoursLater(24)).weeklyUsed).toBe(40);
+    expect(paceOf(account, hoursLater(24 * 7 + 1)).weeklyUsed).toBeNull();
+  });
+
+  it('leaves a collected reading as it is: the next sync replaces it', () => {
+    const account = { ...manual(hoursLater(24).toISOString()), reading: null };
+    expect(paceOf(account, hoursLater(30)).weeklyUsed).toBe(40);
   });
 });

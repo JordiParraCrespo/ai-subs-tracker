@@ -1,18 +1,15 @@
 import { CommandBase, type CommandProps } from '@flama/backend-ddd';
+import type { ManualUsage } from '../../domain/manual-usage.factory';
 
 export class RecordAccountUsageCommand extends CommandBase {
   readonly userId: string;
   readonly accountId: string;
-  readonly sessionUtilization: number | null;
-  readonly weeklyUtilization: number | null;
-  readonly weeklyResetsAt: Date | null;
+  readonly usage: ManualUsage;
 
   constructor(props: CommandProps<RecordAccountUsageCommand>) {
     super(props);
     this.userId = props.userId;
     this.accountId = props.accountId;
-    this.sessionUtilization = props.sessionUtilization;
-    this.weeklyUtilization = props.weeklyUtilization;
-    this.weeklyResetsAt = props.weeklyResetsAt;
+    this.usage = props.usage;
   }
 }

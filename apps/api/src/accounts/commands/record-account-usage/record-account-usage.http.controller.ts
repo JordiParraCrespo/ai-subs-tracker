@@ -62,9 +62,7 @@ export class RecordAccountUsageHttpController {
       new RecordAccountUsageCommand({
         userId,
         accountId,
-        sessionUtilization: body.sessionUtilization,
-        weeklyUtilization: body.weeklyUtilization,
-        weeklyResetsAt: body.weeklyResetsAt ? new Date(body.weeklyResetsAt) : null,
+        usage: this.mapper.toManualUsage(body),
       }),
     );
     const views = await this.queryBus.execute<FindAccountsQuery, AccountView[]>(

@@ -22,15 +22,7 @@ export class CreateAccountCommandHandler
   ) {}
 
   async execute(command: CreateAccountCommand): Promise<AggregateID> {
-    const account = AccountEntity.addManual(randomUUID(), {
-      userId: command.userId,
-      provider: command.provider,
-      label: command.label,
-      email: command.email,
-      planId: command.planId,
-      monthlyPriceCents: command.monthlyPriceCents,
-      renewalDay: command.renewalDay,
-    });
+    const account = AccountEntity.addManual(randomUUID(), command.input);
     await this.accounts.insert(account);
     return account.id;
   }

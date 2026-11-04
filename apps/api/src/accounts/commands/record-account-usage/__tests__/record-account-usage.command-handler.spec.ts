@@ -44,9 +44,11 @@ function setup(account: AccountEntity | null) {
 const reading = {
   userId: 'user-1',
   accountId: 'a1',
-  sessionUtilization: 30,
-  weeklyUtilization: 55,
-  weeklyResetsAt: new Date('2026-11-09T08:00:00Z'),
+  usage: {
+    sessionUtilization: 30,
+    weeklyUtilization: 55,
+    weeklyResetsAt: new Date('2026-11-09T08:00:00Z'),
+  },
 };
 
 describe('RecordAccountUsageCommandHandler', () => {
