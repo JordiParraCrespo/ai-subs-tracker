@@ -1050,6 +1050,60 @@
         ],
         "summary": "List my coding-agent accounts with their latest limits",
         "tags": ["Accounts"]
+      },
+      "post": {
+        "description": "For providers ResetOwl cannot read on the machine (Z.AI Coding Plan). Takes no credential.",
+        "operationId": "createAccount",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAccountRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add a subscription tracked by hand",
+        "tags": ["Accounts"]
       }
     },
     "/api/v1/accounts/usage": {
@@ -1354,6 +1408,16 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "ACCOUNT_003 — A hand-tracked subscription is not used from a terminal",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1362,6 +1426,91 @@
           }
         ],
         "summary": "Make this the account terminals use for its provider",
+        "tags": ["Accounts"]
+      }
+    },
+    "/api/v1/accounts/{id}/usage": {
+      "post": {
+        "description": "Percent of the 5-hour and weekly allowances used, as the vendor’s usage page shows them.",
+        "operationId": "recordAccountUsage",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordAccountUsageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ACCOUNT_001 — Account not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ACCOUNT_002 — The account’s usage is read from the machine",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Record a usage reading for a subscription tracked by hand",
         "tags": ["Accounts"]
       }
     },
@@ -2600,7 +2749,7 @@
           },
           "source": {
             "type": "string",
-            "enum": ["poll", "live"]
+            "enum": ["poll", "live", "manual"]
           },
           "status": {
             "type": "string",
@@ -2650,7 +2799,7 @@
           },
           "provider": {
             "type": "string",
-            "enum": ["claude-code", "codex"]
+            "enum": ["claude-code", "codex", "zai"]
           },
           "externalId": {
             "type": "string"
@@ -3048,7 +3197,7 @@
                     },
                     "source": {
                       "type": "string",
-                      "enum": ["poll", "live"]
+                      "enum": ["poll", "live", "manual"]
                     },
                     "status": {
                       "type": "string",
@@ -3218,6 +3367,45 @@
         },
         "required": ["device", "accounts"]
       },
+      "CreateAccountRequest": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": ["zai"]
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 320,
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+            "nullable": true
+          },
+          "planId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "monthlyPriceCents": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000,
+            "nullable": true
+          },
+          "renewalDay": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 31,
+            "nullable": true
+          }
+        },
+        "required": ["provider", "label", "planId"]
+      },
       "UpdateAccountRequest": {
         "type": "object",
         "properties": {
@@ -3246,6 +3434,30 @@
             "nullable": true
           }
         }
+      },
+      "RecordAccountUsageRequest": {
+        "type": "object",
+        "properties": {
+          "sessionUtilization": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "nullable": true
+          },
+          "weeklyUtilization": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "nullable": true
+          },
+          "weeklyResetsAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+            "nullable": true
+          }
+        },
+        "required": ["sessionUtilization", "weeklyUtilization", "weeklyResetsAt"]
       },
       "RoleResponseDto": {
         "type": "object",

@@ -5,7 +5,7 @@ import {
   type LiveFeedTarget,
   type ShellIntegration,
 } from '@flama/shared/desktop';
-import type { ProviderId } from '@flama/shared/subscriptions';
+import type { LocalProviderId } from '@flama/shared/subscriptions';
 import type { IpcMainInvokeEvent } from 'electron';
 import {
   isTrustedSender,
@@ -30,10 +30,10 @@ export interface DesktopServices {
   setToken(token: string | null): Promise<void>;
   collectorStatus(): CollectorStatus;
   collectorRefresh(): Promise<CollectorStatus>;
-  addLogin(provider: ProviderId): Promise<AddLoginResult>;
+  addLogin(provider: LocalProviderId): Promise<AddLoginResult>;
   submitLoginCode(code: string): void;
   cancelLogin(): void;
-  activate(provider: ProviderId, externalId: string): Promise<void>;
+  activate(provider: LocalProviderId, externalId: string): Promise<void>;
   shellIntegration(): Promise<ShellIntegration>;
   shellInstall(): Promise<ShellIntegration>;
   liveFeedTargets(): Promise<LiveFeedTarget[]>;

@@ -1,7 +1,7 @@
 import { toast } from '@flama/design-system-web';
 import { desktopBridge } from '@flama/frontend-web';
 import type { LoginProgress } from '@flama/shared/desktop';
-import type { ProviderId } from '@flama/shared/subscriptions';
+import type { LocalProviderId } from '@flama/shared/subscriptions';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -17,7 +17,7 @@ const NOTHING_YET: LoginProgress = { link: null, code: null };
 export function useAddLogin({ onAdded, onFailed }: { onAdded: () => void; onFailed: () => void }) {
   const { t } = useTranslation();
   const [progress, setProgress] = useState<LoginProgress>(NOTHING_YET);
-  const [running, setRunning] = useState<ProviderId | null>(null);
+  const [running, setRunning] = useState<LocalProviderId | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   // Which start a result belongs to: a login stopped by Back resolves later,
@@ -36,7 +36,7 @@ export function useAddLogin({ onAdded, onFailed }: { onAdded: () => void; onFail
     [],
   );
 
-  const start = async (provider: ProviderId) => {
+  const start = async (provider: LocalProviderId) => {
     const bridge = desktopBridge;
     if (!bridge) return;
     const mine = ++generation.current;

@@ -4,7 +4,12 @@ import type {
   SnapshotSource,
   SnapshotStatus,
 } from '@flama/shared/schemas/accounts';
-import type { ProviderId, RankableAccount } from '@flama/shared/subscriptions';
+import {
+  currentWindows,
+  isManualProvider,
+  type ProviderId,
+  type RankableAccount,
+} from '@flama/shared/subscriptions';
 
 export interface WeeklyPeak {
   resetsAt: Date;
@@ -56,6 +61,23 @@ export class AccountEntity implements RankableAccount {
 
   get windows(): readonly LimitWindow[] {
     return this.latest?.windows ?? [];
+  }
+
+  get reading(): RankableAccount['reading'] {
+    return this.latest ? { source: this.latest.source, capturedAt: this.latest.capturedAt } : null;
+  }
+
+  /** A window that still holds at `now`: an expired hand-recorded one is unknown. */
+  currentWindow(kind: LimitWindow['kind'], now: Date): LimitWindow | undefined {
+    return currentWindows(this, now).find((w) => w.kind === kind && w.utilization !== null);
+  }
+
+  /**
+   * Added and tracked by hand (Z.AI): usage is what the person records, and no
+   * terminal switches to it, since there is no login on the machine.
+   */
+  get isManual(): boolean {
+    return isManualProvider(this.provider);
   }
 
   window(kind: LimitWindow['kind']): LimitWindow | undefined {

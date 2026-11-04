@@ -247,7 +247,7 @@ export type ExtraUsageResponseDto = {
 
 export type UsageSnapshotResponseDto = {
     capturedAt: string;
-    source: 'poll' | 'live';
+    source: 'poll' | 'live' | 'manual';
     status: 'ok' | 'auth_expired' | 'no_credentials' | 'rate_limited' | 'error';
     message: string | null;
     windows: Array<LimitWindowResponseDto>;
@@ -264,7 +264,7 @@ export type WeeklyPeakResponseDto = {
 
 export type AccountResponseDto = {
     id: string;
-    provider: 'claude-code' | 'codex';
+    provider: 'claude-code' | 'codex' | 'zai';
     externalId: string;
     /**
      * The person's label, else the email
@@ -406,7 +406,7 @@ export type SyncAccountsRequest = {
         location: string | null;
         snapshot: {
             capturedAt: string;
-            source: 'poll' | 'live';
+            source: 'poll' | 'live' | 'manual';
             status: 'ok' | 'auth_expired' | 'no_credentials' | 'rate_limited' | 'error';
             message: string | null;
             windows: Array<{
@@ -437,11 +437,26 @@ export type SyncAccountsRequest = {
     }>;
 };
 
+export type CreateAccountRequest = {
+    provider: 'zai';
+    label: string;
+    email?: string | null;
+    planId: string;
+    monthlyPriceCents?: number | null;
+    renewalDay?: number | null;
+};
+
 export type UpdateAccountRequest = {
     label?: string | null;
     planId?: string | null;
     monthlyPriceCents?: number | null;
     renewalDay?: number | null;
+};
+
+export type RecordAccountUsageRequest = {
+    sessionUtilization: number | null;
+    weeklyUtilization: number | null;
+    weeklyResetsAt: string | null;
 };
 
 export type RoleResponseDto = {
@@ -1117,6 +1132,32 @@ export type ListAccountsResponses = {
 
 export type ListAccountsResponse = ListAccountsResponses[keyof ListAccountsResponses];
 
+export type CreateAccountData = {
+    body: CreateAccountRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/accounts';
+};
+
+export type CreateAccountErrors = {
+    /**
+     * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
+     */
+    401: ProblemDetailsDto;
+    /**
+     * AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this
+     */
+    403: ProblemDetailsDto;
+};
+
+export type CreateAccountError = CreateAccountErrors[keyof CreateAccountErrors];
+
+export type CreateAccountResponses = {
+    201: AccountResponseDto;
+};
+
+export type CreateAccountResponse = CreateAccountResponses[keyof CreateAccountResponses];
+
 export type GetUsageSummaryData = {
     body?: never;
     path?: never;
@@ -1257,6 +1298,10 @@ export type ActivateAccountErrors = {
      * ACCOUNT_001 — Account not found
      */
     404: ProblemDetailsDto;
+    /**
+     * ACCOUNT_003 — A hand-tracked subscription is not used from a terminal
+     */
+    409: ProblemDetailsDto;
 };
 
 export type ActivateAccountError = ActivateAccountErrors[keyof ActivateAccountErrors];
@@ -1266,6 +1311,42 @@ export type ActivateAccountResponses = {
 };
 
 export type ActivateAccountResponse = ActivateAccountResponses[keyof ActivateAccountResponses];
+
+export type RecordAccountUsageData = {
+    body: RecordAccountUsageRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/accounts/{id}/usage';
+};
+
+export type RecordAccountUsageErrors = {
+    /**
+     * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
+     */
+    401: ProblemDetailsDto;
+    /**
+     * AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this
+     */
+    403: ProblemDetailsDto;
+    /**
+     * ACCOUNT_001 — Account not found
+     */
+    404: ProblemDetailsDto;
+    /**
+     * ACCOUNT_002 — The account’s usage is read from the machine
+     */
+    409: ProblemDetailsDto;
+};
+
+export type RecordAccountUsageError = RecordAccountUsageErrors[keyof RecordAccountUsageErrors];
+
+export type RecordAccountUsageResponses = {
+    200: AccountResponseDto;
+};
+
+export type RecordAccountUsageResponse = RecordAccountUsageResponses[keyof RecordAccountUsageResponses];
 
 export type FindAll2Data = {
     body?: never;

@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { ActivateAccountData, ActivateAccountErrors, ActivateAccountResponses, ArchiveAccountData, ArchiveAccountErrors, ArchiveAccountResponses, AssignData, AssignErrors, AssignResponses, CatalogData, CatalogErrors, CatalogResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CheckData, CheckResponses, CreateData, CreateErrors, CreateResponses, DeleteAvatarData, DeleteAvatarErrors, DeleteAvatarResponses, DeploymentCapabilitiesData, DeploymentCapabilitiesResponses, FindAll2Data, FindAll2Errors, FindAll2Responses, FindAllData, FindAllErrors, FindAllResponses, FindOne2Data, FindOne2Errors, FindOne2Responses, FindOneData, FindOneErrors, FindOneResponses, FindSessionsData, FindSessionsErrors, FindSessionsResponses, FindUserRolesData, FindUserRolesErrors, FindUserRolesResponses, GetProfileData, GetProfileErrors, GetProfileResponses, GetSettingsData, GetSettingsErrors, GetSettingsResponses, GetUsageSummaryData, GetUsageSummaryErrors, GetUsageSummaryResponses, ListAccountsData, ListAccountsErrors, ListAccountsResponses, MeData, MeErrors, MeResponses, PermissionsData, PermissionsErrors, PermissionsResponses, ReadinessData, ReadinessErrors, ReadinessResponses, Remove2Data, Remove2Errors, Remove2Responses, RemoveData, RemoveErrors, RemoveResponses, RevokeOtherSessionsData, RevokeOtherSessionsErrors, RevokeOtherSessionsResponses, RevokeSessionData, RevokeSessionErrors, RevokeSessionResponses, SyncAccountsData, SyncAccountsErrors, SyncAccountsResponses, Update2Data, Update2Errors, Update2Responses, UpdateAccountData, UpdateAccountErrors, UpdateAccountResponses, UpdateData, UpdateErrors, UpdatePermissionsData, UpdatePermissionsErrors, UpdatePermissionsResponses, UpdateProfileData, UpdateProfileErrors, UpdateProfileResponses, UpdateResponses, UpdateSettingsData, UpdateSettingsErrors, UpdateSettingsResponses, UploadAvatarData, UploadAvatarErrors, UploadAvatarResponses } from './types.gen';
+import type { ActivateAccountData, ActivateAccountErrors, ActivateAccountResponses, ArchiveAccountData, ArchiveAccountErrors, ArchiveAccountResponses, AssignData, AssignErrors, AssignResponses, CatalogData, CatalogErrors, CatalogResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CheckData, CheckResponses, CreateAccountData, CreateAccountErrors, CreateAccountResponses, CreateData, CreateErrors, CreateResponses, DeleteAvatarData, DeleteAvatarErrors, DeleteAvatarResponses, DeploymentCapabilitiesData, DeploymentCapabilitiesResponses, FindAll2Data, FindAll2Errors, FindAll2Responses, FindAllData, FindAllErrors, FindAllResponses, FindOne2Data, FindOne2Errors, FindOne2Responses, FindOneData, FindOneErrors, FindOneResponses, FindSessionsData, FindSessionsErrors, FindSessionsResponses, FindUserRolesData, FindUserRolesErrors, FindUserRolesResponses, GetProfileData, GetProfileErrors, GetProfileResponses, GetSettingsData, GetSettingsErrors, GetSettingsResponses, GetUsageSummaryData, GetUsageSummaryErrors, GetUsageSummaryResponses, ListAccountsData, ListAccountsErrors, ListAccountsResponses, MeData, MeErrors, MeResponses, PermissionsData, PermissionsErrors, PermissionsResponses, ReadinessData, ReadinessErrors, ReadinessResponses, RecordAccountUsageData, RecordAccountUsageErrors, RecordAccountUsageResponses, Remove2Data, Remove2Errors, Remove2Responses, RemoveData, RemoveErrors, RemoveResponses, RevokeOtherSessionsData, RevokeOtherSessionsErrors, RevokeOtherSessionsResponses, RevokeSessionData, RevokeSessionErrors, RevokeSessionResponses, SyncAccountsData, SyncAccountsErrors, SyncAccountsResponses, Update2Data, Update2Errors, Update2Responses, UpdateAccountData, UpdateAccountErrors, UpdateAccountResponses, UpdateData, UpdateErrors, UpdatePermissionsData, UpdatePermissionsErrors, UpdatePermissionsResponses, UpdateProfileData, UpdateProfileErrors, UpdateProfileResponses, UpdateResponses, UpdateSettingsData, UpdateSettingsErrors, UpdateSettingsResponses, UploadAvatarData, UploadAvatarErrors, UploadAvatarResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -218,6 +218,21 @@ export const listAccounts = <ThrowOnError extends boolean = false>(options?: Opt
 });
 
 /**
+ * Add a subscription tracked by hand
+ *
+ * For providers ResetOwl cannot read on the machine (Z.AI Coding Plan). Takes no credential.
+ */
+export const createAccount = <ThrowOnError extends boolean = false>(options: Options<CreateAccountData, ThrowOnError>): RequestResult<CreateAccountResponses, CreateAccountErrors, ThrowOnError> => (options.client ?? client).post<CreateAccountResponses, CreateAccountErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * Tokens used across my accounts, by model, account and day, priced at API rates
  */
 export const getUsageSummary = <ThrowOnError extends boolean = false>(options?: Options<GetUsageSummaryData, ThrowOnError>): RequestResult<GetUsageSummaryResponses, GetUsageSummaryErrors, ThrowOnError> => (options?.client ?? client).get<GetUsageSummaryResponses, GetUsageSummaryErrors, ThrowOnError>({
@@ -272,6 +287,21 @@ export const activateAccount = <ThrowOnError extends boolean = false>(options: O
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/accounts/{id}/activate',
     ...options
+});
+
+/**
+ * Record a usage reading for a subscription tracked by hand
+ *
+ * Percent of the 5-hour and weekly allowances used, as the vendor’s usage page shows them.
+ */
+export const recordAccountUsage = <ThrowOnError extends boolean = false>(options: Options<RecordAccountUsageData, ThrowOnError>): RequestResult<RecordAccountUsageResponses, RecordAccountUsageErrors, ThrowOnError> => (options.client ?? client).post<RecordAccountUsageResponses, RecordAccountUsageErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts/{id}/usage',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**

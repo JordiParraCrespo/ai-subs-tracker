@@ -9,16 +9,46 @@
  * (what it actually pays), and the catalog price is only the default.
  *
  * Sources: claude.com/pricing and learn.chatgpt.com/docs/pricing, checked
- * 2026-11-02.
+ * 2026-11-02; docs.z.ai/devpack/overview and docs.z.ai/devpack/faq, checked
+ * 2026-11-04.
  */
 
-export const PROVIDER_IDS = ['claude-code', 'codex'] as const;
+/** Providers the desktop collector reads on the machine and a terminal can switch between. */
+export const LOCAL_PROVIDER_IDS = ['claude-code', 'codex'] as const;
+export type LocalProviderId = (typeof LOCAL_PROVIDER_IDS)[number];
+
+/** Providers a person adds in the app and tracks by hand (see `ProviderTracking`). */
+export const MANUAL_PROVIDER_IDS = ['zai'] as const;
+export type ManualProviderId = (typeof MANUAL_PROVIDER_IDS)[number];
+
+export const PROVIDER_IDS = [...LOCAL_PROVIDER_IDS, ...MANUAL_PROVIDER_IDS] as const;
 export type ProviderId = (typeof PROVIDER_IDS)[number];
 
 export const PROVIDER_LABELS: Record<ProviderId, { name: string; vendor: string }> = {
   'claude-code': { name: 'Claude Code', vendor: 'Anthropic' },
   codex: { name: 'Codex', vendor: 'OpenAI' },
+  zai: { name: 'GLM Coding Plan', vendor: 'Z.AI' },
 };
+
+/**
+ * How ResetOwl learns an account's usage.
+ *
+ * - `local`: the desktop collector finds the login on the machine
+ *   (`@flama/usage-providers`) and reads its limits and tokens.
+ * - `manual`: there is no login to find and no documented usage API, so the
+ *   person adds the subscription in the app and records its usage by hand.
+ *   Z.AI's Coding Plan is an API key used inside other tools; Z.AI documents
+ *   no usage endpoint (its usage page is z.ai/manage-apikey/billing).
+ */
+export type ProviderTracking = 'local' | 'manual';
+
+export function providerTracking(id: ProviderId): ProviderTracking {
+  return (MANUAL_PROVIDER_IDS as readonly ProviderId[]).includes(id) ? 'manual' : 'local';
+}
+
+export function isManualProvider(id: ProviderId): id is ManualProviderId {
+  return providerTracking(id) === 'manual';
+}
 
 /** Which limit windows a plan meters; a plan without a 5-hour window only has a weekly one. */
 export type PlanWindows = 'session+weekly' | 'weekly';
@@ -29,11 +59,21 @@ export interface PlanDefinition {
   provider: ProviderId;
   /** The vendor's current name for it. */
   name: string;
-  /** Default monthly price in US cents; an account may override it. */
-  monthlyPriceCents: number;
+  /**
+   * Default monthly price in US cents; an account may override it. Null when
+   * the vendor publishes no list price for the tier, so the person must say
+   * what they pay — never a guessed number.
+   */
+  monthlyPriceCents: number | null;
   windows: PlanWindows;
   /** Usage relative to the provider's entry paid plan, when the vendor states one. */
   multiplier?: number;
+  /**
+   * The allowance per window when the vendor states it as a quantity rather
+   * than a percentage, e.g. Z.AI's credits. Informational: limits are still
+   * tracked as percent used.
+   */
+  allowance?: { session: number; weekly: number; unit: 'credits' };
   /** Names a provider reports for this plan, lower-cased, old names included. */
   aliases: readonly string[];
 }
@@ -174,6 +214,38 @@ export const PLANS: readonly PlanDefinition[] = [
     monthlyPriceCents: 0,
     windows: 'session+weekly',
     aliases: ['enterprise', 'edu'],
+  },
+  // Z.AI — docs.z.ai/devpack/overview. Credits per window are documented for
+  // every tier; the 5-hour credits return 5 hours after they are spent and the
+  // weekly ones reset every 7 days from the order. Only Lite's price is
+  // published there ("starting at 18 USD per month"); Pro and Max have none
+  // in the docs, so their accounts carry the price the person pays.
+  {
+    id: 'zai-lite',
+    provider: 'zai',
+    name: 'Lite',
+    monthlyPriceCents: 1800,
+    windows: 'session+weekly',
+    allowance: { session: 2000, weekly: 10000, unit: 'credits' },
+    aliases: ['lite', 'glm coding lite'],
+  },
+  {
+    id: 'zai-pro',
+    provider: 'zai',
+    name: 'Pro',
+    monthlyPriceCents: null,
+    windows: 'session+weekly',
+    allowance: { session: 12000, weekly: 60000, unit: 'credits' },
+    aliases: ['pro', 'glm coding pro'],
+  },
+  {
+    id: 'zai-max',
+    provider: 'zai',
+    name: 'Max',
+    monthlyPriceCents: null,
+    windows: 'session+weekly',
+    allowance: { session: 28000, weekly: 140000, unit: 'credits' },
+    aliases: ['max', 'glm coding max'],
   },
 ];
 

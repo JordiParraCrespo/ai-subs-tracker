@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { PROVIDER_IDS } from '@flama/shared/subscriptions';
+import { LOCAL_PROVIDER_IDS } from '@flama/shared/subscriptions';
 import { legacyPointerDir, pointerPath } from './pointers';
 
 /**
@@ -49,7 +49,7 @@ export function legacyPointerPath(home: string, provider: string): string {
  */
 export async function migratePointers(home: string): Promise<string[]> {
   const copied: string[] = [];
-  for (const provider of PROVIDER_IDS) {
+  for (const provider of LOCAL_PROVIDER_IDS) {
     let content: string;
     try {
       content = await readFile(legacyPointerPath(home, provider), 'utf8');

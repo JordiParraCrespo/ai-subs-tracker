@@ -3,7 +3,7 @@
 Use up the AI coding plans you pay for.
 
 ResetOwl is a desktop app for people who run several personal **Claude Code**
-and **Codex** subscriptions. It finds the logins on your computer, shows how
+and **Codex** subscriptions, and can track a **Z.AI Coding Plan** beside them. It finds the logins on your computer, shows how
 much of each plan's 5-hour and weekly allowance is left, and tells you which
 account to use next so nothing you paid for expires unused ("tokenmaxxing").
 It also prices your usage at API rates, so you can see what each plan is worth.
@@ -49,6 +49,16 @@ The screens follow the designs in [`designs/`](designs/).
   `codex` in your terminal follow it. **Add subscription** signs a new login into its
   own folder with the provider's CLI (`claude auth login`, `codex login --device-auth`).
 
+- **Z.AI Coding Plan is tracked by hand.** Z.AI documents no usage API (its
+  usage page is z.ai/manage-apikey/billing) and its plan is an API key used
+  inside other tools, so there is no login for the collector to find. **Add
+  subscription → Z.AI** records the plan (Lite, Pro, Max), what you pay and the
+  billing day, in the desktop app or a browser, and asks for no key. **Record**
+  on the Z.AI page stores the 5-hour and weekly percentages you copy from Z.AI,
+  which the screens and Tokenmaxx read like any other reading. Only Lite's
+  price is published (docs.z.ai/devpack/overview), so Pro and Max carry the
+  price you enter. A Z.AI plan is never switched to from a terminal.
+
 **What it never does:** refresh a provider's token, send a provider credential
 anywhere but that provider, or replace a status line you already have. Only
 identity, limit percentages, reset times and token counts reach the API.
@@ -71,9 +81,11 @@ Built on the [Flama](https://github.com/JordiParraCrespo/flama-ai) boilerplate
 | `e2e` | Playwright suites for the API and the screens |
 | `designs` | The Claude Design export the screens are built from |
 
-Adding a provider (Grok, Z.ai and others) means a folder in
-`packages/usage-providers`, its id in `PROVIDER_IDS`, and its plans in
-`plans.ts`.
+Adding a provider (Grok and others) means a folder in
+`packages/usage-providers`, its id in `LOCAL_PROVIDER_IDS`, and its plans in
+`plans.ts`. A provider with no login on the machine and no documented usage
+API (Z.AI) goes in `MANUAL_PROVIDER_IDS` instead, with no folder: it is added
+in the app and its usage recorded by hand.
 
 ## Quick start
 

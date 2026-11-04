@@ -30,7 +30,8 @@ export function TokenmaxxMoves() {
         when: hours(row.hours),
         value: formatMoney(row.wasteCents, locale),
       }),
-      action: row.account.isActive ? null : () => switcher.switchTo(row.account),
+      action:
+        row.account.isActive || row.account.isManual ? null : () => switcher.switchTo(row.account),
     })),
     ...hot.slice(0, 1).map((row) => ({
       key: `hot-${row.account.id}`,

@@ -50,6 +50,14 @@ src/
   network or the real home. A new provider is a folder plus one line in
   `registry.ts`, with specs over a fake home.
 
+Only providers in `LOCAL_PROVIDER_IDS` live here. Z.AI's Coding Plan is
+tracked by hand (`MANUAL_PROVIDER_IDS`, `packages/shared/src/subscriptions/plans.ts`):
+its key sits in whatever tool uses it and Z.AI documents no usage API, so
+there is nothing for this package to read. Its official `glm-plan-usage`
+Claude Code plugin calls `/api/monitor/usage/quota/limit` with the key, but
+that endpoint is not in Z.AI's documentation; reading it would mean reading
+the person's key from their Claude Code settings, so it is not done.
+
 Rules this package follows: [`provider-integrations.md`](../../.agents/rules/provider-integrations.md)
 (one capability, a provider per vendor, an honest client name) and
 [`integrations.md`](../../.agents/rules/integrations.md) (respect the vendor's

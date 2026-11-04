@@ -23,6 +23,10 @@ export function trayModel(accounts: readonly SyncedAccount[] | null, now: Date):
       id: a.id,
       status: a.latest?.status ?? null,
       windows: a.latest?.windows ?? [],
+      reading:
+        a.latest?.source && a.latest.capturedAt
+          ? { source: a.latest.source, capturedAt: a.latest.capturedAt }
+          : null,
     })),
     now,
   );

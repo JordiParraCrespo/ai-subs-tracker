@@ -31,7 +31,8 @@ export interface TokenmaxxRow {
 export function tokenmaxxRows(accounts: readonly AccountEntity[], now: Date): TokenmaxxRow[] {
   const rows: TokenmaxxRow[] = [];
   for (const account of accounts) {
-    const weekly = account.window('weekly');
+    // An expired hand-recorded reading says nothing about this week.
+    const weekly = account.currentWindow('weekly', now);
     if (!weekly || weekly.utilization === null || !weekly.resetsAt) continue;
     if (account.status !== 'ok' && account.status !== 'rate_limited') continue;
     const windowHours = (weekly.windowMinutes ?? 10_080) / 60;

@@ -115,7 +115,9 @@
     "yourPrice": "tu precio",
     "listPrice": "precio de lista",
     "resets": "Se renueva",
-    "range": "{{from}}–{{to}} de {{total}}"
+    "range": "{{from}}–{{to}} de {{total}}",
+    "manual": "registrado por ti",
+    "notRecorded": "sin registrar"
   },
   "tokenmaxx": {
     "title": "Tokenmaxx",
@@ -224,7 +226,10 @@
     "switchSub": "Le queda un {{left}} de la semana antes de renovarse",
     "hotTitle": "{{name}} está al {{used}} por sí sola",
     "hotSub": "Repartir trabajo no ayuda a una cuenta que se usa sola. Un plan superior sí.",
-    "noMoves": "Nada que mover: tus cuentas se usan por igual."
+    "noMoves": "Nada que mover: tus cuentas se usan por igual.",
+    "usage": "Uso",
+    "record": "Registrar",
+    "subManual": "Suscripciones que sigues a mano: registra el uso de Z.AI para ordenarlas"
   },
   "tm": {
     "pickFor": "Elegir siguiente para",
@@ -373,10 +378,11 @@
   },
   "add": {
     "title": "Añadir suscripción",
-    "description": "Elige la herramienta. Claude Code y Codex inician sesión en el navegador.",
+    "description": "Elige la herramienta. Claude Code y Codex inician sesión en el navegador; un Z.AI Coding Plan se añade a mano.",
     "how": {
       "claude-code": "Inicia sesión en claude.com",
-      "codex": "Inicia sesión con un código en openai.com"
+      "codex": "Inicia sesión con un código en openai.com",
+      "zai": "Añádelo a mano: plan, precio y día de cobro"
     },
     "claude": {
       "title": "Termina de iniciar sesión en Claude",
@@ -416,9 +422,35 @@
       "text": "La app de escritorio de ResetOwl inicia la sesión y lee el plan, así nada de tu inicio de sesión llega a una pestaña del navegador. Abre la app y elige Añadir suscripción."
     },
     "back": "Atrás",
-    "failed": "No se completó el inicio de sesión."
+    "failed": "No se completó el inicio de sesión.",
+    "manual": {
+      "title": "Añadir un Z.AI Coding Plan",
+      "description": "Z.AI no publica ninguna API de uso, así que ResetOwl sigue este plan con lo que introduces: aquí su precio y día de cobro, y su uso cuando lo registres.",
+      "label": "Nombre",
+      "labelPlaceholder": "p. ej. Proyecto personal",
+      "email": "Email (opcional)",
+      "plan": "Plan",
+      "planOption": "{{plan}} · {{session}} créditos / 5 h · {{weekly}} / semana",
+      "price": "Precio mensual (USD)",
+      "priceList": "Precio de lista: {{price}}",
+      "priceRequired": "Z.AI no publica el precio de este nivel: introduce lo que pagas",
+      "renewalDay": "Se renueva el día del mes",
+      "renewalPlaceholder": "Del 1 al 31, según tu recibo",
+      "noKey": "No hace falta clave de API: ResetOwl nunca te pide tu clave de Z.AI.",
+      "submit": "Añadir suscripción"
+    }
   },
   "search": {
     "group": "Suscripciones"
+  },
+  "record": {
+    "title": "Registrar uso",
+    "description": "Copia los porcentajes que Z.AI muestra para este plan. ResetOwl no puede leerlos por sí mismo.",
+    "session": "Ventana de 5 horas usada (%)",
+    "weekly": "Cuota semanal usada (%)",
+    "weeklyResetsAt": "La cuota semanal se reinicia el",
+    "hint": "Deja una ventana vacía para omitirla. Una lectura de 5 horas caduca a las 5 horas: Z.AI devuelve los créditos 5 horas después de gastarlos.",
+    "openUsage": "Abrir la página de uso de Z.AI",
+    "submit": "Registrar"
   }
 }

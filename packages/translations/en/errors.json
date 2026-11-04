@@ -4,6 +4,8 @@
   "correlationId": "Reference: {{id}}",
   "byCode": {
     "ACCOUNT_001": "That account could not be found.",
+    "ACCOUNT_002": "This account’s usage is read from your computer, not recorded by hand.",
+    "ACCOUNT_003": "This subscription is not used from a terminal.",
     "ACCOUNT_TEMPORARILY_LOCKED": "Too many wrong codes. Two-factor sign-in is locked for 15 minutes.",
     "AUTHZ_001": "You are not a member of that organization.",
     "AUTHZ_002": "Something is misconfigured on the server. Please try again later.",
@@ -79,6 +81,8 @@
     "ACCOUNTS_CLIENT_002": "We couldn't save the account.",
     "ACCOUNTS_CLIENT_003": "We couldn't switch accounts.",
     "ACCOUNTS_CLIENT_004": "We couldn't remove the account.",
-    "ACCOUNTS_CLIENT_005": "We couldn't load token usage."
+    "ACCOUNTS_CLIENT_005": "We couldn't load token usage.",
+    "ACCOUNTS_CLIENT_006": "We couldn't add the subscription.",
+    "ACCOUNTS_CLIENT_007": "We couldn't record the usage."
   }
 }

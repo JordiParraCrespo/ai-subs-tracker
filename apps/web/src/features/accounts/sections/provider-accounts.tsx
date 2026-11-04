@@ -8,17 +8,19 @@ import type { ProviderId } from '@flama/shared/subscriptions';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EditAccountDialog } from '../dialogs/edit-account';
+import { RecordUsageDialog } from '../dialogs/record-usage';
 import { RemoveAccountDialog } from '../dialogs/remove-account';
 import { useSwitchAccount } from '../hooks/use-switch-account';
 import { formatPercent } from '../lib/format';
 import { providerGroup } from '../lib/provider-group';
 
-type Dialog = { kind: 'edit' | 'remove'; account: AccountEntity } | null;
+type Dialog = { kind: 'edit' | 'remove' | 'record'; account: AccountEntity } | null;
 
 /**
  * The design's shared-accounts page for one provider: the account to pick
  * next, how evenly the week is spread, a card per account with the average
- * marked on its bar, and the moves that would help.
+ * marked on its bar, and the moves that would help. A provider tracked by
+ * hand (Z.AI) has no terminal to switch: each card records usage instead.
  */
 export function ProviderAccounts({ provider }: { provider: ProviderId }) {
   const { t } = useTranslation();
@@ -110,18 +112,29 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
                       : formatPercent(pace.sessionUsed)}
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="ds-text-label min-w-0 flex-1 truncate">
-                    {t('accounts.group.terminals')}
-                  </span>
-                  {account.isActive ? (
-                    <span className="ds-text-label ds-muted">{t('accounts.group.inUse')}</span>
-                  ) : (
-                    <DsButton size="text" onClick={() => switcher.switchTo(account)}>
-                      {t('accounts.group.use')}
+                {account.isManual ? (
+                  <div className="flex items-center gap-2">
+                    <span className="ds-text-label min-w-0 flex-1 truncate">
+                      {t('accounts.group.usage')}
+                    </span>
+                    <DsButton size="text" onClick={() => setDialog({ kind: 'record', account })}>
+                      {t('accounts.group.record')}
                     </DsButton>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="ds-text-label min-w-0 flex-1 truncate">
+                      {t('accounts.group.terminals')}
+                    </span>
+                    {account.isActive ? (
+                      <span className="ds-text-label ds-muted">{t('accounts.group.inUse')}</span>
+                    ) : (
+                      <DsButton size="text" onClick={() => switcher.switchTo(account)}>
+                        {t('accounts.group.use')}
+                      </DsButton>
+                    )}
+                  </div>
+                )}
                 <div className="flex gap-1">
                   <DsButton size="text" onClick={() => setDialog({ kind: 'edit', account })}>
                     {t('accounts.table.edit')}
@@ -140,7 +153,7 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
         <div className="flex items-center justify-between px-6 py-5">
           <h2 className="ds-card-header__title">{t('accounts.group.moves')}</h2>
         </div>
-        {group.pick && !group.pick.account.isActive && (
+        {group.pick && !group.pick.account.isActive && !group.pick.account.isManual && (
           <div className="flex items-center gap-3 px-6 py-4">
             <span className="ds-disc">
               <ArrowRightLeft className="size-5" strokeWidth={1.5} />
@@ -178,13 +191,17 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
             </div>
           </div>
         )}
-        {(!group.pick || group.pick.account.isActive) && !group.overloaded && (
-          <p className="px-6 py-4 text-sm text-ink-600">{t('accounts.group.noMoves')}</p>
-        )}
+        {(!group.pick || group.pick.account.isActive || group.pick.account.isManual) &&
+          !group.overloaded && (
+            <p className="px-6 py-4 text-sm text-ink-600">{t('accounts.group.noMoves')}</p>
+          )}
       </div>
 
       {dialog?.kind === 'edit' && (
         <EditAccountDialog account={dialog.account} onClose={() => setDialog(null)} />
+      )}
+      {dialog?.kind === 'record' && (
+        <RecordUsageDialog account={dialog.account} onClose={() => setDialog(null)} />
       )}
       {dialog?.kind === 'remove' && (
         <RemoveAccountDialog account={dialog.account} onClose={() => setDialog(null)} />

@@ -57,8 +57,17 @@ export function SubscriptionsTable({
     {
       key: 'weekly',
       label: t('accounts.table.weekly'),
-      render: ({ pace }) => (
-        <UsageCell value={pace.weeklyUsed} sub={t('accounts.table.weeklySub')} />
+      render: ({ account, pace }) => (
+        <UsageCell
+          value={pace.weeklyUsed}
+          sub={
+            !account.isManual
+              ? t('accounts.table.weeklySub')
+              : account.latest
+                ? t('accounts.table.manual')
+                : t('accounts.table.notRecorded')
+          }
+        />
       ),
     },
     {

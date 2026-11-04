@@ -68,7 +68,7 @@ describe('the guides', () => {
   it('state no dollar price the plan catalog or the API rates do not hold', () => {
     // Regression: a price typed into prose outlives the catalog row it came from.
     const known = new Set([
-      ...PLANS.map((p) => p.monthlyPriceCents / 100),
+      ...PLANS.flatMap((p) => (p.monthlyPriceCents === null ? [] : [p.monthlyPriceCents / 100])),
       ...MODEL_PRICES.flatMap((m) => [m.input, m.output, m.cacheRead]),
     ]);
     for (const locale of siteConfig.locales) {

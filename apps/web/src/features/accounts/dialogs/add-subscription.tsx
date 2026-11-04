@@ -6,33 +6,49 @@ import {
   DsModalBody,
   DsModalFooter,
   DsModalHeader,
+  toast,
 } from '@flama/design-system-web';
 import { ArrowLeft } from '@flama/design-system-web/icons';
-import { desktopBridge } from '@flama/frontend-web';
-import type { ProviderId } from '@flama/shared/subscriptions';
+import { useCreateAccount } from '@flama/frontend-consumer/react';
+import { desktopBridge, useErrorMessage } from '@flama/frontend-web';
+import type { AddManualAccountFormValues } from '@flama/shared/schemas/accounts';
+import {
+  isManualProvider,
+  type LocalProviderId,
+  type ManualProviderId,
+  type ProviderId,
+} from '@flama/shared/subscriptions';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClaudeSignIn } from '../components/claude-sign-in';
 import { CodexSignIn } from '../components/codex-sign-in';
 import { ProviderPickRow } from '../components/provider-pick-row';
+import { AddManualAccountForm } from '../forms/add-manual-account-form';
 import { SignInCodeForm } from '../forms/sign-in-code-form';
 import { useAddLogin } from '../hooks/use-add-login';
 import { PROVIDER_COLORS } from '../lib/marks';
 import { PROVIDER_NAMES, PROVIDER_ORDER } from '../lib/providers';
 
-const INITIALS = { 'claude-code': 'CC', codex: 'CX' } as const satisfies Record<ProviderId, string>;
+const INITIALS = { 'claude-code': 'CC', codex: 'CX', zai: 'ZA' } as const satisfies Record<
+  ProviderId,
+  string
+>;
+
+const MANUAL_FORM = 'add-manual-account';
 
 type Step =
   | { kind: 'pick' }
-  | { kind: 'sign-in'; provider: ProviderId }
+  | { kind: 'sign-in'; provider: LocalProviderId }
   | { kind: 'code' }
-  | { kind: 'desktop' };
+  | { kind: 'desktop' }
+  | { kind: 'manual'; provider: ManualProviderId };
 
 /**
- * The design's Add subscription modal, for the two tools that sign in:
- * pick one, then follow its CLI's sign-in (Claude in the browser or by code,
- * Codex by a one-time code). The sign-in runs on the machine, so in a browser
- * picking a tool says where to do it instead.
+ * The design's Add subscription modal: pick a tool, then follow its CLI's
+ * sign-in (Claude in the browser or by code, Codex by a one-time code). The
+ * sign-in runs on the machine, so in a browser picking one says where to do
+ * it instead. A tool with nothing to sign in to on the machine (Z.AI) is a
+ * short form instead, in the browser too: ResetOwl tracks its plan, not a key.
  */
 export function AddSubscriptionDialog({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
@@ -43,7 +59,19 @@ export function AddSubscriptionDialog({ onClose }: { onClose: () => void }) {
     setStep({ kind: 'pick' });
   };
 
+  const resolveError = useErrorMessage();
+  const create = useCreateAccount({
+    onSuccess: () => {
+      toast.success(t('toasts.subscriptionAdded'));
+      onClose();
+    },
+  });
+
   const pick = (provider: ProviderId) => {
+    if (isManualProvider(provider)) {
+      setStep({ kind: 'manual', provider });
+      return;
+    }
     if (!desktopBridge) {
       setStep({ kind: 'desktop' });
       return;
@@ -107,6 +135,53 @@ export function AddSubscriptionDialog({ onClose }: { onClose: () => void }) {
         />
       )}
 
+      {step.kind === 'manual' && (
+        <>
+          <DsModalHeader
+            closeLabel={t('common.close')}
+            title={t('accounts.add.manual.title')}
+            description={t('accounts.add.manual.description')}
+          />
+          <DsModalBody>
+            {create.error && (
+              <Alert variant="destructive">
+                <AlertDescription>
+                  {resolveError(create.error, t('common.error')).message}
+                </AlertDescription>
+              </Alert>
+            )}
+            <AddManualAccountForm
+              id={MANUAL_FORM}
+              provider={step.provider}
+              isPending={create.isPending}
+              onSubmit={(values) => create.mutate(toCreateInput(step.provider, values))}
+            />
+            <p className="ds-t-sub m-0">{t('accounts.add.manual.noKey')}</p>
+          </DsModalBody>
+          <DsModalFooter
+            start={
+              <DsButton
+                size="text"
+                icon={<ArrowLeft className="size-4" />}
+                onClick={() => setStep({ kind: 'pick' })}
+              >
+                {t('accounts.add.back')}
+              </DsButton>
+            }
+          >
+            <DsButton
+              variant="primary"
+              size="sm"
+              type="submit"
+              form={MANUAL_FORM}
+              disabled={create.isPending}
+            >
+              {t('accounts.add.manual.submit')}
+            </DsButton>
+          </DsModalFooter>
+        </>
+      )}
+
       {step.kind === 'desktop' && (
         <>
           <DsModalHeader
@@ -132,4 +207,16 @@ export function AddSubscriptionDialog({ onClose }: { onClose: () => void }) {
       )}
     </DsModal>
   );
+}
+
+/** The form as typed, onto the API's input: empty means not set, prices in cents. */
+function toCreateInput(provider: ManualProviderId, values: AddManualAccountFormValues) {
+  return {
+    provider,
+    label: values.label,
+    email: values.email === '' ? null : values.email,
+    planId: values.planId,
+    monthlyPriceCents: values.price === '' ? null : Math.round(Number(values.price) * 100),
+    renewalDay: values.renewalDay === '' ? null : Number(values.renewalDay),
+  };
 }

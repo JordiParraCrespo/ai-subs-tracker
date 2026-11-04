@@ -1,5 +1,5 @@
 import type { SyncAccount } from '@flama/shared/schemas/accounts';
-import type { ProviderId } from '@flama/shared/subscriptions';
+import type { LocalProviderId } from '@flama/shared/subscriptions';
 
 /**
  * Everything a provider touches outside its own logic, injected so tests run
@@ -25,7 +25,7 @@ export interface ProviderEnv {
 
 /** One login a provider found on this machine. */
 export interface DetectedLogin {
-  provider: ProviderId;
+  provider: LocalProviderId;
   /** The login's home: a Claude Code config dir, a Codex home. */
   home: string;
   /** The login a plain terminal uses (`~/.claude`, `$CODEX_HOME` or `~/.codex`). */
@@ -49,7 +49,7 @@ export interface ReadOptions {
 }
 
 export interface CodingAgentProvider {
-  id: ProviderId;
+  id: LocalProviderId;
   displayName: string;
   detect(env: ProviderEnv): Promise<DetectedLogin[]>;
   /** Never throws for provider errors: they become the snapshot's status and message. */
