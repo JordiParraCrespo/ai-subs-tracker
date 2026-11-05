@@ -4,10 +4,13 @@ import { type DesktopServices, ipcHandlers, registerIpc } from '../ipc';
 import {
   IpcArgumentError,
   isTrustedSender,
+  parseAccountId,
+  parseApiKey,
   parseExternalUrl,
   parseHome,
   parseLoginCode,
   parseProvider,
+  parseReaderProvider,
   parseToken,
 } from '../ipc-validation';
 
@@ -21,12 +24,15 @@ function services(): DesktopServices {
       nextRunAt: null,
       lastError: null,
       logins: [],
+      readers: [],
     })),
     collectorRefresh: vi.fn(),
     addLogin: vi.fn(async () => ({ ok: true, message: null })),
     submitLoginCode: vi.fn(),
     cancelLogin: vi.fn(),
     activate: vi.fn(async () => undefined),
+    usageReaderConnect: vi.fn(async () => ({ ok: true, message: null, reader: null })),
+    usageReaderDisconnect: vi.fn(async () => undefined),
     shellIntegration: vi.fn(),
     shellInstall: vi.fn(),
     liveFeedTargets: vi.fn(async () => []),
@@ -42,6 +48,30 @@ describe('IPC argument validation', () => {
     expect(parseProvider('codex')).toBe('codex');
     for (const bad of ['gemini', '', null, 1, { id: 'codex' }]) {
       expect(() => parseProvider(bad)).toThrow(IpcArgumentError);
+    }
+  });
+
+  it('takes a usage reader only for a provider that has one, never a local login', () => {
+    expect(parseReaderProvider('zai')).toBe('zai');
+    expect(parseReaderProvider('bigmodel')).toBe('bigmodel');
+    for (const bad of ['codex', 'claude-code', 'toString', '__proto__', '', null]) {
+      expect(() => parseReaderProvider(bad)).toThrow(IpcArgumentError);
+    }
+  });
+
+  it('files a key only under an account UUID', () => {
+    const id = '0b7c8a5e-3f0a-4c1e-9d2b-6a1f2e3d4c5b';
+    expect(parseAccountId(id.toUpperCase())).toBe(id);
+    for (const bad of ['../../etc', `${id}x`, '', 7]) {
+      expect(() => parseAccountId(bad)).toThrow(IpcArgumentError);
+    }
+  });
+
+  // The key becomes an HTTP header value: a line break would add a header.
+  it('takes a pasted API key as one printable line', () => {
+    expect(parseApiKey('  abcd1234.efgh  ')).toBe('abcd1234.efgh');
+    for (const bad of ['short', 'abcd1234\r\nX-Evil: 1', 'abcd 1234 efgh', 'x'.repeat(600), null]) {
+      expect(() => parseApiKey(bad)).toThrow(IpcArgumentError);
     }
   });
 

@@ -56,9 +56,12 @@ export type SnapshotStatus = (typeof SNAPSHOT_STATUSES)[number];
 
 /**
  * `poll`: the collector asked the provider; `live`: a running session
- * reported it; `manual`: the person recorded it (providers with no usage API).
+ * reported it; `manual`: the person recorded it (providers with no usage API);
+ * `unofficial`: the desktop app read it, opt-in, from an endpoint the vendor
+ * does not document (`UNOFFICIAL_USAGE_READERS`), so the screens say so.
+ * At most 10 characters: the column is `varchar(10)`.
  */
-export const SNAPSHOT_SOURCES = ['poll', 'live', 'manual'] as const;
+export const SNAPSHOT_SOURCES = ['poll', 'live', 'manual', 'unofficial'] as const;
 export type SnapshotSource = (typeof SNAPSHOT_SOURCES)[number];
 
 export const usageSnapshotSchema = z.object({
@@ -165,6 +168,22 @@ export const recordUsageSchema = z
   });
 export type RecordUsageInput = z.infer<typeof recordUsageSchema>;
 
+/**
+ * A reading the desktop app took from a manual provider's unofficial usage
+ * endpoint, with the person's key on their machine. The windows carry the
+ * vendor's real reset times; `reportedPlan` is the tier the vendor named
+ * (`lite`, `pro`, `max`), kept for information. Never a credential.
+ */
+export const reportUsageReadingSchema = z.object({
+  reportedPlan: z.string().max(80).nullable(),
+  snapshot: usageSnapshotSchema.extend({
+    source: z.literal('unofficial'),
+    status: z.literal('ok'),
+    windows: z.array(limitWindowSchema).min(1).max(20),
+  }),
+});
+export type ReportUsageReadingInput = z.infer<typeof reportUsageReadingSchema>;
+
 export const usageSummaryQuerySchema = z.object({
   days: z.coerce.number().int().min(1).max(90).default(30),
 });
@@ -233,3 +252,18 @@ export const recordUsageFormSchema = z
     params: { i18nKey: 'validation.required' },
   });
 export type RecordUsageFormValues = z.infer<typeof recordUsageFormSchema>;
+
+/**
+ * The key a person pastes to turn on an unofficial usage reader (desktop
+ * only). One line of printable text: it travels as a header value, to the
+ * vendor and nowhere else.
+ */
+export const usageReaderKeyFormSchema = z.object({
+  apiKey: z
+    .string()
+    .trim()
+    .min(8)
+    .max(512)
+    .regex(/^[\x21-\x7e]+$/),
+});
+export type UsageReaderKeyFormValues = z.infer<typeof usageReaderKeyFormSchema>;

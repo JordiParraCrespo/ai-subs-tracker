@@ -11,6 +11,8 @@ import { CreateAccountCommandHandler } from './commands/create-account/create-ac
 import { CreateAccountHttpController } from './commands/create-account/create-account.http.controller';
 import { RecordAccountUsageCommandHandler } from './commands/record-account-usage/record-account-usage.command-handler';
 import { RecordAccountUsageHttpController } from './commands/record-account-usage/record-account-usage.http.controller';
+import { ReportUsageReadingCommandHandler } from './commands/report-usage-reading/report-usage-reading.command-handler';
+import { ReportUsageReadingHttpController } from './commands/report-usage-reading/report-usage-reading.http.controller';
 import { SyncAccountsCommandHandler } from './commands/sync-accounts/sync-accounts.command-handler';
 import { SyncAccountsHttpController } from './commands/sync-accounts/sync-accounts.http.controller';
 import { UpdateAccountCommandHandler } from './commands/update-account/update-account.command-handler';
@@ -34,6 +36,7 @@ const httpControllers = [
   UpdateAccountHttpController,
   ActivateAccountHttpController,
   RecordAccountUsageHttpController,
+  ReportUsageReadingHttpController,
   ArchiveAccountHttpController,
 ];
 
@@ -42,6 +45,7 @@ const commandHandlers: Provider[] = [
   CreateAccountCommandHandler,
   UpdateAccountCommandHandler,
   RecordAccountUsageCommandHandler,
+  ReportUsageReadingCommandHandler,
   ActivateAccountCommandHandler,
   ArchiveAccountCommandHandler,
 ];
@@ -50,7 +54,7 @@ const queryHandlers: Provider[] = [FindAccountsQueryHandler, GetUsageSummaryQuer
 
 /**
  * The coding-agent accounts a person tracks: what the desktop collector
- * syncs, the subscriptions added by hand (Z.AI), and what the overview, accounts, tokenmaxx and usage screens read.
+ * syncs, the subscriptions added by hand (Z.AI, BigModel) and the readings the desktop takes of them, and what the overview, accounts, tokenmaxx and usage screens read.
  */
 @Module({
   imports: [

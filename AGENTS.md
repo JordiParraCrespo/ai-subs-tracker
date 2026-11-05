@@ -15,7 +15,8 @@ billing are available as Flama plugins (see [Plugins](#plugins)).
 ### ResetOwl's own rules
 
 - **Provider credentials never leave the machine** except to their own
-  provider, and are never refreshed: Claude Code's refresh tokens rotate, so a
+  provider, and are never refreshed (a Coding Plan key a person pastes for an
+  unofficial reader included): Claude Code's refresh tokens rotate, so a
   refresh here would sign the CLI out. Only identity, limit windows and token
   counts reach the API (`packages/shared/src/schemas/accounts.schema.ts`).
 - **Name ourselves honestly** to every vendor (`resetowl-desktop/<version>`);
@@ -31,9 +32,17 @@ billing are available as Flama plugins (see [Plugins](#plugins)).
   Plan) is a **manual** one instead: its id in `MANUAL_PROVIDER_IDS`, its
   plans, no folder. It is added with `POST /v1/accounts`, its usage recorded
   with `POST /v1/accounts/:id/usage`, it is never synced and never activated
-  for terminals, and it holds no credential. Never invent a price or an
-  endpoint the vendor does not document: a tier without a published price has
-  `monthlyPriceCents: null` and the account carries the price paid.
+  for terminals, and the API holds no credential for it. Never invent a
+  price: a tier without a published price has `monthlyPriceCents: null` and
+  the account carries the price paid (in US dollars, like every price here).
+  Never call an endpoint the vendor does not document, with one opt-in
+  exception: a manual provider listed in `UNOFFICIAL_USAGE_READERS` (Z.AI and
+  BigModel's quota endpoint, which the vendor's own usage plugin calls) may be
+  read by the desktop app with the person's own key, which stays encrypted on
+  the machine and goes only to that vendor. Its readings carry the source
+  `unofficial`, the screens say so, they lapse like hand-typed ones, and
+  recording by hand stays the fallback. Adding another such reader is a
+  product decision, not a code one.
 - **The desktop bridge** (`window.resetowl`, typed in
   `packages/shared/src/desktop/bridge.ts`) is the only way the screens reach
   the machine; in a browser it is absent and local features are not offered.

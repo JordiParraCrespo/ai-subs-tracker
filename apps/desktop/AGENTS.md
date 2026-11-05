@@ -29,6 +29,10 @@
   impersonate claude-code or codex.
 - **Never log the API token.** It lives in `token-store.ts`, encrypted with
   `safeStorage`, memory-only when that is unavailable.
+- **A usage reader key** (`usage-readers.ts`) is kept only when `safeStorage`
+  can encrypt it and only after one reading worked; it goes only to its
+  vendor, never to the API, the screens or a log, and is deleted when the
+  reader is turned off or the API says the account is gone.
 - **The default login's pointer is an empty file.** Writing `~/.claude` there
   would set `CLAUDE_CONFIG_DIR` and change the macOS Keychain item.
 - **Opt-in and reversible**: the rc file is touched only by `shell.install()`

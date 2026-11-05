@@ -4,23 +4,27 @@ import type { AccountEntity } from '@flama/frontend-consumer';
 import { useAccounts } from '@flama/frontend-consumer/react';
 import { dateFormatter, useLocale } from '@flama/frontend-web';
 import { useNow } from '@flama/react-hooks';
-import type { ProviderId } from '@flama/shared/subscriptions';
+import { isManualProvider, type ProviderId } from '@flama/shared/subscriptions';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EditAccountDialog } from '../dialogs/edit-account';
+import { ReadUsageDialog } from '../dialogs/read-usage';
 import { RecordUsageDialog } from '../dialogs/record-usage';
 import { RemoveAccountDialog } from '../dialogs/remove-account';
+import { useDesktopStatus } from '../hooks/use-desktop-status';
 import { useSwitchAccount } from '../hooks/use-switch-account';
 import { formatPercent } from '../lib/format';
 import { providerGroup } from '../lib/provider-group';
+import { PROVIDER_NAMES } from '../lib/providers';
 
-type Dialog = { kind: 'edit' | 'remove' | 'record'; account: AccountEntity } | null;
+type Dialog = { kind: 'edit' | 'remove' | 'record' | 'read'; account: AccountEntity } | null;
 
 /**
  * The design's shared-accounts page for one provider: the account to pick
  * next, how evenly the week is spread, a card per account with the average
  * marked on its bar, and the moves that would help. A provider tracked by
- * hand (Z.AI) has no terminal to switch: each card records usage instead.
+ * hand (Z.AI, BigModel) has no terminal to switch: each card records usage
+ * instead, and turns on the desktop app's unofficial reader where there is one.
  */
 export function ProviderAccounts({ provider }: { provider: ProviderId }) {
   const { t } = useTranslation();
@@ -28,7 +32,16 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
   const now = useNow(60_000);
   const accounts = useAccounts();
   const switcher = useSwitchAccount();
+  const desktop = useDesktopStatus();
   const [dialog, setDialog] = useState<Dialog>(null);
+
+  /** The reader's state as a button: off, on, or failing (null: kept, not tried yet). */
+  const readerLabel = (status: string | null | undefined) =>
+    status === undefined
+      ? t('accounts.group.readerOff')
+      : status === 'ok' || status === null
+        ? t('accounts.group.readerOn')
+        : t('accounts.group.readerFailing');
 
   if (!accounts.data) return <Skeleton className="h-96 w-full" />;
   const mine = accounts.data.filter((account) => account.provider === provider);
@@ -101,6 +114,11 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
                 {account.planName ?? '—'} ·{' '}
                 {t('accounts.group.resets', { at: reset(pace.weeklyResetsAt) })}
               </span>
+              {account.readUnofficially && (
+                <span className="ds-t-sub">
+                  {t('accounts.group.readUnofficially', { name: PROVIDER_NAMES[account.provider] })}
+                </span>
+              )}
               <div className="flex flex-col gap-2 border-t border-border-default pt-3">
                 <div className="flex items-center gap-2">
                   <span className="ds-text-label min-w-0 flex-1 truncate">
@@ -113,14 +131,28 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
                   </span>
                 </div>
                 {account.isManual ? (
-                  <div className="flex items-center gap-2">
-                    <span className="ds-text-label min-w-0 flex-1 truncate">
-                      {t('accounts.group.usage')}
-                    </span>
-                    <DsButton size="text" onClick={() => setDialog({ kind: 'record', account })}>
-                      {t('accounts.group.record')}
-                    </DsButton>
-                  </div>
+                  <>
+                    <div className="flex items-center gap-2">
+                      <span className="ds-text-label min-w-0 flex-1 truncate">
+                        {t('accounts.group.usage')}
+                      </span>
+                      <DsButton size="text" onClick={() => setDialog({ kind: 'record', account })}>
+                        {t('accounts.group.record')}
+                      </DsButton>
+                    </div>
+                    {account.hasUnofficialReader && (
+                      <div className="flex items-center gap-2">
+                        <span className="ds-text-label min-w-0 flex-1 truncate">
+                          {t('accounts.group.automatic')}
+                        </span>
+                        <DsButton size="text" onClick={() => setDialog({ kind: 'read', account })}>
+                          {readerLabel(
+                            desktop?.readers.find((r) => r.accountId === account.id)?.status,
+                          )}
+                        </DsButton>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <div className="flex items-center gap-2">
                     <span className="ds-text-label min-w-0 flex-1 truncate">
@@ -202,6 +234,13 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
       )}
       {dialog?.kind === 'record' && (
         <RecordUsageDialog account={dialog.account} onClose={() => setDialog(null)} />
+      )}
+      {dialog?.kind === 'read' && isManualProvider(dialog.account.provider) && (
+        <ReadUsageDialog
+          account={dialog.account}
+          provider={dialog.account.provider}
+          onClose={() => setDialog(null)}
+        />
       )}
       {dialog?.kind === 'remove' && (
         <RemoveAccountDialog account={dialog.account} onClose={() => setDialog(null)} />

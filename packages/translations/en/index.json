@@ -498,7 +498,12 @@
       "noMoves": "Nothing to move: your accounts are evenly used.",
       "usage": "Usage",
       "record": "Record",
-      "subManual": "Subscriptions you track by hand: record usage from Z.AI to rank them"
+      "subManual": "Subscriptions you track by hand: record usage, or read it automatically in the desktop app, to rank them",
+      "automatic": "Automatic reading",
+      "readerOff": "Turn on",
+      "readerOn": "On",
+      "readerFailing": "Not working",
+      "readUnofficially": "Read from {{name}}’s unofficial usage endpoint"
     },
     "tm": {
       "pickFor": "Pick next for",
@@ -647,11 +652,12 @@
     },
     "add": {
       "title": "Add subscription",
-      "description": "Pick the tool. Claude Code and Codex sign in through the browser; a Z.AI Coding Plan is added by hand.",
+      "description": "Pick the tool. Claude Code and Codex sign in through the browser; a GLM Coding Plan (Z.AI or BigModel) is added by hand.",
       "how": {
         "claude-code": "Sign in through claude.com",
         "codex": "Sign in with a code at openai.com",
-        "zai": "Add it by hand: plan, price and billing day"
+        "zai": "Add it by hand: plan, price and billing day",
+        "bigmodel": "Sold in mainland China. Add it by hand: plan, price and billing day"
       },
       "claude": {
         "title": "Finish signing in to Claude",
@@ -693,8 +699,8 @@
       "back": "Back",
       "failed": "Sign-in did not finish.",
       "manual": {
-        "title": "Add a Z.AI Coding Plan",
-        "description": "Z.AI publishes no usage API, so ResetOwl tracks this plan from what you enter: its price and billing day here, its usage when you record it.",
+        "title": "Add a {{name}} Coding Plan",
+        "description": "{{name}} documents no usage API, so ResetOwl tracks this plan from what you enter: its price and billing day here, its usage when you record it. The desktop app can also read usage automatically once it is added.",
         "label": "Name",
         "labelPlaceholder": "e.g. Side project",
         "email": "Email (optional)",
@@ -702,10 +708,10 @@
         "planOption": "{{plan}} · {{session}} credits / 5 h · {{weekly}} / week",
         "price": "Monthly price (USD)",
         "priceList": "List price: {{price}}",
-        "priceRequired": "Z.AI does not publish this tier’s price: enter what you pay",
+        "priceRequired": "No list price is published for this tier: enter what you pay, in US dollars",
         "renewalDay": "Renews on day of month",
         "renewalPlaceholder": "1 to 31, from your receipt",
-        "noKey": "No API key needed: ResetOwl never asks for your Z.AI key.",
+        "noKey": "No API key needed to add it. Reading usage automatically is a separate, optional step in the desktop app.",
         "submit": "Add subscription"
       }
     },
@@ -714,13 +720,30 @@
     },
     "record": {
       "title": "Record usage",
-      "description": "Copy the percentages Z.AI shows for this plan. ResetOwl cannot read them itself.",
+      "description": "Copy the percentages {{name}} shows for this plan.",
       "session": "5-hour window used (%)",
       "weekly": "Weekly allowance used (%)",
       "weeklyResetsAt": "Weekly allowance resets at",
-      "hint": "Leave a window empty to skip it. A 5-hour reading lapses after 5 hours: Z.AI returns credits 5 hours after they are spent.",
-      "openUsage": "Open Z.AI usage page",
+      "hint": "Leave a window empty to skip it. A 5-hour reading lapses after 5 hours: {{name}} returns credits 5 hours after they are spent.",
+      "openUsage": "Open {{name}} usage page",
       "submit": "Record"
+    },
+    "reader": {
+      "title": "Read usage from {{name}}",
+      "description": "While the desktop app is open, ResetOwl reads this plan’s 5-hour, weekly and MCP limits from {{name}} every 10 minutes, with your Coding Plan key.",
+      "unofficialTitle": "Unofficial endpoint",
+      "unofficialText": "{{name}} does not document this endpoint. ResetOwl calls the one {{name}}’s own usage plugin calls; it may change or stop working at any time. When it does, the reading lapses and you record usage by hand again.",
+      "desktopOnly": "Automatic reading runs in the ResetOwl desktop app, so your key stays on your computer. Open the app to turn it on.",
+      "key": "{{name}} Coding Plan API key",
+      "keyHelp": "The key you use for the Coding Plan. ResetOwl checks it with one reading before keeping it.",
+      "keyStays": "The key is encrypted with your computer’s keystore and sent only to {{name}}, never to ResetOwl’s servers. Turning this off or removing the subscription deletes it.",
+      "on": "Reading automatically · last read {{ago}}",
+      "notYet": "not yet",
+      "failed": "The last reading from {{name}} did not work.",
+      "getKey": "Get a key from {{name}}",
+      "turnOn": "Turn on",
+      "replace": "Replace key",
+      "turnOff": "Turn off"
     }
   },
   "home": {
@@ -1412,7 +1435,9 @@
     "accountAdded": "Account added",
     "accountSaved": "Account saved",
     "subscriptionAdded": "Subscription added",
-    "usageRecorded": "Usage recorded"
+    "usageRecorded": "Usage recorded",
+    "usageReaderOn": "Reading usage from {{name}}",
+    "usageReaderOff": "Automatic reading turned off"
   },
   "emails": {
     "common": {

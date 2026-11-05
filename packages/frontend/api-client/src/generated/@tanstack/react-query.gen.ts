@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { activateAccount, archiveAccount, assign, catalog, changePassword, check, create, createAccount, deleteAvatar, deploymentCapabilities, findAll, findAll2, findOne, findOne2, findSessions, findUserRoles, getProfile, getSettings, getUsageSummary, listAccounts, me, type Options, permissions, readiness, recordAccountUsage, remove, remove2, revokeOtherSessions, revokeSession, syncAccounts, update, update2, updateAccount, updatePermissions, updateProfile, updateSettings, uploadAvatar } from '../sdk.gen';
-import type { ActivateAccountData, ActivateAccountError, ActivateAccountResponse, ArchiveAccountData, ArchiveAccountError, ArchiveAccountResponse, AssignData, AssignError, AssignResponse, CatalogData, CatalogError, CatalogResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, CheckData, CheckResponse, CreateAccountData, CreateAccountError, CreateAccountResponse, CreateData, CreateError, CreateResponse, DeleteAvatarData, DeleteAvatarError, DeleteAvatarResponse, DeploymentCapabilitiesData, DeploymentCapabilitiesResponse, FindAll2Data, FindAll2Error, FindAll2Response, FindAllData, FindAllError, FindAllResponse, FindOne2Data, FindOne2Error, FindOne2Response, FindOneData, FindOneError, FindOneResponse, FindSessionsData, FindSessionsError, FindSessionsResponse, FindUserRolesData, FindUserRolesError, FindUserRolesResponse, GetProfileData, GetProfileError, GetProfileResponse, GetSettingsData, GetSettingsError, GetSettingsResponse, GetUsageSummaryData, GetUsageSummaryError, GetUsageSummaryResponse, ListAccountsData, ListAccountsError, ListAccountsResponse, MeData, MeError, MeResponse, PermissionsData, PermissionsError, PermissionsResponse, ReadinessData, ReadinessError, ReadinessResponse, RecordAccountUsageData, RecordAccountUsageError, RecordAccountUsageResponse, Remove2Data, Remove2Error, RemoveData, RemoveError, RevokeOtherSessionsData, RevokeOtherSessionsError, RevokeOtherSessionsResponse, RevokeSessionData, RevokeSessionError, RevokeSessionResponse, SyncAccountsData, SyncAccountsError, SyncAccountsResponse, Update2Data, Update2Error, Update2Response, UpdateAccountData, UpdateAccountError, UpdateAccountResponse, UpdateData, UpdateError, UpdatePermissionsData, UpdatePermissionsError, UpdatePermissionsResponse, UpdateProfileData, UpdateProfileError, UpdateProfileResponse, UpdateResponse, UpdateSettingsData, UpdateSettingsError, UpdateSettingsResponse, UploadAvatarData, UploadAvatarError, UploadAvatarResponse } from '../types.gen';
+import { activateAccount, archiveAccount, assign, catalog, changePassword, check, create, createAccount, deleteAvatar, deploymentCapabilities, findAll, findAll2, findOne, findOne2, findSessions, findUserRoles, getProfile, getSettings, getUsageSummary, listAccounts, me, type Options, permissions, readiness, recordAccountUsage, remove, remove2, reportUsageReading, revokeOtherSessions, revokeSession, syncAccounts, update, update2, updateAccount, updatePermissions, updateProfile, updateSettings, uploadAvatar } from '../sdk.gen';
+import type { ActivateAccountData, ActivateAccountError, ActivateAccountResponse, ArchiveAccountData, ArchiveAccountError, ArchiveAccountResponse, AssignData, AssignError, AssignResponse, CatalogData, CatalogError, CatalogResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, CheckData, CheckResponse, CreateAccountData, CreateAccountError, CreateAccountResponse, CreateData, CreateError, CreateResponse, DeleteAvatarData, DeleteAvatarError, DeleteAvatarResponse, DeploymentCapabilitiesData, DeploymentCapabilitiesResponse, FindAll2Data, FindAll2Error, FindAll2Response, FindAllData, FindAllError, FindAllResponse, FindOne2Data, FindOne2Error, FindOne2Response, FindOneData, FindOneError, FindOneResponse, FindSessionsData, FindSessionsError, FindSessionsResponse, FindUserRolesData, FindUserRolesError, FindUserRolesResponse, GetProfileData, GetProfileError, GetProfileResponse, GetSettingsData, GetSettingsError, GetSettingsResponse, GetUsageSummaryData, GetUsageSummaryError, GetUsageSummaryResponse, ListAccountsData, ListAccountsError, ListAccountsResponse, MeData, MeError, MeResponse, PermissionsData, PermissionsError, PermissionsResponse, ReadinessData, ReadinessError, ReadinessResponse, RecordAccountUsageData, RecordAccountUsageError, RecordAccountUsageResponse, Remove2Data, Remove2Error, RemoveData, RemoveError, ReportUsageReadingData, ReportUsageReadingError, ReportUsageReadingResponse, RevokeOtherSessionsData, RevokeOtherSessionsError, RevokeOtherSessionsResponse, RevokeSessionData, RevokeSessionError, RevokeSessionResponse, SyncAccountsData, SyncAccountsError, SyncAccountsResponse, Update2Data, Update2Error, Update2Response, UpdateAccountData, UpdateAccountError, UpdateAccountResponse, UpdateData, UpdateError, UpdatePermissionsData, UpdatePermissionsError, UpdatePermissionsResponse, UpdateProfileData, UpdateProfileError, UpdateProfileResponse, UpdateResponse, UpdateSettingsData, UpdateSettingsError, UpdateSettingsResponse, UploadAvatarData, UploadAvatarError, UploadAvatarResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -547,6 +547,25 @@ export const recordAccountUsageMutation = (options?: Partial<Options<RecordAccou
     const mutationOptions: UseMutationOptions<RecordAccountUsageResponse, RecordAccountUsageError, Options<RecordAccountUsageData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await recordAccountUsage({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Store a reading the desktop app took from a vendor’s unofficial usage endpoint
+ *
+ * For a hand-tracked GLM Coding Plan (Z.AI, BigModel) whose owner turned on automatic reading in the desktop app. Limit windows with the vendor’s own resets, and the tier it named; never a key. Stored with the source `unofficial`.
+ */
+export const reportUsageReadingMutation = (options?: Partial<Options<ReportUsageReadingData>>): UseMutationOptions<ReportUsageReadingResponse, ReportUsageReadingError, Options<ReportUsageReadingData>> => {
+    const mutationOptions: UseMutationOptions<ReportUsageReadingResponse, ReportUsageReadingError, Options<ReportUsageReadingData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await reportUsageReading({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

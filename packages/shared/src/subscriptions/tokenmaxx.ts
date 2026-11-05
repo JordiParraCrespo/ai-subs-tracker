@@ -26,7 +26,10 @@ export interface RankableAccount {
   id: string;
   status: SnapshotStatus | null;
   windows: readonly LimitWindow[];
-  /** Where the windows came from and when; a `manual` reading is never refreshed by a sync. */
+  /**
+   * Where the windows came from and when; a `manual` or `unofficial` reading
+   * is never refreshed by a sync.
+   */
   reading?: { source: SnapshotSource; capturedAt: Date | string } | null;
 }
 
@@ -67,12 +70,15 @@ function hoursUntil(iso: string | null, now: Date): number | null {
 /**
  * The windows that still describe `now`. A collected reading is replaced
  * every sync, so it is taken as it is. A reading the person recorded by hand
- * is not: once a window has reset — or, with no reset given, once a whole
- * window has passed since it was recorded — what it said no longer holds,
- * and the window is unknown until a fresh reading.
+ * is not, and neither is one from an unofficial endpoint, which stops
+ * arriving when the desktop app is closed or the endpoint stops answering:
+ * once a window has reset — or, with no reset given, once a whole window has
+ * passed since it was recorded — what it said no longer holds, and the
+ * window is unknown until a fresh reading.
  */
 export function currentWindows(account: RankableAccount, now: Date): readonly LimitWindow[] {
-  if (account.reading?.source !== 'manual') return account.windows;
+  const source = account.reading?.source;
+  if (!account.reading || (source !== 'manual' && source !== 'unofficial')) return account.windows;
   const recordedAt = new Date(account.reading.capturedAt).getTime();
   return account.windows.filter((window) => {
     const endsAt = window.resetsAt

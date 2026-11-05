@@ -70,6 +70,11 @@ const bridge: DesktopBridge = {
     activate: (provider, externalId) =>
       invoke(DESKTOP_CHANNELS.accountsActivate, provider, externalId),
   },
+  usageReaders: {
+    connect: (accountId, provider, apiKey) =>
+      invoke(DESKTOP_CHANNELS.usageReaderConnect, accountId, provider, apiKey),
+    disconnect: (accountId) => invoke(DESKTOP_CHANNELS.usageReaderDisconnect, accountId),
+  },
   shell: {
     integration: () => invoke(DESKTOP_CHANNELS.shellIntegration),
     install: () => invoke(DESKTOP_CHANNELS.shellInstall),

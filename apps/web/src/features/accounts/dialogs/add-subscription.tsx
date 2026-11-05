@@ -29,10 +29,12 @@ import { useAddLogin } from '../hooks/use-add-login';
 import { PROVIDER_COLORS } from '../lib/marks';
 import { PROVIDER_NAMES, PROVIDER_ORDER } from '../lib/providers';
 
-const INITIALS = { 'claude-code': 'CC', codex: 'CX', zai: 'ZA' } as const satisfies Record<
-  ProviderId,
-  string
->;
+const INITIALS = {
+  'claude-code': 'CC',
+  codex: 'CX',
+  zai: 'ZA',
+  bigmodel: 'BM',
+} as const satisfies Record<ProviderId, string>;
 
 const MANUAL_FORM = 'add-manual-account';
 
@@ -47,8 +49,9 @@ type Step =
  * The design's Add subscription modal: pick a tool, then follow its CLI's
  * sign-in (Claude in the browser or by code, Codex by a one-time code). The
  * sign-in runs on the machine, so in a browser picking one says where to do
- * it instead. A tool with nothing to sign in to on the machine (Z.AI) is a
- * short form instead, in the browser too: ResetOwl tracks its plan, not a key.
+ * it instead. A tool with nothing to sign in to on the machine (Z.AI,
+ * BigModel) is a short form instead, in the browser too: ResetOwl tracks its
+ * plan; reading its usage with a key is a later, opt-in step in the desktop app.
  */
 export function AddSubscriptionDialog({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
@@ -139,8 +142,10 @@ export function AddSubscriptionDialog({ onClose }: { onClose: () => void }) {
         <>
           <DsModalHeader
             closeLabel={t('common.close')}
-            title={t('accounts.add.manual.title')}
-            description={t('accounts.add.manual.description')}
+            title={t('accounts.add.manual.title', { name: PROVIDER_NAMES[step.provider] })}
+            description={t('accounts.add.manual.description', {
+              name: PROVIDER_NAMES[step.provider],
+            })}
           />
           <DsModalBody>
             {create.error && (
@@ -156,7 +161,9 @@ export function AddSubscriptionDialog({ onClose }: { onClose: () => void }) {
               isPending={create.isPending}
               onSubmit={(values) => create.mutate(toCreateInput(step.provider, values))}
             />
-            <p className="ds-t-sub m-0">{t('accounts.add.manual.noKey')}</p>
+            <p className="ds-t-sub m-0">
+              {t('accounts.add.manual.noKey', { name: PROVIDER_NAMES[step.provider] })}
+            </p>
           </DsModalBody>
           <DsModalFooter
             start={

@@ -1,4 +1,5 @@
-import type { LocalProviderId } from '../subscriptions/plans';
+import type { SnapshotStatus } from '../schemas/accounts.schema';
+import type { LocalProviderId, ManualProviderId } from '../subscriptions/plans';
 
 /**
  * The contract between the ResetOwl desktop shell (`apps/desktop`, Electron)
@@ -8,8 +9,11 @@ import type { LocalProviderId } from '../subscriptions/plans';
  * bridge: no local features) and in the desktop app.
  *
  * Types only, plus the IPC channel names both sides agree on. Nothing here
- * carries a provider credential: the bridge moves the API session token (the
- * app's own) and descriptions of local logins.
+ * carries a provider credential back to the screens: the bridge moves the API
+ * session token (the app's own) and descriptions of local logins. The one key
+ * that crosses it goes the other way: a Coding Plan key the person pastes to
+ * turn on an unofficial usage reader, which the main process keeps encrypted
+ * and never hands back.
  */
 
 /** A login the collector found on this machine. */
@@ -26,6 +30,30 @@ export interface LocalLogin {
   active: boolean;
 }
 
+/**
+ * An account whose usage the desktop app reads from the vendor's unofficial
+ * endpoint (opt-in, `UNOFFICIAL_USAGE_READERS`). Describes the key, never
+ * holds it.
+ */
+export interface UsageReaderState {
+  /** The ResetOwl account id the key belongs to. */
+  accountId: string;
+  provider: ManualProviderId;
+  /** When the last reading reached ResetOwl. */
+  lastReadAt: string | null;
+  /** The last attempt's outcome; null before the first. */
+  status: SnapshotStatus | null;
+  /** Why the last attempt failed, in words for the person. */
+  message: string | null;
+}
+
+export interface ConnectUsageReaderResult {
+  ok: boolean;
+  /** Why the key was not kept: refused by the vendor, no keystore, … */
+  message: string | null;
+  reader: UsageReaderState | null;
+}
+
 export type CollectorPhase = 'idle' | 'collecting' | 'syncing' | 'signed_out' | 'error';
 
 export interface CollectorStatus {
@@ -34,6 +62,8 @@ export interface CollectorStatus {
   nextRunAt: string | null;
   lastError: string | null;
   logins: LocalLogin[];
+  /** The accounts read from an unofficial usage endpoint on this machine. */
+  readers: UsageReaderState[];
 }
 
 export interface AddLoginResult {
@@ -99,6 +129,20 @@ export interface DesktopBridge {
     /** Points terminals at the login with this provider and external id. */
     activate(provider: LocalProviderId, externalId: string): Promise<void>;
   };
+  usageReaders: {
+    /**
+     * Turns on the unofficial usage reader for a hand-tracked account: reads
+     * once with `apiKey` and keeps the key (encrypted with the OS keystore)
+     * only when that worked. The key is sent only to the provider's own site.
+     */
+    connect(
+      accountId: string,
+      provider: ManualProviderId,
+      apiKey: string,
+    ): Promise<ConnectUsageReaderResult>;
+    /** Forgets the key; the account goes back to readings recorded by hand. */
+    disconnect(accountId: string): Promise<void>;
+  };
   shell: {
     integration(): Promise<ShellIntegration>;
     install(): Promise<ShellIntegration>;
@@ -137,6 +181,8 @@ export const DESKTOP_CHANNELS = {
   accountsLoginCode: 'resetowl:accounts:login-code',
   accountsLoginCancel: 'resetowl:accounts:login-cancel',
   accountsActivate: 'resetowl:accounts:activate',
+  usageReaderConnect: 'resetowl:usage-reader:connect',
+  usageReaderDisconnect: 'resetowl:usage-reader:disconnect',
   shellIntegration: 'resetowl:shell:integration',
   shellInstall: 'resetowl:shell:install',
   liveFeedTargets: 'resetowl:live-feed:targets',

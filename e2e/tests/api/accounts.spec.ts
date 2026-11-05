@@ -103,3 +103,70 @@ test('Claude Code and Codex are never added by hand, nor Z.AI synced', async () 
   expect(typed.status()).toBe(409);
   await api.dispose();
 });
+
+const unofficialReading = (utilization: number) => ({
+  reportedPlan: 'Pro',
+  snapshot: {
+    capturedAt: new Date().toISOString(),
+    source: 'unofficial',
+    status: 'ok',
+    message: null,
+    windows: [
+      {
+        key: 'weekly',
+        kind: 'weekly',
+        label: 'Weekly',
+        utilization,
+        resetsAt: new Date(Date.now() + 3 * 86_400_000).toISOString(),
+        windowMinutes: 10080,
+      },
+    ],
+    extraUsage: null,
+  },
+});
+
+test('a GLM plan takes readings from the desktop’s unofficial reader, labelled as such', async () => {
+  const { api } = await signedUpContext('accountreader');
+
+  // BigModel publishes no price for any tier: the one paid is required.
+  const created = await api.post(`${API_URL}/api/v1/accounts`, {
+    data: { provider: 'bigmodel', label: 'CN', planId: 'bigmodel-lite', monthlyPriceCents: 1700 },
+  });
+  expect(created.status()).toBe(201);
+  const account = await created.json();
+
+  const sent = await api.post(`${API_URL}/api/v1/accounts/${account.id}/readings`, {
+    data: unofficialReading(30),
+  });
+  expect(sent.status()).toBe(200);
+  const body = await sent.json();
+  expect(body.latest).toMatchObject({ source: 'unofficial', status: 'ok' });
+  expect(body.latest.windows[0]).toMatchObject({ kind: 'weekly', utilization: 30 });
+  // The person's chosen plan still names and prices it.
+  expect(body).toMatchObject({
+    planId: 'bigmodel-lite',
+    monthlyPriceCents: 1700,
+    reportedPlan: 'Pro',
+  });
+
+  // A reading that is not an unofficial success is not one.
+  const wrong = await api.post(`${API_URL}/api/v1/accounts/${account.id}/readings`, {
+    data: {
+      ...unofficialReading(30),
+      snapshot: { ...unofficialReading(30).snapshot, source: 'poll' },
+    },
+  });
+  expect(wrong.status()).toBe(400);
+  await api.dispose();
+});
+
+test('a collected login takes no unofficial reading', async () => {
+  const { api } = await signedUpContext('accountreaderno');
+  await syncTwoAccounts(api);
+  const [synced] = await (await api.get(`${API_URL}/api/v1/accounts`)).json();
+  const sent = await api.post(`${API_URL}/api/v1/accounts/${synced.id}/readings`, {
+    data: unofficialReading(10),
+  });
+  expect(sent.status()).toBe(409);
+  await api.dispose();
+});

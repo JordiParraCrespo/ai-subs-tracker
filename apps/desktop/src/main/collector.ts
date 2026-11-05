@@ -1,5 +1,5 @@
 import { resolve } from 'node:path';
-import type { CollectorStatus } from '@flama/shared/desktop';
+import type { CollectorStatus, UsageReaderState } from '@flama/shared/desktop';
 import type { LimitWindow, SyncAccountsInput } from '@flama/shared/schemas/accounts';
 import type { ProviderId } from '@flama/shared/subscriptions';
 import type { DetectedLogin } from '@flama/usage-providers';
@@ -8,7 +8,8 @@ import { buildSyncInput, type LocalAccount, sinceDayFor, toLocalLogins } from '.
 import type { TokenStore } from './token-store';
 
 /**
- * The loop that reads local logins and syncs them: every 10 minutes, on
+ * The loop that reads local logins and syncs them, then runs the opt-in
+ * unofficial usage readers: every 10 minutes, on
  * `refresh` (at most once a minute), and as soon as a token arrives. A 401
  * signs out; a network or server failure backs off 1m → 2m → … → 15m. A
  * login the provider rate limits is read from disk only for 15 minutes.
@@ -46,6 +47,14 @@ export interface CollectorDeps {
   now(): Date;
   timers: Timers;
   onStatus(status: CollectorStatus): void;
+  /**
+   * The opt-in unofficial usage readers (Z.AI, BigModel), run after each
+   * successful sync; their failures never fail the collector.
+   */
+  readers?: {
+    runAll(token: string): Promise<void>;
+    states(): UsageReaderState[];
+  };
   /** `partial`: a live-feed sync, whose answer may hold only the account it sent. */
   onSynced(accounts: readonly SyncedAccount[], partial: boolean): void;
   log(line: string): void;
@@ -58,6 +67,7 @@ export class Collector {
     nextRunAt: null,
     lastError: null,
     logins: [],
+    readers: [],
   };
   private lastEmitted = '';
   private inFlight: Promise<CollectorStatus> | null = null;
@@ -116,6 +126,12 @@ export class Collector {
     }
     this.clearTimer();
     this.update({ phase: 'signed_out', nextRunAt: null, lastError: null });
+    return this.current;
+  }
+
+  /** Publishes the readers' state again, after one was turned on or off. */
+  readersChanged(): CollectorStatus {
+    this.update({ readers: this.deps.readers?.states() ?? [] });
     return this.current;
   }
 
@@ -233,10 +249,18 @@ export class Collector {
       this.deps.log(`could not update the active pointers: ${String(err)}`);
     }
     this.deps.onSynced(result.accounts, false);
+    if (this.deps.readers) {
+      try {
+        await this.deps.readers.runAll(token);
+      } catch (err) {
+        this.deps.log(`usage readers failed: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
     const activeLogins = toLocalLogins(local, await this.deps.readPointers());
     this.update({
       phase: 'idle',
       logins: activeLogins,
+      readers: this.deps.readers?.states() ?? [],
       lastRunAt: this.deps.now().toISOString(),
       nextRunAt: this.schedule(SYNC_INTERVAL_MS),
       lastError: null,

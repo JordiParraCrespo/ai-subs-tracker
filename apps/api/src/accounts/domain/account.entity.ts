@@ -11,6 +11,7 @@ import {
   type PlanDefinition,
   type ProviderId,
   resolvePlan,
+  unofficialUsageReader,
 } from '@flama/shared/subscriptions';
 
 export interface AccountProps {
@@ -189,6 +190,14 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
   /** Added and tracked by hand: no collector reads it and no terminal switches to it. */
   get isManual(): boolean {
     return isManualProvider(this.props.provider);
+  }
+
+  /**
+   * Hand-tracked, but the desktop app can read its usage, opt-in, from an
+   * endpoint the vendor does not document (`UNOFFICIAL_USAGE_READERS`).
+   */
+  get hasUnofficialReader(): boolean {
+    return unofficialUsageReader(this.props.provider) !== undefined;
   }
 
   /** The person's chosen plan, else the one the provider reports, else unknown. */

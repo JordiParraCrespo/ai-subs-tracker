@@ -1,20 +1,24 @@
 import {
   type AddLoginResult,
   type CollectorStatus,
+  type ConnectUsageReaderResult,
   DESKTOP_CHANNELS,
   type LiveFeedTarget,
   type ShellIntegration,
 } from '@flama/shared/desktop';
-import type { LocalProviderId } from '@flama/shared/subscriptions';
+import type { LocalProviderId, ManualProviderId } from '@flama/shared/subscriptions';
 import type { IpcMainInvokeEvent } from 'electron';
 import {
   isTrustedSender,
   MAX_ID_LENGTH,
+  parseAccountId,
+  parseApiKey,
   parseBoundedString,
   parseExternalUrl,
   parseHome,
   parseLoginCode,
   parseProvider,
+  parseReaderProvider,
   parseToken,
 } from './ipc-validation';
 
@@ -34,6 +38,12 @@ export interface DesktopServices {
   submitLoginCode(code: string): void;
   cancelLogin(): void;
   activate(provider: LocalProviderId, externalId: string): Promise<void>;
+  usageReaderConnect(
+    accountId: string,
+    provider: ManualProviderId,
+    apiKey: string,
+  ): Promise<ConnectUsageReaderResult>;
+  usageReaderDisconnect(accountId: string): Promise<void>;
   shellIntegration(): Promise<ShellIntegration>;
   shellInstall(): Promise<ShellIntegration>;
   liveFeedTargets(): Promise<LiveFeedTarget[]>;
@@ -59,6 +69,14 @@ export function ipcHandlers(services: DesktopServices): Record<string, Handler> 
         parseProvider(provider),
         parseBoundedString(externalId, MAX_ID_LENGTH, 'account id'),
       ),
+    [DESKTOP_CHANNELS.usageReaderConnect]: (accountId, provider, apiKey) =>
+      services.usageReaderConnect(
+        parseAccountId(accountId),
+        parseReaderProvider(provider),
+        parseApiKey(apiKey),
+      ),
+    [DESKTOP_CHANNELS.usageReaderDisconnect]: (accountId) =>
+      services.usageReaderDisconnect(parseAccountId(accountId)),
     [DESKTOP_CHANNELS.shellIntegration]: () => services.shellIntegration(),
     [DESKTOP_CHANNELS.shellInstall]: () => services.shellInstall(),
     [DESKTOP_CHANNELS.liveFeedTargets]: () => services.liveFeedTargets(),

@@ -8,5 +8,7 @@
   "accountAdded": "Cuenta añadida",
   "accountSaved": "Cuenta guardada",
   "subscriptionAdded": "Suscripción añadida",
-  "usageRecorded": "Uso registrado"
+  "usageRecorded": "Uso registrado",
+  "usageReaderOn": "Leyendo el uso desde {{name}}",
+  "usageReaderOff": "Lectura automática desactivada"
 }
