@@ -244,9 +244,16 @@ async function main(): Promise<void> {
           async check(dir) {
             const externalId = await impl.signedInAs(dir);
             if (!externalId) return `${impl.displayName} finished without signing an account in.`;
+            // A collection that ran during the sign-in may have read this
+            // very folder already; it is not a duplicate of itself.
             const known = collector
               .localAccounts()
-              .some((l) => l.account.provider === provider && l.account.externalId === externalId);
+              .some(
+                (l) =>
+                  l.account.provider === provider &&
+                  l.account.externalId === externalId &&
+                  resolve(l.login.home) !== resolve(dir),
+              );
             return known ? `This ${impl.displayName} account is already added.` : null;
           },
           onProgress: (progress) => {

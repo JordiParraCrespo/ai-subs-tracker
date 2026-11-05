@@ -227,7 +227,9 @@ export function startLogin(deps: AddLoginDeps): LoginHandle {
       let last = '';
       const report = () => {
         const printed = readProgress(output);
-        const progress: LoginProgress = capture
+        // A CLI that gives `$BROWSER` its automatic link prints the manual
+        // one, which needs a code, whether or not the capture could run.
+        const progress: LoginProgress = cmd.capturesBrowser
           ? { link: captured, codeLink: printed.link, code: printed.code, deadline }
           : { link: printed.link, codeLink: null, code: printed.code, deadline };
         const key = JSON.stringify(progress);

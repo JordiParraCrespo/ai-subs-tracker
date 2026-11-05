@@ -184,6 +184,30 @@ describe('a Claude sign-in that finishes in a private window', () => {
     },
   );
 
+  it('still offers the printed link as the code path where $BROWSER cannot be caught', async () => {
+    const root = await tempDir();
+    const seen: LoginProgress[] = [];
+    let browser: string | undefined = 'unset';
+    const result = await addLogin({
+      managedRoot: root,
+      provider: 'claude-code',
+      command: claude,
+      platform: 'win32',
+      onProgress: (progress) => seen.push(progress),
+      env: {},
+      spawn: ((cmd: string, args: string[], opts: { env: Record<string, string> }) => {
+        browser = opts.env.BROWSER;
+        return fakeChild((child) => {
+          child.stdout.write(`If the browser didn't open, visit: ${MANUAL}\n`);
+          setTimeout(() => child.emit('exit', 0, null), 5);
+        })(cmd, args, opts);
+      }) as never,
+    });
+    expect(result.ok).toBe(true);
+    expect(browser).toBeUndefined();
+    expect(seen.at(-1)).toMatchObject({ link: null, codeLink: MANUAL });
+  });
+
   it('takes only a link whose callback is on this computer from $BROWSER', () => {
     expect(acceptBrowserLink(`${AUTO}\n`)).toBe(AUTO);
     expect(acceptBrowserLink(AUTO.replace('localhost', '127.0.0.1'))).not.toBeNull();
