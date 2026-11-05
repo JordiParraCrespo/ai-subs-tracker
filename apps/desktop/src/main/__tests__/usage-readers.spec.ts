@@ -176,6 +176,43 @@ describe('UsageReaders', () => {
     expect(h.reads).toHaveLength(3);
   });
 
+  it('does not call the vendor again on a new Turn on while it is rate limited', async () => {
+    const h = harness({
+      readings: [
+        { status: 'rate_limited', message: 'slow down', reportedPlan: null, snapshot: null },
+      ],
+    });
+    expect((await h.readers.connect(ACCOUNT, 'zai', KEY, 'session')).ok).toBe(false);
+    expect((await h.readers.connect(ACCOUNT, 'zai', KEY, 'session')).ok).toBe(false);
+    expect(h.reads).toHaveLength(1);
+    h.advance(READER_RATE_LIMIT_PAUSE_MS);
+    expect((await h.readers.connect(ACCOUNT, 'zai', KEY, 'session')).ok).toBe(true);
+    expect(h.reads).toHaveLength(2);
+  });
+
+  // A Turn off while a replacement key is still being checked must win: the
+  // key it would have kept is never stored.
+  it('keeps no key from a connect that was still in flight when the reader was turned off', async () => {
+    const h = harness();
+    let release: (value: QuotaReading) => void = () => undefined;
+    const pending = new Promise<QuotaReading>((resolve) => {
+      release = resolve;
+    });
+    const readers = new UsageReaders({
+      store: h.store,
+      read: () => pending,
+      post: async () => ({ kind: 'ok' }),
+      now: () => new Date('2026-11-05T12:00:00Z'),
+      log: () => undefined,
+    });
+    const connecting = readers.connect(ACCOUNT, 'zai', KEY, 'session');
+    await readers.disconnect(ACCOUNT);
+    release(ok);
+    expect((await connecting).ok).toBe(false);
+    expect(await h.store.list()).toEqual([]);
+    expect(readers.states()).toEqual([]);
+  });
+
   it('forgets the key when ResetOwl says the account is gone', async () => {
     const h = harness({ posts: [{ kind: 'ok' }, { kind: 'not_found' }] });
     await h.readers.connect(ACCOUNT, 'zai', KEY, 'session');

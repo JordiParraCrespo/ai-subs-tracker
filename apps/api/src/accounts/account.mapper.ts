@@ -167,6 +167,20 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
     };
   }
 
+  /**
+   * A reading the desktop's unofficial reader sent, as stored: its source
+   * pinned to `unofficial` and stamped when it arrived, so a desktop clock
+   * that is off cannot file it in the future.
+   */
+  toUnofficialSnapshot(snapshot: UsageSnapshot, at: Date): UsageSnapshot {
+    return { ...snapshot, source: 'unofficial', capturedAt: at.toISOString() };
+  }
+
+  /** The tier a vendor named in a reading, as a sighting that changes nothing else. */
+  toReadingSighting(reportedPlan: string, at: Date): Sighting {
+    return { email: null, organization: null, reportedPlan, location: null, at };
+  }
+
   toSnapshotRecord(accountId: string, snapshot: UsageSnapshot): Partial<UsageSnapshotOrmEntity> {
     return {
       accountId,

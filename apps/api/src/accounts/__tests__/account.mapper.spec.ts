@@ -63,3 +63,23 @@ describe('AccountMapper: hand-tracked accounts', () => {
     expect(mapper.toManualUsage({ ...usage, weeklyResetsAt: null }).weeklyResetsAt).toBeNull();
   });
 });
+
+describe('AccountMapper.toUnofficialSnapshot', () => {
+  // Regression: a desktop clock running ahead filed readings in the future,
+  // where they would outrank every later one as "latest".
+  it('pins the source and stamps the reading when it arrived, not when the desktop says', () => {
+    const at = new Date('2026-11-05T12:00:00.000Z');
+    const stored = new AccountMapper().toUnofficialSnapshot(
+      {
+        capturedAt: '2099-01-01T00:00:00.000Z',
+        source: 'unofficial',
+        status: 'ok',
+        message: null,
+        windows: [],
+        extraUsage: null,
+      },
+      at,
+    );
+    expect(stored).toMatchObject({ source: 'unofficial', capturedAt: at.toISOString() });
+  });
+});

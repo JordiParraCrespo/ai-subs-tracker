@@ -2,6 +2,7 @@ import { AppError } from '@flama/backend-core';
 import type { UsageSnapshot } from '@flama/shared/schemas/accounts';
 import { None, Some } from 'oxide.ts';
 import { describe, expect, it, vi } from 'vitest';
+import { AccountMapper } from '../../../account.mapper';
 import type { AccountRepositoryPort } from '../../../database/account.repository.port';
 import type { UsageRepositoryPort } from '../../../database/usage.repository.port';
 import { AccountEntity } from '../../../domain/account.entity';
@@ -40,6 +41,7 @@ function setup(account: AccountEntity | null) {
   const handler = new ReportUsageReadingCommandHandler(
     accounts as unknown as AccountRepositoryPort,
     usage as unknown as UsageRepositoryPort,
+    new AccountMapper(),
   );
   return { accounts, usage, handler };
 }

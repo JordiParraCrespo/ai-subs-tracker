@@ -119,6 +119,8 @@ export class UsageReaders {
   private readonly state = new Map<string, UsageReaderState>();
   private readonly lastAttempt = new Map<string, number>();
   private readonly pausedUntil = new Map<string, number>();
+  /** Bumped by every connect and disconnect: an older connect still in flight keeps no key. */
+  private readonly generation = new Map<string, number>();
   private loaded = false;
 
   constructor(private readonly deps: UsageReadersDeps) {}
@@ -138,6 +140,8 @@ export class UsageReaders {
     apiKey: string,
     token: string | null,
   ): Promise<ConnectUsageReaderResult> {
+    // Taken before any await, so a Turn off pressed after this always wins.
+    const mine = this.bump(accountId);
     if (!token) return { ok: false, message: 'Sign in to ResetOwl first.', reader: null };
     if (!this.deps.store.available()) {
       return {
@@ -148,8 +152,20 @@ export class UsageReaders {
       };
     }
     await this.ensureLoaded();
+    // A rate limit holds for a pasted key too: pressing Turn on again must not call the vendor.
+    if ((this.pausedUntil.get(accountId) ?? 0) > this.deps.now().getTime()) {
+      return {
+        ok: false,
+        message: 'The vendor is rate limiting usage requests. Try again in a few minutes.',
+        reader: null,
+      };
+    }
     const outcome = await this.readAndSend(accountId, provider, apiKey, token);
     if (outcome.status !== 'ok') return { ok: false, message: outcome.message, reader: null };
+    // Turned off (or connected again) while this one waited: it keeps nothing.
+    if (this.generation.get(accountId) !== mine) {
+      return { ok: false, message: 'Automatic reading was turned off.', reader: null };
+    }
     await this.deps.store.put(accountId, provider, apiKey);
     this.state.set(accountId, outcome);
     return { ok: true, message: null, reader: outcome };
@@ -157,6 +173,7 @@ export class UsageReaders {
 
   /** Forgets the key; the account goes back to readings recorded by hand. */
   async disconnect(accountId: string): Promise<void> {
+    this.bump(accountId);
     await this.deps.store.remove(accountId);
     this.state.delete(accountId);
     this.lastAttempt.delete(accountId);
@@ -181,6 +198,12 @@ export class UsageReaders {
       }
       this.state.set(accountId, outcome);
     }
+  }
+
+  private bump(accountId: string): number {
+    const next = (this.generation.get(accountId) ?? 0) + 1;
+    this.generation.set(accountId, next);
+    return next;
   }
 
   private async ensureLoaded(): Promise<void> {

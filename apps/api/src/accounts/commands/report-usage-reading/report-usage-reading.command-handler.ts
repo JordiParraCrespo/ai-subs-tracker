@@ -3,6 +3,7 @@ import type { AggregateID } from '@flama/backend-ddd';
 import { Inject } from '@nestjs/common';
 import { CommandHandler, type ICommandHandler } from '@nestjs/cqrs';
 import { ACCOUNT_REPOSITORY, USAGE_REPOSITORY } from '../../account.di-tokens';
+import { AccountMapper } from '../../account.mapper';
 import type { AccountRepositoryPort } from '../../database/account.repository.port';
 import type { UsageRepositoryPort } from '../../database/usage.repository.port';
 import { AccountErrors } from '../../domain/account.errors';
@@ -27,6 +28,7 @@ export class ReportUsageReadingCommandHandler
     private readonly accounts: AccountRepositoryPort,
     @Inject(USAGE_REPOSITORY)
     private readonly usage: UsageRepositoryPort,
+    private readonly mapper: AccountMapper,
   ) {}
 
   async execute(command: ReportUsageReadingCommand): Promise<AggregateID> {
@@ -34,21 +36,14 @@ export class ReportUsageReadingCommandHandler
     if (found.isNone()) throw new AppError(AccountErrors.NOT_FOUND);
     const account = found.unwrap();
     if (!account.hasUnofficialReader) throw new AppError(AccountErrors.NO_USAGE_READER);
-    // Stamped on arrival: a desktop clock that is off must not file it in the future.
     const at = new Date();
     await this.usage.recordSnapshot(
       account.id,
-      { ...command.snapshot, source: 'unofficial', capturedAt: at.toISOString() },
+      this.mapper.toUnofficialSnapshot(command.snapshot, at),
       SNAPSHOT_RETENTION_DAYS,
     );
     if (command.reportedPlan && command.reportedPlan !== account.reportedPlan) {
-      account.recordSighting({
-        email: null,
-        organization: null,
-        reportedPlan: command.reportedPlan,
-        location: null,
-        at,
-      });
+      account.recordSighting(this.mapper.toReadingSighting(command.reportedPlan, at));
       await this.accounts.save(account);
     }
     return account.id;
