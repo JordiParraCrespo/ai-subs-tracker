@@ -1,5 +1,5 @@
 import { DsModalBody, DsModalFooter } from '@flama/design-system-web';
-import { useZodResolver } from '@flama/frontend-web';
+import { PasswordInput, useZodResolver } from '@flama/frontend-web';
 import { changeOwnPasswordSchema } from '@flama/shared/schemas/profile';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -50,33 +50,39 @@ export function ChangePasswordForm({
   return (
     <form id={FORM} className="contents" onSubmit={handleSubmit(onSubmit)} noValidate>
       <DsModalBody>
-        <label className="ds-field">
-          <span className="ds-label">{t('settings.changePassword.current')}</span>
-          <input
+        <div className="ds-field">
+          <label htmlFor={`${FORM}-current`} className="ds-label">
+            {t('settings.changePassword.current')}
+          </label>
+          <PasswordInput
             {...register('currentPassword')}
-            type="password"
+            id={`${FORM}-current`}
             autoComplete="current-password"
-            className="ds-text-field ds-text-field--sm"
+            className="ds-text-field--sm"
           />
-        </label>
-        <label className="ds-field">
-          <span className="ds-label">{t('settings.changePassword.new')}</span>
-          <input
+        </div>
+        <div className="ds-field">
+          <label htmlFor={`${FORM}-new`} className="ds-label">
+            {t('settings.changePassword.new')}
+          </label>
+          <PasswordInput
             {...register('newPassword')}
-            type="password"
+            id={`${FORM}-new`}
             autoComplete="new-password"
-            className="ds-text-field ds-text-field--sm"
+            className="ds-text-field--sm"
           />
-        </label>
-        <label className="ds-field">
-          <span className="ds-label">{t('settings.changePassword.confirm')}</span>
-          <input
+        </div>
+        <div className="ds-field">
+          <label htmlFor={`${FORM}-confirm`} className="ds-label">
+            {t('settings.changePassword.confirm')}
+          </label>
+          <PasswordInput
             {...register('confirmPassword')}
-            type="password"
+            id={`${FORM}-confirm`}
             autoComplete="new-password"
-            className="ds-text-field ds-text-field--sm"
+            className="ds-text-field--sm"
           />
-        </label>
+        </div>
         <span className="ds-t-sub">{t('settings.changePassword.note')}</span>
       </DsModalBody>
       <DsModalFooter start={<BackButton onClick={onBack} />}>

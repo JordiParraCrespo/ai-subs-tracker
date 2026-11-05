@@ -1,5 +1,11 @@
 import { FieldGroup, Input } from '@flama/design-system-web';
-import { AuthField, AuthFormError, authInputClass, useZodResolver } from '@flama/frontend-web';
+import {
+  AuthField,
+  AuthFormError,
+  authInputClass,
+  PasswordInput,
+  useZodResolver,
+} from '@flama/frontend-web';
 import { type LoginDto, loginSchema } from '@flama/shared/schemas/auth';
 import type { ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
@@ -52,15 +58,13 @@ export function LoginForm({
         </AuthField>
 
         <AuthField label={t('auth.password')} htmlFor="password" error={errors.password}>
-          <Input
+          <PasswordInput
             {...register('password')}
             id="password"
-            type="password"
             autoComplete="current-password"
             placeholder={t('auth.passwordPlaceholder')}
             aria-invalid={Boolean(errors.password)}
             disabled={isPending}
-            className={authInputClass}
           />
         </AuthField>
 
