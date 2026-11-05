@@ -52,7 +52,9 @@ const WHAM = {
 describe('codex detect', () => {
   it('finds ~/.codex and managed homes', async () => {
     const { home, dir } = await codexHome();
-    await mkdir(join(home, 'managed', 'codex', 'c1'), { recursive: true });
+    await writeJson(join(home, 'managed', 'codex', 'c1', 'auth.json'), {
+      tokens: { access_token: 'c' },
+    });
     const found = await codexProvider.detect(testEnv(home));
     expect(found).toEqual([
       { provider: 'codex', home: dir, isDefault: true, managed: false },
@@ -72,6 +74,13 @@ describe('codex detect', () => {
     await writeJson(join(home, '.codex', 'auth.json'), { tokens: { access_token: 'b' } });
     const found = await codexProvider.detect(testEnv(home, { env: { CODEX_HOME: custom } }));
     expect(found.map((l) => [l.home, l.isDefault])).toEqual([[custom, true]]);
+  });
+
+  it('skips a managed folder holding no login, which a failed sign-in can leave', async () => {
+    const { home, dir } = await codexHome();
+    await mkdir(join(home, 'managed', 'codex', 'empty'), { recursive: true });
+    const found = await codexProvider.detect(testEnv(home));
+    expect(found.map((l) => l.home)).toEqual([dir]);
   });
 
   it('finds nothing without a Codex home', async () => {
@@ -345,11 +354,47 @@ describe('codex commands', () => {
       command: 'codex',
       args: ['login', '--device-auth'],
       env: { CODEX_HOME: '/m/codex/c1' },
+      linkHosts: ['auth.openai.com'],
     });
     const base = { provider: 'codex' as const, managed: true };
     expect(codexProvider.launchEnv({ ...base, home: '/h/.codex', isDefault: true })).toEqual({});
     expect(codexProvider.launchEnv({ ...base, home: '/m/codex/c1', isDefault: false })).toEqual({
       CODEX_HOME: '/m/codex/c1',
+    });
+  });
+});
+
+describe('codex identify', () => {
+  const identify = (home: string) => {
+    if (!codexProvider.identify) throw new Error('codex identifies its logins');
+    return codexProvider.identify(home, testEnv(home));
+  };
+
+  it('names the account a ChatGPT sign-in saved', async () => {
+    const { dir } = await codexHome();
+    expect(await identify(dir)).toEqual({
+      ok: true,
+      externalId: 'acct-1',
+      email: 'dev@example.com',
+      organization: null,
+    });
+  });
+
+  it('refuses a folder with no login, an API key, or a login naming no account', async () => {
+    const home = await tempHome();
+    expect(await identify(home)).toMatchObject({
+      ok: false,
+      problem: expect.stringMatching(/without saving/),
+    });
+    await writeJson(join(home, 'auth.json'), { OPENAI_API_KEY: 'sk-x' });
+    expect(await identify(home)).toMatchObject({
+      ok: false,
+      problem: expect.stringMatching(/API key/),
+    });
+    await writeJson(join(home, 'auth.json'), { tokens: { access_token: 'a' } });
+    expect(await identify(home)).toMatchObject({
+      ok: false,
+      problem: expect.stringMatching(/no ChatGPT account/),
     });
   });
 });

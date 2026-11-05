@@ -12,8 +12,11 @@ import type { LoginCommand } from '@flama/usage-providers';
  * opens the browser itself; ResetOwl reads what it prints (Claude's manual
  * sign-in link, Codex's page and one-time code) so the screens can offer them,
  * types a code the person pastes into the CLI's own prompt, and waits for it
- * to exit. The credentials it writes stay in that folder and are never read
- * for anything but the provider's own usage endpoint.
+ * to exit. A provider that can say who a folder is signed in as then has the
+ * new folder checked (`verify`): no login, or an account already on this
+ * machine, removes it and fails with the reason. The credentials it writes
+ * stay in that folder and are never read for anything but the provider's own
+ * usage endpoint.
  */
 
 /** Codex's one-time code lasts 15 minutes; Claude's sign-in gets the same. */
@@ -34,22 +37,51 @@ export function stripTerminal(text: string): string {
 /**
  * What the screens can show from what a login printed so far: the link to
  * sign in at (Claude's manual link, Codex's device page) and Codex's one-time
- * code, which the CLI prints on the line after the one that names it.
+ * code, which the CLI prints on the line after the one that names it. A link
+ * counts once whitespace follows it (output arrives in chunks, so a link
+ * without it may still be printing) and, with `linkHosts`, only on those hosts.
  */
-export function readProgress(output: string): LoginProgress {
+export function readProgress(output: string, linkHosts?: readonly string[]): LoginProgress {
   const text = stripTerminal(output);
-  const link = extractUrls(text)[0] ?? null;
-  const code = text.match(/one-time code[^\n]*\n\s*([A-Z0-9]{4,}(?:-[A-Z0-9]{4,})+)/)?.[1] ?? null;
+  const link =
+    extractUrls(text).find((url) => !linkHosts || linkHosts.includes(hostOf(url))) ?? null;
+  const code =
+    text.match(/one-time code[^\n]*\r?\n\s*([A-Z0-9]{4,}(?:-[A-Z0-9]{4,})+)\s/)?.[1] ?? null;
   return { link, code };
 }
 
-/** Finds https URLs in CLI output, without trailing punctuation. */
+function hostOf(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return '';
+  }
+}
+
+/** Finds complete https URLs (whitespace after them) in CLI output, without trailing punctuation. */
 export function extractUrls(text: string): string[] {
   const out: string[] = [];
-  for (const match of text.matchAll(/https:\/\/[^\s"'<>`]+/g)) {
+  for (const match of text.matchAll(/https:\/\/[^\s"'<>`]+(?=\s)/g)) {
     out.push(match[0].replace(/[).,;:\]]+$/, ''));
   }
   return out;
+}
+
+/** How much of a failed CLI's output a failure message carries. */
+const TAIL_CHARS = 2_000;
+const TAIL_LINES = 20;
+
+/**
+ * The end of what a CLI printed, readable: terminal escapes gone, a line a
+ * spinner redrew kept as its last state, blank lines dropped.
+ */
+export function outputTail(output: string): string {
+  const lines = stripTerminal(output)
+    .split(/\r?\n/)
+    .map((line) => (line.split('\r').pop() ?? '').trimEnd())
+    .filter((line) => line.trim() !== '');
+  const tail = lines.slice(-TAIL_LINES).join('\n');
+  return tail.length <= TAIL_CHARS ? tail : `…${tail.slice(-TAIL_CHARS)}`;
 }
 
 /**
@@ -81,6 +113,11 @@ export interface AddLoginDeps {
   managedRoot: string;
   provider: string;
   command: (home: string) => LoginCommand;
+  /**
+   * Checks the folder a sign-in that exited 0 wrote: null keeps it, a
+   * message removes it and fails with that message.
+   */
+  verify?(home: string): Promise<string | null>;
   /** Called each time the link or the code the CLI printed changes. */
   onProgress?(progress: LoginProgress): void;
   env: Record<string, string | undefined>;
@@ -142,7 +179,7 @@ export function startLogin(deps: AddLoginDeps): LoginHandle {
       }, timeoutMs);
       const onOutput = (chunk: Buffer) => {
         output += chunk.toString('utf8');
-        const progress = readProgress(output);
+        const progress = readProgress(output, cmd.linkHosts);
         const key = `${progress.link}|${progress.code}`;
         if (key === last) return;
         last = key;
@@ -164,20 +201,31 @@ export function startLogin(deps: AddLoginDeps): LoginHandle {
       running.on('exit', (code, signal) => {
         if (code === 0) finish({ ok: true, message: null });
         else if (cancelled) finish({ ok: false, message: 'Sign-in cancelled.' });
-        else
-          finish({
-            ok: false,
-            message: `\`${cmd.command} ${cmd.args.join(' ')}\` exited with ${code ?? signal}.`,
-          });
+        else {
+          // The CLI's own words are the reason (a workspace with device-code
+          // sign-in turned off, a network error), so they go with the failure.
+          const said = outputTail(output);
+          const exited = `\`${cmd.command} ${cmd.args.join(' ')}\` exited with ${code ?? signal}`;
+          finish({ ok: false, message: said ? `${exited}:\n${said}` : `${exited}.` });
+        }
       });
     });
 
-    if (!outcome.ok) {
-      // The folder is ours and minutes old; a failed sign-in leaves nothing to keep.
-      await rm(home, { recursive: true, force: true }).catch(() => undefined);
-      deps.log?.(`add login (${deps.provider}) failed: ${outcome.message}`);
+    let checked = outcome;
+    if (outcome.ok && deps.verify) {
+      const problem = await deps
+        .verify(home)
+        .catch((err: unknown) => (err instanceof Error ? err.message : String(err)));
+      if (problem) checked = { ok: false, message: problem };
     }
-    return outcome;
+
+    if (!checked.ok) {
+      // The folder is ours and minutes old; a failed sign-in leaves nothing to
+      // keep, and a second folder of one account would rotate its tokens.
+      await rm(home, { recursive: true, force: true }).catch(() => undefined);
+      deps.log?.(`add login (${deps.provider}) failed: ${checked.message}`);
+    }
+    return checked;
   })();
 
   return {

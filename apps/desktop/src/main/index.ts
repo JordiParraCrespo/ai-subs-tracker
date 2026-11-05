@@ -36,6 +36,7 @@ import {
 } from './shell-integration';
 import { createTokenStore } from './token-store';
 import { createTray, type TrayController } from './tray';
+import { checkNewLogin } from './verify-login';
 import { createMainWindow, registerAppScheme, rendererRoot, serveRenderer } from './window';
 
 /**
@@ -238,6 +239,7 @@ async function main(): Promise<void> {
           managedRoot,
           provider,
           command: (dir) => impl.loginCommand(dir),
+          verify: (dir) => checkNewLogin(impl, dir, providerEnv()),
           onProgress: (progress) => {
             if (win && !win.isDestroyed())
               win.webContents.send(DESKTOP_CHANNELS.accountsLoginProgress, progress);

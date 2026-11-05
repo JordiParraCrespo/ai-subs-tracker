@@ -683,7 +683,11 @@
         "expires": "The code expires in 15 minutes",
         "copyCode": "Copy code",
         "openPage": "Open page",
-        "preparing": "Asking OpenAI for a code…"
+        "preparing": "Asking OpenAI for a code…",
+        "otherTitle": "Signed in to a different account?",
+        "otherText": "Copy the link and open it in a private window, so you sign in as the account you want to add and the one you use now stays signed in.",
+        "copyLink": "Copy link",
+        "linkCopied": "Link copied"
       },
       "desktop": {
         "title": "Add it from the desktop app",

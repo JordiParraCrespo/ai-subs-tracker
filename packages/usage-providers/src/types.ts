@@ -39,7 +39,20 @@ export interface LoginCommand {
   command: string;
   args: string[];
   env: Record<string, string>;
+  /**
+   * Hosts a printed sign-in link must be on to be shown (Codex's
+   * `auth.openai.com`); any https link when absent.
+   */
+  linkHosts?: readonly string[];
 }
+
+/**
+ * Who a login folder is signed in as, read from disk only: the key the
+ * account syncs under, or why the folder holds no account ResetOwl can use.
+ */
+export type LoginIdentity =
+  | { ok: true; externalId: string; email: string | null; organization: string | null }
+  | { ok: false; problem: string };
 
 export interface ReadOptions {
   /** `YYYY-MM-DD`, a local day: tokens from this day on are counted. */
@@ -56,6 +69,12 @@ export interface CodingAgentProvider {
   read(login: DetectedLogin, env: ProviderEnv, opts: ReadOptions): Promise<SyncAccount>;
   /** The command that signs a NEW isolated account into `home`. */
   loginCommand(home: string): LoginCommand;
+  /**
+   * Who `home` is signed in as, without the network. When present, a new
+   * sign-in is checked with it: a folder with no usable login, or one naming
+   * an account already on this machine, is removed instead of kept.
+   */
+  identify?(home: string, env: ProviderEnv): Promise<LoginIdentity>;
   /** The env a terminal needs to use this login; `{}` for the default login. */
   launchEnv(login: DetectedLogin): Record<string, string>;
 }

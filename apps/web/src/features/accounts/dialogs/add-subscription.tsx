@@ -92,7 +92,9 @@ export function AddSubscriptionDialog({ onClose }: { onClose: () => void }) {
           <DsModalBody className="ds-modal__body--list">
             {login.failure && (
               <Alert variant="destructive">
-                <AlertDescription>{login.failure}</AlertDescription>
+                <AlertDescription className="whitespace-pre-line break-words">
+                  {login.failure}
+                </AlertDescription>
               </Alert>
             )}
             {PROVIDER_ORDER.map((provider) => (

@@ -12,6 +12,7 @@ import type {
   CodingAgentProvider,
   DetectedLogin,
   LoginCommand,
+  LoginIdentity,
   ProviderEnv,
   ReadOptions,
 } from '../types';
@@ -35,14 +36,16 @@ function codexCommand(login: DetectedLogin): string {
   return login.isDefault ? 'codex' : `CODEX_HOME=${login.home} codex`;
 }
 
+/** A Codex home holds a login or the sessions of one; an empty folder is neither. */
+async function hasCodexData(home: string): Promise<boolean> {
+  return (await exists(join(home, 'auth.json'))) || (await isDirectory(join(home, 'sessions')));
+}
+
 async function detect(env: ProviderEnv): Promise<DetectedLogin[]> {
   const found: DetectedLogin[] = [];
   const managedDir = resolve(env.managedRoot, 'codex');
   const defaultHome = resolve(defaultCodexHome(env));
-  if (
-    (await exists(join(defaultHome, 'auth.json'))) ||
-    (await isDirectory(join(defaultHome, 'sessions')))
-  ) {
+  if (await hasCodexData(defaultHome)) {
     found.push({
       provider: 'codex',
       home: defaultHome,
@@ -52,7 +55,8 @@ async function detect(env: ProviderEnv): Promise<DetectedLogin[]> {
   }
   for (const dir of await subdirectories(managedDir)) {
     const home = resolve(dir);
-    if (home === defaultHome) continue;
+    // A folder a sign-in left behind without a login is not an account.
+    if (home === defaultHome || !(await hasCodexData(home))) continue;
     found.push({ provider: 'codex', home, isDefault: false, managed: true });
   }
   return found;
@@ -186,7 +190,33 @@ async function read(
 function loginCommand(home: string): LoginCommand {
   // The device-code flow: a page and a one-time code the screens can show,
   // rather than a callback on a localhost port another app may hold.
-  return { command: 'codex', args: ['login', '--device-auth'], env: { CODEX_HOME: home } };
+  return {
+    command: 'codex',
+    args: ['login', '--device-auth'],
+    env: { CODEX_HOME: home },
+    linkHosts: ['auth.openai.com'],
+  };
+}
+
+async function identify(home: string): Promise<LoginIdentity> {
+  const auth = await readCodexAuth(home).catch(() => null);
+  if (!auth) return { ok: false, problem: 'Codex finished without saving a login.' };
+  if (auth.mode === 'api_key') {
+    return {
+      ok: false,
+      problem:
+        'Codex saved an API key, which has no plan limits. Sign in with ChatGPT to add a subscription.',
+    };
+  }
+  if (!auth.accountId && !auth.email) {
+    return { ok: false, problem: 'Codex saved a login that names no ChatGPT account.' };
+  }
+  return {
+    ok: true,
+    externalId: externalIdFor(auth.accountId, auth.email, home),
+    email: auth.email,
+    organization: auth.organization,
+  };
 }
 
 function launchEnv(login: DetectedLogin): Record<string, string> {
@@ -199,5 +229,6 @@ export const codexProvider: CodingAgentProvider = {
   detect,
   read,
   loginCommand,
+  identify,
   launchEnv,
 };
