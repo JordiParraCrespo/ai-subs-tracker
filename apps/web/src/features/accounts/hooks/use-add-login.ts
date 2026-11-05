@@ -5,11 +5,11 @@ import type { LocalProviderId } from '@flama/shared/subscriptions';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const NOTHING_YET: LoginProgress = { link: null, code: null };
+const NOTHING_YET: LoginProgress = { link: null, codeLink: null, code: null, deadline: null };
 
 /**
  * One add-account sign-in through the desktop app: starts the provider's CLI
- * login, follows what it prints (the link, Codex's code), types a pasted code
+ * login, follows what it gives (its links, Codex's code, its deadline), types a pasted code
  * into it, and stops it when the person goes back or closes the dialog.
  * `onAdded` runs once the CLI has signed the new account in, `onFailed` when
  * it stopped without one (the reason is `failure`).

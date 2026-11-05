@@ -340,6 +340,16 @@ describe('codex tokens', () => {
 });
 
 describe('codex commands', () => {
+  it('names who a login signed in, and nobody before auth.json names an account', async () => {
+    const empty = await tempHome();
+    expect(await codexProvider.signedInAs(join(empty, 'c1'))).toBeNull();
+    const apiKeyOnly = await tempHome();
+    await writeJson(join(apiKeyOnly, 'auth.json'), { OPENAI_API_KEY: 'sk-abc' });
+    expect(await codexProvider.signedInAs(apiKeyOnly)).toBeNull();
+    const { dir } = await codexHome();
+    expect(await codexProvider.signedInAs(dir)).toBe('acct-1');
+  });
+
   it('signs a new account into its own CODEX_HOME', () => {
     expect(codexProvider.loginCommand('/m/codex/c1')).toEqual({
       command: 'codex',

@@ -238,6 +238,24 @@ async function main(): Promise<void> {
           managedRoot,
           provider,
           command: (dir) => impl.loginCommand(dir),
+          // The CLI exiting is not enough: the folder must name an account,
+          // and not one already on this machine (often the browser's own,
+          // signed in again), which would only be merged away in the list.
+          async check(dir) {
+            const externalId = await impl.signedInAs(dir);
+            if (!externalId) return `${impl.displayName} finished without signing an account in.`;
+            // A collection that ran during the sign-in may have read this
+            // very folder already; it is not a duplicate of itself.
+            const known = collector
+              .localAccounts()
+              .some(
+                (l) =>
+                  l.account.provider === provider &&
+                  l.account.externalId === externalId &&
+                  resolve(l.login.home) !== resolve(dir),
+              );
+            return known ? `This ${impl.displayName} account is already added.` : null;
+          },
           onProgress: (progress) => {
             if (win && !win.isDestroyed())
               win.webContents.send(DESKTOP_CHANNELS.accountsLoginProgress, progress);
@@ -293,6 +311,8 @@ async function main(): Promise<void> {
   app.on('before-quit', () => {
     quitting = true;
     collector.stop();
+    // The CLI runs in a process group of its own, which a quit would not end.
+    login?.cancel();
     void liveServer?.close();
   });
   app.on('window-all-closed', () => {

@@ -189,6 +189,13 @@ function loginCommand(home: string): LoginCommand {
   return { command: 'codex', args: ['login', '--device-auth'], env: { CODEX_HOME: home } };
 }
 
+/** Signed in once `auth.json` names an account or an email. */
+async function signedInAs(home: string): Promise<string | null> {
+  const auth = await readCodexAuth(home).catch(() => null);
+  if (!auth?.accountId && !auth?.email) return null;
+  return externalIdFor(auth.accountId, auth.email, home);
+}
+
 function launchEnv(login: DetectedLogin): Record<string, string> {
   return login.isDefault ? {} : { CODEX_HOME: login.home };
 }
@@ -199,5 +206,6 @@ export const codexProvider: CodingAgentProvider = {
   detect,
   read,
   loginCommand,
+  signedInAs,
   launchEnv,
 };
