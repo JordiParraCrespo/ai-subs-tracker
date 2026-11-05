@@ -219,14 +219,20 @@ test('the desktop app finds the logins on disk, syncs them, and switches the ter
   }
 });
 
+/** The link the fake CLI hands to `$BROWSER`: its callback is on localhost. */
+const AUTO_LINK =
+  'https://claude.com/cai/oauth/authorize?code=false&redirect_uri=http%3A%2F%2Flocalhost%3A45454%2Fcallback&state=e2e';
+
 /**
- * A stand-in for `claude` on the app's PATH: it prints what Claude Code's
- * login prints when its stdin is a pipe (the manual link and the paste
- * prompt), takes the code from that prompt, and signs a login into
- * `CLAUDE_CONFIG_DIR` as the real one would. Nothing leaves the machine.
+ * A stand-in for `claude` on the app's PATH: it hands its automatic link to
+ * `$BROWSER` and prints what Claude Code's login prints when its stdin is a
+ * pipe (the manual link and the paste prompt), takes the code from that
+ * prompt, and signs a login into `CLAUDE_CONFIG_DIR` as the real one would.
+ * Nothing leaves the machine.
  */
 async function fakeClaude(bin: string, email: string) {
   const script = `#!/bin/sh
+[ -n "$BROWSER" ] && "$BROWSER" "${AUTO_LINK}"
 echo "Opening browser to sign in…"
 echo "If the browser didn't open, visit: https://claude.com/cai/oauth/authorize?code=true&state=e2e"
 printf 'Paste code here if prompted > '
@@ -276,6 +282,8 @@ test('adds a Claude Code account through the add-subscription modal, by pasted c
     const dialog = page.getByRole('dialog');
     await dialog.getByRole('button', { name: /Claude Code/ }).click();
     await expect(dialog.getByText('Waiting for Claude…')).toBeVisible();
+    // The link handed to $BROWSER is caught rather than opened, and offered.
+    await expect(dialog.getByRole('button', { name: 'Open in browser' })).toBeVisible();
 
     // The link arrives from the CLI's output; the code path needs it.
     await dialog.getByRole('button', { name: 'Use a code instead' }).click();

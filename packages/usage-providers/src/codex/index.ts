@@ -12,7 +12,6 @@ import type {
   CodingAgentProvider,
   DetectedLogin,
   LoginCommand,
-  LoginIdentity,
   ProviderEnv,
   ReadOptions,
 } from '../types';
@@ -198,25 +197,11 @@ function loginCommand(home: string): LoginCommand {
   };
 }
 
-async function identify(home: string): Promise<LoginIdentity> {
+/** Signed in once `auth.json` names an account or an email. */
+async function signedInAs(home: string): Promise<string | null> {
   const auth = await readCodexAuth(home).catch(() => null);
-  if (!auth) return { ok: false, problem: 'Codex finished without saving a login.' };
-  if (auth.mode === 'api_key') {
-    return {
-      ok: false,
-      problem:
-        'Codex saved an API key, which has no plan limits. Sign in with ChatGPT to add a subscription.',
-    };
-  }
-  if (!auth.accountId && !auth.email) {
-    return { ok: false, problem: 'Codex saved a login that names no ChatGPT account.' };
-  }
-  return {
-    ok: true,
-    externalId: externalIdFor(auth.accountId, auth.email, home),
-    email: auth.email,
-    organization: auth.organization,
-  };
+  if (!auth?.accountId && !auth?.email) return null;
+  return externalIdFor(auth.accountId, auth.email, home);
 }
 
 function launchEnv(login: DetectedLogin): Record<string, string> {
@@ -229,6 +214,6 @@ export const codexProvider: CodingAgentProvider = {
   detect,
   read,
   loginCommand,
-  identify,
+  signedInAs,
   launchEnv,
 };

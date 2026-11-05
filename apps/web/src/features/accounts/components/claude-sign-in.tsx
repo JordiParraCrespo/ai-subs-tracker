@@ -1,25 +1,44 @@
 import { DsButton, DsModalBody, DsModalFooter, DsModalHeader } from '@flama/design-system-web';
-import { ArrowLeft, Check, Copy } from '@flama/design-system-web/icons';
+import { ArrowLeft, ArrowUpRight, Check, Copy } from '@flama/design-system-web/icons';
 import { useCopy } from '@flama/frontend-web';
 import { useTranslation } from 'react-i18next';
+import { TimeLeft } from './time-left';
 import { WaitingCard } from './waiting-card';
 
 /**
- * Claude Code's sign-in step: the CLI has opened claude.com, and this waits
- * for it. Its manual link can be copied into a private window (another
- * account stays signed in) or followed to a code to paste instead.
+ * Claude Code's sign-in step. `link` is the automatic one: opened in any
+ * browser on this computer, a private window included (so another account
+ * stays signed in), it finishes the sign-in by itself. `codeLink` is the
+ * manual one, which ends at claude.com showing a code to paste back; when it
+ * is all there is, copying it goes straight to the step that takes the code.
  */
 export function ClaudeSignIn({
   link,
+  codeLink,
+  deadline,
   onBack,
+  onOpen,
   onUseCode,
 }: {
   link: string | null;
+  codeLink: string | null;
+  deadline: string | null;
   onBack: () => void;
+  onOpen: (link: string) => void;
   onUseCode: () => void;
 }) {
   const { t } = useTranslation();
   const { copied, copy } = useCopy();
+  const codeOnly = !link && !!codeLink;
+
+  const copyLink = () => {
+    if (link) {
+      void copy(link);
+    } else if (codeLink) {
+      void copy(codeLink);
+      onUseCode();
+    }
+  };
 
   return (
     <>
@@ -30,12 +49,16 @@ export function ClaudeSignIn({
       />
       <DsModalBody className="ds-modal__body--flow">
         <WaitingCard
-          title={t('accounts.add.claude.waiting')}
-          detail={t('accounts.add.claude.expires')}
+          title={
+            link || codeLink ? t('accounts.add.claude.waiting') : t('accounts.add.claude.preparing')
+          }
+          detail={<TimeLeft deadline={deadline} />}
         />
         <div className="ds-stack-4">
           <span className="ds-label-strong">{t('accounts.add.claude.otherTitle')}</span>
-          <span className="ds-t-sub">{t('accounts.add.claude.otherText')}</span>
+          <span className="ds-t-sub">
+            {codeOnly ? t('accounts.add.claude.codeOnlyText') : t('accounts.add.claude.otherText')}
+          </span>
         </div>
       </DsModalBody>
       <DsModalFooter
@@ -45,17 +68,27 @@ export function ClaudeSignIn({
           </DsButton>
         }
       >
-        <DsButton variant="ghost" size="sm" disabled={!link} onClick={onUseCode}>
+        <DsButton variant="ghost" size="sm" disabled={!codeLink} onClick={onUseCode}>
           {t('accounts.add.claude.useCode')}
         </DsButton>
         <DsButton
           size="sm"
-          disabled={!link}
+          disabled={!link && !codeLink}
           icon={copied ? <Check className="size-4" /> : <Copy className="size-4" />}
-          onClick={() => link && void copy(link)}
+          onClick={copyLink}
         >
           {copied ? t('accounts.add.claude.linkCopied') : t('accounts.add.claude.copyLink')}
         </DsButton>
+        {link && (
+          <DsButton
+            variant="primary"
+            size="sm"
+            iconEnd={<ArrowUpRight className="size-4" />}
+            onClick={() => onOpen(link)}
+          >
+            {t('accounts.add.claude.open')}
+          </DsButton>
+        )}
       </DsModalFooter>
     </>
   );

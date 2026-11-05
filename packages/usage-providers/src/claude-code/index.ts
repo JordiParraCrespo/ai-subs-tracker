@@ -181,7 +181,19 @@ function loginCommand(home: string): LoginCommand {
     command: 'claude',
     args: ['auth', 'login', '--claudeai'],
     env: { CLAUDE_CONFIG_DIR: home },
+    // The link it prints ends in a code to paste; the one it gives `$BROWSER`
+    // calls back to localhost and finishes in a private window by itself.
+    capturesBrowser: true,
   };
+}
+
+/** Signed in once `.claude.json` names an account with an email. */
+async function signedInAs(home: string): Promise<string | null> {
+  // `home` is a folder of ResetOwl's own, never `~/.claude`: passing it as
+  // the user's home too keeps `~/.claude.json` out of the candidates.
+  const identity = await readIdentity(home, home).catch(() => null);
+  if (!identity?.email) return null;
+  return externalIdFor(identity.accountUuid, identity.email, home);
 }
 
 /**
@@ -198,5 +210,6 @@ export const claudeCodeProvider: CodingAgentProvider = {
   detect,
   read,
   loginCommand,
+  signedInAs,
   launchEnv,
 };

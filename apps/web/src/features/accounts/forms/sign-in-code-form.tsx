@@ -9,8 +9,9 @@ interface SignInCodeValues {
 }
 
 /**
- * Claude Code's sign-in by code, for a browser on another device: the link to
- * open there, and the code claude.com shows afterwards, which goes to the CLI.
+ * Claude Code's sign-in by code, for a browser on another device: the manual
+ * link to open there, and the code claude.com shows afterwards, which goes to
+ * the CLI. Nothing finishes until that code is pasted.
  */
 export function SignInCodeForm({
   link,

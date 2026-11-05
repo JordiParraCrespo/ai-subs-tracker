@@ -17,7 +17,6 @@ export type {
   CodingAgentProvider,
   DetectedLogin,
   LoginCommand,
-  LoginIdentity,
   ProviderEnv,
   ReadOptions,
 } from './types';

@@ -45,7 +45,8 @@ type Step =
 
 /**
  * The design's Add subscription modal: pick a tool, then follow its CLI's
- * sign-in (Claude in the browser or by code, Codex by a one-time code). The
+ * sign-in (Claude in a browser on this computer or by a pasted code, Codex by
+ * a one-time code). The
  * sign-in runs on the machine, so in a browser picking one says where to do
  * it instead. A tool with nothing to sign in to on the machine (Z.AI) is a
  * short form instead, in the browser too: ResetOwl tracks its plan, not a key.
@@ -114,7 +115,10 @@ export function AddSubscriptionDialog({ onClose }: { onClose: () => void }) {
       {step.kind === 'sign-in' && step.provider === 'claude-code' && (
         <ClaudeSignIn
           link={login.progress.link}
+          codeLink={login.progress.codeLink}
+          deadline={login.progress.deadline}
           onBack={back}
+          onOpen={(link) => void desktopBridge?.openExternal(link)}
           onUseCode={() => setStep({ kind: 'code' })}
         />
       )}
@@ -128,9 +132,9 @@ export function AddSubscriptionDialog({ onClose }: { onClose: () => void }) {
         />
       )}
 
-      {step.kind === 'code' && login.progress.link && (
+      {step.kind === 'code' && login.progress.codeLink && (
         <SignInCodeForm
-          link={login.progress.link}
+          link={login.progress.codeLink}
           submitting={login.submitting}
           onBack={() => setStep({ kind: 'sign-in', provider: 'claude-code' })}
           onSubmit={login.submitCode}

@@ -40,19 +40,19 @@ export interface LoginCommand {
   args: string[];
   env: Record<string, string>;
   /**
+   * The CLI hands its automatic sign-in link (the one whose callback is on
+   * localhost and needs no code) to `$BROWSER`, and prints a manual link
+   * that ends in a code to paste back. The caller then points `BROWSER` at a
+   * script of its own to capture the first, and offers the printed one as
+   * the code path.
+   */
+  capturesBrowser?: boolean;
+  /**
    * Hosts a printed sign-in link must be on to be shown (Codex's
    * `auth.openai.com`); any https link when absent.
    */
   linkHosts?: readonly string[];
 }
-
-/**
- * Who a login folder is signed in as, read from disk only: the key the
- * account syncs under, or why the folder holds no account ResetOwl can use.
- */
-export type LoginIdentity =
-  | { ok: true; externalId: string; email: string | null; organization: string | null }
-  | { ok: false; problem: string };
 
 export interface ReadOptions {
   /** `YYYY-MM-DD`, a local day: tokens from this day on are counted. */
@@ -70,11 +70,12 @@ export interface CodingAgentProvider {
   /** The command that signs a NEW isolated account into `home`. */
   loginCommand(home: string): LoginCommand;
   /**
-   * Who `home` is signed in as, without the network. When present, a new
-   * sign-in is checked with it: a folder with no usable login, or one naming
-   * an account already on this machine, is removed instead of kept.
+   * Who a login just signed into `home` is, as the `externalId` `read` would
+   * give it; null when the folder holds no signed-in account. Run after the
+   * login command exits, to tell a real sign-in from a CLI that only exited,
+   * and an account already on this machine from a new one.
    */
-  identify?(home: string, env: ProviderEnv): Promise<LoginIdentity>;
+  signedInAs(home: string): Promise<string | null>;
   /** The env a terminal needs to use this login; `{}` for the default login. */
   launchEnv(login: DetectedLogin): Record<string, string>;
 }

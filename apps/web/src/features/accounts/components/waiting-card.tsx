@@ -1,7 +1,8 @@
 import { LoaderCircle } from '@flama/design-system-web/icons';
+import type { ReactNode } from 'react';
 
 /** The card a sign-in step shows while the provider has not answered yet. */
-export function WaitingCard({ title, detail }: { title: string; detail: string }) {
+export function WaitingCard({ title, detail }: { title: string; detail: ReactNode }) {
   return (
     <div className="ds-wait-card" role="status">
       <span className="ds-disc">

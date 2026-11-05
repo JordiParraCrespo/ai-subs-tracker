@@ -43,13 +43,25 @@ export interface AddLoginResult {
 }
 
 /**
- * What a login in flight has printed that the person can use: the link to
- * sign in at (Claude Code's manual link, Codex's device page) and Codex's
- * one-time code. Either is null until the CLI prints it.
+ * What a login in flight has given the person to use. Each is null until the
+ * CLI hands it over.
  */
 export interface LoginProgress {
+  /**
+   * The link that finishes the sign-in by itself once it is opened in a
+   * browser on this computer: Claude Code's automatic link (its callback is
+   * on localhost), Codex's device page.
+   */
   link: string | null;
+  /**
+   * Claude Code's manual link. It ends at claude.com showing a code, and
+   * nothing finishes until that code is pasted back (`submitLoginCode`).
+   */
+  codeLink: string | null;
+  /** Codex's one-time code, to enter on its device page. */
   code: string | null;
+  /** When the CLI is stopped if the sign-in has not finished, ISO 8601. */
+  deadline: string | null;
 }
 
 export interface ShellIntegration {
@@ -90,7 +102,7 @@ export interface DesktopBridge {
      * login; resolves when the CLI exits. One login runs at a time.
      */
     addLogin(provider: LocalProviderId): Promise<AddLoginResult>;
-    /** What the running login printed: its link and, for Codex, its code. */
+    /** What the running login gave so far: its links, Codex's code, its deadline. */
     onLoginProgress(listener: (progress: LoginProgress) => void): () => void;
     /** Types a code the person pasted into the running login's prompt. */
     submitLoginCode(code: string): Promise<void>;

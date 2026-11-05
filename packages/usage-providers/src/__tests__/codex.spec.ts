@@ -349,6 +349,16 @@ describe('codex tokens', () => {
 });
 
 describe('codex commands', () => {
+  it('names who a login signed in, and nobody before auth.json names an account', async () => {
+    const empty = await tempHome();
+    expect(await codexProvider.signedInAs(join(empty, 'c1'))).toBeNull();
+    const apiKeyOnly = await tempHome();
+    await writeJson(join(apiKeyOnly, 'auth.json'), { OPENAI_API_KEY: 'sk-abc' });
+    expect(await codexProvider.signedInAs(apiKeyOnly)).toBeNull();
+    const { dir } = await codexHome();
+    expect(await codexProvider.signedInAs(dir)).toBe('acct-1');
+  });
+
   it('signs a new account into its own CODEX_HOME', () => {
     expect(codexProvider.loginCommand('/m/codex/c1')).toEqual({
       command: 'codex',
@@ -360,41 +370,6 @@ describe('codex commands', () => {
     expect(codexProvider.launchEnv({ ...base, home: '/h/.codex', isDefault: true })).toEqual({});
     expect(codexProvider.launchEnv({ ...base, home: '/m/codex/c1', isDefault: false })).toEqual({
       CODEX_HOME: '/m/codex/c1',
-    });
-  });
-});
-
-describe('codex identify', () => {
-  const identify = (home: string) => {
-    if (!codexProvider.identify) throw new Error('codex identifies its logins');
-    return codexProvider.identify(home, testEnv(home));
-  };
-
-  it('names the account a ChatGPT sign-in saved', async () => {
-    const { dir } = await codexHome();
-    expect(await identify(dir)).toEqual({
-      ok: true,
-      externalId: 'acct-1',
-      email: 'dev@example.com',
-      organization: null,
-    });
-  });
-
-  it('refuses a folder with no login, an API key, or a login naming no account', async () => {
-    const home = await tempHome();
-    expect(await identify(home)).toMatchObject({
-      ok: false,
-      problem: expect.stringMatching(/without saving/),
-    });
-    await writeJson(join(home, 'auth.json'), { OPENAI_API_KEY: 'sk-x' });
-    expect(await identify(home)).toMatchObject({
-      ok: false,
-      problem: expect.stringMatching(/API key/),
-    });
-    await writeJson(join(home, 'auth.json'), { tokens: { access_token: 'a' } });
-    expect(await identify(home)).toMatchObject({
-      ok: false,
-      problem: expect.stringMatching(/no ChatGPT account/),
     });
   });
 });

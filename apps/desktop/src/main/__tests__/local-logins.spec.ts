@@ -30,6 +30,7 @@ function fakeProvider(
     detect: async () => logins,
     read,
     loginCommand: () => ({ command: 'claude', args: [], env: {} }),
+    signedInAs: async () => null,
     launchEnv: () => ({}),
   };
 }
