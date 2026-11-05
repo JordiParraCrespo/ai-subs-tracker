@@ -661,18 +661,23 @@
       },
       "claude": {
         "title": "Finish signing in to Claude",
-        "description": "We opened claude.com in your browser. Sign in with the account you want to add.",
+        "description": "Open claude.com and sign in with the account you want to add. ResetOwl picks it up by itself.",
+        "preparing": "Asking Claude Code for a sign-in link…",
         "waiting": "Waiting for Claude…",
         "expires": "ResetOwl waits up to 15 minutes",
+        "timeLeft_one": "ResetOwl stops waiting in {{count}} minute",
+        "timeLeft_other": "ResetOwl stops waiting in {{count}} minutes",
         "otherTitle": "Signed in to a different account?",
-        "otherText": "Copy the link and open it in a private window, so the account you use now stays signed in.",
+        "otherText": "Copy the link and open it in a private window, so the account you use now stays signed in. It finishes here by itself, with no code to paste.",
+        "codeOnlyText": "This link ends at claude.com showing a code, and nothing finishes until you paste that code here. Copying it takes you to the step for it.",
+        "open": "Open in browser",
         "useCode": "Use a code instead",
         "copyLink": "Copy sign-in link",
         "linkCopied": "Link copied"
       },
       "code": {
         "title": "Sign in with a code",
-        "description": "For when the browser is on another device.",
+        "description": "For a browser on another device. Once you sign in, claude.com shows a code: nothing finishes until you paste it here.",
         "open": "1. Open this link on any device",
         "paste": "2. Paste the code Claude shows you",
         "placeholder": "Paste it here",
@@ -689,7 +694,11 @@
         "expires": "The code expires in 15 minutes",
         "copyCode": "Copy code",
         "openPage": "Open page",
-        "preparing": "Asking OpenAI for a code…"
+        "preparing": "Asking OpenAI for a code…",
+        "otherTitle": "Signed in to a different account?",
+        "otherText": "Copy the link and open it in a private window, so you sign in as the account you want to add and the one you use now stays signed in.",
+        "copyLink": "Copy link",
+        "linkCopied": "Link copied"
       },
       "desktop": {
         "title": "Add it from the desktop app",

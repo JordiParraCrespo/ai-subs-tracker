@@ -1,6 +1,7 @@
 import { type ChildProcess, execFile, spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
-import { mkdir, rm } from 'node:fs/promises';
+import { chmod, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { AddLoginResult, LoginProgress } from '@flama/shared/desktop';
 import type { LoginCommand } from '@flama/usage-providers';
@@ -8,17 +9,40 @@ import type { LoginCommand } from '@flama/usage-providers';
 /**
  * "Add account": signs a new login into a folder of its own by running the
  * provider's CLI login (`claude auth login`, `codex login --device-auth`) with
- * `CLAUDE_CONFIG_DIR` / `CODEX_HOME` pointed there. The CLI does the OAuth and
- * opens the browser itself; ResetOwl reads what it prints (Claude's manual
- * sign-in link, Codex's page and one-time code) so the screens can offer them,
+ * `CLAUDE_CONFIG_DIR` / `CODEX_HOME` pointed there. ResetOwl passes on what
+ * the CLI gives (Claude's automatic link, caught through `$BROWSER`, and its
+ * manual one; Codex's page and one-time code) so the screens can offer them,
  * types a code the person pastes into the CLI's own prompt, and waits for it
- * to exit. The credentials it writes stay in that folder and are never read
- * for anything but the provider's own usage endpoint.
+ * to exit with an account in the folder. The credentials it writes stay in
+ * that folder and are never read for anything but the provider's own usage
+ * endpoint.
  */
 
 /** Codex's one-time code lasts 15 minutes; Claude's sign-in gets the same. */
 export const LOGIN_TIMEOUT_MS = 15 * 60_000;
 const PATH_MARKER = '__RESETOWL_PATH__';
+/** How often the captured browser link is looked for. */
+const CAPTURE_POLL_MS = 250;
+const BROWSER_SCRIPT = 'browser.sh';
+const BROWSER_LINK = 'browser-link';
+
+/**
+ * What `$BROWSER` runs: it keeps the link it is handed and opens nothing, so
+ * no browser signed in to another account takes the sign-in. The link file
+ * sits beside the script, so the script names no path of its own.
+ */
+const BROWSER_SCRIPT_BODY = `#!/bin/sh
+# ResetOwl: keeps the sign-in link the CLI would open, for the app to offer.
+printf '%s' "$1" > "$(dirname "$0")/${BROWSER_LINK}"
+`;
+
+/**
+ * Lines a CLI prints when the sign-in has failed for good: an authorization
+ * the person denied, a code that was not accepted, an OAuth error. The run
+ * ends there instead of waiting out the timer.
+ */
+const FAILURE_LINE =
+  /^.*(?:\baccess_denied\b|authorization (?:was )?denied|login failed|oauth error).*$/im;
 
 /** Drops terminal escapes (colours, OSC 8 hyperlinks) from CLI output. */
 export function stripTerminal(text: string): string {
@@ -32,21 +56,76 @@ export function stripTerminal(text: string): string {
 }
 
 /**
- * What the screens can show from what a login printed so far: the link to
- * sign in at (Claude's manual link, Codex's device page) and Codex's one-time
- * code, which the CLI prints on the line after the one that names it.
+ * What a login printed so far that the screens can show: the link it printed
+ * (Claude's manual link, Codex's device page) and Codex's one-time code,
+ * which the CLI prints on the line after the one that names it. A link
+ * counts once whitespace follows it (output arrives in chunks, so a link
+ * without it may still be printing) and, with `linkHosts`, only on those hosts.
  */
-export function readProgress(output: string): LoginProgress {
+export function readProgress(
+  output: string,
+  linkHosts?: readonly string[],
+): { link: string | null; code: string | null } {
   const text = stripTerminal(output);
-  const link = extractUrls(text)[0] ?? null;
-  const code = text.match(/one-time code[^\n]*\n\s*([A-Z0-9]{4,}(?:-[A-Z0-9]{4,})+)/)?.[1] ?? null;
+  const link =
+    extractUrls(text).find((url) => !linkHosts || linkHosts.includes(hostOf(url))) ?? null;
+  const code =
+    text.match(/one-time code[^\n]*\r?\n\s*([A-Z0-9]{4,}(?:-[A-Z0-9]{4,})+)\s/)?.[1] ?? null;
   return { link, code };
 }
 
-/** Finds https URLs in CLI output, without trailing punctuation. */
+function hostOf(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return '';
+  }
+}
+
+/** How much of a failed CLI's output a failure message carries. */
+const TAIL_CHARS = 2_000;
+const TAIL_LINES = 20;
+
+/**
+ * The end of what a CLI printed, readable: terminal escapes gone, a line a
+ * spinner redrew kept as its last state, blank lines dropped.
+ */
+export function outputTail(output: string): string {
+  const lines = stripTerminal(output)
+    .split(/\r?\n/)
+    .map((line) => (line.split('\r').pop() ?? '').trimEnd())
+    .filter((line) => line.trim() !== '');
+  const tail = lines.slice(-TAIL_LINES).join('\n');
+  return tail.length <= TAIL_CHARS ? tail : `…${tail.slice(-TAIL_CHARS)}`;
+}
+
+/** The line saying the sign-in failed, once the CLI has printed one. */
+export function readFailure(output: string): string | null {
+  const line = stripTerminal(output).match(FAILURE_LINE)?.[0]?.trim();
+  return line ? line.slice(0, 300) : null;
+}
+
+/**
+ * A link `$BROWSER` was handed, if it is the automatic one: https, with its
+ * `redirect_uri` on this computer, so opening it anywhere else would fail.
+ */
+export function acceptBrowserLink(raw: string): string | null {
+  const link = raw.trim();
+  try {
+    const url = new URL(link);
+    if (url.protocol !== 'https:') return null;
+    const back = new URL(url.searchParams.get('redirect_uri') ?? '');
+    if (back.protocol !== 'http:') return null;
+    return back.hostname === 'localhost' || back.hostname === '127.0.0.1' ? link : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Finds complete https URLs (whitespace after them) in CLI output, without trailing punctuation. */
 export function extractUrls(text: string): string[] {
   const out: string[] = [];
-  for (const match of text.matchAll(/https:\/\/[^\s"'<>`]+/g)) {
+  for (const match of text.matchAll(/https:\/\/[^\s"'<>`]+(?=\s)/g)) {
     out.push(match[0].replace(/[).,;:\]]+$/, ''));
   }
   return out;
@@ -81,11 +160,20 @@ export interface AddLoginDeps {
   managedRoot: string;
   provider: string;
   command: (home: string) => LoginCommand;
-  /** Called each time the link or the code the CLI printed changes. */
+  /**
+   * Run after the CLI exits 0: why the folder does not hold a new account
+   * (none signed in, or one already on this machine), or null when it does.
+   * A reason fails the sign-in and the folder is removed.
+   */
+  check?(home: string): Promise<string | null>;
+  /** Called each time what the screens can show changes. */
   onProgress?(progress: LoginProgress): void;
   env: Record<string, string | undefined>;
   spawn?: typeof spawn;
   timeoutMs?: number;
+  /** Where the `$BROWSER` script goes; a private folder is made in it. */
+  tmpRoot?: string;
+  platform?: NodeJS.Platform;
   log?: (line: string) => void;
 }
 
@@ -98,8 +186,22 @@ export interface LoginHandle {
   cancel(): void;
 }
 
+/**
+ * Writes the `$BROWSER` script into a private folder of its own. It is not
+ * the account's folder: that sits under the app's data folder, which has a
+ * space in it on macOS, and a CLI may split `$BROWSER` on spaces.
+ */
+async function browserCapture(root: string): Promise<{ dir: string; script: string }> {
+  const dir = await mkdtemp(join(root, 'resetowl-login-'));
+  const script = join(dir, BROWSER_SCRIPT);
+  await writeFile(script, BROWSER_SCRIPT_BODY, { mode: 0o700 });
+  await chmod(script, 0o700);
+  return { dir, script };
+}
+
 export function startLogin(deps: AddLoginDeps): LoginHandle {
   let child: ChildProcess | null = null;
+  let stop: () => void = () => undefined;
   let cancelled = false;
   let pending: string | null = null;
   const result = (async () => {
@@ -108,8 +210,18 @@ export function startLogin(deps: AddLoginDeps): LoginHandle {
     const cmd = deps.command(home);
     const doSpawn = deps.spawn ?? spawn;
     const timeoutMs = deps.timeoutMs ?? LOGIN_TIMEOUT_MS;
+    const platform = deps.platform ?? process.platform;
+    // A shell script for `$BROWSER` needs a shell; elsewhere the CLI opens
+    // the browser itself and its printed link is the one on offer.
+    const capture =
+      cmd.capturesBrowser && platform !== 'win32'
+        ? await browserCapture(deps.tmpRoot ?? tmpdir()).catch(() => null)
+        : null;
+    // Its own process group, so a wrapper (node, mise) cannot leave the real
+    // CLI behind, holding the localhost port, when the run is stopped.
+    const group = platform !== 'win32';
 
-    const outcome = await new Promise<AddLoginResult>((done) => {
+    let outcome = await new Promise<AddLoginResult>((done) => {
       if (cancelled) {
         done({ ok: false, message: 'Sign-in cancelled.' });
         return;
@@ -118,8 +230,9 @@ export function startLogin(deps: AddLoginDeps): LoginHandle {
         // stdin is a pipe, not closed: Claude Code only prints its manual
         // link and reads a pasted code when it has somewhere to read from.
         child = doSpawn(cmd.command, cmd.args, {
-          env: { ...deps.env, ...cmd.env },
+          env: { ...deps.env, ...cmd.env, ...(capture ? { BROWSER: capture.script } : {}) },
           stdio: ['pipe', 'pipe', 'pipe'],
+          detached: group,
           windowsHide: true,
         });
       } catch (err) {
@@ -127,27 +240,69 @@ export function startLogin(deps: AddLoginDeps): LoginHandle {
         return;
       }
       const running = child;
+      const killGroup = () => {
+        if (!group || !running.pid) return false;
+        try {
+          process.kill(-running.pid, 'SIGTERM');
+          return true;
+        } catch {
+          return false; // the group is gone already
+        }
+      };
+      stop = () => {
+        if (!killGroup()) running.kill();
+      };
+      const deadline = new Date(Date.now() + timeoutMs).toISOString();
       let settled = false;
       let output = '';
+      let captured: string | null = null;
       let last = '';
-      const finish = (value: AddLoginResult) => {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        done(value);
-      };
-      const timer = setTimeout(() => {
-        running.kill();
-        finish({ ok: false, message: 'Sign-in did not finish within 15 minutes.' });
-      }, timeoutMs);
-      const onOutput = (chunk: Buffer) => {
-        output += chunk.toString('utf8');
-        const progress = readProgress(output);
-        const key = `${progress.link}|${progress.code}`;
+      const report = () => {
+        const printed = readProgress(output, cmd.linkHosts);
+        // A CLI that gives `$BROWSER` its automatic link prints the manual
+        // one, which needs a code, whether or not the capture could run.
+        const progress: LoginProgress = cmd.capturesBrowser
+          ? { link: captured, codeLink: printed.link, code: printed.code, deadline }
+          : { link: printed.link, codeLink: null, code: printed.code, deadline };
+        const key = JSON.stringify(progress);
         if (key === last) return;
         last = key;
         deps.onProgress?.(progress);
       };
+      const finish = (value: AddLoginResult) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        clearInterval(poll);
+        done(value);
+      };
+      const timer = setTimeout(() => {
+        stop();
+        finish({ ok: false, message: 'Sign-in did not finish within 15 minutes.' });
+      }, timeoutMs);
+      const poll = setInterval(() => {
+        if (!capture || captured) return;
+        void readFile(join(capture.dir, BROWSER_LINK), 'utf8').then(
+          (raw) => {
+            const link = acceptBrowserLink(raw);
+            if (!link || captured || settled) return;
+            captured = link;
+            report();
+          },
+          () => undefined, // not handed over yet
+        );
+      }, CAPTURE_POLL_MS);
+      const onOutput = (chunk: Buffer) => {
+        output += chunk.toString('utf8');
+        const failure = readFailure(output);
+        if (failure) {
+          stop();
+          finish({ ok: false, message: failure });
+          return;
+        }
+        report();
+      };
+      report();
       running.stdout?.on('data', onOutput);
       running.stderr?.on('data', onOutput);
       running.stdin?.on('error', () => undefined);
@@ -162,16 +317,28 @@ export function startLogin(deps: AddLoginDeps): LoginHandle {
         });
       });
       running.on('exit', (code, signal) => {
+        // Whatever the CLI left running in its group goes with it.
+        killGroup();
         if (code === 0) finish({ ok: true, message: null });
         else if (cancelled) finish({ ok: false, message: 'Sign-in cancelled.' });
-        else
-          finish({
-            ok: false,
-            message: `\`${cmd.command} ${cmd.args.join(' ')}\` exited with ${code ?? signal}.`,
-          });
+        else {
+          // The CLI's own words are the reason (a workspace with device-code
+          // sign-in turned off, a network error), so they go with the failure.
+          const said = outputTail(output);
+          const exited = `\`${cmd.command} ${cmd.args.join(' ')}\` exited with ${code ?? signal}`;
+          finish({ ok: false, message: said ? `${exited}:\n${said}` : `${exited}.` });
+        }
       });
     });
 
+    if (capture) await rm(capture.dir, { recursive: true, force: true }).catch(() => undefined);
+    // An exit 0 is not a sign-in until the folder names a new account.
+    if (outcome.ok && deps.check) {
+      const reason = await deps
+        .check(home)
+        .catch((err: unknown) => (err instanceof Error ? err.message : String(err)));
+      if (reason) outcome = { ok: false, message: reason };
+    }
     if (!outcome.ok) {
       // The folder is ours and minutes old; a failed sign-in leaves nothing to keep.
       await rm(home, { recursive: true, force: true }).catch(() => undefined);
@@ -190,7 +357,7 @@ export function startLogin(deps: AddLoginDeps): LoginHandle {
     },
     cancel() {
       cancelled = true;
-      child?.kill();
+      stop();
     },
   };
 }

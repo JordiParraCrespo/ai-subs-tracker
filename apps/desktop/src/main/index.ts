@@ -38,6 +38,7 @@ import {
 import { createTokenStore } from './token-store';
 import { createTray, type TrayController } from './tray';
 import { createReaderKeyStore, UsageReaders } from './usage-readers';
+import { checkNewLogin } from './verify-login';
 import { createMainWindow, registerAppScheme, rendererRoot, serveRenderer } from './window';
 
 /**
@@ -262,6 +263,7 @@ async function main(): Promise<void> {
           managedRoot,
           provider,
           command: (dir) => impl.loginCommand(dir),
+          check: (dir) => checkNewLogin(impl, dir, collector.localAccounts(), providerEnv()),
           onProgress: (progress) => {
             if (win && !win.isDestroyed())
               win.webContents.send(DESKTOP_CHANNELS.accountsLoginProgress, progress);
@@ -326,6 +328,8 @@ async function main(): Promise<void> {
   app.on('before-quit', () => {
     quitting = true;
     collector.stop();
+    // The CLI runs in a process group of its own, which a quit would not end.
+    login?.cancel();
     void liveServer?.close();
   });
   app.on('window-all-closed', () => {

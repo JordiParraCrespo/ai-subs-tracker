@@ -363,7 +363,23 @@ describe('claude-code commands', () => {
       command: 'claude',
       args: ['auth', 'login', '--claudeai'],
       env: { CLAUDE_CONFIG_DIR: '/m/claude-code/a1' },
+      capturesBrowser: true,
     });
+  });
+
+  it('names who a login signed in, and nobody for a folder the CLI left without an account', async () => {
+    const home = await tempHome();
+    const dir = join(home, 'managed', 'a1');
+    expect(await claudeCodeProvider.signedInAs(dir)).toBeNull();
+    // A credential alone is not a sign-in the app can name.
+    await writeJson(join(dir, '.credentials.json'), { claudeAiOauth: { accessToken: 't' } });
+    expect(await claudeCodeProvider.signedInAs(dir)).toBeNull();
+    await writeJson(join(dir, '.claude.json'), {
+      oauthAccount: { accountUuid: 'uuid-new', emailAddress: 'new@x.dev' },
+    });
+    expect(await claudeCodeProvider.signedInAs(dir)).toBe('uuid-new');
+    await writeJson(join(dir, '.claude.json'), { oauthAccount: { emailAddress: 'New@X.dev' } });
+    expect(await claudeCodeProvider.signedInAs(dir)).toBe('email:new@x.dev');
   });
 
   it('leaves the default login without CLAUDE_CONFIG_DIR', () => {

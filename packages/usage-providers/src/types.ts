@@ -39,6 +39,19 @@ export interface LoginCommand {
   command: string;
   args: string[];
   env: Record<string, string>;
+  /**
+   * The CLI hands its automatic sign-in link (the one whose callback is on
+   * localhost and needs no code) to `$BROWSER`, and prints a manual link
+   * that ends in a code to paste back. The caller then points `BROWSER` at a
+   * script of its own to capture the first, and offers the printed one as
+   * the code path.
+   */
+  capturesBrowser?: boolean;
+  /**
+   * Hosts a printed sign-in link must be on to be shown (Codex's
+   * `auth.openai.com`); any https link when absent.
+   */
+  linkHosts?: readonly string[];
 }
 
 export interface ReadOptions {
@@ -56,6 +69,13 @@ export interface CodingAgentProvider {
   read(login: DetectedLogin, env: ProviderEnv, opts: ReadOptions): Promise<SyncAccount>;
   /** The command that signs a NEW isolated account into `home`. */
   loginCommand(home: string): LoginCommand;
+  /**
+   * Who a login just signed into `home` is, as the `externalId` `read` would
+   * give it; null when the folder holds no signed-in account. Run after the
+   * login command exits, to tell a real sign-in from a CLI that only exited,
+   * and an account already on this machine from a new one.
+   */
+  signedInAs(home: string): Promise<string | null>;
   /** The env a terminal needs to use this login; `{}` for the default login. */
   launchEnv(login: DetectedLogin): Record<string, string>;
 }
