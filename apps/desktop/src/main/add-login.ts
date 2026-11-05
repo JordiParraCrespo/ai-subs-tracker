@@ -58,13 +58,45 @@ export function stripTerminal(text: string): string {
 /**
  * What a login printed so far that the screens can show: the link it printed
  * (Claude's manual link, Codex's device page) and Codex's one-time code,
- * which the CLI prints on the line after the one that names it.
+ * which the CLI prints on the line after the one that names it. A link
+ * counts once whitespace follows it (output arrives in chunks, so a link
+ * without it may still be printing) and, with `linkHosts`, only on those hosts.
  */
-export function readProgress(output: string): { link: string | null; code: string | null } {
+export function readProgress(
+  output: string,
+  linkHosts?: readonly string[],
+): { link: string | null; code: string | null } {
   const text = stripTerminal(output);
-  const link = extractUrls(text)[0] ?? null;
-  const code = text.match(/one-time code[^\n]*\n\s*([A-Z0-9]{4,}(?:-[A-Z0-9]{4,})+)/)?.[1] ?? null;
+  const link =
+    extractUrls(text).find((url) => !linkHosts || linkHosts.includes(hostOf(url))) ?? null;
+  const code =
+    text.match(/one-time code[^\n]*\r?\n\s*([A-Z0-9]{4,}(?:-[A-Z0-9]{4,})+)\s/)?.[1] ?? null;
   return { link, code };
+}
+
+function hostOf(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return '';
+  }
+}
+
+/** How much of a failed CLI's output a failure message carries. */
+const TAIL_CHARS = 2_000;
+const TAIL_LINES = 20;
+
+/**
+ * The end of what a CLI printed, readable: terminal escapes gone, a line a
+ * spinner redrew kept as its last state, blank lines dropped.
+ */
+export function outputTail(output: string): string {
+  const lines = stripTerminal(output)
+    .split(/\r?\n/)
+    .map((line) => (line.split('\r').pop() ?? '').trimEnd())
+    .filter((line) => line.trim() !== '');
+  const tail = lines.slice(-TAIL_LINES).join('\n');
+  return tail.length <= TAIL_CHARS ? tail : `…${tail.slice(-TAIL_CHARS)}`;
 }
 
 /** The line saying the sign-in failed, once the CLI has printed one. */
@@ -90,10 +122,10 @@ export function acceptBrowserLink(raw: string): string | null {
   }
 }
 
-/** Finds https URLs in CLI output, without trailing punctuation. */
+/** Finds complete https URLs (whitespace after them) in CLI output, without trailing punctuation. */
 export function extractUrls(text: string): string[] {
   const out: string[] = [];
-  for (const match of text.matchAll(/https:\/\/[^\s"'<>`]+/g)) {
+  for (const match of text.matchAll(/https:\/\/[^\s"'<>`]+(?=\s)/g)) {
     out.push(match[0].replace(/[).,;:\]]+$/, ''));
   }
   return out;
@@ -226,7 +258,7 @@ export function startLogin(deps: AddLoginDeps): LoginHandle {
       let captured: string | null = null;
       let last = '';
       const report = () => {
-        const printed = readProgress(output);
+        const printed = readProgress(output, cmd.linkHosts);
         // A CLI that gives `$BROWSER` its automatic link prints the manual
         // one, which needs a code, whether or not the capture could run.
         const progress: LoginProgress = cmd.capturesBrowser
@@ -289,11 +321,13 @@ export function startLogin(deps: AddLoginDeps): LoginHandle {
         killGroup();
         if (code === 0) finish({ ok: true, message: null });
         else if (cancelled) finish({ ok: false, message: 'Sign-in cancelled.' });
-        else
-          finish({
-            ok: false,
-            message: `\`${cmd.command} ${cmd.args.join(' ')}\` exited with ${code ?? signal}.`,
-          });
+        else {
+          // The CLI's own words are the reason (a workspace with device-code
+          // sign-in turned off, a network error), so they go with the failure.
+          const said = outputTail(output);
+          const exited = `\`${cmd.command} ${cmd.args.join(' ')}\` exited with ${code ?? signal}`;
+          finish({ ok: false, message: said ? `${exited}:\n${said}` : `${exited}.` });
+        }
       });
     });
 

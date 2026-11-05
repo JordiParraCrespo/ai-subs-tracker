@@ -6,7 +6,9 @@ import { WaitingCard } from './waiting-card';
 
 /**
  * Codex's sign-in step: the one-time code the CLI printed, to enter on
- * OpenAI's device page, and a wait for the approval to land.
+ * OpenAI's device page, and a wait for the approval to land. The page's link
+ * can be copied into a private window, so the account the browser is signed
+ * in to now is not the one added again.
  */
 export function CodexSignIn({
   code,
@@ -21,6 +23,7 @@ export function CodexSignIn({
 }) {
   const { t } = useTranslation();
   const { copied, copy } = useCopy();
+  const linkCopy = useCopy();
 
   return (
     <>
@@ -49,6 +52,10 @@ export function CodexSignIn({
           title={code ? t('accounts.add.codex.waiting') : t('accounts.add.codex.preparing')}
           detail={t('accounts.add.codex.expires')}
         />
+        <div className="ds-stack-4">
+          <span className="ds-label-strong">{t('accounts.add.codex.otherTitle')}</span>
+          <span className="ds-t-sub">{t('accounts.add.codex.otherText')}</span>
+        </div>
       </DsModalBody>
       <DsModalFooter
         start={
@@ -57,6 +64,14 @@ export function CodexSignIn({
           </DsButton>
         }
       >
+        <DsButton
+          size="sm"
+          disabled={!link}
+          icon={linkCopy.copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+          onClick={() => link && void linkCopy.copy(link)}
+        >
+          {linkCopy.copied ? t('accounts.add.codex.linkCopied') : t('accounts.add.codex.copyLink')}
+        </DsButton>
         <DsButton
           variant="primary"
           size="sm"

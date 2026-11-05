@@ -419,7 +419,11 @@
       "expires": "El código caduca en 15 minutos",
       "copyCode": "Copiar código",
       "openPage": "Abrir página",
-      "preparing": "Pidiendo un código a OpenAI…"
+      "preparing": "Pidiendo un código a OpenAI…",
+      "otherTitle": "¿Tienes otra cuenta abierta?",
+      "otherText": "Copia el enlace y ábrelo en una ventana privada, así inicias sesión con la cuenta que quieres añadir y la que usas ahora sigue con la sesión iniciada.",
+      "copyLink": "Copiar enlace",
+      "linkCopied": "Enlace copiado"
     },
     "desktop": {
       "title": "Añádela desde la app de escritorio",

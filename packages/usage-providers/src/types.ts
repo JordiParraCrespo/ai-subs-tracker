@@ -47,6 +47,11 @@ export interface LoginCommand {
    * the code path.
    */
   capturesBrowser?: boolean;
+  /**
+   * Hosts a printed sign-in link must be on to be shown (Codex's
+   * `auth.openai.com`); any https link when absent.
+   */
+  linkHosts?: readonly string[];
 }
 
 export interface ReadOptions {

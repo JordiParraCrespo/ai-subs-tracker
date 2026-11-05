@@ -5,7 +5,14 @@ import { join } from 'node:path';
 import { PassThrough } from 'node:stream';
 import type { LoginProgress } from '@flama/shared/desktop';
 import { describe, expect, it } from 'vitest';
-import { acceptBrowserLink, addLogin, readFailure, readProgress, startLogin } from '../add-login';
+import {
+  acceptBrowserLink,
+  addLogin,
+  outputTail,
+  readFailure,
+  readProgress,
+  startLogin,
+} from '../add-login';
 import { tempDir } from './helpers';
 
 function fakeChild(
@@ -93,8 +100,21 @@ describe('add login', () => {
       command: (home: string) => ({ command: 'codex', args: ['login'], env: { CODEX_HOME: home } }),
       env: {},
     };
-    const failed = await addLogin({ ...common, spawn: fakeSpawn((c) => c.emit('exit', 1, null)) });
-    expect(failed).toMatchObject({ ok: false });
+    const failed = await addLogin({
+      ...common,
+      spawn: fakeSpawn((c) => {
+        c.stderr.write('Error: device code login is not enabled for this workspace\n');
+        setTimeout(() => c.emit('exit', 1, null), 5);
+      }),
+    });
+    // The CLI's reason goes with the failure, not just its exit code.
+    expect(failed).toEqual({
+      ok: false,
+      message:
+        '`codex login` exited with 1:\nError: device code login is not enabled for this workspace',
+    });
+    const silent = await addLogin({ ...common, spawn: fakeSpawn((c) => c.emit('exit', 1, null)) });
+    expect(silent.message).toBe('`codex login` exited with 1.');
     const timedOut = await addLogin({
       ...common,
       timeoutMs: 20,
@@ -262,6 +282,38 @@ describe('a Claude sign-in that finishes in a private window', () => {
 });
 
 describe('reading what a login printed', () => {
+  it('waits for a link and a code to finish printing', () => {
+    expect(readProgress('visit https://auth.openai.com/codex/dev')).toEqual({
+      link: null,
+      code: null,
+    });
+    expect(readProgress('Enter this one-time code\n   K7QF-2X')).toEqual({
+      link: null,
+      code: null,
+    });
+  });
+
+  it('shows only a link on the hosts the provider names', () => {
+    const printed =
+      'See https://github.com/openai/codex for help\nOpen https://auth.openai.com/codex/device\n';
+    expect(readProgress(printed, ['auth.openai.com']).link).toBe(
+      'https://auth.openai.com/codex/device',
+    );
+    expect(
+      readProgress('See https://evil.example/auth.openai.com\n', ['auth.openai.com']).link,
+    ).toBeNull();
+  });
+
+  it('keeps the readable end of a failed CLI’s output', () => {
+    const noise = Array.from({ length: 40 }, (_, i) => `line ${i}`).join('\n');
+    const tail = outputTail(
+      `${noise}\n\u001b[31mError:\u001b[0m device code sign-in is disabled\r\n\n`,
+    );
+    expect(tail.split('\n')).toHaveLength(20);
+    expect(tail.endsWith('Error: device code sign-in is disabled')).toBe(true);
+    expect(outputTail('Working ⠋\rWorking ⠙\rDone\n')).toBe('Done');
+  });
+
   it('finds a line that says the sign-in failed, and nothing in a normal run', () => {
     expect(readFailure('Paste code here if prompted > ')).toBeNull();
     expect(readFailure(`visit: ${MANUAL}\n`)).toBeNull();
@@ -286,6 +338,7 @@ describe('reading what a login printed', () => {
       '',
       '2. Enter this one-time code \u001b[90m(expires in 15 minutes)\u001b[0m',
       '   \u001b[94mK7QF-2XMB9\u001b[0m',
+      '',
     ].join('\n');
     expect(readProgress(printed)).toEqual({
       link: 'https://auth.openai.com/codex/device',
