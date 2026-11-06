@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { AddLoginResult, LoginProgress } from '@flama/shared/desktop';
 import type { LoginCommand } from '@flama/usage-providers';
+import type { Timers } from './collector';
 
 /**
  * "Add account": signs a new login into a folder of its own by running the
@@ -365,4 +366,44 @@ export function startLogin(deps: AddLoginDeps): LoginHandle {
 /** Runs a login to its end, for a caller that needs neither the progress nor a code. */
 export function addLogin(deps: AddLoginDeps): Promise<AddLoginResult> {
   return startLogin(deps).result;
+}
+
+/**
+ * How long a finished sign-in waits for its sync before answering. The API
+ * call has its own 30 s timeout; reading the logins' limits comes before it.
+ */
+export const SYNC_AFTER_LOGIN_MS = 45_000;
+
+export interface SyncAfterLoginDeps {
+  /** The collector's run, which sends the new login to the API. */
+  sync(): Promise<unknown>;
+  timers: Timers;
+  log(line: string): void;
+}
+
+/**
+ * Answers a sign-in only once its account is on the API, so "Account added"
+ * and a list refetched at that moment agree. The sign-in itself has already
+ * worked: a sync that fails or outlasts the wait is logged and the answer is
+ * still the login's own, and the collector's next run sends it.
+ */
+export async function syncAfterLogin(
+  result: AddLoginResult,
+  deps: SyncAfterLoginDeps,
+  timeoutMs = SYNC_AFTER_LOGIN_MS,
+): Promise<AddLoginResult> {
+  if (!result.ok) return result;
+  let timer: unknown = null;
+  const timedOut = new Promise<'timeout'>((resolve) => {
+    timer = deps.timers.set(() => resolve('timeout'), timeoutMs);
+  });
+  try {
+    const outcome = await Promise.race([deps.sync().then(() => 'synced' as const), timedOut]);
+    if (outcome === 'timeout') deps.log('sync after sign-in still running; answering without it');
+  } catch (err) {
+    deps.log(`sync after sign-in failed: ${err instanceof Error ? err.message : String(err)}`);
+  } finally {
+    deps.timers.clear(timer);
+  }
+  return result;
 }

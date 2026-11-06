@@ -12,6 +12,7 @@ import type {
   UpdateAccountInput,
 } from '@flama/shared/schemas/accounts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import type { AccountEntity, UsageSummary } from '../modules/accounts/accounts.entity';
 import { useConsumerApp } from './context';
 
@@ -37,6 +38,19 @@ export function useAccounts(options?: EntityQueryOptions<AccountEntity[]>) {
     refetchInterval: ACCOUNTS_REFETCH_MS,
     ...options,
   });
+}
+
+/**
+ * Refetches the list, the overview and the usage at once: for a change made
+ * somewhere else, like a desktop sync, that answered these screens nothing.
+ */
+export function useRefreshAccounts() {
+  const queryClient = useQueryClient();
+  // Stable, so a caller can subscribe with it from an effect.
+  return useCallback(
+    () => queryClient.invalidateQueries({ queryKey: accountsKeys.all }),
+    [queryClient],
+  );
 }
 
 /** Token usage is plain numbers, not entities, so it keeps `useQuery`. */

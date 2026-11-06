@@ -11,8 +11,11 @@ import {
   outputTail,
   readFailure,
   readProgress,
+  SYNC_AFTER_LOGIN_MS,
   startLogin,
+  syncAfterLogin,
 } from '../add-login';
+import type { Timers } from '../collector';
 import { tempDir } from './helpers';
 
 function fakeChild(
@@ -344,5 +347,88 @@ describe('reading what a login printed', () => {
       link: 'https://auth.openai.com/codex/device',
       code: 'K7QF-2XMB9',
     });
+  });
+});
+
+// "Account added" used to reach the screen before the collector had sent the
+// account, so a list refetched on that answer still missed it.
+describe('syncAfterLogin', () => {
+  function fakeTimers() {
+    const pending: Array<{ fn: () => void; ms: number; id: number }> = [];
+    let id = 0;
+    const timers: Timers = {
+      set(fn, ms) {
+        id += 1;
+        pending.push({ fn, ms, id });
+        return id;
+      },
+      clear(handle) {
+        const i = pending.findIndex((t) => t.id === handle);
+        if (i >= 0) pending.splice(i, 1);
+      },
+    };
+    return { timers, pending };
+  }
+
+  const OK = { ok: true, message: null };
+
+  it('answers only after the sync has finished', async () => {
+    const { timers, pending } = fakeTimers();
+    let finish: () => void = () => undefined;
+    const sync = new Promise<void>((resolve) => {
+      finish = resolve;
+    });
+    let answered = false;
+    const answer = syncAfterLogin(OK, { sync: () => sync, timers, log: () => undefined }).then(
+      (r) => {
+        answered = true;
+        return r;
+      },
+    );
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(answered).toBe(false);
+    finish();
+    expect(await answer).toEqual(OK);
+    expect(pending).toHaveLength(0);
+  });
+
+  it('stays ok when the sync fails', async () => {
+    const { timers } = fakeTimers();
+    const lines: string[] = [];
+    const result = await syncAfterLogin(OK, {
+      sync: () => Promise.reject(new Error('ECONNREFUSED')),
+      timers,
+      log: (l) => lines.push(l),
+    });
+    expect(result).toEqual(OK);
+    expect(lines.join('\n')).toContain('ECONNREFUSED');
+  });
+
+  it('stays ok and answers when the sync outlasts the wait', async () => {
+    const { timers, pending } = fakeTimers();
+    const answer = syncAfterLogin(OK, {
+      sync: () => new Promise(() => undefined),
+      timers,
+      log: () => undefined,
+    });
+    expect(pending.map((t) => t.ms)).toEqual([SYNC_AFTER_LOGIN_MS]);
+    pending[0]?.fn();
+    expect(await answer).toEqual(OK);
+  });
+
+  it('does not sync a sign-in that failed', async () => {
+    const { timers } = fakeTimers();
+    let synced = false;
+    const failed = { ok: false, message: 'Sign-in cancelled.' };
+    const result = await syncAfterLogin(failed, {
+      sync: async () => {
+        synced = true;
+      },
+      timers,
+      log: () => undefined,
+    });
+    expect(result).toEqual(failed);
+    expect(synced).toBe(false);
   });
 });

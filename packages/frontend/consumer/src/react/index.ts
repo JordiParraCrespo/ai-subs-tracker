@@ -7,6 +7,7 @@ export {
   useArchiveAccount,
   useCreateAccount,
   useRecordAccountUsage,
+  useRefreshAccounts,
   useUpdateAccount,
   useUsageSummary,
 } from './accounts.queries';
