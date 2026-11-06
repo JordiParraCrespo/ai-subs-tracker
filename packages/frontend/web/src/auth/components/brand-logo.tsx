@@ -8,7 +8,7 @@ export function BrandLogo({ className, label }: { className?: string; label?: st
 
   return (
     <div className={cn('flex items-center gap-2.5', className)}>
-      <BrandGlyph />
+      <BrandGlyph aria-hidden />
       <span className="text-base font-medium text-ink-900">{label ?? t('common.appName')}</span>
     </div>
   );
