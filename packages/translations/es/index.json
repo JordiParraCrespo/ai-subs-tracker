@@ -625,7 +625,8 @@
       "missingTitle": "Sin día de renovación",
       "missingSub": "Estas sesiones no indican cuándo se cobra el plan. Pon el día de tu recibo para verlo en el calendario.",
       "reportedDay": "Día según {{provider}}",
-      "reportedDayChecked": "Día según {{provider}}, visto el {{date}}",
+      "reportedDayChecked": "Día según {{provider}} · {{date}}",
+      "reportedDayHint": "El día de cobro que indica tu sesión de {{provider}}. {{provider}} comprobó la suscripción por última vez el {{date}}.",
       "setDay": "Poner día"
     },
     "firstRun": {

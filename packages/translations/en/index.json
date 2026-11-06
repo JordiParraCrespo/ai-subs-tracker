@@ -625,7 +625,8 @@
       "missingTitle": "No renewal day yet",
       "missingSub": "These logins do not say when the plan bills. Set the day from your receipt to put it on the calendar.",
       "reportedDay": "Day from {{provider}}",
-      "reportedDayChecked": "Day from {{provider}}, checked {{date}}",
+      "reportedDayChecked": "Day from {{provider}} · {{date}}",
+      "reportedDayHint": "The billing day your {{provider}} login reports. {{provider}} last checked the subscription on {{date}}.",
       "setDay": "Set day"
     },
     "firstRun": {

@@ -121,7 +121,7 @@ test('a billing day the Codex login reports is on the calendar, and the person c
 
   await page.goto('/renewals');
   const upcoming = page.getByRole('button', { name: /Codex · Plus/ });
-  await expect(upcoming).toContainText(/Day from Codex, checked/);
+  await expect(upcoming).toContainText(/Day from Codex · /);
   // Only Claude Code is still waiting for a day.
   await expect(page.getByRole('button', { name: 'Set day' })).toHaveCount(1);
 

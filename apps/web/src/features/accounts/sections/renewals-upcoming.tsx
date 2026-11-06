@@ -28,12 +28,14 @@ export function RenewalsUpcoming({ onOpen }: { onOpen: (account: AccountEntity) 
   const source = (account: AccountEntity) => {
     if (account.renewalDayOverridden || account.renewalDay === null) return null;
     const provider = PROVIDER_NAMES[account.provider];
-    return account.renewalCheckedAt
-      ? t('accounts.renewals.reportedDayChecked', {
-          provider,
-          date: checked.format(account.renewalCheckedAt),
-        })
-      : t('accounts.renewals.reportedDay', { provider });
+    if (!account.renewalCheckedAt) {
+      return { line: t('accounts.renewals.reportedDay', { provider }), hint: undefined };
+    }
+    const date = checked.format(account.renewalCheckedAt);
+    return {
+      line: t('accounts.renewals.reportedDayChecked', { provider, date }),
+      hint: t('accounts.renewals.reportedDayHint', { provider, date }),
+    };
   };
 
   return (
@@ -61,7 +63,11 @@ export function RenewalsUpcoming({ onOpen }: { onOpen: (account: AccountEntity) 
               <span className="ds-row__txt">
                 <span className="ds-cell-strong">{accountTitle(account)}</span>
                 <span className="ds-cell-sub">{account.displayName}</span>
-                {from && <span className="ds-cell-sub">{from}</span>}
+                {from && (
+                  <span className="ds-cell-sub" title={from.hint}>
+                    {from.line}
+                  </span>
+                )}
               </span>
               <span className="ds-cell-money">
                 {formatMoney(account.monthlyPriceCents, locale)}
