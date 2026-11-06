@@ -100,9 +100,14 @@ export class Collector {
     return this.run();
   }
 
-  /** Reads and syncs now, skipping the refresh debounce (a login was just added). */
+  /**
+   * Reads and syncs now, skipping the refresh debounce (a login was just
+   * added). A run already under way read the disk before that login was
+   * there, so it is let finish and a fresh one follows.
+   */
   runNow(): Promise<CollectorStatus> {
-    return this.inFlight ?? this.run();
+    if (this.inFlight) return this.inFlight.then(() => this.inFlight ?? this.run());
+    return this.run();
   }
 
   /** A new token (sign-in) syncs at once; a cleared one signs out. */
