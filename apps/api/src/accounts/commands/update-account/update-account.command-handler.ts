@@ -7,7 +7,7 @@ import type { AccountRepositoryPort } from '../../database/account.repository.po
 import { AccountErrors } from '../../domain/account.errors';
 import { UpdateAccountCommand } from './update-account.command';
 
-/** Renames an account, or sets the plan, price and billing day its owner actually has. */
+/** Renames an account, says who uses it, or sets the plan, price and billing day its owner actually has. */
 @CommandHandler(UpdateAccountCommand)
 export class UpdateAccountCommandHandler
   implements ICommandHandler<UpdateAccountCommand, AggregateID>
@@ -23,6 +23,7 @@ export class UpdateAccountCommandHandler
     const account = found.unwrap();
     account.edit({
       label: command.label,
+      person: command.person,
       planId: command.planId,
       monthlyPriceCents: command.monthlyPriceCents,
       renewalDay: command.renewalDay,

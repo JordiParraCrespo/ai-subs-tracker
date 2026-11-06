@@ -41,6 +41,9 @@ export class AccountOrmEntity {
   @Column({ type: 'varchar', nullable: true })
   label!: string | null;
 
+  @Column({ type: 'varchar', length: 80, nullable: true })
+  person!: string | null;
+
   @Column({ type: 'varchar', nullable: true })
   planId!: string | null;
 

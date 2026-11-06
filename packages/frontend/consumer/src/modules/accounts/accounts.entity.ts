@@ -38,6 +38,8 @@ export class AccountEntity implements RankableAccount {
     public readonly externalId: string,
     public readonly displayName: string,
     public readonly label: string | null,
+    /** Who uses the account, as the owner named them; null is the owner. */
+    public readonly person: string | null,
     public readonly email: string | null,
     public readonly organization: string | null,
     public readonly location: string | null,

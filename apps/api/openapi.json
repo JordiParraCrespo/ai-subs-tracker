@@ -2897,6 +2897,11 @@
             "type": "string",
             "nullable": true
           },
+          "person": {
+            "type": "string",
+            "nullable": true,
+            "description": "Who uses the account, as the owner names them; null is the owner"
+          },
           "email": {
             "type": "string",
             "nullable": true
@@ -2975,6 +2980,7 @@
           "externalId",
           "displayName",
           "label",
+          "person",
           "email",
           "organization",
           "location",
@@ -3495,6 +3501,12 @@
         "type": "object",
         "properties": {
           "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "nullable": true
+          },
+          "person": {
             "type": "string",
             "minLength": 1,
             "maxLength": 80,

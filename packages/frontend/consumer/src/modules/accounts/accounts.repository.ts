@@ -16,6 +16,7 @@ function toAccount(data: AccountResponseDto): AccountEntity {
     data.externalId,
     data.displayName,
     data.label,
+    data.person,
     data.email,
     data.organization,
     data.location,

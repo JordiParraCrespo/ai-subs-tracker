@@ -27,6 +27,8 @@ export interface AccountProps {
   location: string | null;
   /** The person's own name for it; null shows the email. */
   label: string | null;
+  /** Who uses this login, as the owner names them; null is the owner themself. */
+  person: string | null;
   /** A plan the person chose over the reported one. */
   planId: string | null;
   /** What the person actually pays, over the plan's list price. */
@@ -60,6 +62,7 @@ export interface ManualAccountInput {
 
 export interface AccountEdit {
   label?: string | null;
+  person?: string | null;
   planId?: string | null;
   monthlyPriceCents?: number | null;
   renewalDay?: number | null;
@@ -88,6 +91,7 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
         reportedPlan: input.reportedPlan,
         location: input.location,
         label: null,
+        person: null,
         planId: null,
         monthlyPriceCents: null,
         renewalDay: null,
@@ -121,6 +125,7 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
         reportedPlan: null,
         location: null,
         label: input.label,
+        person: null,
         planId: input.planId,
         monthlyPriceCents: input.monthlyPriceCents,
         renewalDay: input.renewalDay,
@@ -161,6 +166,10 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
   }
   get label() {
     return this.props.label;
+  }
+
+  get person() {
+    return this.props.person;
   }
   get planId() {
     return this.props.planId;
@@ -232,6 +241,7 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
       }
     }
     if (change.label !== undefined) this.props.label = change.label;
+    if (change.person !== undefined) this.props.person = change.person;
     if (change.planId !== undefined) this.props.planId = change.planId;
     if (change.monthlyPriceCents !== undefined)
       this.props.monthlyPriceCents = change.monthlyPriceCents;

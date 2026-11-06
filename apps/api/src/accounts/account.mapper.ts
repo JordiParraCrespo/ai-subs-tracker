@@ -61,6 +61,7 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
     record.reportedPlan = props.reportedPlan;
     record.location = props.location;
     record.label = props.label;
+    record.person = props.person;
     record.planId = props.planId;
     record.monthlyPriceCents = props.monthlyPriceCents;
     record.renewalDay = props.renewalDay;
@@ -87,6 +88,7 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
         reportedPlan: record.reportedPlan,
         location: record.location,
         label: record.label,
+        person: record.person,
         planId: record.planId,
         monthlyPriceCents: record.monthlyPriceCents,
         renewalDay: record.renewalDay,
@@ -114,6 +116,7 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
     dto.externalId = entity.externalId;
     dto.displayName = entity.displayName;
     dto.label = entity.label;
+    dto.person = entity.person;
     dto.email = entity.email;
     dto.organization = entity.organization;
     dto.location = entity.location;

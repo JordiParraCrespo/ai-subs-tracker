@@ -271,6 +271,10 @@ export type AccountResponseDto = {
      */
     displayName: string;
     label: string | null;
+    /**
+     * Who uses the account, as the owner names them; null is the owner
+     */
+    person: string | null;
     email: string | null;
     organization: string | null;
     location: string | null;
@@ -448,6 +452,7 @@ export type CreateAccountRequest = {
 
 export type UpdateAccountRequest = {
     label?: string | null;
+    person?: string | null;
     planId?: string | null;
     monthlyPriceCents?: number | null;
     renewalDay?: number | null;

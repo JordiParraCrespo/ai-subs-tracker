@@ -1,5 +1,6 @@
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -29,17 +30,20 @@ const AUTO_PLAN = '';
 const AUTO_OPTION = 'reported';
 
 /**
- * An account's own name, plan, price and billing day. The dialog renders the submit
+ * An account's own name, who uses it, its plan, price and billing day. The dialog renders the submit
  * button and points it at `id`.
  */
 export function EditAccountForm({
   id,
   account,
+  people,
   isPending,
   onSubmit,
 }: {
   id: string;
   account: AccountEntity;
+  /** The names already given to other accounts, offered as the person types. */
+  people: readonly string[];
   isPending: boolean;
   onSubmit: (values: EditAccountFormValues) => void;
 }) {
@@ -54,6 +58,7 @@ export function EditAccountForm({
     resolver: useZodResolver(editAccountFormSchema),
     defaultValues: {
       label: account.label ?? '',
+      person: account.person ?? '',
       planId:
         account.planOverridden || account.isManual ? (account.planId ?? AUTO_PLAN) : AUTO_PLAN,
       price: account.priceOverridden ? (account.monthlyPriceCents / 100).toFixed(2) : '',
@@ -85,6 +90,26 @@ export function EditAccountForm({
             disabled={isPending}
           />
           <FieldError errors={[errors.label]} />
+        </Field>
+        <Field data-invalid={Boolean(errors.person)}>
+          <FieldLabel htmlFor={`${id}-person`}>{t('accounts.edit.person')}</FieldLabel>
+          <Input
+            {...register('person')}
+            id={`${id}-person`}
+            list={people.length ? `${id}-people` : undefined}
+            placeholder={t('accounts.edit.personPlaceholder')}
+            aria-invalid={Boolean(errors.person)}
+            disabled={isPending}
+          />
+          {people.length > 0 && (
+            <datalist id={`${id}-people`}>
+              {people.map((name) => (
+                <option key={name} value={name} />
+              ))}
+            </datalist>
+          )}
+          <FieldDescription>{t('accounts.edit.personHint')}</FieldDescription>
+          <FieldError errors={[errors.person]} />
         </Field>
         <Field>
           <FieldLabel htmlFor={`${id}-plan`}>{t('accounts.edit.plan')}</FieldLabel>
