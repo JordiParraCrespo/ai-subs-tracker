@@ -15,6 +15,7 @@ function make(id: string, provider: 'claude-code' | 'codex', active = false) {
     organization: null,
     reportedPlan: null,
     location: null,
+    reportedRenewal: null,
     at: new Date(),
   });
   if (active) entity.activate(new Date());

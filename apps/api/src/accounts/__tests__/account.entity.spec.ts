@@ -10,6 +10,7 @@ function account(reportedPlan: string | null = 'default_claude_max_20x') {
     organization: null,
     reportedPlan,
     location: '~/.claude',
+    reportedRenewal: null,
     at: new Date('2026-11-01T00:00:00Z'),
   });
 }
@@ -44,6 +45,39 @@ describe('AccountEntity', () => {
     expect(entity.renewalDay).toBeNull();
   });
 
+  // Codex's token carries the end of the paid period, so its billing day
+  // arrives with a sync. The person's own day must win, clearing theirs must
+  // fall back to the reported one, and a sync whose token says nothing must
+  // not wipe a day already known.
+  it('takes the billing day a login reports, under the one the person sets', () => {
+    const entity = account();
+    const sighting = (reportedRenewal: { day: number; checkedAt: Date | null } | null) =>
+      entity.recordSighting({
+        email: null,
+        organization: null,
+        reportedPlan: null,
+        location: null,
+        reportedRenewal,
+        at: new Date('2026-11-06T00:00:00Z'),
+      });
+    sighting({ day: 23, checkedAt: new Date('2026-09-22T10:09:48Z') });
+    expect(entity.renewalDay).toBe(23);
+    expect(entity.renewalDayOverridden).toBe(false);
+    expect(entity.renewalCheckedAt?.toISOString()).toBe('2026-09-22T10:09:48.000Z');
+
+    entity.edit({ renewalDay: 5 });
+    sighting({ day: 24, checkedAt: null });
+    expect(entity.renewalDay).toBe(5);
+    expect(entity.renewalDayOverridden).toBe(true);
+    // A token that names no check keeps the last one known.
+    expect(entity.renewalCheckedAt?.toISOString()).toBe('2026-09-22T10:09:48.000Z');
+
+    entity.edit({ renewalDay: null });
+    sighting(null);
+    expect(entity.renewalDay).toBe(24);
+    expect(entity.renewalDayOverridden).toBe(false);
+  });
+
   it('refuses a plan from another provider', () => {
     expect(() => account().edit({ planId: 'codex-plus' })).toThrow();
   });
@@ -55,6 +89,7 @@ describe('AccountEntity', () => {
       organization: 'Acme',
       reportedPlan: null,
       location: null,
+      reportedRenewal: null,
       at: new Date('2026-11-02T00:00:00Z'),
     });
     expect(entity.email).toBe('me@example.com');

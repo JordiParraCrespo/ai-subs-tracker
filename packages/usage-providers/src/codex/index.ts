@@ -1,5 +1,10 @@
 import { join, resolve, sep } from 'node:path';
-import type { LimitWindow, SyncAccount, UsageSnapshot } from '@flama/shared/schemas/accounts';
+import type {
+  LimitWindow,
+  ReportedRenewal,
+  SyncAccount,
+  UsageSnapshot,
+} from '@flama/shared/schemas/accounts';
 import {
   errorMessage,
   exists,
@@ -59,6 +64,20 @@ async function detect(env: ProviderEnv): Promise<DetectedLogin[]> {
     found.push({ provider: 'codex', home, isDefault: false, managed: true });
   }
   return found;
+}
+
+/**
+ * The day the plan bills, from the end of the paid period in the login's
+ * token, in this machine's local time. Only the day: the token is reissued
+ * when Codex refreshes, so the date itself may be a period or more behind.
+ */
+export function reportedRenewal(auth: CodexAuth | null): ReportedRenewal | null {
+  const until = auth?.subscriptionActiveUntil;
+  if (!until) return null;
+  return {
+    day: until.getDate(),
+    checkedAt: auth.subscriptionLastChecked?.toISOString() ?? null,
+  };
 }
 
 /** Limits from the newest session log, for when the server cannot be asked. */
@@ -183,6 +202,7 @@ async function read(
     location: login.home.slice(0, 300),
     snapshot: snap,
     dailyTokens: sessions.dailyTokens,
+    reportedRenewal: reportedRenewal(auth),
   };
 }
 

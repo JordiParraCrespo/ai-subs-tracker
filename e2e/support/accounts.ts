@@ -7,7 +7,9 @@ const today = () => new Date().toISOString().slice(0, 10);
 /**
  * Reports two logins the way the desktop collector does: a Claude Code Ultra
  * account well behind pace, and a Codex Plus account whose week resets in a
- * few hours with most of it left — the one Tokenmaxx should pick.
+ * few hours with most of it left — the one Tokenmaxx should pick. Codex's
+ * login reports its billing day (today's, so it is in the next 30 days);
+ * Claude Code's reports none.
  */
 export async function syncTwoAccounts(api: APIRequestContext) {
   return api.post(`${API_URL}/api/v1/accounts/sync`, {
@@ -75,6 +77,7 @@ export async function syncTwoAccounts(api: APIRequestContext) {
             extraUsage: null,
           },
           dailyTokens: [],
+          reportedRenewal: { day: new Date().getDate(), checkedAt: hoursFromNow(-24 * 40) },
         },
       ],
     },
