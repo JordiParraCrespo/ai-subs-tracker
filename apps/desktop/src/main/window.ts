@@ -83,7 +83,17 @@ function originOf(url: string): string | null {
   }
 }
 
-export function createMainWindow(config: DesktopConfig, preloadPath: string): BrowserWindow {
+/**
+ * `iconPath` is the window's icon on Windows and on Linux under X11; macOS
+ * takes the bundle's icon (the dock's in development is set in `index.ts`),
+ * and a Wayland desktop takes the icon of the `.desktop` file whose name
+ * matches `desktopName` in package.json.
+ */
+export function createMainWindow(
+  config: DesktopConfig,
+  preloadPath: string,
+  iconPath: string,
+): BrowserWindow {
   const win = new BrowserWindow({
     width: 1280,
     height: 820,
@@ -91,6 +101,7 @@ export function createMainWindow(config: DesktopConfig, preloadPath: string): Br
     minHeight: 640,
     show: false,
     title: 'ResetOwl',
+    icon: iconPath,
     backgroundColor: '#0b0b0c',
     webPreferences: {
       preload: preloadPath,

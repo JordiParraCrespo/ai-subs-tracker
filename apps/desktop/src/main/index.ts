@@ -55,6 +55,10 @@ const timers: Timers = {
 };
 
 app.setName(APP_NAME);
+// Windows groups the taskbar button and pins under this id; it must be the
+// installer's (`appId` in electron-builder.json) or the pinned shortcut shows
+// a second button with Electron's icon.
+if (process.platform === 'win32') app.setAppUserModelId('com.resetowl.desktop');
 // An install from when the app was called Subtrack keeps its folder: the
 // logins it added live there, and moving them would sign them out (legacy.ts).
 app.setPath('userData', userDataDir(app.getPath('appData'), existsSync));
@@ -107,6 +111,11 @@ async function collectOnce(): Promise<void> {
 
 async function main(): Promise<void> {
   await app.whenReady();
+  const assetsDir = join(__dirname, 'assets');
+  const iconPath = join(assetsDir, 'icon.png');
+  // Unpackaged, macOS shows Electron's own icon in the dock; packaged, the
+  // bundle's .icns is already the owl.
+  if (process.platform === 'darwin' && !app.isPackaged) app.dock?.setIcon(iconPath);
   if (!config.rendererUrl)
     serveRenderer(rendererRoot(app.isPackaged, process.resourcesPath, __dirname), config.apiUrl);
 
@@ -229,7 +238,7 @@ async function main(): Promise<void> {
   };
 
   const openWindow = () => {
-    const created = createMainWindow(config, join(__dirname, 'preload.js'));
+    const created = createMainWindow(config, join(__dirname, 'preload.js'), iconPath);
     created.on('close', (event) => {
       if (!quitting && tray && config.mode === 'app') {
         event.preventDefault();
@@ -338,7 +347,7 @@ async function main(): Promise<void> {
 
   try {
     tray = createTray({
-      assetsDir: join(__dirname, 'assets'),
+      assetsDir,
       onRefresh: () => void collector.refresh(),
       onOpen: showWindow,
       onQuit: () => app.quit(),
