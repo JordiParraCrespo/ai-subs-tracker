@@ -245,13 +245,27 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
     this.props.organization = sighting.organization ?? this.props.organization;
     this.props.reportedPlan = sighting.reportedPlan ?? this.props.reportedPlan;
     this.props.location = sighting.location ?? this.props.location;
-    if (sighting.reportedRenewal) {
+    if (this.isNewerRenewal(sighting.reportedRenewal)) {
       this.props.reportedRenewalDay = sighting.reportedRenewal.day;
-      this.props.renewalCheckedAt =
-        sighting.reportedRenewal.checkedAt ?? this.props.renewalCheckedAt;
+      this.props.renewalCheckedAt = sighting.reportedRenewal.checkedAt;
     }
     this.props.lastSyncedAt = sighting.at;
     this.setUpdatedAt(sighting.at);
+  }
+
+  /**
+   * Whether a reported billing day may replace the one kept. One login can
+   * sync from several machines, each holding a token issued at a different
+   * time, so a day the provider confirmed earlier never replaces one it
+   * confirmed later; the day and its check move together.
+   */
+  private isNewerRenewal(
+    renewal: Sighting['reportedRenewal'],
+  ): renewal is NonNullable<Sighting['reportedRenewal']> {
+    if (!renewal) return false;
+    const kept = this.props.renewalCheckedAt;
+    if (!kept) return true;
+    return renewal.checkedAt !== null && renewal.checkedAt.getTime() >= kept.getTime();
   }
 
   edit(change: AccountEdit): void {

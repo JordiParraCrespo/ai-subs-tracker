@@ -66,16 +66,39 @@ describe('AccountEntity', () => {
     expect(entity.renewalCheckedAt?.toISOString()).toBe('2026-09-22T10:09:48.000Z');
 
     entity.edit({ renewalDay: 5 });
-    sighting({ day: 24, checkedAt: null });
+    sighting({ day: 24, checkedAt: new Date('2026-10-22T10:00:00Z') });
     expect(entity.renewalDay).toBe(5);
     expect(entity.renewalDayOverridden).toBe(true);
-    // A token that names no check keeps the last one known.
-    expect(entity.renewalCheckedAt?.toISOString()).toBe('2026-09-22T10:09:48.000Z');
 
     entity.edit({ renewalDay: null });
     sighting(null);
     expect(entity.renewalDay).toBe(24);
     expect(entity.renewalDayOverridden).toBe(false);
+  });
+
+  // One login syncs from every machine that holds it, each with a token
+  // issued at a different time: an older token must not bring back a day
+  // the provider has since replaced.
+  it('keeps the billing day the provider confirmed last, whichever machine syncs', () => {
+    const entity = account();
+    const sighting = (day: number, checkedAt: string | null) =>
+      entity.recordSighting({
+        email: null,
+        organization: null,
+        reportedPlan: null,
+        location: null,
+        reportedRenewal: { day, checkedAt: checkedAt ? new Date(checkedAt) : null },
+        at: new Date('2026-11-06T00:00:00Z'),
+      });
+    sighting(23, '2026-11-02T10:00:00Z');
+    sighting(12, '2026-09-22T10:00:00Z');
+    expect(entity.renewalDay).toBe(23);
+    // A token that names no check cannot say it is newer either.
+    sighting(12, null);
+    expect(entity.renewalDay).toBe(23);
+    expect(entity.renewalCheckedAt?.toISOString()).toBe('2026-11-02T10:00:00.000Z');
+    sighting(12, '2026-12-02T10:00:00Z');
+    expect(entity.renewalDay).toBe(12);
   });
 
   it('refuses a plan from another provider', () => {
