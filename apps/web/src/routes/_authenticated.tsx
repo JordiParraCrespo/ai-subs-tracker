@@ -10,6 +10,7 @@ import {
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import type { ComponentType, ReactNode } from 'react';
 import { AccountSearchResults } from '@/features/accounts/sections/account-search-results';
+import { DesktopSync } from '@/features/accounts/sections/desktop-sync';
 // flama:begin organizations
 // flama:end organizations
 import { apiBaseUrl } from '@/lib/auth-client';
@@ -52,6 +53,7 @@ function AuthenticatedShell() {
       workspace={workspace}
       commandResults={AccountSearchResults}
     >
+      <DesktopSync />
       {api.reachable ? (
         <Outlet />
       ) : (

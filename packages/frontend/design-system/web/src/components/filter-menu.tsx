@@ -3,6 +3,7 @@
 import { FilterIcon } from "lucide-react";
 import * as React from "react";
 
+import { MENU_ITEM, MENU_SCROLL, MENU_SEPARATOR, MENU_SURFACE } from "../lib/menu";
 import { cn } from "../lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
@@ -90,7 +91,7 @@ function FilterMenu({
       />
       <PopoverContent
         align={align}
-        className="overflow-hidden p-1.5"
+        className={cn(MENU_SURFACE, MENU_SCROLL, "max-h-menu gap-0")}
         style={{ width }}
         data-slot="filter-menu-content"
       >
@@ -103,7 +104,11 @@ function FilterMenu({
               role="menuitemcheckbox"
               aria-checked={on}
               onClick={() => toggle(option.value)}
-              className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-base text-ink-900 transition-colors hover:bg-surface-hover [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5"
+              className={cn(
+                MENU_ITEM,
+                "cursor-pointer hover:bg-surface-hover hover:text-ink-900 [&_svg:not([class*='size-'])]:size-3.5",
+                on && "text-ink-900",
+              )}
             >
               <FilterMenuCheck checked={on} />
               <span className="text-ink-400">{option.icon}</span>
@@ -116,12 +121,15 @@ function FilterMenu({
             </button>
           );
         })}
-        <div className="mx-0.5 my-[5px] h-px bg-border-subtle" />
+        <div className={MENU_SEPARATOR} />
         <button
           type="button"
           disabled={active === 0}
           onClick={() => onSelectedChange([])}
-          className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-base text-accent-blue transition-colors not-disabled:hover:bg-surface-hover disabled:cursor-default disabled:text-ink-400"
+          className={cn(
+            MENU_ITEM,
+            "cursor-pointer text-accent-blue not-disabled:hover:bg-surface-hover disabled:cursor-default disabled:text-ink-400",
+          )}
         >
           <span className="w-[17px] flex-none" />
           <span className="min-w-0 flex-1">{clearLabel}</span>

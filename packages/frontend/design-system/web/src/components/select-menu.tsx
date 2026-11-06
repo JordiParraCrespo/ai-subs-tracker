@@ -3,6 +3,7 @@
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import * as React from "react";
 
+import { MENU_ITEM, MENU_SCROLL, MENU_SURFACE } from "../lib/menu";
 import { cn } from "../lib/utils";
 import { Button } from "./button";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
@@ -70,7 +71,7 @@ function SelectMenu({
       />
       <PopoverContent
         align={align}
-        className="max-w-[calc(100vw-2rem)] p-1.5"
+        className={cn(MENU_SURFACE, MENU_SCROLL, "max-h-menu max-w-[calc(100vw-2rem)] gap-0")}
         style={{ width }}
       >
         {options.map((option) => (
@@ -81,11 +82,15 @@ function SelectMenu({
               onValueChange?.(option);
               setOpen(false);
             }}
-            className="flex w-full items-center justify-between gap-3 rounded-md px-2.5 py-2 text-left text-base text-ink-900 transition-colors hover:bg-surface-hover"
+            className={cn(
+              MENU_ITEM,
+              "cursor-pointer justify-between gap-3 hover:bg-surface-hover hover:text-ink-900",
+              value === option && "text-ink-900",
+            )}
           >
-            {option}
+            <span className="min-w-0 truncate">{option}</span>
             {value === option ? (
-              <CheckIcon className="size-4 text-ink-900" />
+              <CheckIcon className="size-4 text-accent-blue" />
             ) : null}
           </button>
         ))}

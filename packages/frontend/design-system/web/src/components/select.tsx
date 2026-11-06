@@ -5,6 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import * as React from "react";
 
+import { MENU_ITEM, MENU_LABEL, MENU_SCROLL, MENU_SEPARATOR, MENU_SURFACE } from "../lib/menu";
 import { cn } from "../lib/utils";
 
 /**
@@ -35,7 +36,7 @@ function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   return (
     <SelectPrimitive.Group
       data-slot="select-group"
-      className={cn("scroll-my-1.5", className)}
+      className={cn("scroll-my-1", className)}
       {...props}
     />
   );
@@ -74,19 +75,34 @@ function SelectTrigger({
   );
 }
 
+/**
+ * The open list wears the shared menu card (`lib/menu.ts`): compact rows, the
+ * thin scrollbar, and a height capped at `max-h-menu` — 20rem or the room left
+ * on the side it opened, whichever is less. The popup is a flex column that
+ * does not scroll; Base UI's `List` inside it is the scroller, so the bar sits
+ * inside the card's padding instead of on its rounded edge. The positioner
+ * flips to the other side of the trigger when the list does not fit below,
+ * keeping 8px off the viewport's edge.
+ */
 function SelectContent({
   className,
   children,
   side = "bottom",
-  sideOffset = 6,
+  sideOffset = 4,
   align = "start",
   alignOffset = 0,
   alignItemWithTrigger = false,
+  collisionPadding = 8,
   ...props
 }: SelectPrimitive.Popup.Props &
   Pick<
     SelectPrimitive.Positioner.Props,
-    "align" | "alignOffset" | "side" | "sideOffset" | "alignItemWithTrigger"
+    | "align"
+    | "alignOffset"
+    | "side"
+    | "sideOffset"
+    | "alignItemWithTrigger"
+    | "collisionPadding"
   >) {
   return (
     <SelectPrimitive.Portal>
@@ -96,6 +112,7 @@ function SelectContent({
         align={align}
         alignOffset={alignOffset}
         alignItemWithTrigger={alignItemWithTrigger}
+        collisionPadding={collisionPadding}
         // Above `.ds-modal` (z-index 71): a select inside a dialog opens over it.
         className="isolate z-80"
       >
@@ -103,14 +120,15 @@ function SelectContent({
           data-slot="select-content"
           data-align-trigger={alignItemWithTrigger}
           className={cn(
-            "cn-menu-target relative isolate z-50 max-h-60 w-(--anchor-width) min-w-36 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-2xl border border-border-default bg-popover p-1.5 text-popover-foreground shadow-menu duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+            MENU_SURFACE,
+            "cn-menu-target relative isolate z-50 flex max-h-menu w-(--anchor-width) max-w-(--available-width) min-w-36 origin-(--transform-origin) flex-col overflow-hidden duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
             className,
           )}
           {...props}
         >
-          <SelectScrollUpButton />
-          <SelectPrimitive.List>{children}</SelectPrimitive.List>
-          <SelectScrollDownButton />
+          <SelectPrimitive.List data-slot="select-list" className={cn("min-h-0", MENU_SCROLL)}>
+            {children}
+          </SelectPrimitive.List>
         </SelectPrimitive.Popup>
       </SelectPrimitive.Positioner>
     </SelectPrimitive.Portal>
@@ -124,16 +142,18 @@ function SelectLabel({
   return (
     <SelectPrimitive.GroupLabel
       data-slot="select-label"
-      className={cn("px-3 py-2.5 text-xs text-muted-foreground", className)}
+      className={cn(MENU_LABEL, "pl-8", className)}
       {...props}
     />
   );
 }
 
 /**
- * A menu row: a 15px leading slot holding the blue check when selected, then
+ * A menu row: a 16px leading slot holding the blue check when selected, then
  * the label. The check leads rather than trails so a scanned column of rows
- * shows the current choice without the eye crossing the label.
+ * shows the current choice without the eye crossing the label — the same
+ * column `Combobox` keeps. The picked row is told by its check and primary
+ * ink, not by a fill, so the pointer's hover tint is the only fill in the list.
  */
 function SelectItem({
   className,
@@ -144,7 +164,8 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "flex w-full cursor-default items-center gap-2.5 rounded-md px-2.5 py-2 text-base text-ink-900 outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-selected:bg-surface-sunken data-[highlighted]:not-data-selected:bg-surface-hover hover:bg-surface-hover! [&_svg]:pointer-events-none [&_svg]:shrink-0",
+        MENU_ITEM,
+        "data-highlighted:bg-surface-hover data-highlighted:text-ink-900 data-selected:text-ink-900",
         className,
       )}
       {...props}
@@ -154,7 +175,7 @@ function SelectItem({
           <CheckIcon className="size-4 text-accent-blue" />
         </SelectPrimitive.ItemIndicator>
       </span>
-      <SelectPrimitive.ItemText className="flex flex-1 gap-2 whitespace-nowrap">
+      <SelectPrimitive.ItemText className="flex min-w-0 flex-1 gap-2 truncate">
         {children}
       </SelectPrimitive.ItemText>
     </SelectPrimitive.Item>
@@ -168,10 +189,7 @@ function SelectSeparator({
   return (
     <SelectPrimitive.Separator
       data-slot="select-separator"
-      className={cn(
-        "pointer-events-none -mx-1.5 my-1.5 h-px bg-border",
-        className,
-      )}
+      className={cn("pointer-events-none", MENU_SEPARATOR, className)}
       {...props}
     />
   );

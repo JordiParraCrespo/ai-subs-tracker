@@ -580,6 +580,15 @@
   background-size: 22px 22px;
 }
 
+/* How tall a floating list may grow: 20rem (about nine 32px rows), never past
+   the room Base UI's positioner measured on the side it opened (its
+   `--available-height`), so a long list scrolls inside the card instead of
+   running off the viewport, and flips above its trigger when that side has
+   more room. */
+@utility max-h-menu {
+  max-height: min(var(--available-height, 20rem), 20rem);
+}
+
 /* A quiet 8px scrollbar for panes that scroll inside a card — the product's
    tables and menus. The default 15px bar eats real estate and reads as chrome
    the flat system does not otherwise have. */

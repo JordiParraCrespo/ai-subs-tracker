@@ -13,9 +13,9 @@ import {
   readZaiQuota,
 } from '@flama/usage-providers';
 import { app, type BrowserWindow, ipcMain, safeStorage, shell } from 'electron';
-import { type LoginHandle, loginShellPath, startLogin } from './add-login';
+import { type LoginHandle, loginShellPath, startLogin, syncAfterLogin } from './add-login';
 import { postReading, postSync, type SyncedAccount } from './api-client';
-import { Collector } from './collector';
+import { Collector, type Timers } from './collector';
 import { resolveConfig } from './config';
 import { registerIpc } from './ipc';
 import { APP_NAME, migratePointers, userDataDir } from './legacy';
@@ -49,6 +49,10 @@ import { createMainWindow, registerAppScheme, rendererRoot, serveRenderer } from
  */
 
 const log = (line: string) => console.error(`[resetowl] ${line}`);
+const timers: Timers = {
+  set: (fn, ms) => setTimeout(fn, ms),
+  clear: (handle) => clearTimeout(handle as NodeJS.Timeout),
+};
 
 app.setName(APP_NAME);
 // An install from when the app was called Subtrack keeps its folder: the
@@ -182,10 +186,7 @@ async function main(): Promise<void> {
     readers,
     device: { name: hostname(), platform: process.platform },
     now: () => new Date(),
-    timers: {
-      set: (fn, ms) => setTimeout(fn, ms),
-      clear: (handle) => clearTimeout(handle as NodeJS.Timeout),
-    },
+    timers,
     onStatus(status) {
       if (win && !win.isDestroyed())
         win.webContents.send(DESKTOP_CHANNELS.collectorChanged, status);
@@ -274,8 +275,7 @@ async function main(): Promise<void> {
         login = handle;
         const result = await handle.result;
         if (login === handle) login = null;
-        if (result.ok) void collector.runNow();
-        return result;
+        return syncAfterLogin(result, { sync: () => collector.runNow(), timers, log });
       },
       submitLoginCode: (code) => login?.submitCode(code),
       cancelLogin: () => {

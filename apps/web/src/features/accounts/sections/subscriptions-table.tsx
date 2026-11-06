@@ -16,7 +16,13 @@ import {
 import { SubscriptionsToolbar } from './subscriptions-toolbar';
 
 const PAGE_SIZE = 8;
-const TEMPLATE = 'minmax(240px,2.4fr) minmax(150px,1.2fr) 110px 130px 120px 130px';
+// The minimums hold each column's English copy (avatar and a plan name, the
+// usage bar and its percentage, "5-hour window", "Monthly cost", "in 3 days")
+// and add up to 652px, so the table fits the desktop window at ~1150px with
+// the sidebar open; the fr shares give the longer Spanish copy its room on a
+// wide screen. Status is fixed at the widest badge in either locale.
+const TEMPLATE =
+  'minmax(168px,2.4fr) minmax(124px,1.2fr) minmax(96px,1fr) minmax(88px,0.9fr) minmax(72px,1fr) 104px';
 
 /** The design's Subscriptions list: toolbar, result line, and the grid of accounts. */
 export function SubscriptionsTable({

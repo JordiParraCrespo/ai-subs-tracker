@@ -33,7 +33,11 @@
 .ds-fselect__icon svg{width:16px;height:16px;stroke-width:1.5}
 .ds-fselect__chevron{width:16px;height:16px;color:var(--ds-text-subtle);stroke-width:1.5}
 .ds-fselect__scrim{all:unset;position:fixed;inset:0;z-index:60}
-.ds-fselect__menu{position:absolute;top:calc(100% + 6px);left:0;z-index:61;min-width:max(100%,200px);width:max-content;max-width:300px;background:var(--ds-surface-overlay);color:var(--ds-text);border-radius:12px;outline:1px solid var(--ds-outline-card);box-shadow:var(--ds-shadow-float);overflow:hidden;display:flex;flex-direction:column;padding:4px}
+.ds-fselect__menu{position:absolute;top:calc(100% + 6px);left:0;z-index:61;min-width:max(100%,200px);width:max-content;max-width:300px;background:var(--ds-surface-overlay);color:var(--ds-text);border-radius:12px;outline:1px solid var(--ds-outline-card);box-shadow:var(--ds-shadow-float);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;max-height:min(320px,calc(100vh - 160px));scrollbar-width:thin;scrollbar-color:var(--border-strong) transparent;display:flex;flex-direction:column;padding:4px}
+/* The same quiet bar as the `scrollbar-thin` utility, for the rare filter long enough to scroll. */
+.ds-fselect__menu::-webkit-scrollbar{width:8px}
+.ds-fselect__menu::-webkit-scrollbar-button{display:none;height:0}
+.ds-fselect__menu::-webkit-scrollbar-thumb{background:var(--border-default);border:2px solid transparent;background-clip:padding-box;border-radius:999px}
 .ds-fselect__menu[data-align="right"]{left:auto;right:0}
 .ds-fselect__divider{flex:none;height:1px;background:var(--ds-divider);margin:4px}
 .ds-fselect__item{all:unset;box-sizing:border-box;flex:none;height:32px;padding:0 8px 0 10px;border-radius:6px;display:flex;align-items:center;gap:12px;cursor:pointer;font:500 14px/20px var(--ds-font-sans);white-space:nowrap;color:var(--ds-text-secondary);transition:background-color 150ms}
@@ -43,9 +47,13 @@
 
 /* Page header (the panel's first block). */
 
-/* The list table on the grid (Subscriptions, the Tokenmaxx queue). */
+/* The list table on the grid (Subscriptions, the Tokenmaxx queue).
+   The table is as wide as its rows need (fit-content: the template's minimums
+   plus gaps and padding) and at least its container, so a template that cannot
+   fit scrolls in .ds-gtable-scroll; the overflow:hidden below only rounds the
+   corners and never clips a column. */
 .ds-gtable-scroll{overflow-x:auto;overflow-y:hidden}
-.ds-gtable{border-radius:16px;background:var(--ds-fill-table-head);overflow:hidden}
+.ds-gtable{width:fit-content;min-width:100%;border-radius:16px;background:var(--ds-fill-table-head);overflow:hidden}
 .ds-gtable__head{display:grid;gap:12px;padding:10px 24px;font:var(--ds-type-label);color:var(--ds-text-secondary)}
 .ds-gtable__body{border:1px solid var(--ds-table-border);border-radius:16px;background:var(--ds-surface-nested);overflow:hidden}
 .ds-gtable__group{border-bottom:1px solid var(--ds-table-border)}
@@ -70,8 +78,8 @@
 .ds-cell{font:var(--ds-type-label)}
 .ds-cell-money{font:500 14px/20px var(--ds-font-sans);letter-spacing:var(--ds-tracking-tighter)}
 .ds-cell-sub{font:500 14px/20px var(--ds-font-sans);color:var(--ds-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ds-review-pill{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:6px;background:var(--ds-review-wash);color:var(--ds-review);font:var(--ds-type-badge)}
-.ds-negative-pill{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:6px;background:rgba(255,102,127,.12);color:var(--ds-negative);font:var(--ds-type-badge)}
+.ds-review-pill{display:inline-flex;align-items:center;flex-shrink:0;height:24px;padding:0 8px;border-radius:6px;background:var(--ds-review-wash);color:var(--ds-review);font:var(--ds-type-badge);white-space:nowrap}
+.ds-negative-pill{display:inline-flex;align-items:center;flex-shrink:0;height:24px;padding:0 8px;border-radius:6px;background:rgba(255,102,127,.12);color:var(--ds-negative);font:var(--ds-type-badge);white-space:nowrap}
 .ds-result{display:flex;align-items:center;gap:8px;min-height:28px;font:var(--ds-type-label);color:var(--ds-text-muted)}
 .ds-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 

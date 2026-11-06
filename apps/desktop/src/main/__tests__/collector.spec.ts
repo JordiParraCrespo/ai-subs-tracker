@@ -245,6 +245,17 @@ describe('collector', () => {
     expect(h.syncs).toHaveLength(1);
   });
 
+  // A run under way read the disk before the new login was there; joining it
+  // would answer "Account added" with the account still off the API.
+  it('runNow during a run syncs again once that run has finished', async () => {
+    const h = harness();
+    const first = h.collector.start();
+    const status = await h.collector.runNow();
+    await first;
+    expect(status.phase).toBe('idle');
+    expect(h.syncs).toHaveLength(2);
+  });
+
   it('skips limit fetching for a rate-limited login for 15 minutes', async () => {
     const h = harness();
     h.setNextAccount(account('rate_limited'));
