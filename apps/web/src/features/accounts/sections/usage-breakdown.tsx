@@ -127,7 +127,6 @@ export function UsageBreakdown({
         template={TEMPLATE}
         rows={shown}
         rowKey={(row) => row.key}
-        minWidth={760}
         footer={
           rows.length
             ? t('accounts.table.range', {

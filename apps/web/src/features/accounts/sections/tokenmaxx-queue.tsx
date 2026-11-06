@@ -178,7 +178,6 @@ export function TokenmaxxQueue() {
         template={TEMPLATE}
         rows={rows}
         rowKey={(row) => row.account.id}
-        minWidth={940}
       />
     </div>
   );
