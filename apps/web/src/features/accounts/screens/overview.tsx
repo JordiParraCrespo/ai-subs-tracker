@@ -22,7 +22,9 @@ export function OverviewScreen() {
 
   return (
     <FirstRun page="overview" title={greeting}>
-      <div className="flex flex-col gap-6">
+      {/* Fills the window, so the chart can give up height to the cards;
+          a short window (a 768px laptop) tightens the gaps too. */}
+      <div className="flex flex-1 flex-col gap-6 [@media(max-height:800px)]:gap-4">
         <PageHead className="mb-0" title={greeting} sub={t('accounts.overview.sub')} />
         <OverviewHeadline />
         <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,380px),1fr))] items-stretch gap-4">

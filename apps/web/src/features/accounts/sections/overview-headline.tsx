@@ -26,16 +26,20 @@ export function OverviewHeadline() {
   const apiValue = usage.data?.totals.apiCostCents;
 
   return (
-    <section className="flex flex-col gap-6">
+    // Grows into the page's spare height, and the chart takes it, so the
+    // cards under it stay on screen on a laptop.
+    <section className="flex flex-1 flex-col gap-6 [@media(max-height:800px)]:gap-4">
       <DsAreaChart
         title={t('accounts.overview.monthlySpend')}
         data={history.map((point) => point.cents)}
         labels={history.map((point) => monthLabel.format(point.month))}
         formatValue={(cents) => formatMoney(cents, locale)}
         restLabel={t('accounts.overview.past12')}
-        height={180}
+        height={72}
+        maxHeight={240}
+        fill
       />
-      <div className="border-t border-border-default pt-6">
+      <div className="border-t border-border-default pt-6 [@media(max-height:800px)]:pt-4">
         <DsStatGrid
           columns={4}
           items={[
