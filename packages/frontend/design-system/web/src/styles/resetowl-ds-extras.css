@@ -33,7 +33,11 @@
 .ds-fselect__icon svg{width:16px;height:16px;stroke-width:1.5}
 .ds-fselect__chevron{width:16px;height:16px;color:var(--ds-text-subtle);stroke-width:1.5}
 .ds-fselect__scrim{all:unset;position:fixed;inset:0;z-index:60}
-.ds-fselect__menu{position:absolute;top:calc(100% + 6px);left:0;z-index:61;min-width:max(100%,200px);width:max-content;max-width:300px;background:var(--ds-surface-overlay);color:var(--ds-text);border-radius:12px;outline:1px solid var(--ds-outline-card);box-shadow:var(--ds-shadow-float);overflow:hidden;display:flex;flex-direction:column;padding:4px}
+.ds-fselect__menu{position:absolute;top:calc(100% + 6px);left:0;z-index:61;min-width:max(100%,200px);width:max-content;max-width:300px;background:var(--ds-surface-overlay);color:var(--ds-text);border-radius:12px;outline:1px solid var(--ds-outline-card);box-shadow:var(--ds-shadow-float);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;max-height:min(320px,calc(100vh - 160px));scrollbar-width:thin;scrollbar-color:var(--border-strong) transparent;display:flex;flex-direction:column;padding:4px}
+/* The same quiet bar as the `scrollbar-thin` utility, for the rare filter long enough to scroll. */
+.ds-fselect__menu::-webkit-scrollbar{width:8px}
+.ds-fselect__menu::-webkit-scrollbar-button{display:none;height:0}
+.ds-fselect__menu::-webkit-scrollbar-thumb{background:var(--border-default);border:2px solid transparent;background-clip:padding-box;border-radius:999px}
 .ds-fselect__menu[data-align="right"]{left:auto;right:0}
 .ds-fselect__divider{flex:none;height:1px;background:var(--ds-divider);margin:4px}
 .ds-fselect__item{all:unset;box-sizing:border-box;flex:none;height:32px;padding:0 8px 0 10px;border-radius:6px;display:flex;align-items:center;gap:12px;cursor:pointer;font:500 14px/20px var(--ds-font-sans);white-space:nowrap;color:var(--ds-text-secondary);transition:background-color 150ms}
