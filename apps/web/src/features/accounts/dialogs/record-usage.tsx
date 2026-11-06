@@ -15,21 +15,22 @@ import { desktopBridge, useErrorMessage } from '@flama/frontend-web';
 import type { RecordUsageFormValues } from '@flama/shared/schemas/accounts';
 import { useTranslation } from 'react-i18next';
 import { RecordUsageForm } from '../forms/record-usage-form';
-import { ZAI_USAGE_URL } from '../lib/providers';
+import { PROVIDER_NAMES, usagePageUrl } from '../lib/providers';
 
 const FORM = 'record-usage';
 
 const percent = (value: string) => (value === '' ? null : Number(value));
 
 /** The desktop app opens links in the system browser; a browser tab opens a new one. */
-function openUsagePage() {
-  if (desktopBridge) void desktopBridge.openExternal(ZAI_USAGE_URL);
-  else window.open(ZAI_USAGE_URL, '_blank', 'noopener,noreferrer');
+function openPage(url: string) {
+  if (desktopBridge) void desktopBridge.openExternal(url);
+  else window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 /**
  * Records a usage reading on a subscription tracked by hand, copied from the
- * vendor's own usage page (ResetOwl cannot read Z.AI's); owns the save.
+ * vendor's own usage page; owns the save. The fallback when the desktop
+ * app's unofficial reader is off or failing.
  */
 export function RecordUsageDialog({
   account,
@@ -40,6 +41,8 @@ export function RecordUsageDialog({
 }) {
   const { t } = useTranslation();
   const resolveError = useErrorMessage();
+  const name = PROVIDER_NAMES[account.provider];
+  const usageUrl = usagePageUrl(account.provider);
   const record = useRecordAccountUsage({
     onSuccess: () => {
       toast.success(t('toasts.usageRecorded'));
@@ -64,7 +67,7 @@ export function RecordUsageDialog({
     <DsModal open onOpenChange={(open) => !open && onClose()}>
       <DsModalHeader
         title={t('accounts.record.title')}
-        description={t('accounts.record.description')}
+        description={t('accounts.record.description', { name })}
         closeLabel={t('common.close')}
       />
       <DsModalBody>
@@ -76,17 +79,19 @@ export function RecordUsageDialog({
           </Alert>
         )}
         <RecordUsageForm id={FORM} account={account} isPending={record.isPending} onSubmit={save} />
-        <p className="ds-t-sub m-0">{t('accounts.record.hint')}</p>
+        <p className="ds-t-sub m-0">{t('accounts.record.hint', { name })}</p>
       </DsModalBody>
       <DsModalFooter
         start={
-          <DsButton
-            size="text"
-            iconEnd={<ArrowUpRight className="size-4" />}
-            onClick={openUsagePage}
-          >
-            {t('accounts.record.openUsage')}
-          </DsButton>
+          usageUrl && (
+            <DsButton
+              size="text"
+              iconEnd={<ArrowUpRight className="size-4" />}
+              onClick={() => openPage(usageUrl)}
+            >
+              {t('accounts.record.openUsage', { name })}
+            </DsButton>
+          )
         }
       >
         <DsButton variant="ghost" size="sm" onClick={onClose}>

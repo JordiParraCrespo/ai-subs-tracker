@@ -10,7 +10,7 @@
  *
  * Sources: claude.com/pricing and learn.chatgpt.com/docs/pricing, checked
  * 2026-11-02; docs.z.ai/devpack/overview and docs.z.ai/devpack/faq, checked
- * 2026-11-04.
+ * 2026-11-04; docs.bigmodel.cn/cn/coding-plan/overview, checked 2026-11-05.
  */
 
 /** Providers the desktop collector reads on the machine and a terminal can switch between. */
@@ -18,7 +18,7 @@ export const LOCAL_PROVIDER_IDS = ['claude-code', 'codex'] as const;
 export type LocalProviderId = (typeof LOCAL_PROVIDER_IDS)[number];
 
 /** Providers a person adds in the app and tracks by hand (see `ProviderTracking`). */
-export const MANUAL_PROVIDER_IDS = ['zai'] as const;
+export const MANUAL_PROVIDER_IDS = ['zai', 'bigmodel'] as const;
 export type ManualProviderId = (typeof MANUAL_PROVIDER_IDS)[number];
 
 export const PROVIDER_IDS = [...LOCAL_PROVIDER_IDS, ...MANUAL_PROVIDER_IDS] as const;
@@ -28,6 +28,7 @@ export const PROVIDER_LABELS: Record<ProviderId, { name: string; vendor: string 
   'claude-code': { name: 'Claude Code', vendor: 'Anthropic' },
   codex: { name: 'Codex', vendor: 'OpenAI' },
   zai: { name: 'GLM Coding Plan', vendor: 'Z.AI' },
+  bigmodel: { name: 'GLM Coding Plan', vendor: 'Zhipu BigModel' },
 };
 
 /**
@@ -39,6 +40,14 @@ export const PROVIDER_LABELS: Record<ProviderId, { name: string; vendor: string 
  *   person adds the subscription in the app and records its usage by hand.
  *   Z.AI's Coding Plan is an API key used inside other tools; Z.AI documents
  *   no usage endpoint (its usage page is z.ai/manage-apikey/billing).
+ *   BigModel is the same plan sold in mainland China by Zhipu, with its own
+ *   site, prices and keys.
+ *
+ * A manual provider may also have an **unofficial usage reader**
+ * (`UNOFFICIAL_USAGE_READERS`): an endpoint the vendor's own tools call but
+ * does not document. It is opt-in per account, in the desktop app only, with
+ * the person's own key kept on the machine; its readings carry the source
+ * `unofficial`, and recording by hand stays the fallback.
  */
 export type ProviderTracking = 'local' | 'manual';
 
@@ -48,6 +57,42 @@ export function providerTracking(id: ProviderId): ProviderTracking {
 
 export function isManualProvider(id: ProviderId): id is ManualProviderId {
   return providerTracking(id) === 'manual';
+}
+
+export interface UnofficialUsageReader {
+  /**
+   * The HTTPS origin the quota endpoint lives on; the person's key is sent
+   * there and nowhere else. The path is the reader's (`@flama/usage-providers`).
+   */
+  origin: string;
+  /** Where the person creates the key the reader needs. */
+  keysUrl: string;
+  /** Where the vendor shows the same usage to a person, to check it against. */
+  usageUrl: string;
+}
+
+/**
+ * The manual providers whose usage the desktop app can read, opt-in, from an
+ * endpoint the vendor does not document: `GET <origin>/api/monitor/usage/quota/limit`,
+ * which Z.AI's own `glm-plan-usage` plugin and the Orca and ZCode tools call
+ * with a Coding Plan key. Z.AI and BigModel each have their own site and keys.
+ */
+export const UNOFFICIAL_USAGE_READERS: Partial<Record<ManualProviderId, UnofficialUsageReader>> = {
+  zai: {
+    origin: 'https://api.z.ai',
+    keysUrl: 'https://z.ai/manage-apikey',
+    usageUrl: 'https://z.ai/manage-apikey/billing',
+  },
+  bigmodel: {
+    origin: 'https://open.bigmodel.cn',
+    keysUrl: 'https://open.bigmodel.cn/usercenter/proj-mgmt/apikeys',
+    usageUrl: 'https://www.bigmodel.cn/coding-plan/personal/usage',
+  },
+};
+
+/** The unofficial reader a provider has, if any. */
+export function unofficialUsageReader(id: ProviderId): UnofficialUsageReader | undefined {
+  return isManualProvider(id) ? UNOFFICIAL_USAGE_READERS[id] : undefined;
 }
 
 /** Which limit windows a plan meters; a plan without a 5-hour window only has a weekly one. */
@@ -241,6 +286,37 @@ export const PLANS: readonly PlanDefinition[] = [
   {
     id: 'zai-max',
     provider: 'zai',
+    name: 'Max',
+    monthlyPriceCents: null,
+    windows: 'session+weekly',
+    allowance: { session: 28000, weekly: 140000, unit: 'credits' },
+    aliases: ['max', 'glm coding max'],
+  },
+  // BigModel — docs.bigmodel.cn/cn/coding-plan/overview. The same credits per
+  // window as Z.AI's tiers; the docs publish no price for any tier (the
+  // subscription page sells them in CNY), so every account carries the price
+  // the person pays, which ResetOwl keeps in US dollars like every other.
+  {
+    id: 'bigmodel-lite',
+    provider: 'bigmodel',
+    name: 'Lite',
+    monthlyPriceCents: null,
+    windows: 'session+weekly',
+    allowance: { session: 2000, weekly: 10000, unit: 'credits' },
+    aliases: ['lite', 'glm coding lite'],
+  },
+  {
+    id: 'bigmodel-pro',
+    provider: 'bigmodel',
+    name: 'Pro',
+    monthlyPriceCents: null,
+    windows: 'session+weekly',
+    allowance: { session: 12000, weekly: 60000, unit: 'credits' },
+    aliases: ['pro', 'glm coding pro'],
+  },
+  {
+    id: 'bigmodel-max',
+    provider: 'bigmodel',
     name: 'Max',
     monthlyPriceCents: null,
     windows: 'session+weekly',

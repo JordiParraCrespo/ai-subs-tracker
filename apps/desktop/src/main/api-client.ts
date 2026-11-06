@@ -1,5 +1,6 @@
 import type {
   LimitWindow,
+  ReportUsageReadingInput,
   SnapshotSource,
   SnapshotStatus,
   SyncAccountsInput,
@@ -76,4 +77,49 @@ export async function postSync(opts: {
   }
   const body: unknown = await res.json().catch(() => []);
   return { kind: 'ok', accounts: Array.isArray(body) ? (body as SyncedAccount[]) : [] };
+}
+
+export type ReadingResult =
+  | { kind: 'ok' }
+  | { kind: 'not_found' }
+  | { kind: 'unauthorized' }
+  | { kind: 'http_error'; status: number; message: string };
+
+/**
+ * Sends a reading an unofficial usage reader took (`POST
+ * /v1/accounts/:id/readings`): windows and the tier, never the key that read
+ * them. A 404 means the account is gone, so its key can go too.
+ */
+export async function postReading(opts: {
+  apiUrl: string;
+  token: string;
+  accountId: string;
+  input: ReportUsageReadingInput;
+  userAgent: string;
+  fetch: typeof fetch;
+}): Promise<ReadingResult> {
+  let res: Response;
+  try {
+    res = await opts.fetch(
+      `${opts.apiUrl}/api/v1/accounts/${encodeURIComponent(opts.accountId)}/readings`,
+      {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${opts.token}`,
+          'content-type': 'application/json',
+          accept: 'application/json',
+          'user-agent': opts.userAgent,
+        },
+        body: JSON.stringify(opts.input),
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+      },
+    );
+  } catch (err) {
+    throw new NetworkError(err instanceof Error ? err.message : String(err));
+  }
+  await res.body?.cancel().catch(() => undefined);
+  if (res.ok) return { kind: 'ok' };
+  if (res.status === 404) return { kind: 'not_found' };
+  if (res.status === 401) return { kind: 'unauthorized' };
+  return { kind: 'http_error', status: res.status, message: `The API answered ${res.status}.` };
 }

@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { ActivateAccountData, ActivateAccountErrors, ActivateAccountResponses, ArchiveAccountData, ArchiveAccountErrors, ArchiveAccountResponses, AssignData, AssignErrors, AssignResponses, CatalogData, CatalogErrors, CatalogResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CheckData, CheckResponses, CreateAccountData, CreateAccountErrors, CreateAccountResponses, CreateData, CreateErrors, CreateResponses, DeleteAvatarData, DeleteAvatarErrors, DeleteAvatarResponses, DeploymentCapabilitiesData, DeploymentCapabilitiesResponses, FindAll2Data, FindAll2Errors, FindAll2Responses, FindAllData, FindAllErrors, FindAllResponses, FindOne2Data, FindOne2Errors, FindOne2Responses, FindOneData, FindOneErrors, FindOneResponses, FindSessionsData, FindSessionsErrors, FindSessionsResponses, FindUserRolesData, FindUserRolesErrors, FindUserRolesResponses, GetProfileData, GetProfileErrors, GetProfileResponses, GetSettingsData, GetSettingsErrors, GetSettingsResponses, GetUsageSummaryData, GetUsageSummaryErrors, GetUsageSummaryResponses, ListAccountsData, ListAccountsErrors, ListAccountsResponses, MeData, MeErrors, MeResponses, PermissionsData, PermissionsErrors, PermissionsResponses, ReadinessData, ReadinessErrors, ReadinessResponses, RecordAccountUsageData, RecordAccountUsageErrors, RecordAccountUsageResponses, Remove2Data, Remove2Errors, Remove2Responses, RemoveData, RemoveErrors, RemoveResponses, RevokeOtherSessionsData, RevokeOtherSessionsErrors, RevokeOtherSessionsResponses, RevokeSessionData, RevokeSessionErrors, RevokeSessionResponses, SyncAccountsData, SyncAccountsErrors, SyncAccountsResponses, Update2Data, Update2Errors, Update2Responses, UpdateAccountData, UpdateAccountErrors, UpdateAccountResponses, UpdateData, UpdateErrors, UpdatePermissionsData, UpdatePermissionsErrors, UpdatePermissionsResponses, UpdateProfileData, UpdateProfileErrors, UpdateProfileResponses, UpdateResponses, UpdateSettingsData, UpdateSettingsErrors, UpdateSettingsResponses, UploadAvatarData, UploadAvatarErrors, UploadAvatarResponses } from './types.gen';
+import type { ActivateAccountData, ActivateAccountErrors, ActivateAccountResponses, ArchiveAccountData, ArchiveAccountErrors, ArchiveAccountResponses, AssignData, AssignErrors, AssignResponses, CatalogData, CatalogErrors, CatalogResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CheckData, CheckResponses, CreateAccountData, CreateAccountErrors, CreateAccountResponses, CreateData, CreateErrors, CreateResponses, DeleteAvatarData, DeleteAvatarErrors, DeleteAvatarResponses, DeploymentCapabilitiesData, DeploymentCapabilitiesResponses, FindAll2Data, FindAll2Errors, FindAll2Responses, FindAllData, FindAllErrors, FindAllResponses, FindOne2Data, FindOne2Errors, FindOne2Responses, FindOneData, FindOneErrors, FindOneResponses, FindSessionsData, FindSessionsErrors, FindSessionsResponses, FindUserRolesData, FindUserRolesErrors, FindUserRolesResponses, GetProfileData, GetProfileErrors, GetProfileResponses, GetSettingsData, GetSettingsErrors, GetSettingsResponses, GetUsageSummaryData, GetUsageSummaryErrors, GetUsageSummaryResponses, ListAccountsData, ListAccountsErrors, ListAccountsResponses, MeData, MeErrors, MeResponses, PermissionsData, PermissionsErrors, PermissionsResponses, ReadinessData, ReadinessErrors, ReadinessResponses, RecordAccountUsageData, RecordAccountUsageErrors, RecordAccountUsageResponses, Remove2Data, Remove2Errors, Remove2Responses, RemoveData, RemoveErrors, RemoveResponses, ReportUsageReadingData, ReportUsageReadingErrors, ReportUsageReadingResponses, RevokeOtherSessionsData, RevokeOtherSessionsErrors, RevokeOtherSessionsResponses, RevokeSessionData, RevokeSessionErrors, RevokeSessionResponses, SyncAccountsData, SyncAccountsErrors, SyncAccountsResponses, Update2Data, Update2Errors, Update2Responses, UpdateAccountData, UpdateAccountErrors, UpdateAccountResponses, UpdateData, UpdateErrors, UpdatePermissionsData, UpdatePermissionsErrors, UpdatePermissionsResponses, UpdateProfileData, UpdateProfileErrors, UpdateProfileResponses, UpdateResponses, UpdateSettingsData, UpdateSettingsErrors, UpdateSettingsResponses, UploadAvatarData, UploadAvatarErrors, UploadAvatarResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -297,6 +297,21 @@ export const activateAccount = <ThrowOnError extends boolean = false>(options: O
 export const recordAccountUsage = <ThrowOnError extends boolean = false>(options: Options<RecordAccountUsageData, ThrowOnError>): RequestResult<RecordAccountUsageResponses, RecordAccountUsageErrors, ThrowOnError> => (options.client ?? client).post<RecordAccountUsageResponses, RecordAccountUsageErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/accounts/{id}/usage',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Store a reading the desktop app took from a vendor’s unofficial usage endpoint
+ *
+ * For a hand-tracked GLM Coding Plan (Z.AI, BigModel) whose owner turned on automatic reading in the desktop app. Limit windows with the vendor’s own resets, and the tier it named; never a key. Stored with the source `unofficial`.
+ */
+export const reportUsageReading = <ThrowOnError extends boolean = false>(options: Options<ReportUsageReadingData, ThrowOnError>): RequestResult<ReportUsageReadingResponses, ReportUsageReadingErrors, ThrowOnError> => (options.client ?? client).post<ReportUsageReadingResponses, ReportUsageReadingErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts/{id}/readings',
     ...options,
     headers: {
         'Content-Type': 'application/json',

@@ -19,6 +19,7 @@ src/
 ├── lib/util.ts        # fs/JSONL helpers, local days, externalId, snapshot builder, token buckets
 ├── claude-code/       # credentials, usage-api (+ statusline), local-logs, the provider
 ├── codex/             # auth (JWT claims), usage-api (wham), sessions (tokens + offline limits), the provider
+├── zai/               # quota: the opt-in unofficial reader for Z.AI / BigModel Coding Plans (not a provider)
 └── __tests__/         # vitest; fake homes in os.tmpdir(), fake fetch and keychain
 ```
 
@@ -50,13 +51,21 @@ src/
   network or the real home. A new provider is a folder plus one line in
   `registry.ts`, with specs over a fake home.
 
-Only providers in `LOCAL_PROVIDER_IDS` live here. Z.AI's Coding Plan is
-tracked by hand (`MANUAL_PROVIDER_IDS`, `packages/shared/src/subscriptions/plans.ts`):
-its key sits in whatever tool uses it and Z.AI documents no usage API, so
-there is nothing for this package to read. Its official `glm-plan-usage`
-Claude Code plugin calls `/api/monitor/usage/quota/limit` with the key, but
-that endpoint is not in Z.AI's documentation; reading it would mean reading
-the person's key from their Claude Code settings, so it is not done.
+Only providers in `LOCAL_PROVIDER_IDS` are `CodingAgentProvider`s. The one
+other thing here is `zai/quota.ts`, the **unofficial usage reader** for the
+hand-tracked GLM Coding Plans (`UNOFFICIAL_USAGE_READERS` in
+`packages/shared/src/subscriptions/plans.ts`: Z.AI at `api.z.ai`, BigModel at
+`open.bigmodel.cn`). It calls `GET /api/monitor/usage/quota/limit`, which
+neither vendor documents (Z.AI's own `glm-plan-usage` plugin, Orca and ZCode
+call it), with a key the person pasted into the desktop app:
+
+- the key goes only to the provider's origin, over HTTPS, as the raw
+  `Authorization` value, with redirects refused, and is scrubbed from every
+  message; it is never read from another tool's config or credential store;
+- the answer is parsed as Orca reads it (unit codes 1 day, 3 hour, 5 minute,
+  6 week; credit counts over a lagging percentage; the `TIME_LIMIT` monthly MCP
+  window), tolerantly, and a 5-hour reset more than 5 hours away is dropped;
+- `readZaiQuota` never throws, and its snapshot's source is `unofficial`.
 
 Rules this package follows: [`provider-integrations.md`](../../.agents/rules/provider-integrations.md)
 (one capability, a provider per vendor, an honest client name) and

@@ -10,10 +10,11 @@ import {
   nodeProviderEnv,
   type ProviderEnv,
   parseClaudeStatusline,
+  readZaiQuota,
 } from '@flama/usage-providers';
 import { app, type BrowserWindow, ipcMain, safeStorage, shell } from 'electron';
 import { type LoginHandle, loginShellPath, startLogin, syncAfterLogin } from './add-login';
-import { postSync, type SyncedAccount } from './api-client';
+import { postReading, postSync, type SyncedAccount } from './api-client';
 import { Collector, type Timers } from './collector';
 import { resolveConfig } from './config';
 import { registerIpc } from './ipc';
@@ -36,6 +37,7 @@ import {
 } from './shell-integration';
 import { createTokenStore } from './token-store';
 import { createTray, type TrayController } from './tray';
+import { createReaderKeyStore, UsageReaders } from './usage-readers';
 import { checkNewLogin } from './verify-login';
 import { createMainWindow, registerAppScheme, rendererRoot, serveRenderer } from './window';
 
@@ -141,6 +143,27 @@ async function main(): Promise<void> {
     log,
   });
 
+  const readers = new UsageReaders({
+    store: createReaderKeyStore({
+      file: join(userData, 'usage-readers.json'),
+      encryptor: safeStorage,
+      fs: { readFile, writeFile, rm },
+      log,
+    }),
+    read: (provider, apiKey) => readZaiQuota(providerEnv(), { provider, apiKey }),
+    post: (accountId, input, token) =>
+      postReading({
+        apiUrl: config.apiUrl,
+        token,
+        accountId,
+        input,
+        userAgent: config.userAgent,
+        fetch,
+      }),
+    now: () => new Date(),
+    log,
+  });
+
   const readPointers = async () => {
     const out: Partial<Record<LocalProviderId, string>> = {};
     for (const id of LOCAL_PROVIDER_IDS) out[id] = await readPointer(home, id);
@@ -160,6 +183,7 @@ async function main(): Promise<void> {
     sync: (input, token) =>
       postSync({ apiUrl: config.apiUrl, token, input, userAgent: config.userAgent, fetch }),
     tokens,
+    readers,
     device: { name: hostname(), platform: process.platform },
     now: () => new Date(),
     timers,
@@ -265,6 +289,15 @@ async function main(): Promise<void> {
         if (!item) return; // not on this machine
         await writePointer(home, item.login);
         await collector.pointersChanged();
+      },
+      async usageReaderConnect(accountId, provider, apiKey) {
+        const result = await readers.connect(accountId, provider, apiKey, await tokens.get());
+        collector.readersChanged();
+        return result;
+      },
+      async usageReaderDisconnect(accountId) {
+        await readers.disconnect(accountId);
+        collector.readersChanged();
       },
       shellIntegration: () => shellIntegration(shellEnv),
       shellInstall: () => installShellIntegration(shellEnv),

@@ -28,6 +28,7 @@
   "PATCH /v1/users/:id": ["users:write"],
   "POST /v1/accounts": ["accounts:write"],
   "POST /v1/accounts/:id/activate": ["accounts:write"],
+  "POST /v1/accounts/:id/readings": ["accounts:write"],
   "POST /v1/accounts/:id/usage": ["accounts:write"],
   "POST /v1/accounts/sync": ["accounts:write"],
   "POST /v1/profile/avatar": ["profile:write"],

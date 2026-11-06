@@ -499,7 +499,12 @@
       "noMoves": "Nada que mover: tus cuentas se usan por igual.",
       "usage": "Uso",
       "record": "Registrar",
-      "subManual": "Suscripciones que sigues a mano: registra el uso de Z.AI para ordenarlas"
+      "subManual": "Suscripciones que sigues a mano: registra su uso, o léelo automáticamente en la app de escritorio, para ordenarlas",
+      "automatic": "Lectura automática",
+      "readerOff": "Activar",
+      "readerOn": "Activada",
+      "readerFailing": "No funciona",
+      "readUnofficially": "Leído del endpoint de uso no oficial de {{name}}"
     },
     "tm": {
       "pickFor": "Elegir siguiente para",
@@ -648,11 +653,12 @@
     },
     "add": {
       "title": "Añadir suscripción",
-      "description": "Elige la herramienta. Claude Code y Codex inician sesión en el navegador; un Z.AI Coding Plan se añade a mano.",
+      "description": "Elige la herramienta. Claude Code y Codex inician sesión en el navegador; un GLM Coding Plan (Z.AI o BigModel) se añade a mano.",
       "how": {
         "claude-code": "Inicia sesión en claude.com",
         "codex": "Inicia sesión con un código en openai.com",
-        "zai": "Añádelo a mano: plan, precio y día de cobro"
+        "zai": "Añádelo a mano: plan, precio y día de cobro",
+        "bigmodel": "Se vende en China continental. Añádelo a mano: plan, precio y día de cobro"
       },
       "claude": {
         "title": "Termina de iniciar sesión en Claude",
@@ -703,8 +709,8 @@
       "back": "Atrás",
       "failed": "No se completó el inicio de sesión.",
       "manual": {
-        "title": "Añadir un Z.AI Coding Plan",
-        "description": "Z.AI no publica ninguna API de uso, así que ResetOwl sigue este plan con lo que introduces: aquí su precio y día de cobro, y su uso cuando lo registres.",
+        "title": "Añadir un {{name}} Coding Plan",
+        "description": "{{name}} no documenta ninguna API de uso, así que ResetOwl sigue este plan con lo que introduces: aquí su precio y día de cobro, y su uso cuando lo registres. Una vez añadido, la app de escritorio también puede leer el uso automáticamente.",
         "label": "Nombre",
         "labelPlaceholder": "p. ej. Proyecto personal",
         "email": "Email (opcional)",
@@ -712,10 +718,10 @@
         "planOption": "{{plan}} · {{session}} créditos / 5 h · {{weekly}} / semana",
         "price": "Precio mensual (USD)",
         "priceList": "Precio de lista: {{price}}",
-        "priceRequired": "Z.AI no publica el precio de este nivel: introduce lo que pagas",
+        "priceRequired": "No hay precio de lista publicado para este nivel: introduce lo que pagas, en dólares estadounidenses",
         "renewalDay": "Se renueva el día del mes",
         "renewalPlaceholder": "Del 1 al 31, según tu recibo",
-        "noKey": "No hace falta clave de API: ResetOwl nunca te pide tu clave de Z.AI.",
+        "noKey": "No hace falta clave de API para añadirlo. Leer el uso automáticamente es un paso aparte y opcional en la app de escritorio.",
         "submit": "Añadir suscripción"
       }
     },
@@ -724,13 +730,30 @@
     },
     "record": {
       "title": "Registrar uso",
-      "description": "Copia los porcentajes que Z.AI muestra para este plan. ResetOwl no puede leerlos por sí mismo.",
+      "description": "Copia los porcentajes que {{name}} muestra para este plan.",
       "session": "Ventana de 5 horas usada (%)",
       "weekly": "Cuota semanal usada (%)",
       "weeklyResetsAt": "La cuota semanal se reinicia el",
-      "hint": "Deja una ventana vacía para omitirla. Una lectura de 5 horas caduca a las 5 horas: Z.AI devuelve los créditos 5 horas después de gastarlos.",
-      "openUsage": "Abrir la página de uso de Z.AI",
+      "hint": "Deja una ventana vacía para omitirla. Una lectura de 5 horas caduca a las 5 horas: {{name}} devuelve los créditos 5 horas después de gastarlos.",
+      "openUsage": "Abrir la página de uso de {{name}}",
       "submit": "Registrar"
+    },
+    "reader": {
+      "title": "Leer el uso desde {{name}}",
+      "description": "Mientras la app de escritorio esté abierta, ResetOwl lee cada 10 minutos los límites de 5 horas, semanal y de MCP de este plan desde {{name}}, con tu clave del Coding Plan.",
+      "unofficialTitle": "Endpoint no oficial",
+      "unofficialText": "{{name}} no documenta este endpoint. ResetOwl llama al mismo que usa el plugin de uso de {{name}}; puede cambiar o dejar de funcionar en cualquier momento. Si pasa, la lectura caduca y vuelves a registrar el uso a mano.",
+      "desktopOnly": "La lectura automática funciona en la app de escritorio de ResetOwl, para que tu clave se quede en tu ordenador. Abre la app para activarla.",
+      "key": "Clave de API del Coding Plan de {{name}}",
+      "keyHelp": "La clave que usas para el Coding Plan. ResetOwl la comprueba con una lectura antes de guardarla.",
+      "keyStays": "La clave se cifra con el almacén de claves de tu ordenador y solo se envía a {{name}}, nunca a los servidores de ResetOwl. Desactivar esto o quitar la suscripción la borra.",
+      "on": "Leyendo automáticamente · última lectura {{ago}}",
+      "notYet": "todavía no",
+      "failed": "La última lectura de {{name}} no funcionó.",
+      "getKey": "Obtener una clave en {{name}}",
+      "turnOn": "Activar",
+      "replace": "Cambiar clave",
+      "turnOff": "Desactivar"
     }
   },
   "home": {
@@ -1422,7 +1445,9 @@
     "accountAdded": "Cuenta añadida",
     "accountSaved": "Cuenta guardada",
     "subscriptionAdded": "Suscripción añadida",
-    "usageRecorded": "Uso registrado"
+    "usageRecorded": "Uso registrado",
+    "usageReaderOn": "Leyendo el uso desde {{name}}",
+    "usageReaderOff": "Lectura automática desactivada"
   },
   "emails": {
     "common": {

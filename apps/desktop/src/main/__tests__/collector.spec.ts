@@ -43,7 +43,13 @@ function account(status: 'ok' | 'rate_limited' | null = 'ok'): SyncAccount {
   };
 }
 
-function harness(opts: { token?: string | null; results?: Array<SyncResult | Error> } = {}) {
+function harness(
+  opts: {
+    token?: string | null;
+    results?: Array<SyncResult | Error>;
+    readers?: CollectorDeps['readers'];
+  } = {},
+) {
   let now = new Date('2026-11-02T12:00:00Z').getTime();
   let token: string | null = opts.token === undefined ? 'tok' : opts.token;
   const results = [...(opts.results ?? [])];
@@ -76,6 +82,7 @@ function harness(opts: { token?: string | null; results?: Array<SyncResult | Err
         token = t;
       },
     },
+    readers: opts.readers,
     device: { name: 'mbp', platform: 'darwin' },
     now: () => new Date(now),
     timers: {
@@ -125,6 +132,40 @@ describe('collector', () => {
     expect(h.syncs[0]?.device).toEqual({ name: 'mbp', platform: 'darwin' });
     expect(h.timers.map((t) => t.ms)).toEqual([SYNC_INTERVAL_MS]);
     expect(h.statuses.map((s) => s.phase)).toEqual(['collecting', 'syncing', 'idle']);
+  });
+
+  it('runs the usage readers after a sync and publishes their state, a failure included', async () => {
+    const ran: string[] = [];
+    const reader = {
+      accountId: 'a1',
+      provider: 'zai' as const,
+      lastReadAt: null,
+      status: 'error' as const,
+      message: 'down',
+    };
+    const h = harness({
+      readers: {
+        async runAll(token) {
+          ran.push(token);
+          throw new Error('boom');
+        },
+        states: () => [reader],
+      },
+    });
+    const status = await h.collector.start();
+    expect(ran).toEqual(['tok']);
+    expect(status.phase).toBe('idle');
+    expect(status.readers).toEqual([reader]);
+  });
+
+  it('runs no usage reader when the sync did not go through', async () => {
+    const ran: string[] = [];
+    const h = harness({
+      results: [{ kind: 'unauthorized' }],
+      readers: { runAll: async (t) => void ran.push(t), states: () => [] },
+    });
+    await h.collector.start();
+    expect(ran).toEqual([]);
   });
 
   it('on 401 clears the token and goes signed_out without scheduling', async () => {

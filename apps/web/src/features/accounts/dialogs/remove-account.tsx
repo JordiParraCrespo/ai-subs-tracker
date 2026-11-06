@@ -1,9 +1,12 @@
 import type { AccountEntity } from '@flama/frontend-consumer';
 import { useArchiveAccount } from '@flama/frontend-consumer/react';
-import { ConfirmDialog } from '@flama/frontend-web';
+import { ConfirmDialog, desktopBridge } from '@flama/frontend-web';
 import { useTranslation } from 'react-i18next';
 
-/** Asks before ResetOwl stops tracking an account, and owns the removal. */
+/**
+ * Asks before ResetOwl stops tracking an account, and owns the removal. In the
+ * desktop app it also forgets any usage reader key kept for the account.
+ */
 export function RemoveAccountDialog({
   account,
   onClose,
@@ -12,7 +15,12 @@ export function RemoveAccountDialog({
   onClose: () => void;
 }) {
   const { t } = useTranslation();
-  const archive = useArchiveAccount({ onSuccess: onClose });
+  const archive = useArchiveAccount({
+    onSuccess: () => {
+      if (account.hasUnofficialReader) void desktopBridge?.usageReaders.disconnect(account.id);
+      onClose();
+    },
+  });
 
   return (
     <ConfirmDialog

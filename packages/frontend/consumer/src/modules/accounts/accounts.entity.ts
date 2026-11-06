@@ -9,6 +9,7 @@ import {
   isManualProvider,
   type ProviderId,
   type RankableAccount,
+  unofficialUsageReader,
 } from '@flama/shared/subscriptions';
 
 export interface WeeklyPeak {
@@ -73,11 +74,25 @@ export class AccountEntity implements RankableAccount {
   }
 
   /**
-   * Added and tracked by hand (Z.AI): usage is what the person records, and no
-   * terminal switches to it, since there is no login on the machine.
+   * Added and tracked by hand (Z.AI, BigModel): usage is what the person
+   * records or an opt-in unofficial reader sends, and no terminal switches to
+   * it, since there is no login on the machine.
    */
   get isManual(): boolean {
     return isManualProvider(this.provider);
+  }
+
+  /**
+   * Hand-tracked, but the desktop app can read its usage, opt-in, from the
+   * vendor's undocumented endpoint (Z.AI, BigModel).
+   */
+  get hasUnofficialReader(): boolean {
+    return unofficialUsageReader(this.provider) !== undefined;
+  }
+
+  /** The last reading came from that unofficial endpoint, so the screens label it. */
+  get readUnofficially(): boolean {
+    return this.latest?.source === 'unofficial';
   }
 
   window(kind: LimitWindow['kind']): LimitWindow | undefined {

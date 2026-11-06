@@ -3,7 +3,7 @@
 Use up the AI coding plans you pay for.
 
 ResetOwl is a desktop app for people who run several personal **Claude Code**
-and **Codex** subscriptions, and can track a **Z.AI Coding Plan** beside them. It finds the logins on your computer, shows how
+and **Codex** subscriptions, and can track a **GLM Coding Plan** (Z.AI or BigModel) beside them. It finds the logins on your computer, shows how
 much of each plan's 5-hour and weekly allowance is left, and tells you which
 account to use next so nothing you paid for expires unused ("tokenmaxxing").
 It also prices your usage at API rates, so you can see what each plan is worth.
@@ -49,19 +49,31 @@ The screens follow the designs in [`designs/`](designs/).
   `codex` in your terminal follow it. **Add subscription** signs a new login into its
   own folder with the provider's CLI (`claude auth login`, `codex login --device-auth`).
 
-- **Z.AI Coding Plan is tracked by hand.** Z.AI documents no usage API (its
-  usage page is z.ai/manage-apikey/billing) and its plan is an API key used
-  inside other tools, so there is no login for the collector to find. **Add
-  subscription → Z.AI** records the plan (Lite, Pro, Max), what you pay and the
-  billing day, in the desktop app or a browser, and asks for no key. **Record**
-  on the Z.AI page stores the 5-hour and weekly percentages you copy from Z.AI,
-  which the screens and Tokenmaxx read like any other reading. Only Lite's
-  price is published (docs.z.ai/devpack/overview), so Pro and Max carry the
-  price you enter. A Z.AI plan is never switched to from a terminal.
+- **GLM Coding Plans (Z.AI, and BigModel in mainland China) are tracked by
+  hand.** Neither vendor documents a usage API (Z.AI's usage page is
+  z.ai/manage-apikey/billing) and the plan is an API key used inside other
+  tools, so there is no login for the collector to find. **Add subscription →
+  Z.AI / BigModel** records the plan (Lite, Pro, Max), what you pay and the
+  billing day, in the desktop app or a browser. **Record** stores the 5-hour
+  and weekly percentages you copy from the vendor's page, which the screens
+  and Tokenmaxx read like any other reading. Only Z.AI Lite's price is
+  published (docs.z.ai/devpack/overview), so the other tiers carry the price
+  you enter, in US dollars. A GLM plan is never switched to from a terminal.
+- **Reading GLM usage automatically is opt-in, and unofficial.** In the
+  desktop app, **Automatic reading → Turn on** takes your Coding Plan key and
+  reads the plan's 5-hour, weekly and monthly MCP limits, with their real
+  reset times, from `/api/monitor/usage/quota/limit` on `api.z.ai` or
+  `open.bigmodel.cn`: the endpoint the vendor's own usage plugin calls, which
+  is not in its documentation and may change. The key is encrypted with your
+  OS keystore, sent only to that vendor, and deleted when you turn the reader
+  off or remove the subscription. Readings say they came from an unofficial
+  endpoint and lapse like hand-typed ones when they stop arriving; recording
+  by hand stays the fallback.
 
 **What it never does:** refresh a provider's token, send a provider credential
-anywhere but that provider, or replace a status line you already have. Only
-identity, limit percentages, reset times and token counts reach the API.
+(or a GLM key you paste) anywhere but that provider, or replace a status line
+you already have. Only identity, limit percentages, reset times and token
+counts reach the API.
 
 ## Repository
 
@@ -74,7 +86,7 @@ Built on the [Flama](https://github.com/JordiParraCrespo/flama-ai) boilerplate
 | `apps/web` | The screens (Vite + TanStack Router). One build serves the desktop app and, later, the web |
 | `apps/site` | The website (Astro): the home page and SEO guides on Claude Code and Codex plans, limits and prices, in English and Spanish |
 | `apps/api` | NestJS API (Domain-Driven Hexagon): auth, and the `accounts` module |
-| `packages/usage-providers` | One `CodingAgentProvider` interface; Claude Code and Codex readers |
+| `packages/usage-providers` | One `CodingAgentProvider` interface; Claude Code and Codex readers; the opt-in Z.AI / BigModel quota reader |
 | `packages/shared` | Wire contracts (`schemas/accounts`), plan catalog, model prices, Tokenmaxx ranking, desktop bridge types |
 | `packages/frontend/*` | Kernel, the consumer product package (accounts, profile), web kit, design system |
 | `packages/backend/*` | The API's toolkit |
@@ -84,8 +96,9 @@ Built on the [Flama](https://github.com/JordiParraCrespo/flama-ai) boilerplate
 Adding a provider (Grok and others) means a folder in
 `packages/usage-providers`, its id in `LOCAL_PROVIDER_IDS`, and its plans in
 `plans.ts`. A provider with no login on the machine and no documented usage
-API (Z.AI) goes in `MANUAL_PROVIDER_IDS` instead, with no folder: it is added
-in the app and its usage recorded by hand.
+API (Z.AI, BigModel) goes in `MANUAL_PROVIDER_IDS` instead, with no folder:
+it is added in the app and its usage recorded by hand, or read by an opt-in
+unofficial reader where `UNOFFICIAL_USAGE_READERS` lists one.
 
 ## Quick start
 

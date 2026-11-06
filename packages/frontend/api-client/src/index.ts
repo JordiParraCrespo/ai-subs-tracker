@@ -47,6 +47,7 @@ export type {
   ReadinessChecksDto,
   ReadinessResponseDto,
   RecordAccountUsageRequest,
+  ReportUsageReadingRequest,
   ResourceActionDto,
   RolePaginationMetaDto,
   RoleResponseDto,

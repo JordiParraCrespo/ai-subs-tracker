@@ -1514,6 +1514,91 @@
         "tags": ["Accounts"]
       }
     },
+    "/api/v1/accounts/{id}/readings": {
+      "post": {
+        "description": "For a hand-tracked GLM Coding Plan (Z.AI, BigModel) whose owner turned on automatic reading in the desktop app. Limit windows with the vendor’s own resets, and the tier it named; never a key. Stored with the source `unofficial`.",
+        "operationId": "reportUsageReading",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportUsageReadingRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ACCOUNT_001 — Account not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "ACCOUNT_004 — The account’s usage cannot be read from its vendor",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Store a reading the desktop app took from a vendor’s unofficial usage endpoint",
+        "tags": ["Accounts"]
+      }
+    },
     "/api/v1/roles": {
       "get": {
         "operationId": "findAll",
@@ -2749,7 +2834,7 @@
           },
           "source": {
             "type": "string",
-            "enum": ["poll", "live", "manual"]
+            "enum": ["poll", "live", "manual", "unofficial"]
           },
           "status": {
             "type": "string",
@@ -2799,7 +2884,7 @@
           },
           "provider": {
             "type": "string",
-            "enum": ["claude-code", "codex", "zai"]
+            "enum": ["claude-code", "codex", "zai", "bigmodel"]
           },
           "externalId": {
             "type": "string"
@@ -3197,7 +3282,7 @@
                     },
                     "source": {
                       "type": "string",
-                      "enum": ["poll", "live", "manual"]
+                      "enum": ["poll", "live", "manual", "unofficial"]
                     },
                     "status": {
                       "type": "string",
@@ -3372,7 +3457,7 @@
         "properties": {
           "provider": {
             "type": "string",
-            "enum": ["zai"]
+            "enum": ["zai", "bigmodel"]
           },
           "label": {
             "type": "string",
@@ -3458,6 +3543,108 @@
           }
         },
         "required": ["sessionUtilization", "weeklyUtilization", "weeklyResetsAt"]
+      },
+      "ReportUsageReadingRequest": {
+        "type": "object",
+        "properties": {
+          "reportedPlan": {
+            "type": "string",
+            "maxLength": 80,
+            "nullable": true
+          },
+          "snapshot": {
+            "type": "object",
+            "properties": {
+              "capturedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+              },
+              "source": {
+                "type": "string",
+                "enum": ["unofficial"]
+              },
+              "status": {
+                "type": "string",
+                "enum": ["ok"]
+              },
+              "message": {
+                "type": "string",
+                "maxLength": 500,
+                "nullable": true
+              },
+              "windows": {
+                "minItems": 1,
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": ["session", "weekly", "weekly_model", "monthly", "other"]
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    },
+                    "utilization": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1000,
+                      "nullable": true
+                    },
+                    "resetsAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                      "nullable": true
+                    },
+                    "windowMinutes": {
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991,
+                      "nullable": true
+                    }
+                  },
+                  "required": ["key", "kind", "label", "utilization", "resetsAt", "windowMinutes"]
+                }
+              },
+              "extraUsage": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "monthlyLimit": {
+                    "type": ["number", "null"]
+                  },
+                  "usedCredits": {
+                    "type": ["number", "null"]
+                  },
+                  "utilization": {
+                    "type": ["number", "null"]
+                  },
+                  "currency": {
+                    "type": "string",
+                    "maxLength": 8,
+                    "nullable": true
+                  }
+                },
+                "required": ["enabled", "monthlyLimit", "usedCredits", "utilization", "currency"],
+                "nullable": true
+              }
+            },
+            "required": ["capturedAt", "source", "status", "message", "windows", "extraUsage"]
+          }
+        },
+        "required": ["reportedPlan", "snapshot"]
       },
       "RoleResponseDto": {
         "type": "object",

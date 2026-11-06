@@ -11,6 +11,7 @@ export const PROVIDER_COLORS = {
   'claude-code': '#7764d8',
   codex: '#404040',
   zai: '#2f6fde',
+  bigmodel: '#3f51b5',
 } as const satisfies Record<AccountEntity['provider'], string>;
 
 export function accountMark(account: AccountEntity): { initials: string; color: string } {
@@ -20,7 +21,9 @@ export function accountMark(account: AccountEntity): { initials: string; color: 
       ? 'CX'
       : account.provider === 'zai'
         ? `Z${(plan[0] ?? 'L').toUpperCase()}`
-        : `C${(plan[0] ?? 'L').toUpperCase()}`;
+        : account.provider === 'bigmodel'
+          ? `B${(plan[0] ?? 'L').toUpperCase()}`
+          : `C${(plan[0] ?? 'L').toUpperCase()}`;
   return { initials, color: PROVIDER_COLORS[account.provider] };
 }
 

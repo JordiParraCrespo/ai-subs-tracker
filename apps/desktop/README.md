@@ -27,8 +27,9 @@ terminal follow the account marked active.
   | `window.ts`, `renderer-files.ts` | the `app://resetowl/` scheme (SPA fallback, CSP on HTML), the window and its navigation guards |
   | `token-store.ts` | the API session token, `safeStorage`-encrypted in `userData/session.bin` |
   | `local-logins.ts` | reads every login (`@flama/usage-providers`), builds `SyncAccountsInput` |
-  | `api-client.ts` | `POST /api/v1/accounts/sync` |
-  | `collector.ts` | the loop: every 10 min, refresh (≤1/min), backoff, 401, rate-limit pause, live sends |
+  | `api-client.ts` | `POST /api/v1/accounts/sync`, and `POST /api/v1/accounts/:id/readings` for the usage readers |
+  | `usage-readers.ts` | the opt-in unofficial usage readers (Z.AI, BigModel): each pasted Coding Plan key `safeStorage`-encrypted in `userData/usage-readers.json`, read at most every 5 min after a sync, sent only to its vendor |
+  | `collector.ts` | the loop: every 10 min, refresh (≤1/min), backoff, 401, rate-limit pause, live sends, then the usage readers |
   | `pointers.ts` | `~/.resetowl/active/<provider>`, which login terminals use |
   | `shell-integration.ts` | the `claude` / `codex` shell functions and the rc-file install |
   | `add-login.ts` | "Add subscription": runs the provider's CLI login into a folder of its own, reports the link and code it prints, types a pasted code into it |

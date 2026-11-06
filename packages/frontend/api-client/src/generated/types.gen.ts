@@ -247,7 +247,7 @@ export type ExtraUsageResponseDto = {
 
 export type UsageSnapshotResponseDto = {
     capturedAt: string;
-    source: 'poll' | 'live' | 'manual';
+    source: 'poll' | 'live' | 'manual' | 'unofficial';
     status: 'ok' | 'auth_expired' | 'no_credentials' | 'rate_limited' | 'error';
     message: string | null;
     windows: Array<LimitWindowResponseDto>;
@@ -264,7 +264,7 @@ export type WeeklyPeakResponseDto = {
 
 export type AccountResponseDto = {
     id: string;
-    provider: 'claude-code' | 'codex' | 'zai';
+    provider: 'claude-code' | 'codex' | 'zai' | 'bigmodel';
     externalId: string;
     /**
      * The person's label, else the email
@@ -406,7 +406,7 @@ export type SyncAccountsRequest = {
         location: string | null;
         snapshot: {
             capturedAt: string;
-            source: 'poll' | 'live' | 'manual';
+            source: 'poll' | 'live' | 'manual' | 'unofficial';
             status: 'ok' | 'auth_expired' | 'no_credentials' | 'rate_limited' | 'error';
             message: string | null;
             windows: Array<{
@@ -438,7 +438,7 @@ export type SyncAccountsRequest = {
 };
 
 export type CreateAccountRequest = {
-    provider: 'zai';
+    provider: 'zai' | 'bigmodel';
     label: string;
     email?: string | null;
     planId: string;
@@ -457,6 +457,31 @@ export type RecordAccountUsageRequest = {
     sessionUtilization: number | null;
     weeklyUtilization: number | null;
     weeklyResetsAt: string | null;
+};
+
+export type ReportUsageReadingRequest = {
+    reportedPlan: string | null;
+    snapshot: {
+        capturedAt: string;
+        source: 'unofficial';
+        status: 'ok';
+        message: string | null;
+        windows: Array<{
+            key: string;
+            kind: 'session' | 'weekly' | 'weekly_model' | 'monthly' | 'other';
+            label: string;
+            utilization: number | null;
+            resetsAt: string | null;
+            windowMinutes: number | null;
+        }>;
+        extraUsage: {
+            enabled: boolean;
+            monthlyLimit: unknown;
+            usedCredits: unknown;
+            utilization: unknown;
+            currency: string | null;
+        } | null;
+    };
 };
 
 export type RoleResponseDto = {
@@ -1347,6 +1372,42 @@ export type RecordAccountUsageResponses = {
 };
 
 export type RecordAccountUsageResponse = RecordAccountUsageResponses[keyof RecordAccountUsageResponses];
+
+export type ReportUsageReadingData = {
+    body: ReportUsageReadingRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/api/v1/accounts/{id}/readings';
+};
+
+export type ReportUsageReadingErrors = {
+    /**
+     * AUTH_001 / TOKEN_003 — No credential was presented, or it is invalid or expired
+     */
+    401: ProblemDetailsDto;
+    /**
+     * AUTH_002 / TOKEN_004 / TOKEN_005 / TOKEN_006 / TOKEN_007 — The caller's roles, or their credential's scopes, do not permit this
+     */
+    403: ProblemDetailsDto;
+    /**
+     * ACCOUNT_001 — Account not found
+     */
+    404: ProblemDetailsDto;
+    /**
+     * ACCOUNT_004 — The account’s usage cannot be read from its vendor
+     */
+    409: ProblemDetailsDto;
+};
+
+export type ReportUsageReadingError = ReportUsageReadingErrors[keyof ReportUsageReadingErrors];
+
+export type ReportUsageReadingResponses = {
+    200: AccountResponseDto;
+};
+
+export type ReportUsageReadingResponse = ReportUsageReadingResponses[keyof ReportUsageReadingResponses];
 
 export type FindAll2Data = {
     body?: never;

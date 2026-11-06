@@ -8,5 +8,7 @@
   "accountAdded": "Account added",
   "accountSaved": "Account saved",
   "subscriptionAdded": "Subscription added",
-  "usageRecorded": "Usage recorded"
+  "usageRecorded": "Usage recorded",
+  "usageReaderOn": "Reading usage from {{name}}",
+  "usageReaderOff": "Automatic reading turned off"
 }

@@ -23,4 +23,10 @@ export const AccountErrors = {
     message: 'This account is not used from a terminal',
     httpStatus: 409,
   },
+  /** Only a hand-tracked provider with an unofficial usage reader takes a reading from the desktop. */
+  NO_USAGE_READER: {
+    code: 'ACCOUNT_004',
+    message: 'This account’s usage cannot be read from its vendor',
+    httpStatus: 409,
+  },
 } as const satisfies Record<string, ErrorDefinition>;

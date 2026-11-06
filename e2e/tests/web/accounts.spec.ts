@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { API_URL } from '../../playwright.config';
 import { syncTwoAccounts } from '../../support/accounts';
 import { provisionedUser, reloadFromServer, signInAs } from '../../support/web';
 
@@ -155,7 +156,7 @@ test('a Z.AI Coding Plan is added by hand and its usage recorded', async ({ page
   await page.getByLabel('Name', { exact: true }).fill('GLM side project');
   await page.locator('#add-manual-account-plan').click();
   await page.getByRole('option', { name: /^Pro/ }).click();
-  await expect(page.getByText('Z.AI does not publish this tier’s price')).toBeVisible();
+  await expect(page.getByText('No list price is published for this tier')).toBeVisible();
   await page.getByLabel('Monthly price (USD)').fill('72');
   await page.getByLabel('Renews on day of month').fill('9');
   await page.getByRole('button', { name: 'Add subscription' }).last().click();
@@ -177,6 +178,58 @@ test('a Z.AI Coding Plan is added by hand and its usage recorded', async ({ page
   await expect(page.getByText('Z.AI · Pro').first()).toBeVisible();
   await expect(page.getByText('$72').first()).toBeVisible();
   await expect(page.getByText('recorded by you').first()).toBeVisible();
+
+  await api.dispose();
+});
+
+test('a GLM plan read from its unofficial endpoint says so, and the reader is the desktop app’s', async ({
+  page,
+}) => {
+  const { user, api } = await provisionedUser('glmreader');
+  const created = await api.post(`${API_URL}/api/v1/accounts`, {
+    data: {
+      provider: 'bigmodel',
+      label: 'CN plan',
+      planId: 'bigmodel-pro',
+      monthlyPriceCents: 2000,
+    },
+  });
+  const account = await created.json();
+  // What the desktop app sends after reading BigModel with the person's key.
+  await api.post(`${API_URL}/api/v1/accounts/${account.id}/readings`, {
+    data: {
+      reportedPlan: 'pro',
+      snapshot: {
+        capturedAt: new Date().toISOString(),
+        source: 'unofficial',
+        status: 'ok',
+        message: null,
+        windows: [
+          {
+            key: 'weekly',
+            kind: 'weekly',
+            label: 'Weekly',
+            utilization: 30,
+            resetsAt: new Date(Date.now() + 3 * 86_400_000).toISOString(),
+            windowMinutes: 10080,
+          },
+        ],
+        extraUsage: null,
+      },
+    },
+  });
+  await signInAs(page, user);
+
+  await page.goto('/accounts/bigmodel');
+  await expect(page.getByText('CN plan').first()).toBeVisible();
+  await expect(page.getByText('Read from BigModel’s unofficial usage endpoint')).toBeVisible();
+
+  // In a browser there is no key store and no reader: the dialog says where it runs.
+  await page.getByRole('button', { name: 'Turn on', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByText('Unofficial endpoint')).toBeVisible();
+  await expect(dialog.getByText('runs in the ResetOwl desktop app')).toBeVisible();
+  await expect(dialog.getByLabel(/API key/)).toHaveCount(0);
 
   await api.dispose();
 });

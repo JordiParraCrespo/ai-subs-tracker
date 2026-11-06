@@ -1,5 +1,10 @@
 import { isAbsolute } from 'node:path';
-import { LOCAL_PROVIDER_IDS, type LocalProviderId } from '@flama/shared/subscriptions';
+import {
+  LOCAL_PROVIDER_IDS,
+  type LocalProviderId,
+  type ManualProviderId,
+  UNOFFICIAL_USAGE_READERS,
+} from '@flama/shared/subscriptions';
 
 /**
  * Argument checks for every IPC handler: the renderer is web content, so
@@ -16,6 +21,8 @@ export const MAX_PATH_LENGTH = 1024;
 export const MAX_URL_LENGTH = 2048;
 /** A sign-in code pasted from a provider's page; Claude's is well under this. */
 export const MAX_LOGIN_CODE_LENGTH = 512;
+/** A GLM Coding Plan key is well under this. */
+export const MAX_API_KEY_LENGTH = 512;
 
 /** A pasted sign-in code: one line of printable text, never a second command. */
 export function parseLoginCode(value: unknown): string {
@@ -30,6 +37,30 @@ export function parseProvider(value: unknown): LocalProviderId {
     return value as LocalProviderId;
   }
   throw new IpcArgumentError('Unknown provider.');
+}
+
+/** A hand-tracked provider whose usage can be read with a key (Z.AI, BigModel). */
+export function parseReaderProvider(value: unknown): ManualProviderId {
+  if (typeof value === 'string' && Object.hasOwn(UNOFFICIAL_USAGE_READERS, value)) {
+    return value as ManualProviderId;
+  }
+  throw new IpcArgumentError('Unknown provider.');
+}
+
+/** A ResetOwl account id: a UUID, the only thing a key is filed under. */
+export function parseAccountId(value: unknown): string {
+  const id = parseBoundedString(value, 36, 'account id').toLowerCase();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(id)) {
+    throw new IpcArgumentError('Invalid account id.');
+  }
+  return id;
+}
+
+/** A pasted Coding Plan key: one line of printable text, sent as a header value. */
+export function parseApiKey(value: unknown): string {
+  const key = parseBoundedString(value, MAX_API_KEY_LENGTH, 'API key').trim();
+  if (key.length < 8 || !/^[\x21-\x7e]+$/.test(key)) throw new IpcArgumentError('Invalid API key.');
+  return key;
 }
 
 export function parseBoundedString(value: unknown, max: number, what = 'value'): string {

@@ -20,3 +20,11 @@ export type {
   ProviderEnv,
   ReadOptions,
 } from './types';
+export {
+  isPlausibleApiKey,
+  parseZaiQuota,
+  QUOTA_PATH,
+  type QuotaReading,
+  type QuotaRequest,
+  readZaiQuota,
+} from './zai/quota';
