@@ -7,6 +7,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from '@flama/design-system-web';
@@ -16,9 +17,16 @@ import { type EditAccountFormValues, editAccountFormSchema } from '@flama/shared
 import { plansFor } from '@flama/shared/subscriptions';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { reportedPlanName } from '../lib/plan-name';
 
-/** The value of the "use what the provider reports" plan option. */
+/** The form's value for "use what the provider reports". */
 const AUTO_PLAN = '';
+/**
+ * The same choice as the select holds it. Base UI reads an empty string as
+ * "nothing picked" and greys the trigger as a placeholder, though "As reported"
+ * is a real answer.
+ */
+const AUTO_OPTION = 'reported';
 
 /**
  * An account's own name, plan, price and billing day. The dialog renders the submit
@@ -53,10 +61,14 @@ export function EditAccountForm({
     },
   });
   // A hand-tracked plan has no reported one to fall back on.
+  const reported = reportedPlanName(account.provider, account.reportedPlan);
+  const autoLabel = account.isManual
+    ? null
+    : reported
+      ? t('accounts.edit.planAuto', { plan: reported })
+      : t('accounts.edit.planAutoNone');
   const planLabels: Record<string, string> = {
-    ...(account.isManual
-      ? {}
-      : { [AUTO_PLAN]: t('accounts.edit.planAuto', { plan: account.reportedPlan ?? '—' }) }),
+    ...(autoLabel ? { [AUTO_OPTION]: autoLabel } : {}),
     ...Object.fromEntries(plans.map((plan) => [plan.id, plan.name])),
   };
 
@@ -82,17 +94,25 @@ export function EditAccountForm({
             render={({ field }) => (
               <Select
                 items={planLabels}
-                value={field.value}
+                value={field.value === AUTO_PLAN ? AUTO_OPTION : field.value}
                 disabled={isPending}
-                onValueChange={(next) => field.onChange(next ?? AUTO_PLAN)}
+                onValueChange={(next) =>
+                  field.onChange(!next || next === AUTO_OPTION ? AUTO_PLAN : next)
+                }
               >
                 <SelectTrigger id={`${id}-plan`} className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(planLabels).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
+                  {autoLabel && (
+                    <>
+                      <SelectItem value={AUTO_OPTION}>{autoLabel}</SelectItem>
+                      <SelectSeparator />
+                    </>
+                  )}
+                  {plans.map((plan) => (
+                    <SelectItem key={plan.id} value={plan.id}>
+                      {plan.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

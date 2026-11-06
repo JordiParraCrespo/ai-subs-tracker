@@ -3,6 +3,7 @@
 import { CheckIcon, ChevronDownIcon, SearchIcon } from "lucide-react";
 import * as React from "react";
 
+import { MENU_ITEM, MENU_SCROLL } from "../lib/menu";
 import { cn } from "../lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { selectTriggerVariants } from "./select";
@@ -254,11 +255,11 @@ function Combobox({
         align="start"
         data-slot="combobox-content"
         className={cn(
-          "w-(--anchor-width) max-w-[calc(100vw-2rem)] min-w-52 overflow-hidden p-0 shadow-menu",
+          "w-(--anchor-width) max-w-[calc(100vw-2rem)] min-w-52 gap-0 overflow-hidden rounded-xl p-0 shadow-menu",
           contentClassName,
         )}
       >
-        <div className="flex items-center gap-2.25 border-b border-border-subtle px-3.25 py-2.75">
+        <div className="flex items-center gap-2 border-b border-border-subtle px-3 py-2">
           <SearchIcon className="size-3.75 shrink-0 text-ink-400" />
           <input
             // biome-ignore lint/a11y/noAutofocus: the field is the reason the popover opened
@@ -275,7 +276,7 @@ function Combobox({
               setLimit(PAGE_SIZE);
             }}
             onKeyDown={onKeyDown}
-            className="min-w-0 flex-1 bg-transparent text-base text-ink-900 outline-none placeholder:text-ink-400"
+            className="min-w-0 flex-1 bg-transparent text-sm text-ink-900 outline-none placeholder:text-ink-400"
           />
         </div>
 
@@ -284,7 +285,7 @@ function Combobox({
           id={listId}
           role="listbox"
           onScroll={onScroll}
-          className="max-h-64 overflow-y-auto p-1.5 [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:bg-border-default [&::-webkit-scrollbar-thumb]:bg-clip-padding [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-2"
+          className={cn("max-h-64 p-1", MENU_SCROLL)}
         >
           {visible.length > 0 ? (
             visible.map((option, index) => {
@@ -300,9 +301,10 @@ function Combobox({
                   onMouseEnter={() => setActive(index)}
                   onClick={() => choose(option)}
                   className={cn(
-                    "flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-base text-ink-900",
-                    index === active && "bg-surface-hover",
-                    on && "bg-surface-sunken",
+                    MENU_ITEM,
+                    "cursor-pointer",
+                    index === active && "bg-surface-hover text-ink-900",
+                    on && "text-ink-900",
                   )}
                 >
                   <span className="flex w-4 shrink-0 items-center">
