@@ -355,8 +355,8 @@
     "none": "No hay planes de pago que renovar.",
     "missingTitle": "Sin día de renovación",
     "missingSub": "Estas sesiones no indican cuándo se cobra el plan. Pon el día de tu recibo para verlo en el calendario.",
-    "reportedDay": "Día según tu sesión de {{provider}}",
-    "reportedDayChecked": "Día según tu sesión de {{provider}}, comprobado el {{date}}",
+    "reportedDay": "Día según {{provider}}",
+    "reportedDayChecked": "Día según {{provider}}, visto el {{date}}",
     "setDay": "Poner día"
   },
   "firstRun": {

@@ -624,8 +624,8 @@
       "none": "No paid plans to renew.",
       "missingTitle": "No renewal day yet",
       "missingSub": "These logins do not say when the plan bills. Set the day from your receipt to put it on the calendar.",
-      "reportedDay": "Day from your {{provider}} login",
-      "reportedDayChecked": "Day from your {{provider}} login, checked {{date}}",
+      "reportedDay": "Day from {{provider}}",
+      "reportedDayChecked": "Day from {{provider}}, checked {{date}}",
       "setDay": "Set day"
     },
     "firstRun": {
