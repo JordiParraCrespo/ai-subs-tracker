@@ -130,7 +130,6 @@ export function PeopleTable({
         template={TEMPLATE}
         rows={shown}
         rowKey={(person) => person.key}
-        minWidth={720}
         onRowClick={(person) => setOpen((current) => (current === person.key ? null : person.key))}
         expanded={(person) =>
           open === person.key

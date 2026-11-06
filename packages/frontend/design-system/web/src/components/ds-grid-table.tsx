@@ -13,6 +13,11 @@ export interface DsGridColumn<TRow> {
  * The design's list table (Subscriptions, Tokenmaxx's queue): a header on the
  * tinted band, the rows in a rounded card inside it, laid out on one CSS
  * grid template, and a footer with the count and the pager.
+ *
+ * The table is never narrower than the template's minimums plus its gaps and
+ * padding: where those do not fit, it scrolls sideways inside its card rather
+ * than clipping the last columns. Each row is its own grid, so the template's
+ * tracks must be fixed or `minmax(<length>, <fr>)`, never content-sized.
  */
 function DsGridTable<TRow>({
   columns,
@@ -25,7 +30,6 @@ function DsGridTable<TRow>({
   page,
   pages = 1,
   onPage,
-  minWidth = 880,
   className,
 }: {
   columns: readonly DsGridColumn<TRow>[];
@@ -40,15 +44,13 @@ function DsGridTable<TRow>({
   page?: number;
   pages?: number;
   onPage?: (page: number) => void;
-  minWidth?: number;
   className?: string;
 }) {
   // oxlint-disable-next-line no-inline-styles -- the column template is the caller's
   const grid = { gridTemplateColumns: template } as React.CSSProperties;
   return (
     <div className={cn('ds-gtable-scroll', className)}>
-      {/* oxlint-disable-next-line no-inline-styles -- the caller's minimum width */}
-      <div className="ds-gtable" style={{ minWidth }}>
+      <div className="ds-gtable">
         <div className="ds-gtable__head" style={grid}>
           {columns.map((column) => (
             <span key={column.key} data-align={column.align}>
