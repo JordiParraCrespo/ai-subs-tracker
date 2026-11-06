@@ -5,6 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import * as React from "react";
 
+import { useFloatingBoundary } from "../lib/floating-boundary";
 import { MENU_ITEM, MENU_LABEL, MENU_SCROLL, MENU_SEPARATOR, MENU_SURFACE } from "../lib/menu";
 import { cn } from "../lib/utils";
 
@@ -82,7 +83,8 @@ function SelectTrigger({
  * does not scroll; Base UI's `List` inside it is the scroller, so the bar sits
  * inside the card's padding instead of on its rounded edge. The positioner
  * flips to the other side of the trigger when the list does not fit below,
- * keeping 8px off the viewport's edge.
+ * keeping 8px off the viewport's edge — and, inside a dialog, off the edges of
+ * the dialog's body (`FloatingBoundaryContext`), so it never covers the footer.
  */
 function SelectContent({
   className,
@@ -93,6 +95,7 @@ function SelectContent({
   alignOffset = 0,
   alignItemWithTrigger = false,
   collisionPadding = 8,
+  collisionBoundary,
   ...props
 }: SelectPrimitive.Popup.Props &
   Pick<
@@ -103,7 +106,9 @@ function SelectContent({
     | "sideOffset"
     | "alignItemWithTrigger"
     | "collisionPadding"
+    | "collisionBoundary"
   >) {
+  const boundary = useFloatingBoundary();
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Positioner
@@ -113,6 +118,7 @@ function SelectContent({
         alignOffset={alignOffset}
         alignItemWithTrigger={alignItemWithTrigger}
         collisionPadding={collisionPadding}
+        collisionBoundary={collisionBoundary ?? boundary}
         // Above `.ds-modal` (z-index 71): a select inside a dialog opens over it.
         className="isolate z-80"
       >

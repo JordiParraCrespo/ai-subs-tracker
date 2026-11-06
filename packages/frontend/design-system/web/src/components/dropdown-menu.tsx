@@ -4,6 +4,7 @@ import { Menu as MenuPrimitive } from '@base-ui/react/menu';
 import { CheckIcon, ChevronRightIcon } from 'lucide-react';
 import * as React from 'react';
 
+import { useFloatingBoundary } from '../lib/floating-boundary';
 import { MENU_ITEM, MENU_LABEL, MENU_SCROLL, MENU_SEPARATOR, MENU_SURFACE } from '../lib/menu';
 import { cn } from '../lib/utils';
 
@@ -28,11 +29,13 @@ function DropdownMenuContent({
   ...props
 }: MenuPrimitive.Popup.Props &
   Pick<MenuPrimitive.Positioner.Props, 'align' | 'alignOffset' | 'side' | 'sideOffset'>) {
+  const boundary = useFloatingBoundary();
   return (
     <MenuPrimitive.Portal>
       <MenuPrimitive.Positioner
         className="isolate z-50 outline-none"
         collisionPadding={8}
+        collisionBoundary={boundary}
         align={align}
         alignOffset={alignOffset}
         side={side}

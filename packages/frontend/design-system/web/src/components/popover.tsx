@@ -3,6 +3,7 @@
 import { Popover as PopoverPrimitive } from '@base-ui/react/popover';
 import * as React from 'react';
 
+import { useFloatingBoundary } from '../lib/floating-boundary';
 import { cn } from '../lib/utils';
 
 function Popover({ ...props }: PopoverPrimitive.Root.Props) {
@@ -22,9 +23,11 @@ function PopoverContent({
   ...props
 }: PopoverPrimitive.Popup.Props &
   Pick<PopoverPrimitive.Positioner.Props, 'align' | 'alignOffset' | 'side' | 'sideOffset'>) {
+  const boundary = useFloatingBoundary();
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Positioner
+        collisionBoundary={boundary}
         align={align}
         alignOffset={alignOffset}
         side={side}

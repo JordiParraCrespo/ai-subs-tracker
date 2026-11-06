@@ -582,11 +582,13 @@
 
 /* How tall a floating list may grow: 20rem (about nine 32px rows), never past
    the room Base UI's positioner measured on the side it opened (its
-   `--available-height`), so a long list scrolls inside the card instead of
-   running off the viewport, and flips above its trigger when that side has
-   more room. */
+   `--available-height`, inside a dialog's body when it opened in one), so a
+   long list scrolls inside the card instead of running off the viewport or
+   over a dialog's footer, and flips above its trigger when that side has more
+   room. It keeps a floor of 8.5rem (four rows): a list squeezed into a sliver
+   of a short dialog is worse than one that overlaps its footer. */
 @utility max-h-menu {
-  max-height: min(var(--available-height, 20rem), 20rem);
+  max-height: min(20rem, max(var(--available-height, 20rem), 8.5rem));
 }
 
 /* A quiet 8px scrollbar for panes that scroll inside a card — the product's

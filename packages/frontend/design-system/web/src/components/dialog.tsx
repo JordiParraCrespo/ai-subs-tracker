@@ -4,6 +4,7 @@ import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { XIcon } from "lucide-react";
 import * as React from "react";
 
+import { FloatingBoundaryContext } from "../lib/floating-boundary";
 import { cn } from "../lib/utils";
 import { AGENT_GRADIENTS, type AgentGradient } from "./agent-card";
 import { Button } from "./button";
@@ -195,9 +196,14 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
  * `DialogContent` above. Nothing between them: a body that keeps `min-h-0`
  * while the card clips is a body that collapses to zero.
  */
-function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
+function DialogBody({ className, ...props }: Omit<React.ComponentProps<"div">, "ref">) {
+  // The boundary a select or menu opened in the body stays within, so an open
+  // list never covers the footer pinned below it.
+  const [boundary, setBoundary] = React.useState<HTMLDivElement | null>(null);
   return (
+    <FloatingBoundaryContext.Provider value={boundary}>
     <div
+      ref={setBoundary}
       data-slot="dialog-body"
       className={cn(
         "-mx-6 min-h-0 flex-auto scrollbar-thin overflow-y-auto overscroll-contain px-6 [@media(max-height:519.98px)]:min-h-fit [@media(max-height:519.98px)]:overflow-visible",
@@ -205,6 +211,7 @@ function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
       )}
       {...props}
     />
+    </FloatingBoundaryContext.Provider>
   );
 }
 

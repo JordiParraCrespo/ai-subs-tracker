@@ -2,7 +2,8 @@
 
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 import { X } from 'lucide-react';
-import type * as React from 'react';
+import * as React from 'react';
+import { FloatingBoundaryContext } from '../lib/floating-boundary';
 import { cn } from '../lib/utils';
 
 /**
@@ -62,9 +63,18 @@ function DsModalHeader({
   );
 }
 
-/** The modal's middle: padded to the card's edges, and the one part that scrolls. */
-function DsModalBody({ className, ...props }: React.ComponentProps<'div'>) {
-  return <div className={cn('ds-modal__body ds-scroll', className)} {...props} />;
+/**
+ * The modal's middle: padded to the card's edges, and the one part that
+ * scrolls. It is also the boundary a select or menu opened inside it stays
+ * within, so an open list never covers the footer's actions.
+ */
+function DsModalBody({ className, ...props }: Omit<React.ComponentProps<'div'>, 'ref'>) {
+  const [boundary, setBoundary] = React.useState<HTMLDivElement | null>(null);
+  return (
+    <FloatingBoundaryContext.Provider value={boundary}>
+      <div ref={setBoundary} className={cn('ds-modal__body ds-scroll', className)} {...props} />
+    </FloatingBoundaryContext.Provider>
+  );
 }
 
 /**
