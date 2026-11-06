@@ -33,7 +33,7 @@ const bridge = vi.hoisted(() => {
 vi.mock('@flama/frontend-web', () => ({ desktopBridge: bridge.desktopBridge }));
 
 function status(phase: CollectorStatus['phase'], lastRunAt: string | null): CollectorStatus {
-  return { phase, lastRunAt, nextRunAt: null, lastError: null, logins: [] };
+  return { phase, lastRunAt, nextRunAt: null, lastError: null, logins: [], readers: [] };
 }
 
 function setup(initial: CollectorStatus) {
