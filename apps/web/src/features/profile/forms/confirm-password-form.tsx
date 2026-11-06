@@ -44,12 +44,12 @@ export function ConfirmPasswordForm({
     >
       <DsModalBody>
         <div className="ds-field">
-          <label htmlFor={FORM} className="ds-label">
+          <label htmlFor={`${FORM}-field`} className="ds-label">
             {label}
           </label>
           <PasswordInput
             {...register('password')}
-            id={FORM}
+            id={`${FORM}-field`}
             autoComplete="current-password"
             placeholder={t('settings.twoFactorSetup.passwordPlaceholder')}
             className="ds-text-field--sm"
