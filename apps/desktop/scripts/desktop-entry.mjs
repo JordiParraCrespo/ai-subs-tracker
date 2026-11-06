@@ -88,7 +88,8 @@ function install() {
       'Type=Application',
       `Name=${pkg.productName}`,
       `Comment=${pkg.description} (from ${root})`,
-      `Exec=${quote(electron)} ${quote(root)} %U`,
+      // `--dev`, as `pnpm desktop:dev` runs it: the screens from the dev server.
+      `Exec=${quote(electron)} ${quote(root)} --dev %U`,
       `Icon=${id}`,
       `StartupWMClass=${id}`,
       'Terminal=false',

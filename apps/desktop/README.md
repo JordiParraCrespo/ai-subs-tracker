@@ -137,7 +137,8 @@ A Linux desktop names a window and picks its icon from the `.desktop` file
 named after the window's app id, which Electron takes from `desktopName`
 (`resetowl.desktop`); the package ships that file (`linux.syncDesktopName`).
 An unpackaged run has none, so the dock shows a generic icon until you add
-one for this checkout — opt-in, under `~/.local/share`, removed by the second
+one for this checkout (it opens the app as `pnpm desktop:dev` does, with
+`--dev`) — opt-in, under `~/.local/share`, removed by the second
 command and never over an installed ResetOwl's:
 
 ```bash
