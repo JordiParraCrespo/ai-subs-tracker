@@ -1,4 +1,5 @@
 import { DsModalBody, DsModalFooter } from '@flama/design-system-web';
+import { PasswordInput } from '@flama/frontend-web';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { BackButton } from '@/features/profile/components/back-button';
@@ -42,16 +43,18 @@ export function ConfirmPasswordForm({
       noValidate
     >
       <DsModalBody>
-        <label className="ds-field">
-          <span className="ds-label">{label}</span>
-          <input
+        <div className="ds-field">
+          <label htmlFor={`${FORM}-field`} className="ds-label">
+            {label}
+          </label>
+          <PasswordInput
             {...register('password')}
-            type="password"
+            id={`${FORM}-field`}
             autoComplete="current-password"
             placeholder={t('settings.twoFactorSetup.passwordPlaceholder')}
-            className="ds-text-field ds-text-field--sm"
+            className="ds-text-field--sm"
           />
-        </label>
+        </div>
       </DsModalBody>
       <DsModalFooter start={<BackButton onClick={onBack} />}>
         <FormSubmit

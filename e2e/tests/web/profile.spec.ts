@@ -171,7 +171,7 @@ test.describe('two-factor', () => {
     await dialog.getByRole('button', { name: 'Set up' }).click();
 
     await expect(dialog.getByText('Step 1 of 3')).toBeVisible();
-    await dialog.getByLabel('Password').fill(user.password);
+    await dialog.getByLabel('Password', { exact: true }).fill(user.password);
     await dialog.getByRole('button', { name: 'Continue' }).click();
 
     // The key printed beside the QR code, as someone who cannot scan would type it.
