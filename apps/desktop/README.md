@@ -111,7 +111,7 @@ and no token rows, at most once a minute per login.
 # flama:begin web
 pnpm --filter @flama/web build          # the screens, into apps/web/dist (needed by package and the default window)
 # flama:end web
-pnpm --filter @flama/desktop build      # bundle main + preload into dist/ (esbuild), draw tray icons
+pnpm --filter @flama/desktop build      # bundle main + preload into dist/ (esbuild), draw the tray and app icons
 pnpm --filter @flama/desktop dev        # build, then open loading RESETOWL_RENDERER_URL (default http://localhost:3000)
 pnpm desktop:dev                        # the same, from the root
 pnpm --filter @flama/desktop start      # open, serving the built screens on app://resetowl/
@@ -123,6 +123,27 @@ pnpm --filter @flama/desktop package:dir   # unpacked app only, quicker
 
 `package` refuses to run until the screens are built; they are copied into
 the app's `resources/renderer`.
+
+### Name and icon
+
+The app is **ResetOwl** everywhere: `productName` in `package.json` (the name
+Electron runs under, unpackaged too) and in `electron-builder.json`. The owl
+icons are drawn by `scripts/build.mjs` into `dist/assets/`: `icon.png` (the
+window, the macOS dock in development, the Windows `.ico`), `icon-mac.png`
+(inset on Apple's grid, the `.icns`), `icons/<n>x<n>.png` (Linux) and the tray
+images.
+
+A Linux desktop names a window and picks its icon from the `.desktop` file
+named after the window's app id, which Electron takes from `desktopName`
+(`resetowl.desktop`); the package ships that file (`linux.syncDesktopName`).
+An unpackaged run has none, so the dock shows a generic icon until you add
+one for this checkout — opt-in, under `~/.local/share`, removed by the second
+command and never over an installed ResetOwl's:
+
+```bash
+pnpm --filter @flama/desktop desktop-entry:install
+pnpm --filter @flama/desktop desktop-entry:uninstall
+```
 
 ### Diagnostics
 

@@ -1,6 +1,7 @@
 // Bundles the main process and the preload into dist/ (CommonJS, Node
 // platform, `electron` external; workspace packages are bundled from source
-// through their `flama-source` export) and draws the owl icons.
+// through their `flama-source` export) and draws the owl icons: the tray's,
+// and the app's for every platform.
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -97,9 +98,11 @@ function owl(x, y, simple = false) {
 
 /**
  * A square PNG. With `tile`, the owl is white on a rounded tile of `color`
- * (the app icon); without, it is `color` on transparent (the tray).
+ * (the app icon); without, it is `color` on transparent (the tray). `inset`
+ * shrinks the tile inside a transparent margin, as macOS icons are drawn
+ * (824 of 1024 on Apple's grid); elsewhere the tile fills the image.
  */
-function png(size, color, { tile = false } = {}) {
+function png(size, color, { tile = false, inset = 1 } = {}) {
   const [r, g, b] = color;
   const raw = Buffer.alloc(size * (size * 4 + 1));
   const S = 4;
@@ -112,8 +115,9 @@ function png(size, color, { tile = false } = {}) {
       let ground = 0;
       for (let sy = 0; sy < S; sy++) {
         for (let sx = 0; sx < S; sx++) {
-          const px = (x + (sx + 0.5) / S) / size; // 0..1
-          const py = (y + (sy + 0.5) / S) / size;
+          // 0..1 across the tile (beyond it when `inset` leaves a margin)
+          const px = ((x + (sx + 0.5) / S) / size - 0.5) / inset + 0.5;
+          const py = ((y + (sy + 0.5) / S) / size - 0.5) / inset + 0.5;
           const ox = (px * 2 - 1) / scale;
           const oy = (py * 2 - 1) / scale;
           if (owl(ox, oy, size <= 16)) ink++;
@@ -153,6 +157,9 @@ function png(size, color, { tile = false } = {}) {
   ]);
 }
 
+/** The sizes of the Linux icon theme (hicolor) the app installs into. */
+const ICON_SIZES = [16, 24, 32, 48, 64, 128, 256, 512, 1024];
+
 const assets = join(dist, 'assets');
 mkdirSync(assets, { recursive: true });
 // The design system's brand purple (--ds-brand).
@@ -162,6 +169,17 @@ writeFileSync(join(assets, 'tray@2x.png'), png(32, brand));
 // macOS template images are black + alpha; the system tints them.
 writeFileSync(join(assets, 'trayTemplate.png'), png(16, [0, 0, 0]));
 writeFileSync(join(assets, 'trayTemplate@2x.png'), png(32, [0, 0, 0]));
+// The app icon: the window and the dock in development, and what
+// electron-builder turns into each platform's format (electron-builder.json).
+// Linux takes the folder of sizes, named the way it expects (`<n>x<n>.png`);
+// macOS the inset tile, from which it makes the .icns; Windows the full tile,
+// from which it makes the .ico.
 writeFileSync(join(assets, 'icon.png'), png(512, brand, { tile: true }));
+writeFileSync(join(assets, 'icon-mac.png'), png(1024, brand, { tile: true, inset: 824 / 1024 }));
+const icons = join(assets, 'icons');
+mkdirSync(icons, { recursive: true });
+for (const size of ICON_SIZES) {
+  writeFileSync(join(icons, `${size}x${size}.png`), png(size, brand, { tile: true }));
+}
 
 console.log(`built ${pkg.name}@${pkg.version} → dist/`);

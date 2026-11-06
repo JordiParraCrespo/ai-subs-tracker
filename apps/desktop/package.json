@@ -2,6 +2,8 @@
   "name": "@flama/desktop",
   "version": "0.1.0",
   "private": true,
+  "productName": "ResetOwl",
+  "desktopName": "resetowl.desktop",
   "description": "ResetOwl desktop: reads local Claude Code and Codex logins and syncs their usage.",
   "author": "ResetOwl",
   "main": "dist/main.js",
@@ -15,7 +17,9 @@
     "lint": "biome check src/ scripts/",
     "package": "node scripts/build.mjs --require-renderer && electron-builder --config electron-builder.json",
     "clean": "rm -rf dist release",
-    "package:dir": "node scripts/build.mjs --require-renderer && electron-builder --config electron-builder.json --dir"
+    "package:dir": "node scripts/build.mjs --require-renderer && electron-builder --config electron-builder.json --dir",
+    "desktop-entry:install": "node scripts/build.mjs && node scripts/desktop-entry.mjs install",
+    "desktop-entry:uninstall": "node scripts/desktop-entry.mjs uninstall"
   },
   "devDependencies": {
     "@flama/shared": "workspace:*",

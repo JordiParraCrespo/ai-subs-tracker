@@ -15,22 +15,37 @@
     }
   ],
   "npmRebuild": false,
+  "artifactName": "ResetOwl-${version}-${os}-${arch}.${ext}",
   "icon": "dist/assets/icon.png",
   "mac": {
+    "icon": "dist/assets/icon-mac.png",
     "category": "public.app-category.developer-tools",
     "target": ["dmg", "zip"]
   },
   "win": {
+    "executableName": "ResetOwl",
     "target": ["nsis"]
   },
   "nsis": {
     "oneClick": false,
-    "perMachine": false
+    "perMachine": false,
+    "shortcutName": "ResetOwl",
+    "uninstallDisplayName": "ResetOwl"
   },
   "linux": {
+    "icon": "dist/assets/icons",
     "category": "Development",
     "target": ["AppImage"],
-    "executableName": "resetowl"
+    "executableName": "resetowl",
+    "syncDesktopName": true,
+    "synopsis": "Use up the Claude Code and Codex subscriptions you pay for",
+    "description": "Tracks what each Claude Code and Codex plan has left and which account to use next.",
+    "desktop": {
+      "entry": {
+        "GenericName": "Subscription usage tracker",
+        "Keywords": "claude;codex;usage;limits;subscription;"
+      }
+    }
   },
   "publish": null
 }
