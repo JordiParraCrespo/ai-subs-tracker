@@ -15,10 +15,14 @@ billing are available as Flama plugins (see [Plugins](#plugins)).
 ### ResetOwl's own rules
 
 - **Provider credentials never leave the machine** except to their own
-  provider, and are never refreshed (a Coding Plan key a person pastes for an
-  unofficial reader included): Claude Code's refresh tokens rotate, so a
-  refresh here would sign the CLI out. Only identity, limit windows and token
-  counts reach the API (`packages/shared/src/schemas/accounts.schema.ts`).
+  provider, and are never refreshed by ResetOwl (a Coding Plan key a person
+  pastes for an unofficial reader included): Claude Code's refresh tokens
+  rotate, so calling `oauth/token` here would sign the CLI out. The vendor's
+  own CLI may renew its own login — the desktop collector runs
+  `claude auth status` for a lapsed-but-renewable Claude login, and Claude
+  Code (not ResetOwl) refreshes the token and rewrites its credential file.
+  Only identity, limit windows and token counts reach the API
+  (`packages/shared/src/schemas/accounts.schema.ts`).
 - **Name ourselves honestly** to every vendor (`resetowl-desktop/<version>`);
   never pose as Claude Code or Codex.
 - **Plans are data.** Names and prices live in

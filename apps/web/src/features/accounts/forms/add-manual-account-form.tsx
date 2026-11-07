@@ -29,11 +29,14 @@ import { formatMoney } from '../lib/format';
 export function AddManualAccountForm({
   id,
   provider,
+  renewalDay,
   isPending,
   onSubmit,
 }: {
   id: string;
   provider: ManualProviderId;
+  /** The billing day to start from, e.g. the calendar day it was added from. */
+  renewalDay?: number;
   isPending: boolean;
   onSubmit: (values: AddManualAccountFormValues) => void;
 }) {
@@ -47,7 +50,13 @@ export function AddManualAccountForm({
     formState: { errors },
   } = useForm<AddManualAccountFormValues>({
     resolver: useZodResolver(addManualAccountFormSchema),
-    defaultValues: { label: '', email: '', planId: plans[0]?.id ?? '', price: '', renewalDay: '' },
+    defaultValues: {
+      label: '',
+      email: '',
+      planId: plans[0]?.id ?? '',
+      price: '',
+      renewalDay: renewalDay === undefined ? '' : String(renewalDay),
+    },
   });
   const planId = useWatch({ control, name: 'planId' });
   const listPrice = findPlan(planId)?.monthlyPriceCents ?? null;

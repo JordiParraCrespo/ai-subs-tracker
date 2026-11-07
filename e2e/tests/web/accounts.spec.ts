@@ -124,6 +124,36 @@ test('a renewal day puts the plan on the renewals calendar', async ({ page }) =>
   await api.dispose();
 });
 
+test('a calendar day puts a plan on it, or adds a subscription that bills on it', async ({
+  page,
+}) => {
+  const { user, api } = await provisionedUser('renewalday');
+  await syncTwoAccounts(api);
+  await signInAs(page, user);
+
+  await page.goto('/renewals');
+  const days = page.getByRole('button', { name: /^Add a subscription on / });
+  // The 15th: Claude Code's plan is waiting for a day, so the dialog offers it.
+  await days.nth(14).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('heading', { name: /^Renews on .*15/ })).toBeVisible();
+  await dialog.getByRole('button', { name: 'Put here' }).click();
+  await expect(page.getByText('No renewal day yet')).toHaveCount(0);
+
+  await reloadFromServer(page);
+  await page.goto('/renewals');
+  // Both plans are on the calendar now, one row each.
+  await expect(page.locator('.ds-cal__event')).toHaveCount(2);
+
+  // No plan waits for a day now: a click is Add subscription, with the day filled in.
+  await days.nth(19).click();
+  await expect(dialog.getByRole('heading', { name: 'Add subscription' })).toBeVisible();
+  await dialog.getByRole('button', { name: /Z\.AI/ }).click();
+  await expect(dialog.getByLabel('Renews on day of month')).toHaveValue('20');
+
+  await api.dispose();
+});
+
 test('a billing day the Codex login reports is on the calendar, and the person can override it', async ({
   page,
 }) => {

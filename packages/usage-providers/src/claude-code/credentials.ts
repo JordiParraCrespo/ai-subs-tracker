@@ -19,6 +19,14 @@ export interface ClaudeOAuth {
   accessToken: string;
   /** Epoch milliseconds. */
   expiresAt: number | null;
+  /** Present once the login can be renewed without signing in again. */
+  refreshToken: string | null;
+  /**
+   * Epoch milliseconds the refresh token itself expires (Claude Code 2.1.x
+   * stores it beside the refresh token); null when the file does not say, in
+   * which case the refresh token is treated as still good.
+   */
+  refreshTokenExpiresAt: number | null;
   subscriptionType: string | null;
   rateLimitTier: string | null;
 }
@@ -62,9 +70,27 @@ export function parseCredentials(raw: string): ClaudeOAuth | null {
   return {
     accessToken,
     expiresAt: num(oauth.expiresAt),
+    refreshToken: str(oauth.refreshToken),
+    refreshTokenExpiresAt: num(oauth.refreshTokenExpiresAt),
     subscriptionType: str(oauth.subscriptionType),
     rateLimitTier: str(oauth.rateLimitTier),
   };
+}
+
+/**
+ * Whether Claude Code could renew this login itself: it holds a refresh token
+ * and that token has not expired. The access token lapsing is normal for an
+ * account nobody runs Claude in; what makes the login *renewable* is the
+ * refresh token behind it. Revocation cannot be seen from the file — only
+ * running the CLI (`claude auth status`) can tell that apart, so a login that
+ * looks renewable here may still turn out signed out when the CLI is asked.
+ */
+export function isRenewable(
+  creds: Pick<ClaudeOAuth, 'refreshToken' | 'refreshTokenExpiresAt'>,
+  now: Date,
+): boolean {
+  if (!creds.refreshToken) return false;
+  return creds.refreshTokenExpiresAt === null || creds.refreshTokenExpiresAt > now.getTime();
 }
 
 export async function readCredentials(

@@ -1,7 +1,7 @@
 import type { AccountEntity, UsageSummary } from '@flama/frontend-consumer';
 import type { ProviderId } from '@flama/shared/subscriptions';
 import { accountTitle } from './marks';
-import { PROVIDER_NAMES } from './providers';
+import { PROVIDER_NAMES, PROVIDER_VENDORS } from './providers';
 
 /**
  * The usage screen's arithmetic, kept apart from the markup: which rows the
@@ -51,6 +51,7 @@ const accountWords = (account: AccountEntity) => [
   accountTitle(account),
   account.displayName,
   PROVIDER_NAMES[account.provider],
+  PROVIDER_VENDORS[account.provider],
 ];
 
 const matches = (q: string, words: readonly (string | null | undefined)[]) =>
@@ -137,8 +138,10 @@ export function valueRows(
 export interface GroupRow {
   key: string;
   name: string;
-  /** How many of the other dimension the group spans: projects for a model, models otherwise. */
   provider: ProviderId | null;
+  /** The products a provider's row adds up, in the order first seen; empty for the other groups. */
+  products: ProviderId[];
+  /** How many of the other dimension the group spans: accounts for a model, models otherwise. */
   spans: number;
   input: number;
   output: number;
@@ -161,6 +164,7 @@ export function groupUsage(
         key: account.id,
         name: accountTitle(account),
         provider: null,
+        products: [],
         spans: 0,
         input: 0,
         output: 0,
@@ -174,17 +178,22 @@ export function groupUsage(
     const account = accounts.get(row.accountId);
     if (!account) continue;
     const key =
-      group === 'model' ? row.model : group === 'account' ? row.accountId : account.provider;
+      group === 'model'
+        ? row.model
+        : group === 'account'
+          ? row.accountId
+          : PROVIDER_VENDORS[account.provider];
     const name =
       group === 'model'
         ? (labels.get(row.model) ?? row.model)
         : group === 'account'
           ? accountTitle(account)
-          : PROVIDER_NAMES[account.provider];
+          : PROVIDER_VENDORS[account.provider];
     const bucket = groups.get(key) ?? {
       key,
       name,
-      provider: group === 'account' ? null : account.provider,
+      provider: group === 'model' ? account.provider : null,
+      products: [],
       spans: 0,
       input: 0,
       output: 0,
@@ -197,6 +206,8 @@ export function groupUsage(
     bucket.messages += row.messages;
     bucket.cost += row.apiCostCents;
     bucket.set.add(group === 'model' ? row.accountId : row.model);
+    if (group === 'provider' && !bucket.products.includes(account.provider))
+      bucket.products.push(account.provider);
     groups.set(key, bucket);
   }
   return [...groups.values()]

@@ -1,5 +1,9 @@
 import type { CollectorStatus } from '@flama/shared/desktop';
-import type { SyncAccount, SyncAccountsInput } from '@flama/shared/schemas/accounts';
+import type {
+  SnapshotStatus,
+  SyncAccount,
+  SyncAccountsInput,
+} from '@flama/shared/schemas/accounts';
 import type { DetectedLogin } from '@flama/usage-providers';
 import { describe, expect, it } from 'vitest';
 import { NetworkError, type SyncedAccount, type SyncResult } from '../api-client';
@@ -9,6 +13,7 @@ import {
   Collector,
   type CollectorDeps,
   RATE_LIMIT_PAUSE_MS,
+  RENEW_BACKOFF_MS,
   SYNC_INTERVAL_MS,
 } from '../collector';
 import type { LocalAccount } from '../local-logins';
@@ -20,7 +25,7 @@ const LOGIN: DetectedLogin = {
   managed: false,
 };
 
-function account(status: 'ok' | 'rate_limited' | null = 'ok'): SyncAccount {
+function account(status: SnapshotStatus | null = 'ok'): SyncAccount {
   return {
     provider: 'claude-code',
     externalId: 'acc-1',
@@ -48,6 +53,7 @@ function harness(
     token?: string | null;
     results?: Array<SyncResult | Error>;
     readers?: CollectorDeps['readers'];
+    renew?: (login: DetectedLogin, sinceDay: string) => Promise<LocalAccount | null>;
   } = {},
 ) {
   let now = new Date('2026-11-02T12:00:00Z').getTime();
@@ -58,6 +64,7 @@ function harness(
   const syncs: SyncAccountsInput[] = [];
   const fetchLimitsAsked: boolean[] = [];
   const applied: SyncedAccount[][] = [];
+  const renewCalls: Array<{ home: string; sinceDay: string }> = [];
   let nextAccount: SyncAccount = account();
   let id = 0;
 
@@ -66,6 +73,12 @@ function harness(
       fetchLimitsAsked.push(fetchLimitsFor(LOGIN));
       return [{ login: LOGIN, account: nextAccount }] satisfies LocalAccount[];
     },
+    renew: opts.renew
+      ? async (login, sinceDay) => {
+          renewCalls.push({ home: login.home, sinceDay });
+          return opts.renew?.(login, sinceDay) ?? null;
+        }
+      : undefined,
     readPointers: async () => ({ 'claude-code': '' }),
     async applyActive(server) {
       applied.push([...server]);
@@ -117,6 +130,7 @@ function harness(
     setNextAccount: (a: SyncAccount) => {
       nextAccount = a;
     },
+    renewCalls,
   };
 }
 
@@ -202,6 +216,61 @@ describe('collector', () => {
   it('caps the backoff', () => {
     expect(backoffDelay(1)).toBe(60_000);
     expect(backoffDelay(50)).toBe(BACKOFF_MAX_MS);
+  });
+
+  it('renews a login read as auth_stale and syncs the fresh reading', async () => {
+    const h = harness({ renew: async () => ({ login: LOGIN, account: account('ok') }) });
+    h.setNextAccount(account('auth_stale'));
+    await h.collector.start();
+    expect(h.renewCalls).toEqual([{ home: LOGIN.home, sinceDay: expect.any(String) }]);
+    expect(h.syncs[0]?.accounts[0]?.snapshot?.status).toBe('ok');
+  });
+
+  it('syncs a login the CLI reports signed out as auth_expired', async () => {
+    const h = harness({ renew: async () => ({ login: LOGIN, account: account('auth_expired') }) });
+    h.setNextAccount(account('auth_stale'));
+    await h.collector.start();
+    expect(h.syncs[0]?.accounts[0]?.snapshot?.status).toBe('auth_expired');
+  });
+
+  it('does not renew a healthy login', async () => {
+    const h = harness({ renew: async () => ({ login: LOGIN, account: account('ok') }) });
+    await h.collector.start();
+    expect(h.renewCalls).toHaveLength(0);
+  });
+
+  it('does not renew while signed out of the API', async () => {
+    const h = harness({
+      token: null,
+      renew: async () => ({ login: LOGIN, account: account('ok') }),
+    });
+    h.setNextAccount(account('auth_stale'));
+    await h.collector.start();
+    expect(h.renewCalls).toHaveLength(0);
+  });
+
+  it('keeps the stale reading and backs off when renewal is unavailable', async () => {
+    const h = harness({ renew: async () => null });
+    h.setNextAccount(account('auth_stale'));
+    await h.collector.start();
+    expect(h.renewCalls).toHaveLength(1);
+    expect(h.syncs[0]?.accounts[0]?.snapshot?.status).toBe('auth_stale');
+
+    // The scheduled run inside the renew backoff does not try again…
+    const scheduled = h.timers.at(-1);
+    if (!scheduled) throw new Error('no timer');
+    h.advance(scheduled.ms);
+    scheduled.fn();
+    await h.collector.refresh();
+    expect(h.renewCalls).toHaveLength(1);
+
+    // …but once the backoff has passed, the next run renews again.
+    const next = h.timers.at(-1);
+    if (!next) throw new Error('no timer');
+    h.advance(RENEW_BACKOFF_MS);
+    next.fn();
+    await h.collector.refresh();
+    expect(h.renewCalls).toHaveLength(2);
   });
 
   it('debounces refresh to once a minute', async () => {

@@ -8,6 +8,18 @@ export const PROVIDER_NAMES: Record<ProviderId, string> = {
   bigmodel: 'BigModel',
 };
 
+/**
+ * The company behind each product, for views that group spend by who is paid
+ * rather than by which tool was used. Z.AI and BigModel are both Zhipu's, but
+ * they bill separately and people know them by those names.
+ */
+export const PROVIDER_VENDORS: Record<ProviderId, string> = {
+  'claude-code': 'Anthropic',
+  codex: 'OpenAI',
+  zai: 'Z.AI',
+  bigmodel: 'BigModel',
+};
+
 export const PROVIDER_ORDER: readonly ProviderId[] = ['claude-code', 'codex', 'zai', 'bigmodel'];
 
 /**

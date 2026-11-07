@@ -16,8 +16,10 @@ import type {
   ReadOptions,
 } from '../types';
 import {
+  type ClaudeOAuth,
   defaultConfigDir,
   isDefaultConfigDir,
+  isRenewable,
   readCredentials,
   readIdentity,
   reportedPlan,
@@ -80,6 +82,25 @@ async function detect(env: ProviderEnv): Promise<DetectedLogin[]> {
   return [...found.values()];
 }
 
+/**
+ * The login's access token lapsed, or Anthropic rejected it. Whether that is
+ * "signed out" or "just stale" is not this read's to decide from the token
+ * alone: a refresh token that has not itself expired means the vendor's own
+ * CLI can renew the login, so the desktop collector runs it and reads again.
+ * Only a login that cannot be renewed is `auth_expired` ("sign in again"); a
+ * renewable one is `auth_stale`, and the last good reading stays on screen.
+ */
+function lapsedSnapshot(now: Date, creds: ClaudeOAuth, run: string): UsageSnapshot {
+  if (isRenewable(creds, now)) {
+    return snapshot(
+      now,
+      'auth_stale',
+      "Claude Code's access token has expired; it refreshes the next time Claude runs.",
+    );
+  }
+  return snapshot(now, 'auth_expired', `The Claude Code login expired. Run \`${run}\` to sign in.`);
+}
+
 async function readLimits(
   login: DetectedLogin,
   env: ProviderEnv,
@@ -98,15 +119,11 @@ async function readLimits(
       ),
     };
   }
+  // A lapsed access token is not asked about: the request would only be
+  // rejected. The stored refresh token decides stale-vs-signed-out, and the
+  // collector renews a renewable one through the CLI before the next read.
   if (creds.expiresAt !== null && creds.expiresAt <= now.getTime()) {
-    return {
-      plan,
-      snapshot: snapshot(
-        now,
-        'auth_expired',
-        `The Claude Code login expired. Run \`${run}\` once to refresh it.`,
-      ),
-    };
+    return { plan, snapshot: lapsedSnapshot(now, creds, run) };
   }
   try {
     const parsed = parseClaudeUsage(
@@ -116,14 +133,7 @@ async function readLimits(
   } catch (err) {
     if (err instanceof UsageHttpError) {
       if (err.status === 401 || err.status === 403) {
-        return {
-          plan,
-          snapshot: snapshot(
-            now,
-            'auth_expired',
-            `Anthropic rejected the login. Run \`${run}\` once to refresh it.`,
-          ),
-        };
+        return { plan, snapshot: lapsedSnapshot(now, creds, run) };
       }
       if (err.status === 429) {
         return {
@@ -204,6 +214,23 @@ function launchEnv(login: DetectedLogin): Record<string, string> {
   return login.isDefault ? {} : { CLAUDE_CONFIG_DIR: login.home };
 }
 
+/**
+ * The command the desktop collector runs to let Claude Code renew a lapsed
+ * login of its own: `claude auth status` reports the login as JSON and, as a
+ * side effect, refreshes the short-lived access token and rewrites the
+ * credential file — no prompt, no model call, no usage spent. ResetOwl itself
+ * still never calls `oauth/token` and never writes a credential; Claude Code
+ * does. The env is `launchEnv`, so the default `~/.claude` is run with no
+ * `CLAUDE_CONFIG_DIR` (which would change the macOS Keychain item it reads).
+ */
+function refreshCommand(login: DetectedLogin): LoginCommand {
+  return {
+    command: loginCommand(login.home).command,
+    args: ['auth', 'status'],
+    env: launchEnv(login),
+  };
+}
+
 export const claudeCodeProvider: CodingAgentProvider = {
   id: 'claude-code',
   displayName: 'Claude Code',
@@ -212,4 +239,5 @@ export const claudeCodeProvider: CodingAgentProvider = {
   loginCommand,
   signedInAs,
   launchEnv,
+  refreshCommand,
 };
