@@ -1,7 +1,13 @@
 import { AccountEntity } from '@flama/frontend-consumer';
 import type { ProviderId } from '@flama/shared/subscriptions';
 import { describe, expect, it } from 'vitest';
-import { filtersOf, groupUsage, listedAccounts, type UsageRow } from '../lib/usage-view';
+import {
+  filtersOf,
+  filterUsage,
+  groupUsage,
+  listedAccounts,
+  type UsageRow,
+} from '../lib/usage-view';
 
 function account(id: string, provider: ProviderId, email: string): AccountEntity {
   return new AccountEntity(
@@ -75,5 +81,37 @@ describe('groupUsage by account', () => {
       'b',
       'c',
     ]);
+  });
+});
+
+/**
+ * Grouped by provider, the usage table named the products (Claude Code,
+ * Codex), which the subscription rows above it already show; a provider is the
+ * company that is paid.
+ */
+describe('groupUsage by provider', () => {
+  const accounts = [
+    account('a1', 'claude-code', 'a1@example.com'),
+    account('a2', 'claude-code', 'a2@example.com'),
+    account('o1', 'codex', 'o1@example.com'),
+  ];
+  const byId = new Map(accounts.map((a) => [a.id, a]));
+  const rows = [
+    { ...row('a1', 7_000), model: 'claude-opus' },
+    { ...row('a2', 300), model: 'claude-sonnet' },
+    { ...row('o1', 11), model: 'gpt-5-codex' },
+  ];
+
+  it('names each row after the company and adds up its products', () => {
+    const grouped = groupUsage(rows, byId, new Map(), 'provider');
+    expect(grouped.map((g) => [g.name, g.products, g.spans, g.cost])).toEqual([
+      ['Anthropic', ['claude-code'], 2, 7_300],
+      ['OpenAI', ['codex'], 1, 11],
+    ]);
+  });
+
+  it('finds a product by its company name', () => {
+    const found = filterUsage(rows, byId, new Map(), filtersOf({ q: 'openai' }));
+    expect(found.map((r) => r.accountId)).toEqual(['o1']);
   });
 });

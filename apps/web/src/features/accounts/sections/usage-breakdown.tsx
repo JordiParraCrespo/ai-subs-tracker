@@ -50,7 +50,8 @@ export function UsageBreakdown({
     if (group === 'model' && row.provider)
       return `${PROVIDER_NAMES[row.provider]} · ${t('accounts.usage.accountCount', { count: row.spans })}`;
     if (group === 'account') return byId.get(row.key)?.displayName ?? '';
-    return t('accounts.usage.modelCount', { count: row.spans });
+    const products = row.products.map((provider) => PROVIDER_NAMES[provider]).join(', ');
+    return `${products} · ${t('accounts.usage.modelCount', { count: row.spans })}`;
   };
 
   const columns: DsGridColumn<GroupRow>[] = [
