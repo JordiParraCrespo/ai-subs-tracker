@@ -442,17 +442,12 @@
     },
     "value": {
       "title": "What you'd pay at API prices",
-      "sub": "Plan usage priced at each provider's pay-as-you-go rates",
-      "paid": "You paid for plans",
-      "api": "Same usage via API",
-      "saved": "Saved",
-      "over": "Paid over API",
-      "multiple": "Value per dollar",
-      "chart": "API-equivalent cost",
-      "legendPaid": "Paid",
-      "legendApi": "At API prices",
+      "sub": "Everything your accounts used, priced at each provider's pay-as-you-go rates",
+      "plans_one": "Your plans cost {{value}} for this day",
+      "plans_other": "Your plans cost {{value}} for these {{count}} days",
+      "ofPlan": "· plan {{value}}",
       "noUsage": "No usage",
-      "bar": "Paid against API value for {{name}}"
+      "bar": "{{name}}: {{value}} at API prices, as a share of the total"
     },
     "status": {
       "active": "Active",
