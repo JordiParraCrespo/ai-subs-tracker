@@ -323,8 +323,8 @@
     "models": {
       "input": "Entrada",
       "output": "Salida",
-      "cost": "Coste",
-      "share": "Parte del gasto"
+      "cost": "Valor en API",
+      "share": "% del total"
     },
     "overview": {
       "greeting": {
@@ -411,14 +411,12 @@
         "tokens": "Tokens"
       },
       "kpi": {
-        "paid": "Pagado en planes",
-        "api": "Valor a precios de API",
         "tokens": "Tokens",
         "perMillion": "Valor por 1M de tokens"
       },
       "chart": {
-        "spend": "Valor diario a precios de API",
-        "tokens": "Tokens diarios"
+        "spend": "Valor a precios de API, acumulado",
+        "tokens": "Tokens, acumulados"
       },
       "pastDays": "Últimos {{days}} días",
       "groupBy": "Agrupar por",
@@ -444,18 +442,18 @@
       "noMatch": "Ningún uso coincide con estos filtros."
     },
     "value": {
-      "title": "Lo que pagarías a precios de API",
-      "sub": "El uso de los planes a las tarifas de pago por uso de cada proveedor",
-      "paid": "Pagaste en planes",
-      "api": "El mismo uso vía API",
-      "saved": "Ahorrado",
-      "over": "Pagado de más",
-      "multiple": "Valor por dólar",
-      "chart": "Coste equivalente en API",
-      "legendPaid": "Pagado",
-      "legendApi": "A precios de API",
-      "noUsage": "Sin uso",
-      "bar": "Pagado frente a valor de API de {{name}}"
+      "title": "¿Te salen a cuenta los planes?",
+      "sub": "Lo que costaría tu uso a precios de API, frente a lo que pagaste en estos {{days}} días",
+      "ofPaid": "usados de {{paid}}",
+      "leftTotal": "{{amount}} sin usar todavía",
+      "extraTotal": "{{amount}} más de lo que pagaste",
+      "total": "{{percent}}% de lo pagado usado",
+      "usedOf": "{{used}} de {{paid}}",
+      "left": "Te quedan {{amount}} para amortizarlo",
+      "paidOff": "Amortizado · {{amount}} extra",
+      "noUsage": "Sin usar todavía",
+      "noPrice": "Sin precio",
+      "bar": "{{name}}: {{percent}}% de lo pagado usado"
     },
     "status": {
       "active": "Activa",

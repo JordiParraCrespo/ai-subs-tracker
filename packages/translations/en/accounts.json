@@ -54,8 +54,8 @@
   "models": {
     "input": "Input",
     "output": "Output",
-    "cost": "Cost",
-    "share": "Share of spend"
+    "cost": "API value",
+    "share": "% of total"
   },
   "overview": {
     "greeting": {
@@ -142,14 +142,12 @@
       "tokens": "Tokens"
     },
     "kpi": {
-      "paid": "Paid for plans",
-      "api": "Value at API prices",
       "tokens": "Tokens",
       "perMillion": "Value per 1M tokens"
     },
     "chart": {
-      "spend": "Daily value at API prices",
-      "tokens": "Daily tokens"
+      "spend": "Value at API prices, adding up",
+      "tokens": "Tokens, adding up"
     },
     "pastDays": "Past {{days}} days",
     "groupBy": "Group by",
@@ -175,18 +173,18 @@
     "noMatch": "No usage matches these filters."
   },
   "value": {
-    "title": "What you'd pay at API prices",
-    "sub": "Plan usage priced at each provider's pay-as-you-go rates",
-    "paid": "You paid for plans",
-    "api": "Same usage via API",
-    "saved": "Saved",
-    "over": "Paid over API",
-    "multiple": "Value per dollar",
-    "chart": "API-equivalent cost",
-    "legendPaid": "Paid",
-    "legendApi": "At API prices",
-    "noUsage": "No usage",
-    "bar": "Paid against API value for {{name}}"
+    "title": "Are your plans paying off?",
+    "sub": "What your usage would cost at API prices, against what you paid for these {{days}} days",
+    "ofPaid": "of {{paid}} used",
+    "leftTotal": "{{amount}} not used yet",
+    "extraTotal": "{{amount}} more than you paid",
+    "total": "{{percent}}% of what you paid used",
+    "usedOf": "{{used}} of {{paid}}",
+    "left": "{{amount}} left to get your money's worth",
+    "paidOff": "Paid off · {{amount}} extra",
+    "noUsage": "Not used yet",
+    "noPrice": "No price set",
+    "bar": "{{name}}: {{percent}}% of what you paid used"
   },
   "status": {
     "active": "Active",

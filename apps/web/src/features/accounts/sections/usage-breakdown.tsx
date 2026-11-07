@@ -41,7 +41,6 @@ export function UsageBreakdown({
   const listed = usage.data ? listedAccounts(accounts, filters) : [];
   const rows = groupUsage(filtered, byId, labels, group, listed);
   const total = rows.reduce((sum, row) => sum + row.cost, 0);
-  const top = rows[0]?.cost || 1;
   const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   const page = Math.min(query.page ?? 1, pages);
   const shown = rows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -97,7 +96,11 @@ export function UsageBreakdown({
           <div className="ds-share">
             <div
               className="ds-share__fill"
-              style={{ '--ds-w': `${((row.cost / top) * 100).toFixed(1)}%` } as CSSProperties}
+              style={
+                {
+                  '--ds-w': `${(total > 0 ? (row.cost / total) * 100 : 0).toFixed(1)}%`,
+                } as CSSProperties
+              }
             />
           </div>
           <span className="ds-text-label ds-muted w-9 text-right">
