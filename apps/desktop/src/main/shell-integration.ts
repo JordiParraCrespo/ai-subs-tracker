@@ -149,17 +149,21 @@ export async function shellIntegration(env: ShellEnv): Promise<ShellIntegration>
 }
 
 /**
- * Rewrites a block a Subtrack install left in the rc file into the current
- * one, so `claude`, `codex` and `grok` read the moved pointers. Nothing is written
- * when there is no old block: installing stays the person's choice.
+ * Brings a block the person already installed up to the current snippet: one
+ * a Subtrack install left (so the functions read the moved pointers), or an
+ * older ResetOwl block missing a CLI added since (`grok`). Only the text
+ * between our own markers changes; nothing is written when there is no block,
+ * so installing stays the person's choice.
  */
 export async function migrateShellIntegration(env: ShellEnv): Promise<boolean> {
   const rcFile = rcFileFor(env.home, env.shell, env.platform, env.zdotdir);
   if (!rcFile) return false;
   const before = await readText(rcFile);
-  if (!before.includes(LEGACY_BEGIN_MARKER) || before.includes(BEGIN_MARKER)) return false;
+  if (findBlock(before) === null) return false;
   const snippet = env.platform === 'win32' ? powershellSnippet(env.home) : posixSnippet(env.home);
-  await writeFile(rcFile, upsertBlock(before, snippet));
+  const after = upsertBlock(before, snippet);
+  if (after === before) return false;
+  await writeFile(rcFile, after);
   return true;
 }
 
