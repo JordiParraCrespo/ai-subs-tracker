@@ -53,8 +53,17 @@ type Step =
  * it instead. A tool with nothing to sign in to on the machine (Z.AI,
  * BigModel) is a short form instead, in the browser too: ResetOwl tracks its
  * plan; reading its usage with a key is a later, opt-in step in the desktop app.
+ * Opened from a calendar day, the form starts with that billing day; a login
+ * signed in here reports its own day or gets one set afterwards.
  */
-export function AddSubscriptionDialog({ onClose }: { onClose: () => void }) {
+export function AddSubscriptionDialog({
+  renewalDay,
+  onClose,
+}: {
+  /** Opened from a calendar day: the hand-added plan starts billing on it. */
+  renewalDay?: number;
+  onClose: () => void;
+}) {
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>({ kind: 'pick' });
   const login = useAddLogin({ onAdded: onClose, onFailed: () => setStep({ kind: 'pick' }) });
@@ -164,6 +173,7 @@ export function AddSubscriptionDialog({ onClose }: { onClose: () => void }) {
             <AddManualAccountForm
               id={MANUAL_FORM}
               provider={step.provider}
+              renewalDay={renewalDay}
               isPending={create.isPending}
               onSubmit={(values) => create.mutate(toCreateInput(step.provider, values))}
             />

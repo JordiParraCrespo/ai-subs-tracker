@@ -635,7 +635,14 @@
       "reportedDay": "Day from {{provider}}",
       "reportedDayChecked": "Day from {{provider}} · {{date}}",
       "reportedDayHint": "The billing day your {{provider}} login reports. {{provider}} last checked the subscription on {{date}}.",
-      "setDay": "Set day"
+      "setDay": "Set day",
+      "addOn": "Add a subscription on {{date}}",
+      "day": {
+        "title": "Renews on {{date}}",
+        "description": "Put a plan that has no renewal day yet on this day, or add a new subscription that bills on it.",
+        "put": "Put here",
+        "add": "Add a new subscription"
+      }
     },
     "firstRun": {
       "sub": "Nothing tracked yet",
