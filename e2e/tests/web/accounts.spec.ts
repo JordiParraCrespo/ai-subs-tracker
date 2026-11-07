@@ -99,7 +99,7 @@ test('a renewal day puts the plan on the renewals calendar', async ({ page }) =>
   await signInAs(page, user);
 
   await page.goto('/renewals');
-  // Providers do not report a billing day, so a paid plan starts unscheduled.
+  // Claude Code's login reports no billing day, so its plan starts unscheduled.
   await expect(page.getByText('No renewal day yet')).toBeVisible();
   await page.getByRole('button', { name: 'Set day' }).first().click();
   await page.getByLabel('Renews on day of month').fill('28');
@@ -108,6 +108,34 @@ test('a renewal day puts the plan on the renewals calendar', async ({ page }) =>
   await reloadFromServer(page);
   await expect(page.getByRole('heading', { name: 'Next 30 days' })).toBeVisible();
   await expect(page.locator('.ds-cal__event').first()).toBeVisible();
+
+  await api.dispose();
+});
+
+test('a billing day the Codex login reports is on the calendar, and the person can override it', async ({
+  page,
+}) => {
+  const { user, api } = await provisionedUser('renewalreported');
+  await syncTwoAccounts(api);
+  await signInAs(page, user);
+
+  await page.goto('/renewals');
+  const upcoming = page.getByRole('button', { name: /Codex · Plus/ });
+  await expect(upcoming).toContainText(/Day from Codex · /);
+  // Only Claude Code is still waiting for a day.
+  await expect(page.getByRole('button', { name: 'Set day' })).toHaveCount(1);
+
+  // The reported day is a suggestion: the field stays empty and says where it came from.
+  await upcoming.click();
+  const day = page.getByLabel('Renews on day of month');
+  await expect(day).toHaveValue('');
+  await expect(day).toHaveAttribute('placeholder', /as your Codex login reports/);
+  await day.fill('28');
+  await page.getByRole('button', { name: 'Save' }).click();
+
+  await reloadFromServer(page);
+  await page.goto('/renewals');
+  await expect(page.getByText(/Day from Codex/)).toHaveCount(0);
 
   await api.dispose();
 });

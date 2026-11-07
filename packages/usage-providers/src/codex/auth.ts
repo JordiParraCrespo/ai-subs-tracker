@@ -16,6 +16,14 @@ export interface CodexAuth {
   email: string | null;
   planType: string | null;
   organization: string | null;
+  /**
+   * The end of the paid period as ChatGPT last signed it into the token,
+   * and when it last checked the subscription. OpenAI does not document
+   * these claims, so either may be missing; the token is only reissued when
+   * Codex refreshes its login, so the period can be one already over.
+   */
+  subscriptionActiveUntil: Date | null;
+  subscriptionLastChecked: Date | null;
 }
 
 const AUTH_CLAIM = 'https://api.openai.com/auth';
@@ -34,6 +42,13 @@ export function decodeJwtPayload(token: string): JsonRecord | null {
   }
 }
 
+/** A claim's timestamp (an ISO string or epoch seconds); null when absent or unreadable. */
+function instant(value: unknown): Date | null {
+  const text = str(value);
+  const date = typeof value === 'number' ? new Date(value * 1000) : text ? new Date(text) : null;
+  return date && Number.isFinite(date.getTime()) ? date : null;
+}
+
 export function parseCodexAuth(data: JsonRecord): CodexAuth | null {
   const tokens = isRecord(data.tokens) ? data.tokens : null;
   const accessToken = str(tokens?.access_token) ?? str(tokens?.accessToken);
@@ -47,6 +62,8 @@ export function parseCodexAuth(data: JsonRecord): CodexAuth | null {
           email: null,
           planType: null,
           organization: null,
+          subscriptionActiveUntil: null,
+          subscriptionLastChecked: null,
         }
       : null;
   }
@@ -66,6 +83,8 @@ export function parseCodexAuth(data: JsonRecord): CodexAuth | null {
     email: str(payload?.email) ?? str(profile?.email),
     planType: str(auth?.chatgpt_plan_type),
     organization: str(auth?.workspace_name) ?? str(profile?.workspace_name),
+    subscriptionActiveUntil: instant(auth?.chatgpt_subscription_active_until),
+    subscriptionLastChecked: instant(auth?.chatgpt_subscription_last_checked),
   };
 }
 

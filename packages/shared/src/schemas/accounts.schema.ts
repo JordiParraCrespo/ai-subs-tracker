@@ -86,6 +86,19 @@ export const dailyTokensSchema = z.object({
 });
 export type DailyTokens = z.infer<typeof dailyTokensSchema>;
 
+/**
+ * When the provider says the plan bills, read from the login on the machine
+ * (Codex's `id_token` carries the end of the paid period). Only the day of the
+ * month travels, in the machine's local time: the period end in a token goes
+ * stale until the CLI next refreshes it, but the day a plan bills does not
+ * move. `checkedAt` is when the provider last confirmed the subscription.
+ */
+export const reportedRenewalSchema = z.object({
+  day: z.number().int().min(1).max(31),
+  checkedAt: z.iso.datetime({ offset: true }).nullable(),
+});
+export type ReportedRenewal = z.infer<typeof reportedRenewalSchema>;
+
 export const syncAccountSchema = z.object({
   provider: localProviderIdSchema,
   /** Stable id of the login at the provider (account uuid, ChatGPT account id). */
@@ -98,6 +111,8 @@ export const syncAccountSchema = z.object({
   location: z.string().max(300).nullable(),
   snapshot: usageSnapshotSchema.nullable(),
   dailyTokens: z.array(dailyTokensSchema).max(1000),
+  /** Absent from collectors older than it, and null when the login says nothing. */
+  reportedRenewal: reportedRenewalSchema.nullable().optional(),
 });
 export type SyncAccount = z.infer<typeof syncAccountSchema>;
 

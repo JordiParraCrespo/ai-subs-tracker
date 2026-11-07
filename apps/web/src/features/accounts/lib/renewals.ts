@@ -1,8 +1,8 @@
 import type { AccountEntity } from '@flama/frontend-consumer';
 
 /**
- * When each plan bills, from the day of the month its owner set (providers
- * do not report it). A day the month does not have (the 31st in April) bills
+ * When each plan bills, from its day of the month: the one its owner set, else
+ * the one its login reports (Codex). A day the month does not have (the 31st in April) bills
  * on the month's last day, as card billing does.
  */
 
@@ -84,7 +84,7 @@ export function upcomingRenewals(
     .sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 
-/** Paid plans whose renewal day nobody has set: off the calendar until someone does. */
+/** Paid plans with no renewal day, set or reported: off the calendar until someone sets one. */
 export const unscheduled = (accounts: readonly AccountEntity[]) =>
   accounts.filter((account) => account.renewalDay === null && account.monthlyPriceCents > 0);
 
