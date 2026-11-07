@@ -115,6 +115,17 @@ export interface DesktopBridge {
   platform: string;
   /** Absolute API origin, e.g. `https://api.resetowl.com`. */
   apiUrl: string;
+  /**
+   * The operating system's preferred languages, best first (BCP 47, e.g.
+   * `['es-ES', 'en-US']`). The screens start from these when the person has
+   * not picked a language on this device.
+   */
+  systemLocales: readonly string[];
+  /**
+   * Tells the app which language the screens show, so its own text (the
+   * tray) reads the same. Unsupported tags fall back to English.
+   */
+  setLocale(locale: string): Promise<void>;
   auth: {
     getToken(): Promise<string | null>;
     /** Stores (or clears, with null) the API session token, encrypted at rest. */
@@ -201,4 +212,5 @@ export const DESKTOP_CHANNELS = {
   liveFeedInstall: 'resetowl:live-feed:install',
   liveFeedUninstall: 'resetowl:live-feed:uninstall',
   openExternal: 'resetowl:open-external',
+  setLocale: 'resetowl:locale:set',
 } as const;

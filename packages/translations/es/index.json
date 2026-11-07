@@ -914,6 +914,18 @@
       }
     }
   },
+  "desktop": {
+    "tray": {
+      "notSynced": "Aún sin sincronizar",
+      "noRoom": "Ninguna cuenta tiene margen ahora mismo",
+      "noRoomTooltip": "ResetOwl: ninguna cuenta tiene margen ahora mismo",
+      "useNext": "Siguiente: {{name}} — queda un {{left}} %",
+      "useNextTooltip": "ResetOwl: usa {{name}} a continuación (queda un {{left}} % de la semana)",
+      "refresh": "Actualizar ahora",
+      "open": "Abrir ResetOwl",
+      "quit": "Salir"
+    }
+  },
   "extension": {
     "chrome": {
       "extName": "Flama",

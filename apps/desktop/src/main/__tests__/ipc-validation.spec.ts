@@ -8,6 +8,7 @@ import {
   parseApiKey,
   parseExternalUrl,
   parseHome,
+  parseLocale,
   parseLoginCode,
   parseProvider,
   parseReaderProvider,
@@ -39,6 +40,7 @@ function services(): DesktopServices {
     liveFeedInstall: vi.fn(async () => []),
     liveFeedUninstall: vi.fn(async () => []),
     openExternal: vi.fn(async () => undefined),
+    setLocale: vi.fn(),
   };
 }
 
@@ -110,6 +112,27 @@ describe('IPC argument validation', () => {
     expect(isTrustedSender('https://evil.example/', 'app://resetowl')).toBe(false);
     expect(isTrustedSender('app://other/', 'app://resetowl')).toBe(false);
     expect(isTrustedSender(undefined, 'app://resetowl')).toBe(false);
+  });
+});
+
+describe('language from the screens', () => {
+  it('names a supported locale, region or not, and falls back to English for the rest', () => {
+    expect(parseLocale('es')).toBe('es');
+    expect(parseLocale('es-ES')).toBe('es');
+    expect(parseLocale('en-GB')).toBe('en');
+    expect(parseLocale('fr')).toBe('en');
+  });
+
+  it('refuses anything that is not a language tag', () => {
+    for (const bad of ['', 'e', 'es ES', '../es', 'x'.repeat(40), null, 1, ['es']]) {
+      expect(() => parseLocale(bad)).toThrow(IpcArgumentError);
+    }
+  });
+
+  it('hands the tray the locale, not the raw tag', () => {
+    const s = services();
+    ipcHandlers(s)[DESKTOP_CHANNELS.setLocale]?.('es-419');
+    expect(s.setLocale).toHaveBeenCalledWith('es');
   });
 });
 
