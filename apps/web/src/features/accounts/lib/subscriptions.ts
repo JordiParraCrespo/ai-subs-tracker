@@ -1,8 +1,8 @@
 import type { AccountEntity } from '@flama/frontend-consumer';
 import { type AccountPace, type ProviderId, paceOf } from '@flama/shared/subscriptions';
 
-/** The status column: the design's Active, review wash, or the red limit pill. */
-export type SubscriptionStatus = 'active' | 'review' | 'limit' | 'signin';
+/** The status column: the design's Active, review wash, stale note, or the red limit pill. */
+export type SubscriptionStatus = 'active' | 'review' | 'limit' | 'signin' | 'stale';
 
 export function subscriptionStatus(account: AccountEntity, pace: AccountPace): SubscriptionStatus {
   if (
@@ -12,6 +12,9 @@ export function subscriptionStatus(account: AccountEntity, pace: AccountPace): S
   ) {
     return 'signin';
   }
+  // Renewable-but-stale: the last good reading still shows (so the bars are
+  // real), marked stale — the token refreshes the next time Claude runs.
+  if (account.status === 'auth_stale') return 'stale';
   if (pace.status === 'limit') return 'limit';
   if (pace.status === 'behind' || pace.status === 'expiring') return 'review';
   return 'active';
@@ -53,7 +56,7 @@ export function subscriptionRows(
       if (query.status && query.status !== 'all') {
         if (
           query.status === 'review'
-            ? status !== 'review' && status !== 'signin'
+            ? status !== 'review' && status !== 'signin' && status !== 'stale'
             : status !== query.status
         ) {
           return false;

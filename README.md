@@ -70,10 +70,14 @@ The screens follow the designs in [`designs/`](designs/).
   endpoint and lapse like hand-typed ones when they stop arriving; recording
   by hand stays the fallback.
 
-**What it never does:** refresh a provider's token, send a provider credential
-(or a GLM key you paste) anywhere but that provider, or replace a status line
-you already have. Only identity, limit percentages, reset times and token
-counts reach the API.
+**What it never does:** refresh a provider's token itself, send a provider
+credential (or a GLM key you paste) anywhere but that provider, or replace a
+status line you already have. When a Claude login's short-lived access token
+has lapsed but can still be renewed, ResetOwl lets Claude Code's own CLI renew
+it (so an account nobody runs Claude in no longer stalls at "sign in again"),
+and keeps showing the last reading meanwhile — the token is refreshed by the
+vendor's CLI, never by ResetOwl. Only identity, limit percentages, reset times
+and token counts reach the API.
 
 ## Repository
 

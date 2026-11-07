@@ -461,7 +461,8 @@
       "active": "Active",
       "review": "Needs review",
       "limit": "At limit",
-      "signin": "Sign in again"
+      "signin": "Sign in again",
+      "stale": "Stale"
     },
     "toolbar": {
       "search": "Search accounts",

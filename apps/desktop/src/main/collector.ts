@@ -22,6 +22,8 @@ export const BACKOFF_MIN_MS = 60_000;
 export const BACKOFF_MAX_MS = 15 * 60_000;
 export const RATE_LIMIT_PAUSE_MS = 15 * 60_000;
 export const LIVE_THROTTLE_MS = 60_000;
+/** How long a login whose CLI renewal could not run waits before it is tried again. */
+export const RENEW_BACKOFF_MS = 15 * 60_000;
 
 export function backoffDelay(failures: number): number {
   if (failures <= 0) return 0;
@@ -55,6 +57,13 @@ export interface CollectorDeps {
     runAll(token: string): Promise<void>;
     states(): UsageReaderState[];
   };
+  /**
+   * Lets the vendor's own CLI renew a login read as `auth_stale` and reads it
+   * again: the fresh `LocalAccount` on success, one marked `auth_expired` when
+   * the CLI reports it signed out, or null when the CLI could not run (keep
+   * the stale reading and back off). Omitted in environments with no CLI.
+   */
+  renew?(login: DetectedLogin, sinceDay: string): Promise<LocalAccount | null>;
   /** `partial`: a live-feed sync, whose answer may hold only the account it sent. */
   onSynced(accounts: readonly SyncedAccount[], partial: boolean): void;
   log(line: string): void;
@@ -75,6 +84,10 @@ export class Collector {
   private lastStartedAt: number | null = null;
   private failures = 0;
   private readonly rateLimitedUntil = new Map<string, number>();
+  /** A login whose CLI renewal just failed waits out `RENEW_BACKOFF_MS`. */
+  private readonly renewBackoffUntil = new Map<string, number>();
+  /** Homes a renewal is running for now, so two never run for one folder. */
+  private readonly renewing = new Set<string>();
   private readonly liveSentAt = new Map<string, number>();
   private local: LocalAccount[] = [];
   private stopped = false;
@@ -190,6 +203,44 @@ export class Collector {
     }
   }
 
+  /**
+   * Renews the logins read as `auth_stale`: at most one renewal per folder at
+   * a time (`renewing`) and, after a failure, not again until `RENEW_BACKOFF_MS`
+   * has passed (`renewBackoffUntil`). A renewed login's fresh reading replaces
+   * the stale one in place; a failure leaves the stale reading, which the
+   * screens keep showing. Never throws — a renewal error is logged and backed off.
+   */
+  private async renewStale(local: LocalAccount[], started: Date): Promise<LocalAccount[]> {
+    const sinceDay = sinceDayFor(started);
+    const out = [...local];
+    await Promise.all(
+      out.map(async (item, index) => {
+        if (item.account.snapshot?.status !== 'auth_stale') return;
+        const home = item.login.home;
+        if (this.renewing.has(home)) return;
+        if ((this.renewBackoffUntil.get(home) ?? 0) > started.getTime()) return;
+        this.renewing.add(home);
+        try {
+          const refreshed = await this.deps.renew?.(item.login, sinceDay);
+          if (refreshed) {
+            out[index] = refreshed;
+            this.renewBackoffUntil.delete(home);
+          } else {
+            this.renewBackoffUntil.set(home, started.getTime() + RENEW_BACKOFF_MS);
+          }
+        } catch (err) {
+          this.deps.log(
+            `renew failed for ${home}: ${err instanceof Error ? err.message : String(err)}`,
+          );
+          this.renewBackoffUntil.set(home, started.getTime() + RENEW_BACKOFF_MS);
+        } finally {
+          this.renewing.delete(home);
+        }
+      }),
+    );
+    return out;
+  }
+
   private run(): Promise<CollectorStatus> {
     this.inFlight = this.collectAndSync().finally(() => {
       this.inFlight = null;
@@ -214,6 +265,9 @@ export class Collector {
     } catch (err) {
       return this.fail(err);
     }
+    // A login whose access token has lapsed but is renewable: let the vendor's
+    // own CLI refresh it and read it again, before anything is sent.
+    if (token && this.deps.renew) local = await this.renewStale(local, started);
     for (const { login, account } of local) {
       if (account.snapshot?.status === 'rate_limited') {
         this.rateLimitedUntil.set(login.home, started.getTime() + RATE_LIMIT_PAUSE_MS);

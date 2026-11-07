@@ -192,7 +192,8 @@
     "active": "Activa",
     "review": "Revisar",
     "limit": "En el límite",
-    "signin": "Vuelve a entrar"
+    "signin": "Vuelve a entrar",
+    "stale": "Desfasada"
   },
   "toolbar": {
     "search": "Buscar cuentas",

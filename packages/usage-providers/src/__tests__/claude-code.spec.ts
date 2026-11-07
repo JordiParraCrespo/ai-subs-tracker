@@ -246,6 +246,45 @@ describe('claude-code read', () => {
     expect(calls).toHaveLength(0);
   });
 
+  it('reads a lapsed but renewable token as auth_stale, without a network call', async () => {
+    const { home, login } = await loggedIn('.claude-idle', {
+      accessToken: 't',
+      expiresAt: NOW.getTime() - 1,
+      refreshToken: 'refresh-me',
+      refreshTokenExpiresAt: NOW.getTime() + 30 * 86_400_000,
+    });
+    const { fn, calls } = fakeFetch({});
+    const account = await claudeCodeProvider.read(login, testEnv(home, { fetch: fn }), opts);
+    expect(account.snapshot?.status).toBe('auth_stale');
+    expect(account.snapshot?.message).toMatch(/next time Claude runs/i);
+    expect(calls).toHaveLength(0);
+  });
+
+  it('treats a lapsed token as auth_expired once its refresh token has also expired', async () => {
+    const { home, login } = await loggedIn('.claude-gone', {
+      accessToken: 't',
+      expiresAt: NOW.getTime() - 1,
+      refreshToken: 'refresh-me',
+      refreshTokenExpiresAt: NOW.getTime() - 1,
+    });
+    const account = await claudeCodeProvider.read(login, testEnv(home), opts);
+    expect(account.snapshot?.status).toBe('auth_expired');
+  });
+
+  it('turns a 401 on a renewable login into auth_stale, not auth_expired', async () => {
+    const { home, login } = await loggedIn('.claude-renewable', {
+      accessToken: 'tok',
+      expiresAt: FUTURE,
+      refreshToken: 'refresh-me',
+    });
+    const account = await claudeCodeProvider.read(
+      login,
+      testEnv(home, { fetch: fakeFetch({}, 401).fn }),
+      opts,
+    );
+    expect(account.snapshot?.status).toBe('auth_stale');
+  });
+
   it('turns a network failure into an error status instead of throwing', async () => {
     const { home, login } = await loggedIn();
     const account = await claudeCodeProvider.read(login, testEnv(home), opts);
@@ -391,6 +430,22 @@ describe('claude-code commands', () => {
       claudeCodeProvider.launchEnv({ ...base, home: '/h/.claude-w', isDefault: false }),
     ).toEqual({
       CLAUDE_CONFIG_DIR: '/h/.claude-w',
+    });
+  });
+
+  it('refreshes a login with `claude auth status` — no CLAUDE_CONFIG_DIR for the default', () => {
+    const base = { provider: 'claude-code' as const, managed: false };
+    // The default `~/.claude` carries no CLAUDE_CONFIG_DIR, so Claude Code
+    // refreshes the Keychain item it would use in a terminal on macOS.
+    expect(
+      claudeCodeProvider.refreshCommand?.({ ...base, home: '/h/.claude', isDefault: true }),
+    ).toEqual({ command: 'claude', args: ['auth', 'status'], env: {} });
+    expect(
+      claudeCodeProvider.refreshCommand?.({ ...base, home: '/h/.claude-w', isDefault: false }),
+    ).toEqual({
+      command: 'claude',
+      args: ['auth', 'status'],
+      env: { CLAUDE_CONFIG_DIR: '/h/.claude-w' },
     });
   });
 });

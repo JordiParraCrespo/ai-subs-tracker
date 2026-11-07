@@ -1,3 +1,4 @@
+import type { LimitWindow, UsageSnapshot } from '@flama/shared/schemas/accounts';
 import { describe, expect, it } from 'vitest';
 import { AccountMapper } from '../account.mapper';
 
@@ -81,5 +82,52 @@ describe('AccountMapper.toUnofficialSnapshot', () => {
       at,
     );
     expect(stored).toMatchObject({ source: 'unofficial', capturedAt: at.toISOString() });
+  });
+});
+
+describe('AccountMapper.carryStaleWindows', () => {
+  const NOW = new Date('2026-11-07T12:00:00.000Z');
+  const window = (key: string, resetsAt: string | null): LimitWindow => ({
+    key,
+    kind: 'weekly',
+    label: key,
+    utilization: 42,
+    resetsAt,
+    windowMinutes: 10_080,
+  });
+  const snapshot = (status: UsageSnapshot['status'], windows: LimitWindow[]): UsageSnapshot => ({
+    capturedAt: NOW.toISOString(),
+    source: 'poll',
+    status,
+    message: status === 'auth_stale' ? 'updates the next time Claude runs' : null,
+    windows,
+    extraUsage: null,
+  });
+
+  it('keeps the latest reading when it already has windows', () => {
+    const latest = snapshot('ok', [window('seven_day', null)]);
+    const previous = snapshot('ok', [window('old', null)]);
+    expect(new AccountMapper().carryStaleWindows(latest, previous, NOW)).toBe(latest);
+  });
+
+  it('carries the previous windows onto a stale reading, dropping ones already reset', () => {
+    const latest = snapshot('auth_stale', []);
+    const previous = snapshot('ok', [
+      window('future', '2026-11-10T00:00:00.000Z'),
+      window('past', '2026-11-01T00:00:00.000Z'),
+      window('no-reset', null),
+    ]);
+    const merged = new AccountMapper().carryStaleWindows(latest, previous, NOW);
+    // The stale status and message stay; only the still-live windows come through.
+    expect(merged.status).toBe('auth_stale');
+    expect(merged.message).toBe('updates the next time Claude runs');
+    expect(merged.windows.map((w) => w.key)).toEqual(['future', 'no-reset']);
+  });
+
+  it('leaves the empty reading when there is nothing to carry forward', () => {
+    const latest = snapshot('auth_stale', []);
+    expect(new AccountMapper().carryStaleWindows(latest, undefined, NOW)).toBe(latest);
+    const allExpired = snapshot('ok', [window('past', '2026-11-01T00:00:00.000Z')]);
+    expect(new AccountMapper().carryStaleWindows(latest, allExpired, NOW)).toBe(latest);
   });
 });

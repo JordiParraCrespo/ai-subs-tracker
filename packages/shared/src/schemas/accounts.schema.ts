@@ -45,8 +45,18 @@ export const extraUsageSchema = z.object({
 });
 export type ExtraUsage = z.infer<typeof extraUsageSchema>;
 
+/**
+ * `auth_stale`: the provider's short-lived access token has lapsed but the
+ * login can still be renewed (a refresh token is present and not itself
+ * expired), so it is not signed out — the vendor's own CLI renews it the next
+ * time it runs, and the last good reading stays on screen meanwhile.
+ * `auth_expired` is the signed-out case: no refresh token, its expiry passed,
+ * or the vendor rejected the login for good.
+ * At most 20 characters: the column is `varchar(20)`.
+ */
 export const SNAPSHOT_STATUSES = [
   'ok',
+  'auth_stale',
   'auth_expired',
   'no_credentials',
   'rate_limited',
