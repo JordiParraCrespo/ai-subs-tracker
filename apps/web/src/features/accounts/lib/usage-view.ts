@@ -68,9 +68,6 @@ export function filterAccounts(
   );
 }
 
-export const paidCents = (accounts: readonly AccountEntity[], days: number) =>
-  accounts.reduce((sum, account) => sum + (account.monthlyPriceCents * days) / MONTH_DAYS, 0);
-
 /** One value per day from `since` to today, zero where nothing was used. */
 export function dailySeries(
   rows: readonly UsageRow[],

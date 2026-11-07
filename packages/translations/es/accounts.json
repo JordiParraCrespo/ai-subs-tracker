@@ -137,14 +137,12 @@
       "tokens": "Tokens"
     },
     "kpi": {
-      "paid": "Pagado en planes",
-      "api": "Valor a precios de API",
       "tokens": "Tokens",
       "perMillion": "Valor por 1M de tokens"
     },
     "chart": {
-      "spend": "Valor diario a precios de API",
-      "tokens": "Tokens diarios"
+      "spend": "Valor a precios de API, acumulado",
+      "tokens": "Tokens, acumulados"
     },
     "pastDays": "Últimos {{days}} días",
     "groupBy": "Agrupar por",
@@ -171,19 +169,16 @@
   },
   "value": {
     "title": "¿Te salen a cuenta los planes?",
-    "sub": "Tu uso a precios de API, frente a lo que cuestan los planes en estos días",
-    "paid": "Pagaste en planes",
-    "api": "Tu uso a precios de API",
-    "saved": "Valor extra",
-    "unused": "Sin usar todavía",
-    "perDollar": "Valor por cada $1 pagado",
-    "chart": "Valor en API, acumulado",
+    "sub": "Lo que costaría tu uso a precios de API, frente a lo que pagaste en estos {{days}} días",
+    "ofPaid": "usados de {{paid}}",
+    "leftTotal": "{{amount}} sin usar todavía",
+    "extraTotal": "{{amount}} más de lo que pagaste",
+    "total": "{{percent}}% de lo pagado usado",
     "usedOf": "{{used}} de {{paid}}",
     "left": "Te quedan {{amount}} para amortizarlo",
     "paidOff": "Amortizado · {{amount}} extra",
     "noUsage": "Sin usar todavía",
     "noPrice": "Sin precio",
-    "percentUsed": "{{percent}}% usado",
     "bar": "{{name}}: {{percent}}% de lo pagado usado"
   },
   "status": {

@@ -137,14 +137,12 @@
       "tokens": "Tokens"
     },
     "kpi": {
-      "paid": "Paid for plans",
-      "api": "Value at API prices",
       "tokens": "Tokens",
       "perMillion": "Value per 1M tokens"
     },
     "chart": {
-      "spend": "Daily value at API prices",
-      "tokens": "Daily tokens"
+      "spend": "Value at API prices, adding up",
+      "tokens": "Tokens, adding up"
     },
     "pastDays": "Past {{days}} days",
     "groupBy": "Group by",
@@ -171,19 +169,16 @@
   },
   "value": {
     "title": "Are your plans paying off?",
-    "sub": "Your usage priced at API rates, against what the plans cost for these days",
-    "paid": "You paid for plans",
-    "api": "Your usage at API prices",
-    "saved": "Extra value",
-    "unused": "Not used yet",
-    "perDollar": "Value per $1 paid",
-    "chart": "API value, adding up",
+    "sub": "What your usage would cost at API prices, against what you paid for these {{days}} days",
+    "ofPaid": "of {{paid}} used",
+    "leftTotal": "{{amount}} not used yet",
+    "extraTotal": "{{amount}} more than you paid",
+    "total": "{{percent}}% of what you paid used",
     "usedOf": "{{used}} of {{paid}}",
     "left": "{{amount}} left to get your money's worth",
     "paidOff": "Paid off · {{amount}} extra",
     "noUsage": "Not used yet",
     "noPrice": "No price set",
-    "percentUsed": "{{percent}}% used",
     "bar": "{{name}}: {{percent}}% of what you paid used"
   },
   "status": {

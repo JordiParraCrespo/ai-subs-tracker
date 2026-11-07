@@ -1,13 +1,11 @@
-import { DsAreaChart, DsAvatar, Skeleton } from '@flama/design-system-web';
+import { DsAvatar, Skeleton } from '@flama/design-system-web';
 import { useAccounts, useUsageSummary } from '@flama/frontend-consumer/react';
-import { dateFormatter, useLocale } from '@flama/frontend-web';
+import { useLocale } from '@flama/frontend-web';
 import type { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatMoney } from '../lib/format';
 import { accountMark, accountTitle } from '../lib/marks';
 import {
-  cumulative,
-  dailySeries,
   filterAccounts,
   filtersOf,
   filterUsage,
@@ -19,9 +17,9 @@ import {
 const width = (value: number) => ({ width: `${value.toFixed(1)}%` }) as CSSProperties;
 
 /**
- * The usage screen's "Are your plans paying off?": what the plans cost for the
- * period against the same usage at pay-as-you-go rates, the running total,
- * and per subscription how much of what was paid the usage has made back.
+ * The usage screen's first card, "Are your plans paying off?": how much of
+ * what the plans cost for the period the usage has made back at API prices,
+ * in total and per subscription.
  */
 export function UsageValue({ query }: { query: UsageQuery }) {
   const { t } = useTranslation();
@@ -38,50 +36,40 @@ export function UsageValue({ query }: { query: UsageQuery }) {
   const plans = valueRows(filterAccounts(accounts.data, filters), rows, days);
   const paid = plans.reduce((sum, row) => sum + row.paid, 0);
   const api = plans.reduce((sum, row) => sum + row.api, 0);
-  const saved = api - paid;
-  const series = dailySeries(rows, usage.data.since, days, 'spend');
-  const running = cumulative(series.map((point) => point.value));
-  const dayLabel = dateFormatter(locale, { month: 'short', day: 'numeric' });
+  const left = paid - api;
+  const overall = paid > 0 ? Math.min(api / paid, 1) * 100 : 0;
   const money = (cents: number) => formatMoney(cents, locale);
-  const figures = [
-    { label: t('accounts.value.paid'), value: money(paid) },
-    { label: t('accounts.value.api'), value: money(api) },
-    {
-      label: saved >= 0 ? t('accounts.value.saved') : t('accounts.value.unused'),
-      value: money(Math.abs(saved)),
-      tone: saved > 0 ? 'ds-t-up' : '',
-    },
-    {
-      label: t('accounts.value.perDollar'),
-      value: paid > 0 ? money((api / paid) * 100) : '—',
-    },
-  ];
 
   return (
     <section className="ds-card flex flex-col gap-6 p-6">
       <div className="flex flex-col gap-1">
         <h2 className="ds-body-strong">{t('accounts.value.title')}</h2>
-        <span className="ds-cell-sub">{t('accounts.value.sub')}</span>
+        <span className="ds-cell-sub">{t('accounts.value.sub', { days })}</span>
       </div>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(130px,1fr))] gap-6">
-        {figures.map((figure) => (
-          <div key={figure.label} className="flex flex-col gap-1">
-            <span className="ds-text-label ds-muted">{figure.label}</span>
-            <span className={`ds-title-lg ${figure.tone}`}>{figure.value}</span>
-          </div>
-        ))}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
+          <span className="ds-title-lg">
+            {money(api)}
+            <span className="ds-muted"> {t('accounts.value.ofPaid', { paid: money(paid) })}</span>
+          </span>
+          <span className={`ds-label-strong ${left <= 0 && paid > 0 ? 'ds-t-up' : 'ds-muted'}`}>
+            {left > 0
+              ? t('accounts.value.leftTotal', { amount: money(left) })
+              : t('accounts.value.extraTotal', { amount: money(-left) })}
+          </span>
+        </div>
+        <div
+          className="ds-meter"
+          role="img"
+          aria-label={t('accounts.value.total', { percent: Math.round(overall) })}
+        >
+          <div
+            className={left <= 0 ? 'ds-meter__fill' : 'ds-meter__fill ds-meter__fill--accent'}
+            style={width(overall)}
+          />
+        </div>
       </div>
-      <div className="border-t border-border-default pt-6">
-        <DsAreaChart
-          title={t('accounts.value.chart')}
-          data={running}
-          labels={series.map((point) => dayLabel.format(new Date(`${point.day}T12:00:00`)))}
-          formatValue={money}
-          restLabel={t('accounts.usage.pastDays', { days })}
-          height={140}
-        />
-      </div>
-      <div className="flex flex-col gap-1 border-t border-border-default pt-4">
+      <div className="flex flex-col gap-1 border-t border-border-default pt-3">
         {plans.map((row) => {
           const mark = accountMark(row.account);
           const name = accountTitle(row.account);
