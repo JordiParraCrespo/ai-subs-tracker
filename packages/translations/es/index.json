@@ -445,17 +445,11 @@
     },
     "value": {
       "title": "Lo que pagarías a precios de API",
-      "sub": "El uso de los planes a las tarifas de pago por uso de cada proveedor",
-      "paid": "Pagaste en planes",
-      "api": "El mismo uso vía API",
-      "saved": "Ahorrado",
-      "over": "Pagado de más",
-      "multiple": "Valor por dólar",
-      "chart": "Coste equivalente en API",
-      "legendPaid": "Pagado",
-      "legendApi": "A precios de API",
-      "noUsage": "Sin uso",
-      "bar": "Pagado frente a valor de API de {{name}}"
+      "sub": "Todo lo que han usado tus cuentas, a las tarifas de pago por uso de cada proveedor",
+      "plans_one": "Tus planes cuestan {{value}} por este día",
+      "plans_other": "Tus planes cuestan {{value}} por estos {{count}} días",
+      "ofPlan": "de {{value}}",
+      "bar": "{{name}}: {{value}} a precios de API, el {{percent}} % del precio del plan"
     },
     "status": {
       "active": "Activa",

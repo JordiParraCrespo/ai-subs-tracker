@@ -122,6 +122,7 @@
 .ds-swatch[data-faint]{background:var(--ds-text-faint)}
 .ds-share{flex:1;height:6px;border-radius:999px;background:var(--ds-fill);overflow:hidden}
 .ds-share__fill{height:100%;border-radius:999px;background:var(--ds-accent);width:var(--ds-w,0%)}
+.ds-share__fill[data-under]{background:var(--ds-text-subtle)}
 /* A bare <input> drawn as the design's text field (`.ds-input`), for forms that register() the element itself. */
 .ds-text-field{width:100%;height:var(--ds-control-md);padding:0 var(--ds-space-3);border:0;border-radius:var(--ds-radius-field);background:var(--ds-field);outline:1px solid var(--ds-outline-field);outline-offset:-1px;box-shadow:none;font:500 16px/20px var(--ds-font-sans);color:var(--ds-text);box-sizing:border-box}
 .ds-text-field::placeholder{color:var(--ds-text-subtle)}
