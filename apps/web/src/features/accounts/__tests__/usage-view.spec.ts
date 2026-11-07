@@ -1,24 +1,30 @@
 import { AccountEntity } from '@flama/frontend-consumer';
 import type { ProviderId } from '@flama/shared/subscriptions';
 import { describe, expect, it } from 'vitest';
-import { filterUsage, groupUsage, type UsageRow } from '../lib/usage-view';
+import {
+  filtersOf,
+  filterUsage,
+  groupUsage,
+  listedAccounts,
+  type UsageRow,
+} from '../lib/usage-view';
 
-function account(id: string, provider: ProviderId): AccountEntity {
+function account(id: string, provider: ProviderId, email: string): AccountEntity {
   return new AccountEntity(
     id,
     provider,
     `ext-${id}`,
-    `${id}@example.com`,
+    email,
     null,
     null,
-    `${id}@example.com`,
+    email,
     null,
     null,
     null,
     null,
     null,
     false,
-    0,
+    20_000,
     false,
     null,
     false,
@@ -31,31 +37,52 @@ function account(id: string, provider: ProviderId): AccountEntity {
   );
 }
 
-function row(accountId: string, model: string, apiCostCents: number): UsageRow {
-  return {
-    accountId,
-    day: '2026-11-01',
-    model,
-    input: 100,
-    output: 10,
-    cacheWrite: 0,
-    cacheRead: 0,
-    messages: 1,
-    apiCostCents,
-  } as UsageRow;
-}
+const row = (accountId: string, cost: number): UsageRow => ({
+  accountId,
+  day: '2026-11-05',
+  model: 'claude-opus',
+  input: 100,
+  output: 10,
+  cacheWrite: 0,
+  cacheRead: 0,
+  messages: 1,
+  apiCostCents: cost,
+});
 
-const accounts = new Map([
-  ['a1', account('a1', 'claude-code')],
-  ['a2', account('a2', 'claude-code')],
-  ['o1', account('o1', 'codex')],
-]);
-const labels = new Map<string, string>();
-const rows = [
-  row('a1', 'claude-opus', 7_000),
-  row('a2', 'claude-sonnet', 300),
-  row('o1', 'gpt-5-codex', 11),
-];
+/**
+ * Grouped by account, the table built its rows from token records only, so
+ * an account added later that had not used anything yet vanished from it
+ * while the value card above still listed it.
+ */
+describe('groupUsage by account', () => {
+  const accounts = [
+    account('a', 'claude-code', 'hi@work.ai'),
+    account('b', 'codex', 'me@gmail.com'),
+    account('c', 'claude-code', 'me@gmail.com'),
+  ];
+  const byId = new Map(accounts.map((a) => [a.id, a]));
+  const rows = [row('a', 7_000), row('b', 10)];
+
+  it('lists an account with no usage at zero, after the ones that used something', () => {
+    const listed = listedAccounts(accounts, filtersOf({}));
+    const grouped = groupUsage(rows, byId, new Map(), 'account', listed);
+    expect(grouped.map((g) => [g.key, g.cost, g.messages])).toEqual([
+      ['a', 7_000, 1],
+      ['b', 10, 1],
+      ['c', 0, 0],
+    ]);
+  });
+
+  it('keeps the filters: a provider filter or a search leaves out the accounts they exclude', () => {
+    expect(listedAccounts(accounts, filtersOf({ provider: 'codex' })).map((a) => a.id)).toEqual([
+      'b',
+    ]);
+    expect(listedAccounts(accounts, filtersOf({ q: 'gmail' })).map((a) => a.id)).toEqual([
+      'b',
+      'c',
+    ]);
+  });
+});
 
 /**
  * Grouped by provider, the usage table named the products (Claude Code,
@@ -63,8 +90,20 @@ const rows = [
  * company that is paid.
  */
 describe('groupUsage by provider', () => {
+  const accounts = [
+    account('a1', 'claude-code', 'a1@example.com'),
+    account('a2', 'claude-code', 'a2@example.com'),
+    account('o1', 'codex', 'o1@example.com'),
+  ];
+  const byId = new Map(accounts.map((a) => [a.id, a]));
+  const rows = [
+    { ...row('a1', 7_000), model: 'claude-opus' },
+    { ...row('a2', 300), model: 'claude-sonnet' },
+    { ...row('o1', 11), model: 'gpt-5-codex' },
+  ];
+
   it('names each row after the company and adds up its products', () => {
-    const grouped = groupUsage(rows, accounts, labels, 'provider');
+    const grouped = groupUsage(rows, byId, new Map(), 'provider');
     expect(grouped.map((g) => [g.name, g.products, g.spans, g.cost])).toEqual([
       ['Anthropic', ['claude-code'], 2, 7_300],
       ['OpenAI', ['codex'], 1, 11],
@@ -72,11 +111,7 @@ describe('groupUsage by provider', () => {
   });
 
   it('finds a product by its company name', () => {
-    const found = filterUsage(rows, accounts, labels, {
-      provider: 'all',
-      accountId: '',
-      q: 'openai',
-    });
+    const found = filterUsage(rows, byId, new Map(), filtersOf({ q: 'openai' }));
     expect(found.map((r) => r.accountId)).toEqual(['o1']);
   });
 });

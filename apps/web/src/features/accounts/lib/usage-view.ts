@@ -43,18 +43,32 @@ export function filterUsage(
     if (filters.provider !== 'all' && account.provider !== filters.provider) return false;
     if (filters.accountId && row.accountId !== filters.accountId) return false;
     if (!q) return true;
-    const haystack = [
-      row.model,
-      labels.get(row.model),
-      accountTitle(account),
-      account.displayName,
-      PROVIDER_NAMES[account.provider],
-      PROVIDER_VENDORS[account.provider],
-    ]
-      .join(' ')
-      .toLowerCase();
-    return haystack.includes(q);
+    return matches(q, [row.model, labels.get(row.model), ...accountWords(account)]);
   });
+}
+
+const accountWords = (account: AccountEntity) => [
+  accountTitle(account),
+  account.displayName,
+  PROVIDER_NAMES[account.provider],
+  PROVIDER_VENDORS[account.provider],
+];
+
+const matches = (q: string, words: readonly (string | null | undefined)[]) =>
+  words.join(' ').toLowerCase().includes(q);
+
+/**
+ * The accounts the "Group by account" table lists, whether or not they used
+ * anything: the ones the filters keep, and with a search, the ones it names.
+ */
+export function listedAccounts(
+  accounts: readonly AccountEntity[],
+  filters: UsageFilters,
+): AccountEntity[] {
+  const q = filters.q.trim().toLowerCase();
+  return filterAccounts(accounts, filters).filter(
+    (account) => !q || matches(q, accountWords(account)),
+  );
 }
 
 /** The accounts the filters keep, whether or not they used anything. */
@@ -143,8 +157,26 @@ export function groupUsage(
   accounts: ReadonlyMap<string, AccountEntity>,
   labels: ReadonlyMap<string, string>,
   group: UsageGroup,
+  /** Grouping by account: accounts listed at zero when they used nothing. */
+  listed: readonly AccountEntity[] = [],
 ): GroupRow[] {
   const groups = new Map<string, GroupRow & { set: Set<string> }>();
+  if (group === 'account') {
+    for (const account of listed) {
+      groups.set(account.id, {
+        key: account.id,
+        name: accountTitle(account),
+        provider: null,
+        products: [],
+        spans: 0,
+        input: 0,
+        output: 0,
+        messages: 0,
+        cost: 0,
+        set: new Set<string>(),
+      });
+    }
+  }
   for (const row of rows) {
     const account = accounts.get(row.accountId);
     if (!account) continue;
@@ -183,7 +215,7 @@ export function groupUsage(
   }
   return [...groups.values()]
     .map(({ set, ...rest }) => ({ ...rest, spans: set.size }))
-    .sort((a, b) => b.cost - a.cost);
+    .sort((a, b) => b.cost - a.cost || b.input + b.output - (a.input + a.output));
 }
 
 export const USAGE_GROUPS: readonly UsageGroup[] = ['model', 'account', 'provider'];
