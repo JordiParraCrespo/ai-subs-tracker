@@ -59,6 +59,38 @@ describe('runRefresh', () => {
     expect(spawned.stdin).toBe('ignore');
   });
 
+  it('drops an inherited CLAUDE_CONFIG_DIR for the default login, keeping ~/.claude', async () => {
+    // The default login's command carries no CLAUDE_CONFIG_DIR, so an inherited
+    // one must not leak through and point the CLI at another folder.
+    const defaultCmd: LoginCommand = { command: 'claude', args: ['auth', 'status'], env: {} };
+    let spawnedEnv: Record<string, string | undefined> = {};
+    await runRefresh(defaultCmd, {
+      env: { PATH: '/usr/bin', CLAUDE_CONFIG_DIR: '/h/.claude-other', CODEX_HOME: '/h/.codex-x' },
+      spawn: ((cmd: string, args: string[], opts: { env: Record<string, string | undefined> }) => {
+        spawnedEnv = opts.env;
+        return fakeChild((child) => {
+          child.stdout.write('{"loggedIn":true}\n');
+          child.emit('exit', 0, null);
+        })(cmd, args, opts);
+      }) as never,
+    });
+    expect(spawnedEnv.PATH).toBe('/usr/bin');
+    expect(spawnedEnv.CLAUDE_CONFIG_DIR).toBeUndefined();
+    expect(spawnedEnv.CODEX_HOME).toBeUndefined();
+  });
+
+  it('lets a non-default login override an inherited CLAUDE_CONFIG_DIR with its own', async () => {
+    let spawnedEnv: Record<string, string | undefined> = {};
+    await runRefresh(CMD, {
+      env: { PATH: '/usr/bin', CLAUDE_CONFIG_DIR: '/h/.claude-other' },
+      spawn: ((cmd: string, args: string[], opts: { env: Record<string, string | undefined> }) => {
+        spawnedEnv = opts.env;
+        return fakeChild((child) => child.emit('exit', 0, null))(cmd, args, opts);
+      }) as never,
+    });
+    expect(spawnedEnv.CLAUDE_CONFIG_DIR).toBe('/h/.claude-work');
+  });
+
   it('treats a clean exit as renewed even when the output is not parseable', async () => {
     const outcome = await runRefresh(CMD, {
       env: {},

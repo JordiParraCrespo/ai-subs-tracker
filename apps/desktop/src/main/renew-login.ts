@@ -35,6 +35,23 @@ export interface RenewDeps {
   log?: (line: string) => void;
 }
 
+/**
+ * The env vars that pick which login a provider's CLI acts on. The refresh
+ * command's own env (the provider's `launchEnv`) is the only thing that should
+ * select the login, so these are stripped from the inherited environment
+ * first: for the default login `launchEnv` is `{}`, and an inherited
+ * `CLAUDE_CONFIG_DIR` left in place would point the CLI at another folder —
+ * which for the default login would also change the macOS Keychain item it
+ * reads. A non-default login's command re-adds the right one.
+ */
+const LOGIN_SELECTORS = ['CLAUDE_CONFIG_DIR', 'CODEX_HOME'] as const;
+
+function baseEnv(env: Record<string, string | undefined>): Record<string, string | undefined> {
+  const clean = { ...env };
+  for (const key of LOGIN_SELECTORS) delete clean[key];
+  return clean;
+}
+
 /** `true` / `false` from a `"loggedIn": <bool>` field anywhere in the output. */
 function loggedInFlag(output: string): boolean | null {
   const match = stripTerminal(output).match(/"loggedIn"\s*:\s*(true|false)/);
@@ -53,7 +70,9 @@ export function runRefresh(cmd: LoginCommand, deps: RenewDeps): Promise<RenewOut
     let child: ChildProcess;
     try {
       child = doSpawn(cmd.command, cmd.args, {
-        env: { ...deps.env, ...cmd.env },
+        // The login is selected only by `cmd.env`; an inherited selector must
+        // not leak through (see LOGIN_SELECTORS).
+        env: { ...baseEnv(deps.env), ...cmd.env },
         // stdin closed: `auth status` neither prompts nor reads a code.
         stdio: ['ignore', 'pipe', 'pipe'],
         windowsHide: true,
