@@ -310,7 +310,9 @@
       "renewalPlaceholder": "Del 1 al 31, según tu recibo",
       "person": "La usa",
       "personPlaceholder": "Tú",
-      "personHint": "Quién usa este acceso. Déjalo vacío si es tuyo; las cuentas con el mismo nombre son una persona."
+      "personHint": "Quién usa este acceso. Déjalo vacío si es tuyo; las cuentas con el mismo nombre son una persona.",
+      "renewalReported": "Día {{day}}, según tu sesión de {{provider}}",
+      "renewalReportedHelp": "Déjalo vacío para seguir tu sesión de {{provider}}, o escribe el día de tu recibo."
     },
     "list": {
       "title": "Suscripciones",
@@ -628,7 +630,10 @@
       "due_other": "{{value}} a pagar · {{count}} renovaciones",
       "none": "No hay planes de pago que renovar.",
       "missingTitle": "Sin día de renovación",
-      "missingSub": "Los proveedores no indican cuándo se cobra un plan. Pon el día de tu recibo para verlo en el calendario.",
+      "missingSub": "Estas sesiones no indican cuándo se cobra el plan. Pon el día de tu recibo para verlo en el calendario.",
+      "reportedDay": "Día según {{provider}}",
+      "reportedDayChecked": "Día según {{provider}} · {{date}}",
+      "reportedDayHint": "El día de cobro que indica tu sesión de {{provider}}. {{provider}} comprobó la suscripción por última vez el {{date}}.",
       "setDay": "Poner día"
     },
     "firstRun": {

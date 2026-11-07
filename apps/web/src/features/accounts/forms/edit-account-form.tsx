@@ -19,6 +19,7 @@ import { plansFor } from '@flama/shared/subscriptions';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { reportedPlanName } from '../lib/plan-name';
+import { PROVIDER_NAMES } from '../lib/providers';
 
 /** The form's value for "use what the provider reports". */
 const AUTO_PLAN = '';
@@ -62,7 +63,11 @@ export function EditAccountForm({
       planId:
         account.planOverridden || account.isManual ? (account.planId ?? AUTO_PLAN) : AUTO_PLAN,
       price: account.priceOverridden ? (account.monthlyPriceCents / 100).toFixed(2) : '',
-      renewalDay: account.renewalDay === null ? '' : String(account.renewalDay),
+      // A reported day is not the person's: left empty, it keeps following the login.
+      renewalDay:
+        account.renewalDayOverridden && account.renewalDay !== null
+          ? String(account.renewalDay)
+          : '',
     },
   });
   // A hand-tracked plan has no reported one to fall back on.
@@ -72,6 +77,8 @@ export function EditAccountForm({
     : reported
       ? t('accounts.edit.planAuto', { plan: reported })
       : t('accounts.edit.planAutoNone');
+  const reportedDay = account.renewalDayOverridden ? null : account.renewalDay;
+  const provider = PROVIDER_NAMES[account.provider];
   const planLabels: Record<string, string> = {
     ...(autoLabel ? { [AUTO_OPTION]: autoLabel } : {}),
     ...Object.fromEntries(plans.map((plan) => [plan.id, plan.name])),
@@ -163,10 +170,19 @@ export function EditAccountForm({
             {...register('renewalDay')}
             id={`${id}-renewal`}
             inputMode="numeric"
-            placeholder={t('accounts.edit.renewalPlaceholder')}
+            placeholder={
+              reportedDay === null
+                ? t('accounts.edit.renewalPlaceholder')
+                : t('accounts.edit.renewalReported', { day: reportedDay, provider })
+            }
             aria-invalid={Boolean(errors.renewalDay)}
             disabled={isPending}
           />
+          {reportedDay !== null && (
+            <FieldDescription>
+              {t('accounts.edit.renewalReportedHelp', { provider })}
+            </FieldDescription>
+          )}
           <FieldError errors={[errors.renewalDay]} />
         </Field>
       </FieldGroup>

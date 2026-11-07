@@ -77,6 +77,18 @@ describe('SyncAccountsCommandHandler', () => {
     expect(usage.replaceDailyTokens).toHaveBeenCalledWith(created.id, 'laptop', login.dailyTokens);
   });
 
+  // The Renewals calendar puts a Codex plan on the day its login reports;
+  // dropped here, it would sit under "No renewal day yet".
+  it('keeps the billing day the login reports', async () => {
+    await handler.execute(
+      command([{ ...login, reportedRenewal: { day: 23, checkedAt: '2026-09-22T10:09:48Z' } }]),
+    );
+    const created = vi.mocked(accounts.insert).mock.calls[0][0] as AccountEntity;
+    expect(created.renewalDay).toBe(23);
+    expect(created.renewalDayOverridden).toBe(false);
+    expect(created.renewalCheckedAt?.toISOString()).toBe('2026-09-22T10:09:48.000Z');
+  });
+
   // Without this, removing an account in the app would be undone by the next sync.
   it('ignores a login its owner removed', async () => {
     const archived = AccountEntity.register('acc-1', {
@@ -87,6 +99,7 @@ describe('SyncAccountsCommandHandler', () => {
       organization: null,
       reportedPlan: null,
       location: null,
+      reportedRenewal: null,
       at: new Date(),
     });
     archived.archive(new Date());

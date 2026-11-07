@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { syncAccountSchema } from '@flama/shared/schemas/accounts';
 import { resolvePlan } from '@flama/shared/subscriptions';
 import { describe, expect, it } from 'vitest';
-import { codexProvider } from '../codex';
+import { codexProvider, reportedRenewal } from '../codex';
 import { parseCodexAuth } from '../codex/auth';
 import { parseCodexUsage } from '../codex/usage-api';
 import { localDay } from '../lib/util';
@@ -98,8 +98,39 @@ describe('codex auth', () => {
       email: 'dev@example.com',
       planType: 'pro',
       organization: null,
+      subscriptionActiveUntil: null,
+      subscriptionLastChecked: null,
     });
     expect(resolvePlan('codex', auth?.planType)?.id).toBe('codex-pro-200');
+  });
+
+  it('reads the billing day from the end of the paid period, even one already over', () => {
+    // Shaped like a real token: issued in September, read in November.
+    const token = fakeJwt({
+      'https://api.openai.com/auth': {
+        chatgpt_plan_type: 'pro',
+        chatgpt_subscription_active_start: '2026-03-02T07:36:03+00:00',
+        chatgpt_subscription_active_until: '2026-09-23T12:20:15+00:00',
+        chatgpt_subscription_last_checked: '2026-09-22T10:09:48.974208+00:00',
+      },
+    });
+    const auth = parseCodexAuth({ tokens: { id_token: token, access_token: 'x' } });
+    const renewal = reportedRenewal(auth);
+    // The day in this machine's local time; noon UTC is the 23rd in every zone a test runs in.
+    expect(renewal).toEqual({ day: 23, checkedAt: '2026-09-22T10:09:48.974Z' });
+  });
+
+  it('reports no billing day when the token has no period, or an unreadable one', () => {
+    expect(
+      reportedRenewal(parseCodexAuth({ tokens: { id_token: ID_TOKEN, access_token: 'x' } })),
+    ).toBeNull();
+    const garbled = fakeJwt({
+      'https://api.openai.com/auth': { chatgpt_subscription_active_until: 'soon' },
+    });
+    expect(
+      reportedRenewal(parseCodexAuth({ tokens: { id_token: garbled, access_token: 'x' } })),
+    ).toBeNull();
+    expect(reportedRenewal(parseCodexAuth({ OPENAI_API_KEY: 'sk-1', tokens: null }))).toBeNull();
   });
 
   it('recognises an API-key-only login', () => {

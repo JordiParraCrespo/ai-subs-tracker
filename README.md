@@ -17,7 +17,7 @@ The screens follow the designs in [`designs/`](designs/).
 | **People** | The identities (emails) holding the plans, which plans sat idle this week, and what each costs |
 | **Tokenmaxx** | The account to use next (the most headroom per hour before its reset), and the queue against an even pace through the week |
 | **Usage & tokens** | Tokens by day, account and model, and what the same usage would cost on the API |
-| **Renewals** | A month calendar of when each plan bills, and the next 30 days (the billing day is yours to set: providers do not report it) |
+| **Renewals** | A month calendar of when each plan bills, and the next 30 days (Codex logins report their billing day; for the rest it is yours to set, and yours always wins) |
 | **Settings** | The terminal integration and the opt-in live feed from Claude Code |
 
 ## How it works

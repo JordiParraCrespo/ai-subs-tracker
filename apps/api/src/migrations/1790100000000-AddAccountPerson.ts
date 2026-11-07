@@ -13,8 +13,8 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  * filtered on. A nullable column add with a CHECK every existing row (NULL)
  * passes: no rewrite and only a brief lock.
  */
-export class AddAccountPerson1790000000000 implements MigrationInterface {
-  name = 'AddAccountPerson1790000000000';
+export class AddAccountPerson1790100000000 implements MigrationInterface {
+  name = 'AddAccountPerson1790100000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`

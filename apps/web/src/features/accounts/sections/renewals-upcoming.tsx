@@ -6,6 +6,7 @@ import { useNow } from '@flama/react-hooks';
 import { useTranslation } from 'react-i18next';
 import { formatMoney } from '../lib/format';
 import { accountTitle } from '../lib/marks';
+import { PROVIDER_NAMES } from '../lib/providers';
 import { unscheduled, upcomingRenewals } from '../lib/renewals';
 
 /**
@@ -22,6 +23,20 @@ export function RenewalsUpcoming({ onOpen }: { onOpen: (account: AccountEntity) 
   const missing = unscheduled(accounts);
   const due = upcoming.reduce((sum, entry) => sum + entry.account.monthlyPriceCents, 0);
   const mon = dateFormatter(locale, { month: 'short' });
+  const checked = dateFormatter(locale, { day: 'numeric', month: 'short' });
+  // A day the login reports is the provider's word, not the person's: say so.
+  const source = (account: AccountEntity) => {
+    if (account.renewalDayOverridden || account.renewalDay === null) return null;
+    const provider = PROVIDER_NAMES[account.provider];
+    if (!account.renewalCheckedAt) {
+      return { line: t('accounts.renewals.reportedDay', { provider }), hint: undefined };
+    }
+    const date = checked.format(account.renewalCheckedAt);
+    return {
+      line: t('accounts.renewals.reportedDayChecked', { provider, date }),
+      hint: t('accounts.renewals.reportedDayHint', { provider, date }),
+    };
+  };
 
   return (
     <section className="ds-card flex min-h-105 min-w-0 flex-[1_1_300px] flex-col overflow-hidden">
@@ -32,24 +47,34 @@ export function RenewalsUpcoming({ onOpen }: { onOpen: (account: AccountEntity) 
         </span>
       </div>
       <div className="flex flex-1 flex-col overflow-y-auto">
-        {upcoming.map(({ account, date }) => (
-          <button
-            key={account.id}
-            type="button"
-            className="ds-row ds-row--card"
-            onClick={() => onOpen(account)}
-          >
-            <span className="ds-date-stack">
-              <span className="ds-date-stack__mon">{mon.format(date)}</span>
-              <span className="ds-date-stack__day">{date.getDate()}</span>
-            </span>
-            <span className="ds-row__txt">
-              <span className="ds-cell-strong">{accountTitle(account)}</span>
-              <span className="ds-cell-sub">{account.displayName}</span>
-            </span>
-            <span className="ds-cell-money">{formatMoney(account.monthlyPriceCents, locale)}</span>
-          </button>
-        ))}
+        {upcoming.map(({ account, date }) => {
+          const from = source(account);
+          return (
+            <button
+              key={account.id}
+              type="button"
+              className="ds-row ds-row--card"
+              onClick={() => onOpen(account)}
+            >
+              <span className="ds-date-stack">
+                <span className="ds-date-stack__mon">{mon.format(date)}</span>
+                <span className="ds-date-stack__day">{date.getDate()}</span>
+              </span>
+              <span className="ds-row__txt">
+                <span className="ds-cell-strong">{accountTitle(account)}</span>
+                <span className="ds-cell-sub">{account.displayName}</span>
+                {from && (
+                  <span className="ds-cell-sub" title={from.hint}>
+                    {from.line}
+                  </span>
+                )}
+              </span>
+              <span className="ds-cell-money">
+                {formatMoney(account.monthlyPriceCents, locale)}
+              </span>
+            </button>
+          );
+        })}
         {upcoming.length === 0 && missing.length === 0 && (
           <p className="ds-text-label ds-muted m-0 px-6 py-5">{t('accounts.renewals.none')}</p>
         )}

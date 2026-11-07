@@ -310,7 +310,9 @@
       "renewalPlaceholder": "1 to 31, from your receipt",
       "person": "Used by",
       "personPlaceholder": "You",
-      "personHint": "Who uses this login. Leave it empty if it is yours; accounts with the same name are one person."
+      "personHint": "Who uses this login. Leave it empty if it is yours; accounts with the same name are one person.",
+      "renewalReported": "Day {{day}}, as your {{provider}} login reports",
+      "renewalReportedHelp": "Leave it empty to follow your {{provider}} login, or type the day on your receipt."
     },
     "list": {
       "title": "Subscriptions",
@@ -628,7 +630,10 @@
       "due_other": "{{value}} due · {{count}} renewals",
       "none": "No paid plans to renew.",
       "missingTitle": "No renewal day yet",
-      "missingSub": "Providers do not report when a plan bills. Set the day from your receipt to put it on the calendar.",
+      "missingSub": "These logins do not say when the plan bills. Set the day from your receipt to put it on the calendar.",
+      "reportedDay": "Day from {{provider}}",
+      "reportedDayChecked": "Day from {{provider}} · {{date}}",
+      "reportedDayHint": "The billing day your {{provider}} login reports. {{provider}} last checked the subscription on {{date}}.",
       "setDay": "Set day"
     },
     "firstRun": {
