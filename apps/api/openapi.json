@@ -2897,6 +2897,11 @@
             "type": "string",
             "nullable": true
           },
+          "person": {
+            "type": "string",
+            "nullable": true,
+            "description": "Who uses the account, as the owner names them; null is the owner"
+          },
           "email": {
             "type": "string",
             "nullable": true
@@ -2938,7 +2943,17 @@
           "renewalDay": {
             "type": "number",
             "nullable": true,
-            "description": "Day of the month the plan bills (1–31), when the person set it"
+            "description": "Day of the month the plan bills (1–31): the one the person set, else the one the provider reports"
+          },
+          "renewalDayOverridden": {
+            "type": "boolean",
+            "description": "True when the person set the billing day"
+          },
+          "renewalCheckedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the provider last confirmed the subscription behind a reported billing day"
           },
           "isActive": {
             "type": "boolean"
@@ -2975,6 +2990,7 @@
           "externalId",
           "displayName",
           "label",
+          "person",
           "email",
           "organization",
           "location",
@@ -2985,6 +3001,8 @@
           "monthlyPriceCents",
           "priceOverridden",
           "renewalDay",
+          "renewalDayOverridden",
+          "renewalCheckedAt",
           "isActive",
           "lastSyncedAt",
           "createdAt",
@@ -3435,6 +3453,24 @@
                       "messages"
                     ]
                   }
+                },
+                "reportedRenewal": {
+                  "type": "object",
+                  "properties": {
+                    "day": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 31
+                    },
+                    "checkedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                      "nullable": true
+                    }
+                  },
+                  "required": ["day", "checkedAt"],
+                  "nullable": true
                 }
               },
               "required": [
@@ -3495,6 +3531,12 @@
         "type": "object",
         "properties": {
           "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "nullable": true
+          },
+          "person": {
             "type": "string",
             "minLength": 1,
             "maxLength": 80,

@@ -41,6 +41,9 @@ export class AccountOrmEntity {
   @Column({ type: 'varchar', nullable: true })
   label!: string | null;
 
+  @Column({ type: 'varchar', length: 80, nullable: true })
+  person!: string | null;
+
   @Column({ type: 'varchar', nullable: true })
   planId!: string | null;
 
@@ -49,6 +52,12 @@ export class AccountOrmEntity {
 
   @Column({ type: 'smallint', nullable: true })
   renewalDay!: number | null;
+
+  @Column({ type: 'smallint', nullable: true })
+  reportedRenewalDay!: number | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  renewalCheckedAt!: Date | null;
 
   @Column({ type: 'boolean', default: false })
   isActive!: boolean;

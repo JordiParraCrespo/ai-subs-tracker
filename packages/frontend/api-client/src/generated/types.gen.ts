@@ -271,6 +271,10 @@ export type AccountResponseDto = {
      */
     displayName: string;
     label: string | null;
+    /**
+     * Who uses the account, as the owner names them; null is the owner
+     */
+    person: string | null;
     email: string | null;
     organization: string | null;
     location: string | null;
@@ -296,9 +300,17 @@ export type AccountResponseDto = {
      */
     priceOverridden: boolean;
     /**
-     * Day of the month the plan bills (1–31), when the person set it
+     * Day of the month the plan bills (1–31): the one the person set, else the one the provider reports
      */
     renewalDay: number | null;
+    /**
+     * True when the person set the billing day
+     */
+    renewalDayOverridden: boolean;
+    /**
+     * When the provider last confirmed the subscription behind a reported billing day
+     */
+    renewalCheckedAt: string | null;
     isActive: boolean;
     lastSyncedAt: string | null;
     createdAt: string;
@@ -434,6 +446,10 @@ export type SyncAccountsRequest = {
             cacheRead: number;
             messages: number;
         }>;
+        reportedRenewal?: {
+            day: number;
+            checkedAt: string | null;
+        } | null;
     }>;
 };
 
@@ -448,6 +464,7 @@ export type CreateAccountRequest = {
 
 export type UpdateAccountRequest = {
     label?: string | null;
+    person?: string | null;
     planId?: string | null;
     monthlyPriceCents?: number | null;
     renewalDay?: number | null;

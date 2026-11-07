@@ -28,6 +28,7 @@ const codex = () =>
     organization: null,
     reportedPlan: 'plus',
     location: null,
+    reportedRenewal: null,
     at: new Date(),
   });
 

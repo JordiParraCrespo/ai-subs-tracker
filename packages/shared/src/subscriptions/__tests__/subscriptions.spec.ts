@@ -65,6 +65,39 @@ describe('apiCostCents', () => {
     ).toBeCloseTo(1200);
   });
 
+  // A missing rule falls through to the family's (Opus 4.8 read "Claude Opus 4").
+  it.each([
+    ['claude-opus-5-5', 'Claude Opus 5.5'],
+    ['claude-fable-5-1', 'Claude Fable 5.1'],
+    ['claude-mythos-5-1', 'Claude Mythos 5.1'],
+    ['claude-sonnet-5-5', 'Claude Sonnet 5.5'],
+    ['claude-haiku-5-5', 'Claude Haiku 5.5'],
+    ['claude-haiku-4-5-20251001', 'Claude Haiku 4.5'],
+    ['claude-sonnet-5', 'Claude Sonnet 5'],
+    ['claude-opus-5', 'Claude Opus 5'],
+    ['claude-fable-5', 'Claude Fable 5'],
+    ['claude-mythos-5', 'Claude Mythos 5'],
+    ['claude-opus-4-8', 'Claude Opus 4.8'],
+    ['claude-opus-4-8[1m]', 'Claude Opus 4.8'],
+    ['claude-opus-4-7', 'Claude Opus 4.7'],
+    ['claude-opus-4-6', 'Claude Opus 4.6'],
+    ['claude-opus-4-5-20251101', 'Claude Opus 4.5'],
+    ['claude-opus-4-1-20250805', 'Claude Opus 4.1'],
+    ['claude-opus-4-20250514', 'Claude Opus 4'],
+    ['claude-sonnet-4-6', 'Claude Sonnet 4.6'],
+    ['claude-sonnet-4-5-20250929', 'Claude Sonnet 4.5'],
+    ['claude-sonnet-4-20250514', 'Claude Sonnet 4'],
+  ])('names %s as %s', (model, label) => {
+    expect(priceFor(model)?.label).toBe(label);
+  });
+
+  it('prices Opus 4.8 at its own rate, not at Opus 4 rates', () => {
+    const tokens = { input: 1e6, output: 1e6, cacheRead: 0, cacheWrite: 0 };
+    // $5 + $25 on Opus 4.8; $15 + $75 on Opus 4.
+    expect(apiCostCents('claude-opus-4-8', tokens)).toBeCloseTo(3000);
+    expect(apiCostCents('claude-opus-4-20250514', tokens)).toBeCloseTo(9000);
+  });
+
   it('does not guess a price for an unknown model', () => {
     expect(apiCostCents('mystery-1', { input: 1e6, output: 0, cacheRead: 0, cacheWrite: 0 })).toBe(
       0,

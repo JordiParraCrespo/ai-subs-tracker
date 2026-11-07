@@ -29,7 +29,7 @@
     "refresh": "Refresh"
   },
   "edit": {
-    "description": "Name it, and set the plan, price and billing day you actually have.",
+    "description": "Name it, say who uses it, and set the plan, price and billing day you actually have.",
     "label": "Name",
     "plan": "Plan",
     "planAuto": "As reported · {{plan}}",
@@ -38,7 +38,12 @@
     "pricePlaceholder": "The plan's list price",
     "title": "Edit account",
     "renewalDay": "Renews on day of month",
-    "renewalPlaceholder": "1 to 31, from your receipt"
+    "renewalPlaceholder": "1 to 31, from your receipt",
+    "person": "Used by",
+    "personPlaceholder": "You",
+    "personHint": "Who uses this login. Leave it empty if it is yours; accounts with the same name are one person.",
+    "renewalReported": "Day {{day}}, as your {{provider}} login reports",
+    "renewalReportedHelp": "Leave it empty to follow your {{provider}} login, or type the day on your receipt."
   },
   "list": {
     "title": "Subscriptions",
@@ -313,8 +318,6 @@
   },
   "people": {
     "title": "People",
-    "sub_one": "{{count}} identity · who holds which plan, and what it costs · {{cost}}/mo",
-    "sub_other": "{{count}} identities · who holds which plan, and what it costs · {{cost}}/mo",
     "search": "Search people",
     "status": {
       "all": "Any status",
@@ -336,7 +339,13 @@
     "resets": "resets {{when}}",
     "noReading": "No reading yet",
     "idleTag": "Idle this week",
-    "noMatch": "Nothing matches these filters. Clear them to see everyone."
+    "noMatch": "Nothing matches these filters. Clear them to see everyone.",
+    "peopleCount_one": "{{count}} person",
+    "peopleCount_other": "{{count}} people",
+    "accountCount_one": "{{count}} account",
+    "accountCount_other": "{{count}} accounts",
+    "perMonth": "{{cost}}/mo",
+    "you": "You"
   },
   "renewals": {
     "title": "Renewals",
@@ -350,7 +359,10 @@
     "due_other": "{{value}} due · {{count}} renewals",
     "none": "No paid plans to renew.",
     "missingTitle": "No renewal day yet",
-    "missingSub": "Providers do not report when a plan bills. Set the day from your receipt to put it on the calendar.",
+    "missingSub": "These logins do not say when the plan bills. Set the day from your receipt to put it on the calendar.",
+    "reportedDay": "Day from {{provider}}",
+    "reportedDayChecked": "Day from {{provider}} · {{date}}",
+    "reportedDayHint": "The billing day your {{provider}} login reports. {{provider}} last checked the subscription on {{date}}.",
     "setDay": "Set day"
   },
   "firstRun": {

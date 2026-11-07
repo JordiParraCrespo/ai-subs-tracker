@@ -86,6 +86,19 @@ export const dailyTokensSchema = z.object({
 });
 export type DailyTokens = z.infer<typeof dailyTokensSchema>;
 
+/**
+ * When the provider says the plan bills, read from the login on the machine
+ * (Codex's `id_token` carries the end of the paid period). Only the day of the
+ * month travels, in the machine's local time: the period end in a token goes
+ * stale until the CLI next refreshes it, but the day a plan bills does not
+ * move. `checkedAt` is when the provider last confirmed the subscription.
+ */
+export const reportedRenewalSchema = z.object({
+  day: z.number().int().min(1).max(31),
+  checkedAt: z.iso.datetime({ offset: true }).nullable(),
+});
+export type ReportedRenewal = z.infer<typeof reportedRenewalSchema>;
+
 export const syncAccountSchema = z.object({
   provider: localProviderIdSchema,
   /** Stable id of the login at the provider (account uuid, ChatGPT account id). */
@@ -98,6 +111,8 @@ export const syncAccountSchema = z.object({
   location: z.string().max(300).nullable(),
   snapshot: usageSnapshotSchema.nullable(),
   dailyTokens: z.array(dailyTokensSchema).max(1000),
+  /** Absent from collectors older than it, and null when the login says nothing. */
+  reportedRenewal: reportedRenewalSchema.nullable().optional(),
 });
 export type SyncAccount = z.infer<typeof syncAccountSchema>;
 
@@ -113,6 +128,12 @@ export type SyncAccountsInput = z.infer<typeof syncAccountsSchema>;
 /** The fields a person edits on an account; `null` clears an override. */
 export const updateAccountSchema = z.object({
   label: z.string().trim().min(1).max(80).nullable().optional(),
+  /**
+   * Who uses the account, in the person's own words ("Ana", "Me"); `null`
+   * is the signed-in person. An account is a login a provider knows by an
+   * email; several of them can belong to one person.
+   */
+  person: z.string().trim().min(1).max(80).nullable().optional(),
   planId: z.string().min(1).max(60).nullable().optional(),
   monthlyPriceCents: z.number().int().min(0).max(1_000_000).nullable().optional(),
   renewalDay: z.number().int().min(1).max(31).nullable().optional(),
@@ -191,12 +212,13 @@ export type UsageSummaryQuery = z.infer<typeof usageSummaryQuerySchema>;
 
 /**
  * The account editor's fields as typed: an empty label or plan means "use what
- * the provider reports", an empty price means "the plan's list price", an
+ * the provider reports", an empty person means "the signed-in person", an empty price means "the plan's list price", an
  * empty renewal day means "not set". The
  * form maps these onto `updateAccountSchema`.
  */
 export const editAccountFormSchema = z.object({
   label: z.string().trim().max(80),
+  person: z.string().trim().max(80),
   planId: z.string().max(60),
   price: z
     .string()

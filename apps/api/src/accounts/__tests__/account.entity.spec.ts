@@ -10,6 +10,7 @@ function account(reportedPlan: string | null = 'default_claude_max_20x') {
     organization: null,
     reportedPlan,
     location: '~/.claude',
+    reportedRenewal: null,
     at: new Date('2026-11-01T00:00:00Z'),
   });
 }
@@ -44,6 +45,62 @@ describe('AccountEntity', () => {
     expect(entity.renewalDay).toBeNull();
   });
 
+  // Codex's token carries the end of the paid period, so its billing day
+  // arrives with a sync. The person's own day must win, clearing theirs must
+  // fall back to the reported one, and a sync whose token says nothing must
+  // not wipe a day already known.
+  it('takes the billing day a login reports, under the one the person sets', () => {
+    const entity = account();
+    const sighting = (reportedRenewal: { day: number; checkedAt: Date | null } | null) =>
+      entity.recordSighting({
+        email: null,
+        organization: null,
+        reportedPlan: null,
+        location: null,
+        reportedRenewal,
+        at: new Date('2026-11-06T00:00:00Z'),
+      });
+    sighting({ day: 23, checkedAt: new Date('2026-09-22T10:09:48Z') });
+    expect(entity.renewalDay).toBe(23);
+    expect(entity.renewalDayOverridden).toBe(false);
+    expect(entity.renewalCheckedAt?.toISOString()).toBe('2026-09-22T10:09:48.000Z');
+
+    entity.edit({ renewalDay: 5 });
+    sighting({ day: 24, checkedAt: new Date('2026-10-22T10:00:00Z') });
+    expect(entity.renewalDay).toBe(5);
+    expect(entity.renewalDayOverridden).toBe(true);
+
+    entity.edit({ renewalDay: null });
+    sighting(null);
+    expect(entity.renewalDay).toBe(24);
+    expect(entity.renewalDayOverridden).toBe(false);
+  });
+
+  // One login syncs from every machine that holds it, each with a token
+  // issued at a different time: an older token must not bring back a day
+  // the provider has since replaced.
+  it('keeps the billing day the provider confirmed last, whichever machine syncs', () => {
+    const entity = account();
+    const sighting = (day: number, checkedAt: string | null) =>
+      entity.recordSighting({
+        email: null,
+        organization: null,
+        reportedPlan: null,
+        location: null,
+        reportedRenewal: { day, checkedAt: checkedAt ? new Date(checkedAt) : null },
+        at: new Date('2026-11-06T00:00:00Z'),
+      });
+    sighting(23, '2026-11-02T10:00:00Z');
+    sighting(12, '2026-09-22T10:00:00Z');
+    expect(entity.renewalDay).toBe(23);
+    // A token that names no check cannot say it is newer either.
+    sighting(12, null);
+    expect(entity.renewalDay).toBe(23);
+    expect(entity.renewalCheckedAt?.toISOString()).toBe('2026-11-02T10:00:00.000Z');
+    sighting(12, '2026-12-02T10:00:00Z');
+    expect(entity.renewalDay).toBe(12);
+  });
+
   it('refuses a plan from another provider', () => {
     expect(() => account().edit({ planId: 'codex-plus' })).toThrow();
   });
@@ -55,6 +112,7 @@ describe('AccountEntity', () => {
       organization: 'Acme',
       reportedPlan: null,
       location: null,
+      reportedRenewal: null,
       at: new Date('2026-11-02T00:00:00Z'),
     });
     expect(entity.email).toBe('me@example.com');
@@ -68,6 +126,17 @@ describe('AccountEntity', () => {
     expect(entity.displayName).toBe('me@example.com');
     entity.edit({ label: 'Work' });
     expect(entity.displayName).toBe('Work');
+  });
+
+  it('belongs to its owner until someone else is named, and back again', () => {
+    const entity = account();
+    expect(entity.person).toBeNull();
+    entity.edit({ person: 'Ana' });
+    expect(entity.person).toBe('Ana');
+    entity.edit({ label: 'Work' });
+    expect(entity.person).toBe('Ana');
+    entity.edit({ person: null });
+    expect(entity.person).toBeNull();
   });
 
   it('is no longer active once archived', () => {

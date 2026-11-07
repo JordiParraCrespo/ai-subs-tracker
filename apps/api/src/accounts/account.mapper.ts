@@ -61,9 +61,12 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
     record.reportedPlan = props.reportedPlan;
     record.location = props.location;
     record.label = props.label;
+    record.person = props.person;
     record.planId = props.planId;
     record.monthlyPriceCents = props.monthlyPriceCents;
     record.renewalDay = props.renewalDay;
+    record.reportedRenewalDay = props.reportedRenewalDay;
+    record.renewalCheckedAt = props.renewalCheckedAt;
     record.isActive = props.isActive;
     record.activatedAt = props.activatedAt;
     record.lastSyncedAt = props.lastSyncedAt;
@@ -87,9 +90,12 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
         reportedPlan: record.reportedPlan,
         location: record.location,
         label: record.label,
+        person: record.person,
         planId: record.planId,
         monthlyPriceCents: record.monthlyPriceCents,
         renewalDay: record.renewalDay,
+        reportedRenewalDay: record.reportedRenewalDay,
+        renewalCheckedAt: record.renewalCheckedAt,
         isActive: record.isActive,
         activatedAt: record.activatedAt,
         lastSyncedAt: record.lastSyncedAt,
@@ -114,6 +120,7 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
     dto.externalId = entity.externalId;
     dto.displayName = entity.displayName;
     dto.label = entity.label;
+    dto.person = entity.person;
     dto.email = entity.email;
     dto.organization = entity.organization;
     dto.location = entity.location;
@@ -124,6 +131,8 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
     dto.monthlyPriceCents = entity.effectivePriceCents;
     dto.priceOverridden = entity.monthlyPriceCents !== null;
     dto.renewalDay = entity.renewalDay;
+    dto.renewalDayOverridden = entity.renewalDayOverridden;
+    dto.renewalCheckedAt = entity.renewalCheckedAt?.toISOString() ?? null;
     dto.isActive = entity.isActive;
     dto.lastSyncedAt = entity.lastSyncedAt?.toISOString() ?? null;
     dto.createdAt = entity.createdAt.toISOString();
@@ -141,6 +150,14 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
       organization: input.organization,
       reportedPlan: input.reportedPlan,
       location: input.location,
+      reportedRenewal: input.reportedRenewal
+        ? {
+            day: input.reportedRenewal.day,
+            checkedAt: input.reportedRenewal.checkedAt
+              ? new Date(input.reportedRenewal.checkedAt)
+              : null,
+          }
+        : null,
       at,
     };
   }
@@ -178,7 +195,14 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
 
   /** The tier a vendor named in a reading, as a sighting that changes nothing else. */
   toReadingSighting(reportedPlan: string, at: Date): Sighting {
-    return { email: null, organization: null, reportedPlan, location: null, at };
+    return {
+      email: null,
+      organization: null,
+      reportedPlan,
+      location: null,
+      reportedRenewal: null,
+      at,
+    };
   }
 
   toSnapshotRecord(accountId: string, snapshot: UsageSnapshot): Partial<UsageSnapshotOrmEntity> {

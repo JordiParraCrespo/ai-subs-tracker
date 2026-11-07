@@ -27,12 +27,21 @@ export interface AccountProps {
   location: string | null;
   /** The person's own name for it; null shows the email. */
   label: string | null;
+  /** Who uses this login, as the owner names them; null is the owner themself. */
+  person: string | null;
   /** A plan the person chose over the reported one. */
   planId: string | null;
   /** What the person actually pays, over the plan's list price. */
   monthlyPriceCents: number | null;
-  /** The day of the month the plan bills, as the person told us; providers do not report it. */
+  /** The day of the month the plan bills, as the person told us; it wins over a reported one. */
   renewalDay: number | null;
+  /**
+   * The day the provider's login says the plan bills (Codex's token carries
+   * the end of the paid period); null when it says nothing.
+   */
+  reportedRenewalDay: number | null;
+  /** When the provider last confirmed the subscription behind that day. */
+  renewalCheckedAt: Date | null;
   isActive: boolean;
   activatedAt: Date | null;
   lastSyncedAt: Date | null;
@@ -44,6 +53,8 @@ export interface Sighting {
   organization: string | null;
   reportedPlan: string | null;
   location: string | null;
+  /** The billing day the login reports; null keeps the last one known. */
+  reportedRenewal: { day: number; checkedAt: Date | null } | null;
   at: Date;
 }
 
@@ -60,6 +71,7 @@ export interface ManualAccountInput {
 
 export interface AccountEdit {
   label?: string | null;
+  person?: string | null;
   planId?: string | null;
   monthlyPriceCents?: number | null;
   renewalDay?: number | null;
@@ -77,7 +89,7 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
     id: string,
     input: { userId: string; provider: ProviderId; externalId: string } & Sighting,
   ): AccountEntity {
-    return new AccountEntity({
+    const account = new AccountEntity({
       id,
       props: {
         userId: input.userId,
@@ -88,15 +100,20 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
         reportedPlan: input.reportedPlan,
         location: input.location,
         label: null,
+        person: null,
         planId: null,
         monthlyPriceCents: null,
         renewalDay: null,
+        reportedRenewalDay: input.reportedRenewal?.day ?? null,
+        renewalCheckedAt: input.reportedRenewal?.checkedAt ?? null,
         isActive: false,
         activatedAt: null,
         lastSyncedAt: input.at,
         archivedAt: null,
       },
     });
+    account.validate();
+    return account;
   }
 
   /**
@@ -121,9 +138,12 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
         reportedPlan: null,
         location: null,
         label: input.label,
+        person: null,
         planId: input.planId,
         monthlyPriceCents: input.monthlyPriceCents,
         renewalDay: input.renewalDay,
+        reportedRenewalDay: null,
+        renewalCheckedAt: null,
         isActive: false,
         activatedAt: null,
         lastSyncedAt: null,
@@ -162,6 +182,10 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
   get label() {
     return this.props.label;
   }
+
+  get person() {
+    return this.props.person;
+  }
   get planId() {
     return this.props.planId;
   }
@@ -169,8 +193,19 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
     return this.props.monthlyPriceCents;
   }
 
-  get renewalDay() {
-    return this.props.renewalDay;
+  /** The day the person set, else the one the provider reports, else none. */
+  get renewalDay(): number | null {
+    return this.props.renewalDay ?? this.props.reportedRenewalDay;
+  }
+  /** True when the person set the billing day rather than taking the reported one. */
+  get renewalDayOverridden(): boolean {
+    return this.props.renewalDay !== null;
+  }
+  get reportedRenewalDay() {
+    return this.props.reportedRenewalDay;
+  }
+  get renewalCheckedAt() {
+    return this.props.renewalCheckedAt;
   }
   get isActive() {
     return this.props.isActive;
@@ -219,8 +254,27 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
     this.props.organization = sighting.organization ?? this.props.organization;
     this.props.reportedPlan = sighting.reportedPlan ?? this.props.reportedPlan;
     this.props.location = sighting.location ?? this.props.location;
+    if (this.isNewerRenewal(sighting.reportedRenewal)) {
+      this.props.reportedRenewalDay = sighting.reportedRenewal.day;
+      this.props.renewalCheckedAt = sighting.reportedRenewal.checkedAt;
+    }
     this.props.lastSyncedAt = sighting.at;
     this.setUpdatedAt(sighting.at);
+  }
+
+  /**
+   * Whether a reported billing day may replace the one kept. One login can
+   * sync from several machines, each holding a token issued at a different
+   * time, so a day the provider confirmed earlier never replaces one it
+   * confirmed later; the day and its check move together.
+   */
+  private isNewerRenewal(
+    renewal: Sighting['reportedRenewal'],
+  ): renewal is NonNullable<Sighting['reportedRenewal']> {
+    if (!renewal) return false;
+    const kept = this.props.renewalCheckedAt;
+    if (!kept) return true;
+    return renewal.checkedAt !== null && renewal.checkedAt.getTime() >= kept.getTime();
   }
 
   edit(change: AccountEdit): void {
@@ -232,6 +286,7 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
       }
     }
     if (change.label !== undefined) this.props.label = change.label;
+    if (change.person !== undefined) this.props.person = change.person;
     if (change.planId !== undefined) this.props.planId = change.planId;
     if (change.monthlyPriceCents !== undefined)
       this.props.monthlyPriceCents = change.monthlyPriceCents;
@@ -286,9 +341,10 @@ export class AccountEntity extends AggregateRoot<AccountProps> {
         );
       }
     }
-    const day = this.props.renewalDay;
-    if (day !== null && (!Number.isInteger(day) || day < 1 || day > 31)) {
-      throw new ArgumentInvalidException('Renewal day must be a day of the month, 1 to 31');
+    for (const day of [this.props.renewalDay, this.props.reportedRenewalDay]) {
+      if (day !== null && (!Number.isInteger(day) || day < 1 || day > 31)) {
+        throw new ArgumentInvalidException('Renewal day must be a day of the month, 1 to 31');
+      }
     }
   }
 }

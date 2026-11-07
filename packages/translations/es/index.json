@@ -298,7 +298,7 @@
       "refresh": "Actualizar"
     },
     "edit": {
-      "description": "Ponle nombre e indica el plan, el precio y el día de cobro que tienes.",
+      "description": "Ponle nombre, indica quién la usa y el plan, el precio y el día de cobro que tienes.",
       "label": "Nombre",
       "plan": "Plan",
       "planAuto": "El informado · {{plan}}",
@@ -307,7 +307,12 @@
       "pricePlaceholder": "El precio de lista del plan",
       "title": "Editar cuenta",
       "renewalDay": "Se renueva el día del mes",
-      "renewalPlaceholder": "Del 1 al 31, según tu recibo"
+      "renewalPlaceholder": "Del 1 al 31, según tu recibo",
+      "person": "La usa",
+      "personPlaceholder": "Tú",
+      "personHint": "Quién usa este acceso. Déjalo vacío si es tuyo; las cuentas con el mismo nombre son una persona.",
+      "renewalReported": "Día {{day}}, según tu sesión de {{provider}}",
+      "renewalReportedHelp": "Déjalo vacío para seguir tu sesión de {{provider}}, o escribe el día de tu recibo."
     },
     "list": {
       "title": "Suscripciones",
@@ -582,8 +587,6 @@
     },
     "people": {
       "title": "Personas",
-      "sub_one": "{{count}} identidad · quién tiene cada plan y cuánto cuesta · {{cost}}/mes",
-      "sub_other": "{{count}} identidades · quién tiene cada plan y cuánto cuesta · {{cost}}/mes",
       "search": "Buscar personas",
       "status": {
         "all": "Cualquier estado",
@@ -605,7 +608,13 @@
       "resets": "se reinicia {{when}}",
       "noReading": "Aún sin lectura",
       "idleTag": "Sin uso esta semana",
-      "noMatch": "Nada coincide con estos filtros. Límpialos para ver a todos."
+      "noMatch": "Nada coincide con estos filtros. Límpialos para ver a todos.",
+      "peopleCount_one": "{{count}} persona",
+      "peopleCount_other": "{{count}} personas",
+      "accountCount_one": "{{count}} cuenta",
+      "accountCount_other": "{{count}} cuentas",
+      "perMonth": "{{cost}}/mes",
+      "you": "Tú"
     },
     "renewals": {
       "title": "Renovaciones",
@@ -619,7 +628,10 @@
       "due_other": "{{value}} a pagar · {{count}} renovaciones",
       "none": "No hay planes de pago que renovar.",
       "missingTitle": "Sin día de renovación",
-      "missingSub": "Los proveedores no indican cuándo se cobra un plan. Pon el día de tu recibo para verlo en el calendario.",
+      "missingSub": "Estas sesiones no indican cuándo se cobra el plan. Pon el día de tu recibo para verlo en el calendario.",
+      "reportedDay": "Día según {{provider}}",
+      "reportedDayChecked": "Día según {{provider}} · {{date}}",
+      "reportedDayHint": "El día de cobro que indica tu sesión de {{provider}}. {{provider}} comprobó la suscripción por última vez el {{date}}.",
       "setDay": "Poner día"
     },
     "firstRun": {

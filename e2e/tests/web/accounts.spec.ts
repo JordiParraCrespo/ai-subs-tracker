@@ -78,17 +78,29 @@ test('usage shows tokens by model at API prices', async ({ page }) => {
   await api.dispose();
 });
 
-test('people groups the plans by the identity that holds them', async ({ page }) => {
+test('people are humans, each holding the accounts named for them', async ({ page }) => {
   const { user, api } = await provisionedUser('people');
   await syncTwoAccounts(api);
   await signInAs(page, user);
 
   await page.goto('/people');
   await expect(page.getByRole('heading', { name: 'People', level: 1 })).toBeVisible();
-  // Two logins, two identities, and a row opens to the plan it holds.
-  await expect(page.getByText('Showing 2 of 2 people')).toBeVisible();
-  await page.getByText('work@example.com', { exact: true }).click();
+  // Two logins with two emails, and nobody else named: one person, the owner.
+  await expect(page.getByText('Showing 1 of 1 people')).toBeVisible();
+  await page.getByText('You · 2 accounts').click();
+  await expect(page.getByText('work@example.com', { exact: true })).toBeVisible();
+  await expect(page.getByText('home@example.com', { exact: true })).toBeVisible();
   await expect(page.getByText('Claude Code · Ultra')).toBeVisible();
+
+  // Giving one account to someone else makes them a person of their own.
+  await page.getByRole('button', { name: 'Edit', exact: true }).first().click();
+  await page.getByLabel('Used by').fill('Ana');
+  await page.getByRole('button', { name: 'Save' }).click();
+
+  await reloadFromServer(page);
+  await page.goto('/people');
+  await expect(page.getByText('Showing 2 of 2 people')).toBeVisible();
+  await expect(page.getByText('Ana', { exact: true })).toBeVisible();
 
   await api.dispose();
 });
@@ -99,7 +111,7 @@ test('a renewal day puts the plan on the renewals calendar', async ({ page }) =>
   await signInAs(page, user);
 
   await page.goto('/renewals');
-  // Providers do not report a billing day, so a paid plan starts unscheduled.
+  // Claude Code's login reports no billing day, so its plan starts unscheduled.
   await expect(page.getByText('No renewal day yet')).toBeVisible();
   await page.getByRole('button', { name: 'Set day' }).first().click();
   await page.getByLabel('Renews on day of month').fill('28');
@@ -108,6 +120,34 @@ test('a renewal day puts the plan on the renewals calendar', async ({ page }) =>
   await reloadFromServer(page);
   await expect(page.getByRole('heading', { name: 'Next 30 days' })).toBeVisible();
   await expect(page.locator('.ds-cal__event').first()).toBeVisible();
+
+  await api.dispose();
+});
+
+test('a billing day the Codex login reports is on the calendar, and the person can override it', async ({
+  page,
+}) => {
+  const { user, api } = await provisionedUser('renewalreported');
+  await syncTwoAccounts(api);
+  await signInAs(page, user);
+
+  await page.goto('/renewals');
+  const upcoming = page.getByRole('button', { name: /Codex · Plus/ });
+  await expect(upcoming).toContainText(/Day from Codex · /);
+  // Only Claude Code is still waiting for a day.
+  await expect(page.getByRole('button', { name: 'Set day' })).toHaveCount(1);
+
+  // The reported day is a suggestion: the field stays empty and says where it came from.
+  await upcoming.click();
+  const day = page.getByLabel('Renews on day of month');
+  await expect(day).toHaveValue('');
+  await expect(day).toHaveAttribute('placeholder', /as your Codex login reports/);
+  await day.fill('28');
+  await page.getByRole('button', { name: 'Save' }).click();
+
+  await reloadFromServer(page);
+  await page.goto('/renewals');
+  await expect(page.getByText(/Day from Codex/)).toHaveCount(0);
 
   await api.dispose();
 });

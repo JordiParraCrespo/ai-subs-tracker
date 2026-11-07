@@ -90,6 +90,13 @@ export class AccountResponseDto {
   @ApiProperty({ type: String, nullable: true })
   label!: string | null;
 
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    description: 'Who uses the account, as the owner names them; null is the owner',
+  })
+  person!: string | null;
+
   @ApiProperty({ type: String, nullable: true })
   email!: string | null;
 
@@ -120,9 +127,21 @@ export class AccountResponseDto {
   @ApiProperty({
     type: Number,
     nullable: true,
-    description: 'Day of the month the plan bills (1–31), when the person set it',
+    description:
+      'Day of the month the plan bills (1–31): the one the person set, else the one the provider reports',
   })
   renewalDay!: number | null;
+
+  @ApiProperty({ description: 'True when the person set the billing day' })
+  renewalDayOverridden!: boolean;
+
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    nullable: true,
+    description: 'When the provider last confirmed the subscription behind a reported billing day',
+  })
+  renewalCheckedAt!: string | null;
 
   @ApiProperty()
   isActive!: boolean;

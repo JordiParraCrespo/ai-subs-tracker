@@ -7,6 +7,7 @@ import { useNow } from '@flama/react-hooks';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EditAccountDialog } from '../dialogs/edit-account';
+import { useOwnerName } from '../hooks/use-owner-name';
 import { formatMoney, formatPercent, formatResetIn } from '../lib/format';
 import { accountMark, accountTitle } from '../lib/marks';
 import {
@@ -23,9 +24,10 @@ const PAGE_SIZE = 8;
 const TEMPLATE = 'minmax(220px,2fr) minmax(200px,1.6fr) 110px 130px 32px';
 
 /**
- * The design's People table over the person's identities: who holds which
- * plans, how many sat idle this week, and what they cost. A row opens to its
- * plans, each with its week and an Edit for the plan's name, price and day.
+ * The People table: each person (the owner, and anyone an account was given
+ * to), how many accounts and plans they hold, how many sat idle this week, and
+ * what they cost. A row opens to the person's accounts, each email with its
+ * plans under it, and an Edit on each plan for its name, person, price and day.
  */
 export function PeopleTable({
   query,
@@ -37,10 +39,11 @@ export function PeopleTable({
   const { t } = useTranslation();
   const locale = useLocale();
   const now = useNow(60_000);
+  const owner = useOwnerName();
   const { data: accounts = [], isLoading } = useAccounts();
   const [open, setOpen] = useState<string | null>(null);
   const [editing, setEditing] = useState<AccountEntity | null>(null);
-  const everyone = groupPeople(accounts);
+  const everyone = groupPeople(accounts, owner);
   const rows = filterPeople(everyone, query);
   const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   const page = Math.min(query.page ?? 1, pages);
@@ -62,10 +65,14 @@ export function PeopleTable({
         <div className="flex min-w-0 items-center gap-3">
           <DsAvatar initials={personInitials(person.name)} color="#404040" size={32} />
           <div className="flex min-w-0 flex-col gap-0.5">
-            <span className="ds-cell-strong">{person.name}</span>
+            <span className="ds-cell-strong">{person.name || t('accounts.people.you')}</span>
             <span className="ds-cell-sub">
-              {person.organization ??
-                t('accounts.people.planCount', { count: person.accounts.length })}
+              {[
+                person.isOwner && person.name ? t('accounts.people.you') : null,
+                t('accounts.people.accountCount', { count: person.identities.length }),
+              ]
+                .filter(Boolean)
+                .join(' · ')}
             </span>
           </div>
         </div>
@@ -77,7 +84,7 @@ export function PeopleTable({
       render: (person) => (
         <div className="flex min-w-0 flex-row items-center gap-2">
           <div className="ds-stack">
-            {person.accounts.map((account) => {
+            {person.plans.map((account) => {
               const mark = accountMark(account);
               return (
                 <span key={account.id} title={accountTitle(account)}>
@@ -87,7 +94,7 @@ export function PeopleTable({
             })}
           </div>
           <span className="ds-cell-sub">
-            {t('accounts.people.planCount', { count: person.accounts.length })}
+            {t('accounts.people.planCount', { count: person.plans.length })}
           </span>
         </div>
       ),
@@ -133,29 +140,45 @@ export function PeopleTable({
         onRowClick={(person) => setOpen((current) => (current === person.key ? null : person.key))}
         expanded={(person) =>
           open === person.key
-            ? person.accounts.map((account) => {
-                const mark = accountMark(account);
-                return (
-                  <div key={account.id} className="ds-gtable__expand-row">
-                    <DsAvatar initials={mark.initials} color={mark.color} size={32} />
-                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="ds-label-strong">{accountTitle(account)}</span>
-                      <span className="ds-cell-sub">{detail(account)}</span>
-                    </div>
-                    {isIdle(account) && (
-                      <span className="ds-text-label ds-review">
-                        {t('accounts.people.idleTag')}
-                      </span>
-                    )}
-                    <DsButton size="xs" onClick={() => setEditing(account)}>
-                      {t('accounts.table.edit')}
-                    </DsButton>
-                    <span className="ds-cell-money w-24 text-right">
-                      {formatMoney(account.monthlyPriceCents, locale)}
+            ? person.identities.flatMap((identity) => [
+                <div key={identity.key} className="ds-gtable__expand-row">
+                  <DsAvatar initials={personInitials(identity.name)} color="#404040" size={32} />
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="ds-label-strong">{identity.name}</span>
+                    <span className="ds-cell-sub">
+                      {[
+                        identity.organization,
+                        t('accounts.people.planCount', { count: identity.plans.length }),
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
                     </span>
                   </div>
-                );
-              })
+                </div>,
+                ...identity.plans.map((account) => {
+                  const mark = accountMark(account);
+                  return (
+                    <div key={account.id} className="ds-gtable__expand-row pl-11">
+                      <DsAvatar initials={mark.initials} color={mark.color} size={24} />
+                      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                        <span className="ds-label-strong">{accountTitle(account)}</span>
+                        <span className="ds-cell-sub">{detail(account)}</span>
+                      </div>
+                      {isIdle(account) && (
+                        <span className="ds-text-label ds-review">
+                          {t('accounts.people.idleTag')}
+                        </span>
+                      )}
+                      <DsButton size="xs" onClick={() => setEditing(account)}>
+                        {t('accounts.table.edit')}
+                      </DsButton>
+                      <span className="ds-cell-money w-24 text-right">
+                        {formatMoney(account.monthlyPriceCents, locale)}
+                      </span>
+                    </div>
+                  );
+                }),
+              ])
             : null
         }
         footer={
