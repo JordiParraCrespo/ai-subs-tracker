@@ -1,5 +1,5 @@
 import type { DesktopBridge } from '@flama/shared/desktop';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * The language the screens start in, through i18next's real detection. In the
@@ -14,6 +14,13 @@ function desktop(systemLocales: string[]) {
   return setLocale;
 }
 
+// Which language is picked does not depend on a catalog's contents (only on
+// one arriving: i18next resolves to a language it holds a bundle for), and
+// loading the real Spanish one cost seconds per test under a full parallel run.
+vi.mock('@flama/translations/lazy', () => ({
+  loadLocaleMessages: async () => ({ language: { label: 'Idioma' } }),
+}));
+
 async function startLanguage(): Promise<string | undefined> {
   vi.resetModules();
   const { default: i18n, i18nReady } = await import('./i18n');
@@ -22,6 +29,13 @@ async function startLanguage(): Promise<string | undefined> {
 }
 
 describe('starting language', () => {
+  // The first import transforms i18next, react-i18next and the English catalog;
+  // pay that once here, outside every test's own timeout. Each test re-imports
+  // the module fresh (`resetModules`) from the warm transform cache.
+  beforeAll(async () => {
+    await import('./i18n');
+  }, 30_000);
+
   beforeEach(() => {
     document.documentElement.lang = 'en';
     localStorage.clear();
