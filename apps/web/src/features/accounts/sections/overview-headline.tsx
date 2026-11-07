@@ -51,7 +51,9 @@ export function OverviewHeadline() {
             {
               label: t('accounts.overview.valuePerDollar'),
               value:
-                apiValue !== undefined && spend > 0 ? `${(apiValue / spend).toFixed(1)}×` : '—',
+                apiValue !== undefined && spend > 0
+                  ? formatMoney((apiValue / spend) * 100, locale)
+                  : '—',
             },
             {
               label: t('accounts.overview.savings'),
