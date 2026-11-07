@@ -18,9 +18,9 @@ const width = (value: number) => ({ '--ds-w': `${value.toFixed(1)}%` }) as CSSPr
 
 /**
  * "What you'd pay at API prices": everything the accounts used in the period,
- * priced at each provider's pay-as-you-go rates, in total and per account,
- * each bar the account's share of that total. The plan's price stays beside
- * it as context, not as a score.
+ * priced at each provider's pay-as-you-go rates, in total and per account.
+ * Each account's bar fills towards its plan's price and turns the accent
+ * once the usage is worth what the plan costs.
  */
 export function UsageValue({ query }: { query: UsageQuery }) {
   const { t } = useTranslation();
@@ -53,6 +53,10 @@ export function UsageValue({ query }: { query: UsageQuery }) {
       <div className="flex flex-col gap-1 border-t border-border-default pt-4">
         {plans.map((row) => {
           const mark = accountMark(row.account);
+          // How far the usage has gone towards paying for the plan: grey on
+          // the way, the accent once it is worth the plan's price.
+          const progress = row.ratio === null ? null : Math.round(row.ratio * 100);
+          const paidOff = progress !== null && progress >= 100;
           return (
             <div key={row.account.id} className="flex flex-col gap-2 py-2.5">
               <div className="flex items-center gap-2.5">
@@ -62,15 +66,18 @@ export function UsageValue({ query }: { query: UsageQuery }) {
                   <span className="ds-muted"> · {row.account.displayName}</span>
                 </span>
                 <span className="ds-text-label whitespace-nowrap">
-                  <span className="ds-label-strong">
-                    {row.api > 0 ? formatMoney(row.api, locale) : t('accounts.value.noUsage')}
-                  </span>
+                  <span className="ds-label-strong">{formatMoney(row.api, locale)}</span>
                   {row.paid > 0 && (
                     <span className="ds-muted">
                       {' '}
                       {t('accounts.value.ofPlan', { value: formatMoney(row.paid, locale) })}
                     </span>
                   )}
+                </span>
+                <span
+                  className={`ds-text-label w-12 text-right ${paidOff ? 'ds-t-up' : 'ds-muted'}`}
+                >
+                  {progress === null ? '—' : `${progress}%`}
                 </span>
               </div>
               <div
@@ -79,12 +86,14 @@ export function UsageValue({ query }: { query: UsageQuery }) {
                 aria-label={t('accounts.value.bar', {
                   name: accountTitle(row.account),
                   value: formatMoney(row.api, locale),
+                  percent: progress ?? 0,
                 })}
               >
                 <div className="ds-share">
                   <div
                     className="ds-share__fill"
-                    style={width(api > 0 ? (row.api / api) * 100 : 0)}
+                    data-under={paidOff ? undefined : ''}
+                    style={width(Math.min(progress ?? 0, 100))}
                   />
                 </div>
               </div>

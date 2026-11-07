@@ -176,9 +176,8 @@
     "sub": "Todo lo que han usado tus cuentas, a las tarifas de pago por uso de cada proveedor",
     "plans_one": "Tus planes cuestan {{value}} por este día",
     "plans_other": "Tus planes cuestan {{value}} por estos {{count}} días",
-    "ofPlan": "· plan {{value}}",
-    "noUsage": "Sin uso",
-    "bar": "{{name}}: {{value}} a precios de API, como parte del total"
+    "ofPlan": "de {{value}}",
+    "bar": "{{name}}: {{value}} a precios de API, el {{percent}} % del precio del plan"
   },
   "status": {
     "active": "Activa",

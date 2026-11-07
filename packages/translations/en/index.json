@@ -445,9 +445,8 @@
       "sub": "Everything your accounts used, priced at each provider's pay-as-you-go rates",
       "plans_one": "Your plans cost {{value}} for this day",
       "plans_other": "Your plans cost {{value}} for these {{count}} days",
-      "ofPlan": "· plan {{value}}",
-      "noUsage": "No usage",
-      "bar": "{{name}}: {{value}} at API prices, as a share of the total"
+      "ofPlan": "of {{value}}",
+      "bar": "{{name}}: {{value}} at API prices, {{percent}}% of the plan's price"
     },
     "status": {
       "active": "Active",
