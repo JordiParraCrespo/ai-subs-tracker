@@ -2,6 +2,7 @@ import { cn, Kbd } from '@flama/design-system-web';
 import { PanelLeft, Search } from '@flama/design-system-web/icons';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { BrandGlyph } from '../../theme';
 import { useAuthorizedNav } from '../hooks/use-authorized-nav';
 import { UserMenu } from './user-menu';
 
@@ -38,7 +39,8 @@ export function AppSidebar({
     >
       <div className={cn('flex items-center justify-between', !collapsed && 'pl-3')}>
         {!collapsed && (
-          <span className="text-base leading-none font-bold tracking-tighter">
+          <span className="flex items-center gap-2.5 text-base leading-none font-bold tracking-tighter">
+            <BrandGlyph aria-hidden />
             {t('common.appName')}
           </span>
         )}
