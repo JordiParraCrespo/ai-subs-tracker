@@ -270,17 +270,17 @@
   "accounts": {
     "attention": {
       "title": "Requiere atención",
-      "toSave": "{{value}}/mes por ahorrar",
+      "toSave": "{{value}} sin usar el mes pasado",
       "empty": "Nada requiere tu atención ahora.",
       "detail": "Queda {{left}} · se renueva {{reset}}",
       "signinTitle": "Vuelve a iniciar sesión en {{name}}",
       "signinEnd": "sin sincronizar",
       "expiringTitle": "Usa {{name}} antes de que se renueve",
-      "expiringEnd": "en riesgo",
-      "behindTitle": "{{name}} va por debajo del ritmo",
-      "behindEnd": "sin usar",
+      "expiringEnd": "quedan antes de renovar",
+      "behindTitle": "{{name}} se está usando poco",
+      "behindEnd": "quedan esta semana",
       "limitTitle": "{{name}} está en su límite",
-      "limitEnd": "queda",
+      "limitEnd": "quedan esta semana",
       "showAll": "Ver las {{count}}",
       "showLess": "Ver menos"
     },
@@ -332,16 +332,15 @@
         "afternoon": "Buenas tardes, {{name}}",
         "evening": "Buenas noches, {{name}}"
       },
-      "sub": "Así va tu gasto en IA",
-      "past12": "Últimos 12 meses",
-      "subscriptions": "Suscripciones",
-      "savings": "Ahorro posible",
-      "perMonth": "{{value}}/mes",
+      "sub": "Lo que cuestan tus planes de IA y cuánto los aprovechas",
+      "past12": "en 12 meses",
+      "subscriptions": "Siguiendo",
+      "savings": "Sin usar el mes pasado",
       "accountCount_one": "{{count}} cuenta",
       "accountCount_other": "{{count}} cuentas",
       "monthlySpend": "Gasto mensual",
-      "runRate": "Gasto anual",
-      "valuePerDollar": "Valor por dólar"
+      "runRate": "Coste anual",
+      "valuePerDollar": "Valor API por cada 1 $"
     },
     "remove": {
       "confirm": "Quitar",
@@ -349,11 +348,11 @@
       "title": "¿Quitar {{name}}?"
     },
     "resets": {
-      "title": "Próximas",
+      "title": "Próximas renovaciones semanales",
       "viewAll": "Ver todas",
       "when": "Se renueva {{when}}",
       "leftLabel": "queda",
-      "empty": "Aún no se ha informado de ninguna renovación semanal.",
+      "empty": "Aún no se conoce ninguna renovación semanal.",
       "left": "Queda {{left}}"
     },
     "settings": {
@@ -449,8 +448,8 @@
       "paid": "Pagaste en planes",
       "api": "El mismo uso vía API",
       "saved": "Ahorrado",
-      "over": "Pagado de más",
-      "multiple": "Valor por dólar",
+      "over": "Pagado de más frente a la API",
+      "multiple": "Valor API por cada 1 $",
       "chart": "Coste equivalente en API",
       "legendPaid": "Pagado",
       "legendApi": "A precios de API",
@@ -462,7 +461,7 @@
       "review": "Revisar",
       "limit": "En el límite",
       "signin": "Vuelve a entrar",
-      "stale": "Desfasada"
+      "stale": "Desactualizada"
     },
     "toolbar": {
       "search": "Buscar cuentas",
@@ -487,9 +486,9 @@
       "sub": "Todas las sesiones de este proveedor y cómo se reparte la semana entre ellas",
       "pickNext": "Elige la siguiente",
       "used": "{{used}} usado",
-      "headroom": "{{left}} de margen esta semana · se renueva {{reset}}",
+      "headroom": "Queda {{left}} esta semana · se renueva {{reset}}",
       "weeklyTitle": "Límite semanal usado, esta semana",
-      "busiest": "La más usada: {{name}} al {{used}} · media {{average}}",
+      "busiest": "Más usada: {{name}} al {{used}} · media {{average}}",
       "weeklyHint": "La marca de cada barra es la media. Intenta mantener cada cuenta cerca de ella.",
       "next": "Siguiente",
       "resets": "Se renueva {{at}}",
@@ -518,8 +517,8 @@
       "allTools": "Todas las herramientas",
       "goal": {
         "expiring": "Úsalo o piérdelo",
-        "headroom": "Más margen",
-        "value": "Más $ sin usar",
+        "headroom": "Más disponible",
+        "value": "Más dinero sin usar",
         "pace": "Ritmo más seguro"
       },
       "min": {

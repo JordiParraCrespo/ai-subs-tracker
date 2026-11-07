@@ -51,7 +51,10 @@ export function UsageValue({ query }: { query: UsageQuery }) {
       value: formatMoney(Math.abs(saved), locale),
       tone: saved >= 0 ? 'ds-t-up' : 'ds-t-down',
     },
-    { label: t('accounts.value.multiple'), value: paid > 0 ? `${(api / paid).toFixed(1)}×` : '—' },
+    {
+      label: t('accounts.value.multiple'),
+      value: paid > 0 ? formatMoney((api / paid) * 100, locale) : '—',
+    },
   ];
 
   return (
