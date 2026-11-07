@@ -2838,7 +2838,7 @@
           },
           "status": {
             "type": "string",
-            "enum": ["ok", "auth_expired", "no_credentials", "rate_limited", "error"]
+            "enum": ["ok", "auth_stale", "auth_expired", "no_credentials", "rate_limited", "error"]
           },
           "message": {
             "type": "string",
@@ -3304,7 +3304,14 @@
                     },
                     "status": {
                       "type": "string",
-                      "enum": ["ok", "auth_expired", "no_credentials", "rate_limited", "error"]
+                      "enum": [
+                        "ok",
+                        "auth_stale",
+                        "auth_expired",
+                        "no_credentials",
+                        "rate_limited",
+                        "error"
+                      ]
                     },
                     "message": {
                       "type": "string",

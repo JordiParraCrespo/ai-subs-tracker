@@ -23,8 +23,12 @@
 ## Rules that are not negotiable
 
 - **Never send a provider credential** anywhere but the provider that issued
-  it, and never refresh one. The sync carries identity, plan, windows and
-  token counts.
+  it, and never refresh one yourself. The sync carries identity, plan, windows
+  and token counts. The one sanctioned renewal is `renew-login.ts`: for a
+  Claude login read as `auth_stale` (lapsed but renewable), the collector runs
+  the vendor's own CLI (`claude auth status`, stdin closed, timed out, one at a
+  time per folder, backed off after a failure) so Claude Code refreshes its own
+  token — ResetOwl still never calls `oauth/token` or writes a credential file.
 - **Honest user agent**: `resetowl-desktop/<version> (<platform>)`. Never
   impersonate claude-code or codex.
 - **Never log the API token.** It lives in `token-store.ts`, encrypted with

@@ -78,4 +78,11 @@ export interface CodingAgentProvider {
   signedInAs(home: string): Promise<string | null>;
   /** The env a terminal needs to use this login; `{}` for the default login. */
   launchEnv(login: DetectedLogin): Record<string, string>;
+  /**
+   * The command the collector runs to let the vendor's own CLI renew a lapsed
+   * login of its own (Claude Code's `claude auth status`), spending no usage.
+   * ResetOwl runs it but never refreshes a token itself. Absent for a provider
+   * whose CLI has no verified usage-free refresh (Codex today).
+   */
+  refreshCommand?(login: DetectedLogin): LoginCommand;
 }

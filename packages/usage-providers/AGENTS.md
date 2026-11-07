@@ -26,9 +26,14 @@ src/
 ## Rules
 
 - **Read-only.** Never write to a provider's home, never touch its config.
-- **Never refresh a token.** Refresh tokens rotate; refreshing here would sign
-  the person's own CLI out. An expired login is `auth_expired` with a message
-  telling them to run `claude` / `codex` once.
+- **Never refresh a token here.** This package is pure and read-only: it never
+  calls `oauth/token`, and refresh tokens rotate, so doing so would sign the
+  person's own CLI out. It only *reads* the stored login and decides whether a
+  lapsed access token is renewable (a refresh token that has not itself
+  expired): a renewable one is `auth_stale`, a signed-out one `auth_expired`.
+  Renewing a renewable login is the desktop collector's job, and it does it by
+  running the vendor's own CLI (`claude auth status`) — described here by
+  `refreshCommand`, run there — so the vendor's CLI refreshes its own token.
 - **Credentials go only to the provider that issued them**: the Claude token to
   `api.anthropic.com`, the Codex token to `chatgpt.com`. Never into a
   `SyncAccount`, a log line or an error message.
@@ -36,9 +41,10 @@ src/
   impersonate Claude Code or Codex, and send none of their client headers
   (`originator`, `OpenAI-Beta`, …).
 - **`read` never throws** for a provider failure: map it to the snapshot
-  status (`ok`, `auth_expired`, `no_credentials`, `rate_limited` on 429,
-  `error`) with a short human message. `fetchLimits: false` makes no request
-  and returns `snapshot: null` with identity and tokens.
+  status (`ok`, `auth_stale` when a lapsed token is renewable, `auth_expired`
+  when it is not, `no_credentials`, `rate_limited` on 429, `error`) with a
+  short human message. `fetchLimits: false` makes no request and returns
+  `snapshot: null` with identity and tokens.
 - **externalId**: the provider's account id; else `email:<lowercased email>`;
   else `home:<first 16 hex of sha256(home)>`.
 - **The default login's `launchEnv` is `{}`.** Setting `CLAUDE_CONFIG_DIR` even

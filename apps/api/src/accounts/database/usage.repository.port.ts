@@ -19,6 +19,12 @@ export interface UsageRepositoryPort {
   /** Replaces what `device` reported for each day it sends. */
   replaceDailyTokens(accountId: string, device: string, rows: DailyTokens[]): Promise<void>;
   latestSnapshots(accountIds: string[]): Promise<Map<string, UsageSnapshot>>;
+  /**
+   * The most recent snapshot per account that actually carried limit windows,
+   * so a later reading that lost them (a login gone stale) can keep showing the
+   * last good one instead of empty bars.
+   */
+  latestWindowedSnapshots(accountIds: string[]): Promise<Map<string, UsageSnapshot>>;
   /** Weekly windows that reset between `since` and `now`, with their peak. */
   weeklyPeaks(accountIds: string[], since: Date, now: Date): Promise<Map<string, WeeklyPeak[]>>;
   dailyTokens(accountIds: string[], sinceDay: string): Promise<AccountDailyTokens[]>;

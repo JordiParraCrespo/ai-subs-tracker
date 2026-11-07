@@ -56,6 +56,21 @@ export class UsageRepository implements UsageRepositoryPort {
     return latest;
   }
 
+  async latestWindowedSnapshots(accountIds: string[]): Promise<Map<string, UsageSnapshot>> {
+    const latest = new Map<string, UsageSnapshot>();
+    if (accountIds.length === 0) return latest;
+    const records = await this.snapshots
+      .createQueryBuilder('s')
+      .distinctOn(['s.accountId'])
+      .where({ accountId: In(accountIds) })
+      .andWhere(`jsonb_array_length(s.windows) > 0`)
+      .orderBy('s.accountId')
+      .addOrderBy('s.capturedAt', 'DESC')
+      .getMany();
+    for (const record of records) latest.set(record.accountId, this.mapper.toSnapshot(record));
+    return latest;
+  }
+
   async weeklyPeaks(
     accountIds: string[],
     since: Date,

@@ -248,7 +248,7 @@ export type ExtraUsageResponseDto = {
 export type UsageSnapshotResponseDto = {
     capturedAt: string;
     source: 'poll' | 'live' | 'manual' | 'unofficial';
-    status: 'ok' | 'auth_expired' | 'no_credentials' | 'rate_limited' | 'error';
+    status: 'ok' | 'auth_stale' | 'auth_expired' | 'no_credentials' | 'rate_limited' | 'error';
     message: string | null;
     windows: Array<LimitWindowResponseDto>;
     extraUsage: ExtraUsageResponseDto | null;
@@ -419,7 +419,7 @@ export type SyncAccountsRequest = {
         snapshot: {
             capturedAt: string;
             source: 'poll' | 'live' | 'manual' | 'unofficial';
-            status: 'ok' | 'auth_expired' | 'no_credentials' | 'rate_limited' | 'error';
+            status: 'ok' | 'auth_stale' | 'auth_expired' | 'no_credentials' | 'rate_limited' | 'error';
             message: string | null;
             windows: Array<{
                 key: string;

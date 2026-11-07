@@ -228,6 +228,24 @@ export class AccountMapper implements Mapper<AccountEntity, AccountOrmEntity, Ac
     };
   }
 
+  /**
+   * A stale-but-renewable reading kept readable: the latest snapshot's status
+   * and message, with the windows from the last reading that had them, minus
+   * any whose reset has already passed. Returns `latest` unchanged when it
+   * already carries windows or there is nothing good to carry forward.
+   */
+  carryStaleWindows(
+    latest: UsageSnapshot,
+    previous: UsageSnapshot | undefined,
+    now: Date,
+  ): UsageSnapshot {
+    if (latest.windows.length > 0 || !previous) return latest;
+    const windows = previous.windows.filter(
+      (window) => window.resetsAt === null || new Date(window.resetsAt).getTime() > now.getTime(),
+    );
+    return windows.length > 0 ? { ...latest, windows } : latest;
+  }
+
   toDailyRecord(accountId: string, device: string, row: DailyTokens): TokenUsageDailyOrmEntity {
     const record = new TokenUsageDailyOrmEntity();
     record.accountId = accountId;

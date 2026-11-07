@@ -6,6 +6,7 @@ import { DESKTOP_CHANNELS, type LiveFeedTarget } from '@flama/shared/desktop';
 import { syncAccountsSchema } from '@flama/shared/schemas/accounts';
 import { LOCAL_PROVIDER_IDS, type LocalProviderId } from '@flama/shared/subscriptions';
 import {
+  type DetectedLogin,
   getProvider,
   nodeProviderEnv,
   type ProviderEnv,
@@ -27,8 +28,9 @@ import {
   statuslineScript,
   uninstallLiveFeed,
 } from './live-feed';
-import { buildSyncInput, readLocalAccounts, sinceDayFor } from './local-logins';
+import { buildSyncInput, type LocalAccount, readLocalAccounts, sinceDayFor } from './local-logins';
 import { pointerTargets, readPointer, writePointer } from './pointers';
+import { runRefresh } from './renew-login';
 import {
   installShellIntegration,
   migrateShellIntegration,
@@ -179,8 +181,57 @@ async function main(): Promise<void> {
     return out;
   };
 
+  // The CLI the collector runs to refresh a lapsed login needs the login
+  // shell's PATH, the same as "Add account"; it is looked up once and reused.
+  let cliPath: Promise<string | undefined> | null = null;
+  const cliEnv = async () => {
+    if (!cliPath) cliPath = loginShellPath(process.env.SHELL, process.env.PATH);
+    return { ...process.env, PATH: await cliPath };
+  };
+
+  /**
+   * Lets a provider's own CLI renew a login read as `auth_stale`. ResetOwl
+   * never refreshes a token itself; `claude auth status` does, as a side
+   * effect, spending no usage. Returns the login read again, or null when the
+   * CLI could not run (the stale reading stays, and the collector backs off).
+   */
+  async function renewLogin(login: DetectedLogin, sinceDay: string): Promise<LocalAccount | null> {
+    const provider = getProvider(login.provider);
+    const cmd = provider?.refreshCommand?.(login);
+    if (!provider || !cmd) return null;
+    const env = providerEnv();
+    const outcome = await runRefresh(cmd, { env: await cliEnv(), log });
+    if (outcome === 'renewed') {
+      return { login, account: await provider.read(login, env, { sinceDay, fetchLimits: true }) };
+    }
+    if (outcome === 'signed_out') {
+      // The CLI reports the login gone: keep identity and token counts, but
+      // mark it auth_expired so the screens ask the person to sign in again.
+      const account = await provider.read(login, env, { sinceDay, fetchLimits: false });
+      const run = cmd.env.CLAUDE_CONFIG_DIR
+        ? `CLAUDE_CONFIG_DIR=${cmd.env.CLAUDE_CONFIG_DIR} ${cmd.command}`
+        : cmd.command;
+      return {
+        login,
+        account: {
+          ...account,
+          snapshot: {
+            capturedAt: new Date().toISOString(),
+            source: 'poll',
+            status: 'auth_expired',
+            message: `The ${provider.displayName} login was signed out. Run \`${run}\` to sign in again.`,
+            windows: [],
+            extraUsage: null,
+          },
+        },
+      };
+    }
+    return null;
+  }
+
   const collector = new Collector({
     read: (opts) => readLocalAccounts(providerEnv(), opts),
+    renew: renewLogin,
     readPointers,
     async applyActive(server, local) {
       const targets = pointerTargets(
