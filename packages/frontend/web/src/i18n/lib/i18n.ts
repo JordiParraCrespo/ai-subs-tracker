@@ -36,13 +36,21 @@ const lazyCatalogs: BackendModule = {
  * which can miss a supported language further down the system's list (set to
  * Catalan, then Spanish, it reads as English); the app hands over the whole
  * list instead. Absent in a browser.
+ *
+ * Each tag is reduced to the supported language it names (`es-ES` → `es`),
+ * in the system's order: i18next ranks a mixed list by exact matches first,
+ * so a bare regional tag here would lose to the `en` of `<html lang>`.
  */
+function systemLanguages(): string[] | undefined {
+  const supported: readonly string[] = locales;
+  const languages = (desktopBridge?.systemLocales ?? [])
+    .map((tag) => tag.trim().toLowerCase().split(/[-_]/)[0] ?? '')
+    .filter((language) => supported.includes(language));
+  return languages.length > 0 ? [...new Set(languages)] : undefined;
+}
+
 const languageDetector = new LanguageDetector();
-languageDetector.addDetector({
-  name: 'desktop',
-  lookup: () =>
-    desktopBridge?.systemLocales.length ? [...desktopBridge.systemLocales] : undefined,
-});
+languageDetector.addDetector({ name: 'desktop', lookup: systemLanguages });
 
 // The desktop app's own text (the tray) follows whatever the screens show.
 i18n.on('languageChanged', () => {
