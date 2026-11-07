@@ -14,16 +14,20 @@ const ICON = { className: 'size-4', strokeWidth: 1.5 } as const;
 
 /**
  * The design's month calendar: each plan on the day it bills, the month's
- * total, and Previous / Today / Next. The month lives in the URL.
+ * total, and Previous / Today / Next. The month lives in the URL. A day of
+ * the month is itself a button, under its plans, that adds one on that day.
  */
 export function RenewalsCalendar({
   month: requested,
   onMonth,
   onOpen,
+  onDay,
 }: {
   month?: string;
   onMonth: (month: string | undefined) => void;
   onOpen: (account: AccountEntity) => void;
+  /** A day of the month clicked: put a plan on it, or add one. */
+  onDay: (date: Date) => void;
 }) {
   const { t } = useTranslation();
   const locale = useLocale();
@@ -39,6 +43,7 @@ export function RenewalsCalendar({
     new Date(year, month, 1),
   );
   const weekday = dateFormatter(locale, { weekday: 'short' });
+  const dayName = dateFormatter(locale, { day: 'numeric', month: 'long' });
   // 2024-01-01 was a Monday: seven days from it name the columns in this locale.
   const weekdays = Array.from({ length: 7 }, (_, i) => weekday.format(new Date(2024, 0, 1 + i)));
 
@@ -83,6 +88,14 @@ export function RenewalsCalendar({
             className="ds-cal__cell"
             data-out={cell.inMonth ? undefined : ''}
           >
+            {cell.inMonth && (
+              <button
+                type="button"
+                className="ds-cal__add"
+                aria-label={t('accounts.renewals.addOn', { date: dayName.format(cell.date) })}
+                onClick={() => onDay(cell.date)}
+              />
+            )}
             {cell.inMonth &&
               (sameDay(cell.date, now) ? (
                 <span className="ds-cal__today">{cell.date.getDate()}</span>

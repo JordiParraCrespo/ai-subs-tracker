@@ -635,7 +635,14 @@
       "reportedDay": "Día según {{provider}}",
       "reportedDayChecked": "Día según {{provider}} · {{date}}",
       "reportedDayHint": "El día de cobro que indica tu sesión de {{provider}}. {{provider}} comprobó la suscripción por última vez el {{date}}.",
-      "setDay": "Poner día"
+      "setDay": "Poner día",
+      "addOn": "Añadir una suscripción el {{date}}",
+      "day": {
+        "title": "Se renueva el {{date}}",
+        "description": "Pon en este día un plan que aún no tiene día de renovación, o añade una suscripción nueva que se cobre ese día.",
+        "put": "Poner aquí",
+        "add": "Añadir una suscripción nueva"
+      }
     },
     "firstRun": {
       "sub": "Aún no hay nada",
