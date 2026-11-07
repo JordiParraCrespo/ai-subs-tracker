@@ -52,7 +52,7 @@ export function UsageValue({ query }: { query: UsageQuery }) {
             {money(api)}
             <span className="ds-muted"> {t('accounts.value.ofPaid', { paid: money(paid) })}</span>
           </span>
-          <span className={`ds-label-strong ${left <= 0 && paid > 0 ? 'ds-t-up' : 'ds-muted'}`}>
+          <span className={`ds-label-strong ${left <= 0 && paid > 0 ? 'ds-paid-off' : 'ds-muted'}`}>
             {left > 0
               ? t('accounts.value.leftTotal', { amount: money(left) })
               : t('accounts.value.extraTotal', { amount: money(-left) })}
@@ -64,7 +64,11 @@ export function UsageValue({ query }: { query: UsageQuery }) {
           aria-label={t('accounts.value.total', { percent: Math.round(overall) })}
         >
           <div
-            className={left <= 0 ? 'ds-meter__fill' : 'ds-meter__fill ds-meter__fill--accent'}
+            className={
+              left <= 0
+                ? 'ds-meter__fill ds-meter__fill--paid-off'
+                : 'ds-meter__fill ds-meter__fill--accent'
+            }
             style={width(overall)}
           />
         </div>
@@ -96,7 +100,7 @@ export function UsageValue({ query }: { query: UsageQuery }) {
                     ? money(row.api)
                     : t('accounts.value.usedOf', { used: money(row.api), paid: money(row.paid) })}
                 </span>
-                <span className={`ds-label-strong w-12 text-right ${paidOff ? 'ds-t-up' : ''}`}>
+                <span className={`ds-label-strong w-12 text-right ${paidOff ? 'ds-paid-off' : ''}`}>
                   {percent === null ? '—' : `${percent}%`}
                 </span>
               </div>
@@ -106,11 +110,15 @@ export function UsageValue({ query }: { query: UsageQuery }) {
                 aria-label={t('accounts.value.bar', { name, percent: percent ?? 0 })}
               >
                 <div
-                  className={paidOff ? 'ds-meter__fill' : 'ds-meter__fill ds-meter__fill--accent'}
+                  className={
+                    paidOff
+                      ? 'ds-meter__fill ds-meter__fill--paid-off'
+                      : 'ds-meter__fill ds-meter__fill--accent'
+                  }
                   style={width(Math.min(row.ratio ?? 0, 1) * 100)}
                 />
               </div>
-              <span className={`ds-cell-sub ${paidOff ? 'ds-t-up' : ''}`}>{note}</span>
+              <span className={`ds-cell-sub ${paidOff ? 'ds-paid-off' : ''}`}>{note}</span>
             </div>
           );
         })}
