@@ -112,9 +112,8 @@
 .ds-in-use{display:inline-flex;align-items:center;gap:6px;font:var(--ds-type-label-strong);color:var(--ds-positive)}
 .ds-legend-used{width:10px;height:10px;border-radius:3px;background:var(--ds-accent)}
 .ds-legend-pace{width:2px;height:12px;border-radius:1px;background:var(--ds-text)}
-/* Usage: a plan that has earned back its price, and the share bar. */
-.ds-meter__fill--paid-off{background:var(--ds-paid-off)}
-.ds-paid-off{color:var(--ds-paid-off)}
+/* Usage: the plans' grey progress bars, and the share bar. */
+.ds-meter__fill--neutral{background:var(--ds-text-muted)}
 .ds-share{flex:1;height:6px;border-radius:999px;background:var(--ds-fill);overflow:hidden}
 .ds-share__fill{height:100%;border-radius:999px;background:var(--ds-accent);width:var(--ds-w,0%)}
 /* A bare <input> drawn as the design's text field (`.ds-input`), for forms that register() the element itself. */
