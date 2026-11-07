@@ -128,6 +128,17 @@ describe('AccountEntity', () => {
     expect(entity.displayName).toBe('Work');
   });
 
+  it('belongs to its owner until someone else is named, and back again', () => {
+    const entity = account();
+    expect(entity.person).toBeNull();
+    entity.edit({ person: 'Ana' });
+    expect(entity.person).toBe('Ana');
+    entity.edit({ label: 'Work' });
+    expect(entity.person).toBe('Ana');
+    entity.edit({ person: null });
+    expect(entity.person).toBeNull();
+  });
+
   it('is no longer active once archived', () => {
     const entity = account();
     entity.activate(new Date());

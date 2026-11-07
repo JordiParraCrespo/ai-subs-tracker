@@ -90,6 +90,13 @@ export class AccountResponseDto {
   @ApiProperty({ type: String, nullable: true })
   label!: string | null;
 
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    description: 'Who uses the account, as the owner names them; null is the owner',
+  })
+  person!: string | null;
+
   @ApiProperty({ type: String, nullable: true })
   email!: string | null;
 

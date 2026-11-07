@@ -78,17 +78,29 @@ test('usage shows tokens by model at API prices', async ({ page }) => {
   await api.dispose();
 });
 
-test('people groups the plans by the identity that holds them', async ({ page }) => {
+test('people are humans, each holding the accounts named for them', async ({ page }) => {
   const { user, api } = await provisionedUser('people');
   await syncTwoAccounts(api);
   await signInAs(page, user);
 
   await page.goto('/people');
   await expect(page.getByRole('heading', { name: 'People', level: 1 })).toBeVisible();
-  // Two logins, two identities, and a row opens to the plan it holds.
-  await expect(page.getByText('Showing 2 of 2 people')).toBeVisible();
-  await page.getByText('work@example.com', { exact: true }).click();
+  // Two logins with two emails, and nobody else named: one person, the owner.
+  await expect(page.getByText('Showing 1 of 1 people')).toBeVisible();
+  await page.getByText('You · 2 accounts').click();
+  await expect(page.getByText('work@example.com', { exact: true })).toBeVisible();
+  await expect(page.getByText('home@example.com', { exact: true })).toBeVisible();
   await expect(page.getByText('Claude Code · Ultra')).toBeVisible();
+
+  // Giving one account to someone else makes them a person of their own.
+  await page.getByRole('button', { name: 'Edit', exact: true }).first().click();
+  await page.getByLabel('Used by').fill('Ana');
+  await page.getByRole('button', { name: 'Save' }).click();
+
+  await reloadFromServer(page);
+  await page.goto('/people');
+  await expect(page.getByText('Showing 2 of 2 people')).toBeVisible();
+  await expect(page.getByText('Ana', { exact: true })).toBeVisible();
 
   await api.dispose();
 });

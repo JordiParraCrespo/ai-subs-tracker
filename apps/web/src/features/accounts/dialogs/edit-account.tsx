@@ -9,15 +9,16 @@ import {
   toast,
 } from '@flama/design-system-web';
 import type { AccountEntity } from '@flama/frontend-consumer';
-import { useUpdateAccount } from '@flama/frontend-consumer/react';
+import { useAccounts, useUpdateAccount } from '@flama/frontend-consumer/react';
 import { useErrorMessage } from '@flama/frontend-web';
 import type { EditAccountFormValues } from '@flama/shared/schemas/accounts';
 import { useTranslation } from 'react-i18next';
 import { EditAccountForm } from '../forms/edit-account-form';
+import { namedPeople } from '../lib/people';
 
 const FORM = 'edit-account';
 
-/** Renames an account and sets the plan, price and billing day it really has; owns the save. */
+/** Renames an account, says who uses it, and sets the plan, price and billing day it really has; owns the save. */
 export function EditAccountDialog({
   account,
   onClose,
@@ -27,6 +28,7 @@ export function EditAccountDialog({
 }) {
   const { t } = useTranslation();
   const resolveError = useErrorMessage();
+  const { data: accounts = [] } = useAccounts();
   const update = useUpdateAccount({
     onSuccess: () => {
       toast.success(t('toasts.accountSaved'));
@@ -39,6 +41,7 @@ export function EditAccountDialog({
       id: account.id,
       input: {
         label: values.label === '' ? null : values.label,
+        person: values.person === '' ? null : values.person,
         planId: values.planId === '' ? null : values.planId,
         monthlyPriceCents: values.price === '' ? null : Math.round(Number(values.price) * 100),
         renewalDay: values.renewalDay === '' ? null : Number(values.renewalDay),
@@ -61,7 +64,13 @@ export function EditAccountDialog({
             </AlertDescription>
           </Alert>
         )}
-        <EditAccountForm id={FORM} account={account} isPending={update.isPending} onSubmit={save} />
+        <EditAccountForm
+          id={FORM}
+          account={account}
+          people={namedPeople(accounts)}
+          isPending={update.isPending}
+          onSubmit={save}
+        />
       </DsModalBody>
       <DsModalFooter>
         <DsButton variant="ghost" size="sm" onClick={onClose}>
