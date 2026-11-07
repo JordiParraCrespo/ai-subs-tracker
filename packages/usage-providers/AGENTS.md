@@ -13,12 +13,13 @@ Node: no Electron, no React, nothing from `apps/*`.
 ```
 src/
 ├── types.ts           # ProviderEnv, DetectedLogin, LoginCommand, ReadOptions, CodingAgentProvider
-├── registry.ts        # PROVIDERS (claude-code, then codex); duplicate ids throw
+├── registry.ts        # PROVIDERS (claude-code, codex, grok); duplicate ids throw
 ├── collect.ts         # collectAll: detect + read + de-dupe by provider and externalId
 ├── env.ts             # nodeProviderEnv: the real machine
 ├── lib/util.ts        # fs/JSONL helpers, local days, externalId, snapshot builder, token buckets
 ├── claude-code/       # credentials, usage-api (+ statusline), local-logs, the provider
 ├── codex/             # auth (JWT claims), usage-api (wham), sessions (tokens + offline limits), the provider
+├── grok/              # auth (GROK_HOME/auth.json), billing (the CLI chat proxy's usage view), the provider
 ├── zai/               # quota: the opt-in unofficial reader for Z.AI / BigModel Coding Plans (not a provider)
 └── __tests__/         # vitest; fake homes in os.tmpdir(), fake fetch and keychain
 ```
@@ -35,11 +36,15 @@ src/
   running the vendor's own CLI (`claude auth status`) — described here by
   `refreshCommand`, run there — so the vendor's CLI refreshes its own token.
 - **Credentials go only to the provider that issued them**: the Claude token to
-  `api.anthropic.com`, the Codex token to `chatgpt.com`. Never into a
+  `api.anthropic.com`, the Codex token to `chatgpt.com`, the Grok session to
+  `cli-chat-proxy.grok.com`. Never into a
   `SyncAccount`, a log line or an error message.
 - **Honest User-Agent**: `env.userAgent` (e.g. `resetowl-desktop/0.1.0`). Never
-  impersonate Claude Code or Codex, and send none of their client headers
-  (`originator`, `OpenAI-Beta`, …).
+  impersonate Claude Code, Codex or Grok Build, and send none of their client
+  headers (`originator`, `OpenAI-Beta`, `x-grok-client-*`, …). The one header
+  that names a vendor's CLI is Grok's `X-XAI-Token-Auth: xai-grok-cli`: Grok
+  Build's own docs require it to call its chat proxy with an `auth.json`
+  session, and it says what kind of token the bearer is, not who is calling.
 - **`read` never throws** for a provider failure: map it to the snapshot
   status (`ok`, `auth_stale` when a lapsed token is renewable, `auth_expired`
   when it is not, `no_credentials`, `rate_limited` on 429, `error`) with a

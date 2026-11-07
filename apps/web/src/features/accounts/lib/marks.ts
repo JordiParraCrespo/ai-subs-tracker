@@ -4,12 +4,13 @@ import { PROVIDER_NAMES } from './providers';
 /**
  * How an account is drawn in the design's rows: a two-letter mark on the
  * provider's colour (the design gives Claude plans the brand purple and
- * Codex the neutral disc), "Provider · Plan" as its title, and who it is
+ * Codex the neutral disc; Grok Build a near-black one), "Provider · Plan" as its title, and who it is
  * under it.
  */
 export const PROVIDER_COLORS = {
   'claude-code': '#7764d8',
   codex: '#404040',
+  grok: '#1f1f1f',
   zai: '#2f6fde',
   bigmodel: '#3f51b5',
 } as const satisfies Record<AccountEntity['provider'], string>;
@@ -19,11 +20,13 @@ export function accountMark(account: AccountEntity): { initials: string; color: 
   const initials =
     account.provider === 'codex'
       ? 'CX'
-      : account.provider === 'zai'
-        ? `Z${(plan[0] ?? 'L').toUpperCase()}`
-        : account.provider === 'bigmodel'
-          ? `B${(plan[0] ?? 'L').toUpperCase()}`
-          : `C${(plan[0] ?? 'L').toUpperCase()}`;
+      : account.provider === 'grok'
+        ? `G${(plan[0] ?? 'F').toUpperCase()}`
+        : account.provider === 'zai'
+          ? `Z${(plan[0] ?? 'L').toUpperCase()}`
+          : account.provider === 'bigmodel'
+            ? `B${(plan[0] ?? 'L').toUpperCase()}`
+            : `C${(plan[0] ?? 'L').toUpperCase()}`;
   return { initials, color: PROVIDER_COLORS[account.provider] };
 }
 

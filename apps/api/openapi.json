@@ -2884,7 +2884,7 @@
           },
           "provider": {
             "type": "string",
-            "enum": ["claude-code", "codex", "zai", "bigmodel"]
+            "enum": ["claude-code", "codex", "grok", "zai", "bigmodel"]
           },
           "externalId": {
             "type": "string"
@@ -3263,7 +3263,7 @@
               "properties": {
                 "provider": {
                   "type": "string",
-                  "enum": ["claude-code", "codex"]
+                  "enum": ["claude-code", "codex", "grok"]
                 },
                 "externalId": {
                   "type": "string",
