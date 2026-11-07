@@ -57,7 +57,7 @@ export function OverviewHeadline() {
             },
             {
               label: t('accounts.overview.savings'),
-              value: t('accounts.overview.perMonth', { value: formatMoney(wasted, locale) }),
+              value: formatMoney(wasted, locale),
               tone: 'positive',
             },
           ]}

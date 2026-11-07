@@ -336,7 +336,6 @@
       "past12": "en 12 meses",
       "subscriptions": "Siguiendo",
       "savings": "Sin usar el mes pasado",
-      "perMonth": "{{value}}/mes",
       "accountCount_one": "{{count}} cuenta",
       "accountCount_other": "{{count}} cuentas",
       "monthlySpend": "Gasto mensual",
