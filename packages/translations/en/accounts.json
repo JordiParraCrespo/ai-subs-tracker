@@ -49,8 +49,8 @@
   "models": {
     "input": "Input",
     "output": "Output",
-    "cost": "Cost",
-    "share": "Share of spend"
+    "cost": "API value",
+    "share": "% of total"
   },
   "overview": {
     "greeting": {
@@ -170,18 +170,21 @@
     "noMatch": "No usage matches these filters."
   },
   "value": {
-    "title": "What you'd pay at API prices",
-    "sub": "Plan usage priced at each provider's pay-as-you-go rates",
+    "title": "Are your plans paying off?",
+    "sub": "Your usage priced at API rates, against what the plans cost for these days",
     "paid": "You paid for plans",
-    "api": "Same usage via API",
-    "saved": "Saved",
-    "over": "Paid over API",
-    "multiple": "Value per dollar",
-    "chart": "API-equivalent cost",
-    "legendPaid": "Paid",
-    "legendApi": "At API prices",
-    "noUsage": "No usage",
-    "bar": "Paid against API value for {{name}}"
+    "api": "Your usage at API prices",
+    "saved": "Extra value",
+    "unused": "Not used yet",
+    "perDollar": "Value per $1 paid",
+    "chart": "API value, adding up",
+    "usedOf": "{{used}} of {{paid}}",
+    "left": "{{amount}} left to get your money's worth",
+    "paidOff": "Paid off · {{amount}} extra",
+    "noUsage": "Not used yet",
+    "noPrice": "No price set",
+    "percentUsed": "{{percent}}% used",
+    "bar": "{{name}}: {{percent}}% of what you paid used"
   },
   "status": {
     "active": "Active",

@@ -112,14 +112,7 @@
 .ds-in-use{display:inline-flex;align-items:center;gap:6px;font:var(--ds-type-label-strong);color:var(--ds-positive)}
 .ds-legend-used{width:10px;height:10px;border-radius:3px;background:var(--ds-accent)}
 .ds-legend-pace{width:2px;height:12px;border-radius:1px;background:var(--ds-text)}
-/* Usage: paid against API value on one track, the legend swatches, the share bar. */
-.ds-vbar{position:relative;height:8px;border-radius:999px;background:var(--ds-fill);overflow:hidden}
-.ds-vbar__api,.ds-vbar__paid{position:absolute;left:0;top:0;bottom:0;border-radius:999px;width:var(--ds-w,0%)}
-.ds-vbar__api{background:var(--ds-text-faint)}
-.ds-vbar__paid{background:var(--ds-accent)}
-.ds-vbar__paid[data-over]{background:var(--ds-negative)}
-.ds-swatch{width:10px;height:10px;border-radius:3px;background:var(--ds-accent)}
-.ds-swatch[data-faint]{background:var(--ds-text-faint)}
+/* Usage: the share bar. */
 .ds-share{flex:1;height:6px;border-radius:999px;background:var(--ds-fill);overflow:hidden}
 .ds-share__fill{height:100%;border-radius:999px;background:var(--ds-accent);width:var(--ds-w,0%)}
 /* A bare <input> drawn as the design's text field (`.ds-input`), for forms that register() the element itself. */

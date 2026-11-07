@@ -49,8 +49,8 @@
   "models": {
     "input": "Entrada",
     "output": "Salida",
-    "cost": "Coste",
-    "share": "Parte del gasto"
+    "cost": "Valor en API",
+    "share": "% del total"
   },
   "overview": {
     "greeting": {
@@ -170,18 +170,21 @@
     "noMatch": "Ningún uso coincide con estos filtros."
   },
   "value": {
-    "title": "Lo que pagarías a precios de API",
-    "sub": "El uso de los planes a las tarifas de pago por uso de cada proveedor",
+    "title": "¿Te salen a cuenta los planes?",
+    "sub": "Tu uso a precios de API, frente a lo que cuestan los planes en estos días",
     "paid": "Pagaste en planes",
-    "api": "El mismo uso vía API",
-    "saved": "Ahorrado",
-    "over": "Pagado de más",
-    "multiple": "Valor por dólar",
-    "chart": "Coste equivalente en API",
-    "legendPaid": "Pagado",
-    "legendApi": "A precios de API",
-    "noUsage": "Sin uso",
-    "bar": "Pagado frente a valor de API de {{name}}"
+    "api": "Tu uso a precios de API",
+    "saved": "Valor extra",
+    "unused": "Sin usar todavía",
+    "perDollar": "Valor por cada $1 pagado",
+    "chart": "Valor en API, acumulado",
+    "usedOf": "{{used}} de {{paid}}",
+    "left": "Te quedan {{amount}} para amortizarlo",
+    "paidOff": "Amortizado · {{amount}} extra",
+    "noUsage": "Sin usar todavía",
+    "noPrice": "Sin precio",
+    "percentUsed": "{{percent}}% usado",
+    "bar": "{{name}}: {{percent}}% de lo pagado usado"
   },
   "status": {
     "active": "Activa",
