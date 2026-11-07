@@ -10,6 +10,7 @@ import {
   filterUsage,
   type GroupRow,
   groupUsage,
+  listedAccounts,
   modelLabels,
   USAGE_GROUPS,
   type UsageGroup,
@@ -35,8 +36,10 @@ export function UsageBreakdown({
   const group = query.group ?? 'model';
   const byId = new Map(accounts.map((account) => [account.id, account]));
   const labels = usage.data ? modelLabels(usage.data) : new Map<string, string>();
-  const filtered = filterUsage(usage.data?.rows ?? [], byId, labels, filtersOf(query));
-  const rows = groupUsage(filtered, byId, labels, group);
+  const filters = filtersOf(query);
+  const filtered = filterUsage(usage.data?.rows ?? [], byId, labels, filters);
+  const listed = usage.data ? listedAccounts(accounts, filters) : [];
+  const rows = groupUsage(filtered, byId, labels, group, listed);
   const total = rows.reduce((sum, row) => sum + row.cost, 0);
   const top = rows[0]?.cost || 1;
   const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
