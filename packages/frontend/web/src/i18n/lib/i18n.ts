@@ -4,6 +4,7 @@ import { defaultLocale, defaultNS, locales } from '@flama/translations/locales';
 import i18n, { type BackendModule } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
+import { desktopBridge } from '../../platform';
 
 /** localStorage key used to persist the user's language choice. */
 export const LOCALE_STORAGE_KEY = 'flama-locale';
@@ -30,6 +31,34 @@ const lazyCatalogs: BackendModule = {
 };
 
 /**
+ * Inside the desktop app, the operating system's preferred languages, best
+ * first. Electron's `navigator` carries the one locale Chromium settled on,
+ * which can miss a supported language further down the system's list (set to
+ * Catalan, then Spanish, it reads as English); the app hands over the whole
+ * list instead. Absent in a browser.
+ *
+ * Each tag is reduced to the supported language it names (`es-ES` → `es`),
+ * in the system's order: i18next ranks a mixed list by exact matches first,
+ * so a bare regional tag here would lose to the `en` of `<html lang>`.
+ */
+function systemLanguages(): string[] | undefined {
+  const supported: readonly string[] = locales;
+  const languages = (desktopBridge?.systemLocales ?? [])
+    .map((tag) => tag.trim().toLowerCase().split(/[-_]/)[0] ?? '')
+    .filter((language) => supported.includes(language));
+  return languages.length > 0 ? [...new Set(languages)] : undefined;
+}
+
+const languageDetector = new LanguageDetector();
+languageDetector.addDetector({ name: 'desktop', lookup: systemLanguages });
+
+// The desktop app's own text (the tray) follows whatever the screens show.
+i18n.on('languageChanged', () => {
+  const shown = i18n.resolvedLanguage;
+  if (desktopBridge && shown) void desktopBridge.setLocale(shown).catch(() => {});
+});
+
+/**
  * Resolves once the reader's own catalog is in memory.
  *
  * `main.tsx` renders behind it. For the default locale it settles without a
@@ -37,7 +66,7 @@ const lazyCatalogs: BackendModule = {
  * a Spanish reader seeing a frame of English before the catalog lands.
  */
 export const i18nReady = i18n
-  .use(LanguageDetector)
+  .use(languageDetector)
   .use(lazyCatalogs)
   .use(initReactI18next)
   .init({
@@ -53,12 +82,13 @@ export const i18nReady = i18n
       // React already escapes values, so i18next must not double-escape.
       escapeValue: false,
     },
-    // Read the device's own choice first, but never write what was merely
+    // Read the device's own choice first, then (in the desktop app) the
+    // system's languages, but never write what was merely
     // detected: a cached browser language looked like a choice, so the
     // account's saved language never applied on a new device
     // (`useApplyUserSettings`). A choice is stored by `chooseLocale`.
     detection: {
-      order: ['localStorage', 'navigator', 'htmlTag'],
+      order: ['localStorage', 'desktop', 'navigator', 'htmlTag'],
       caches: [],
       lookupLocalStorage: LOCALE_STORAGE_KEY,
     },

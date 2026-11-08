@@ -1,6 +1,7 @@
 import type { LocalProviderId } from '@flama/shared/subscriptions';
 import { claudeCodeProvider } from './claude-code';
 import { codexProvider } from './codex';
+import { grokProvider } from './grok';
 import type { CodingAgentProvider } from './types';
 
 /** A provider list, refusing two providers with one id. */
@@ -19,6 +20,7 @@ export function defineProviders(
 export const PROVIDERS: readonly CodingAgentProvider[] = defineProviders([
   claudeCodeProvider,
   codexProvider,
+  grokProvider,
 ]);
 
 export function getProvider(id: LocalProviderId): CodingAgentProvider | undefined {

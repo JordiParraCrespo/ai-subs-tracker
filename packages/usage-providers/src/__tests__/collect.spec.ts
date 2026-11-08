@@ -11,8 +11,8 @@ import { fakeFetch, NOW, SINCE, tempHome, testEnv, writeJson } from './helpers';
 const opts = { sinceDay: SINCE, fetchLimits: true };
 
 describe('registry', () => {
-  it('lists Claude Code first, then Codex', () => {
-    expect(PROVIDERS.map((p) => p.id)).toEqual(['claude-code', 'codex']);
+  it('lists Claude Code first, then Codex, then Grok Build', () => {
+    expect(PROVIDERS.map((p) => p.id)).toEqual(['claude-code', 'codex', 'grok']);
   });
 
   it('refuses two providers with one id', () => {

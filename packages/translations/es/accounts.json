@@ -1,17 +1,17 @@
 {
   "attention": {
     "title": "Requiere atención",
-    "toSave": "{{value}}/mes por ahorrar",
+    "toSave": "{{value}} sin usar el mes pasado",
     "empty": "Nada requiere tu atención ahora.",
     "detail": "Queda {{left}} · se renueva {{reset}}",
     "signinTitle": "Vuelve a iniciar sesión en {{name}}",
     "signinEnd": "sin sincronizar",
     "expiringTitle": "Usa {{name}} antes de que se renueve",
-    "expiringEnd": "en riesgo",
-    "behindTitle": "{{name}} va por debajo del ritmo",
-    "behindEnd": "sin usar",
+    "expiringEnd": "quedan antes de renovar",
+    "behindTitle": "{{name}} se está usando poco",
+    "behindEnd": "quedan esta semana",
     "limitTitle": "{{name}} está en su límite",
-    "limitEnd": "queda",
+    "limitEnd": "quedan esta semana",
     "showAll": "Ver las {{count}}",
     "showLess": "Ver menos"
   },
@@ -54,8 +54,8 @@
   "models": {
     "input": "Entrada",
     "output": "Salida",
-    "cost": "Coste",
-    "share": "Parte del gasto"
+    "cost": "Valor en API",
+    "share": "% del total"
   },
   "overview": {
     "greeting": {
@@ -63,16 +63,15 @@
       "afternoon": "Buenas tardes, {{name}}",
       "evening": "Buenas noches, {{name}}"
     },
-    "sub": "Así va tu gasto en IA",
-    "past12": "Últimos 12 meses",
-    "subscriptions": "Suscripciones",
-    "savings": "Ahorro posible",
-    "perMonth": "{{value}}/mes",
+    "sub": "Lo que cuestan tus planes de IA y cuánto los aprovechas",
+    "past12": "en 12 meses",
+    "subscriptions": "Siguiendo",
+    "savings": "Sin usar el mes pasado",
     "accountCount_one": "{{count}} cuenta",
     "accountCount_other": "{{count}} cuentas",
     "monthlySpend": "Gasto mensual",
-    "runRate": "Gasto anual",
-    "valuePerDollar": "Valor por dólar"
+    "runRate": "Coste anual",
+    "valuePerDollar": "Valor API por cada 1 $"
   },
   "remove": {
     "confirm": "Quitar",
@@ -80,11 +79,11 @@
     "title": "¿Quitar {{name}}?"
   },
   "resets": {
-    "title": "Próximas",
+    "title": "Próximas renovaciones semanales",
     "viewAll": "Ver todas",
     "when": "Se renueva {{when}}",
     "leftLabel": "queda",
-    "empty": "Aún no se ha informado de ninguna renovación semanal.",
+    "empty": "Aún no se conoce ninguna renovación semanal.",
     "left": "Queda {{left}}"
   },
   "settings": {
@@ -95,7 +94,7 @@
     "liveTaken": "Esta carpeta ya tiene su propia línea de estado.",
     "liveTitle": "Límites en directo de Claude Code",
     "liveToggle": "Límites en directo para {{home}}",
-    "shellDescription": "Hace que claude y codex en tu terminal usen la cuenta que esté activada.",
+    "shellDescription": "Hace que claude, codex y grok en tu terminal usen la cuenta que esté activada.",
     "shellInstall": "Añadir a mi shell",
     "shellInstalled": "Instalado en {{file}}",
     "shellNotInstalled": "No instalado",
@@ -142,14 +141,12 @@
       "tokens": "Tokens"
     },
     "kpi": {
-      "paid": "Pagado en planes",
-      "api": "Valor a precios de API",
       "tokens": "Tokens",
       "perMillion": "Valor por 1M de tokens"
     },
     "chart": {
-      "spend": "Valor diario a precios de API",
-      "tokens": "Tokens diarios"
+      "spend": "Valor a precios de API, acumulado",
+      "tokens": "Tokens, acumulados"
     },
     "pastDays": "Últimos {{days}} días",
     "groupBy": "Agrupar por",
@@ -175,25 +172,25 @@
     "noMatch": "Ningún uso coincide con estos filtros."
   },
   "value": {
-    "title": "Lo que pagarías a precios de API",
-    "sub": "El uso de los planes a las tarifas de pago por uso de cada proveedor",
-    "paid": "Pagaste en planes",
-    "api": "El mismo uso vía API",
-    "saved": "Ahorrado",
-    "over": "Pagado de más",
-    "multiple": "Valor por dólar",
-    "chart": "Coste equivalente en API",
-    "legendPaid": "Pagado",
-    "legendApi": "A precios de API",
-    "noUsage": "Sin uso",
-    "bar": "Pagado frente a valor de API de {{name}}"
+    "title": "¿Te salen a cuenta los planes?",
+    "sub": "Lo que costaría tu uso a precios de API, frente a lo que pagaste en estos {{days}} días",
+    "ofPaid": "usados de {{paid}}",
+    "leftTotal": "{{amount}} sin usar todavía",
+    "extraTotal": "{{amount}} más de lo que pagaste",
+    "total": "{{percent}}% de lo pagado usado",
+    "usedOf": "{{used}} de {{paid}}",
+    "left": "Te quedan {{amount}} para amortizarlo",
+    "paidOff": "Amortizado · {{amount}} extra",
+    "noUsage": "Sin usar todavía",
+    "noPrice": "Sin precio",
+    "bar": "{{name}}: {{percent}}% de lo pagado usado"
   },
   "status": {
     "active": "Activa",
     "review": "Revisar",
     "limit": "En el límite",
     "signin": "Vuelve a entrar",
-    "stale": "Desfasada"
+    "stale": "Desactualizada"
   },
   "toolbar": {
     "search": "Buscar cuentas",
@@ -218,9 +215,9 @@
     "sub": "Todas las sesiones de este proveedor y cómo se reparte la semana entre ellas",
     "pickNext": "Elige la siguiente",
     "used": "{{used}} usado",
-    "headroom": "{{left}} de margen esta semana · se renueva {{reset}}",
+    "headroom": "Queda {{left}} esta semana · se renueva {{reset}}",
     "weeklyTitle": "Límite semanal usado, esta semana",
-    "busiest": "La más usada: {{name}} al {{used}} · media {{average}}",
+    "busiest": "Más usada: {{name}} al {{used}} · media {{average}}",
     "weeklyHint": "La marca de cada barra es la media. Intenta mantener cada cuenta cerca de ella.",
     "next": "Siguiente",
     "resets": "Se renueva {{at}}",
@@ -249,8 +246,8 @@
     "allTools": "Todas las herramientas",
     "goal": {
       "expiring": "Úsalo o piérdelo",
-      "headroom": "Más margen",
-      "value": "Más $ sin usar",
+      "headroom": "Más disponible",
+      "value": "Más dinero sin usar",
       "pace": "Ritmo más seguro"
     },
     "min": {
@@ -383,7 +380,7 @@
     },
     "subscriptions": {
       "title": "Aún no hay suscripciones",
-      "text": "Añade las herramientas de IA que paga tu equipo. Claude Code y Codex inician sesión en el navegador."
+      "text": "Añade las herramientas de IA que paga tu equipo. Claude Code, Codex y Grok Build inician sesión en el navegador."
     },
     "people": {
       "title": "Aún no hay nadie",
@@ -408,6 +405,7 @@
     "how": {
       "claude-code": "Inicia sesión en claude.com",
       "codex": "Inicia sesión con un código en openai.com",
+      "grok": "Inicia sesión con un código en x.ai",
       "zai": "Añádelo a mano: plan, precio y día de cobro",
       "bigmodel": "China continental. Añádelo a mano, como Z.AI"
     },
@@ -452,9 +450,22 @@
       "copyLink": "Copiar enlace",
       "linkCopied": "Enlace copiado"
     },
+    "grok": {
+      "title": "Introduce este código en xAI",
+      "description": "Abre la página, inicia sesión con la cuenta de X o Grok que quieres añadir y confirma el código. Grok Build puede abrir la página en tu navegador por sí solo.",
+      "waiting": "Esperando la aprobación en accounts.x.ai",
+      "expires": "El código caduca en unos minutos",
+      "copyCode": "Copiar código",
+      "openPage": "Abrir página",
+      "preparing": "Pidiendo un código a xAI…",
+      "otherTitle": "¿Has iniciado sesión con otra cuenta?",
+      "otherText": "Copia el enlace y ábrelo en una ventana privada, para iniciar sesión con la cuenta que quieres añadir y que la que usas ahora siga con la sesión iniciada.",
+      "copyLink": "Copiar enlace",
+      "linkCopied": "Enlace copiado"
+    },
     "desktop": {
       "title": "Añádela desde la app de escritorio",
-      "description": "Claude Code y Codex inician sesión en tu ordenador.",
+      "description": "Claude Code, Codex y Grok Build inician sesión en tu ordenador.",
       "text": "La app de escritorio de ResetOwl inicia la sesión y lee el plan, así nada de tu inicio de sesión llega a una pestaña del navegador. Abre la app y elige Añadir suscripción."
     },
     "back": "Atrás",

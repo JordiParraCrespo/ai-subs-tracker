@@ -1,17 +1,17 @@
 {
   "attention": {
     "title": "Needs attention",
-    "toSave": "{{value}}/mo to save",
+    "toSave": "{{value}} went unused last month",
     "empty": "Nothing needs you right now.",
     "detail": "{{left}} left · resets {{reset}}",
     "signinTitle": "Sign in again to {{name}}",
     "signinEnd": "not syncing",
     "expiringTitle": "Use {{name}} before it resets",
-    "expiringEnd": "at risk",
-    "behindTitle": "{{name}} is behind pace",
-    "behindEnd": "unused so far",
+    "expiringEnd": "left before reset",
+    "behindTitle": "{{name}} is underused",
+    "behindEnd": "left this week",
     "limitTitle": "{{name}} is at its limit",
-    "limitEnd": "left",
+    "limitEnd": "left this week",
     "showAll": "Show all {{count}}",
     "showLess": "Show less"
   },
@@ -54,8 +54,8 @@
   "models": {
     "input": "Input",
     "output": "Output",
-    "cost": "Cost",
-    "share": "Share of spend"
+    "cost": "API value",
+    "share": "% of total"
   },
   "overview": {
     "greeting": {
@@ -63,16 +63,15 @@
       "afternoon": "Good afternoon, {{name}}",
       "evening": "Good evening, {{name}}"
     },
-    "sub": "Here’s where your AI spend stands",
-    "past12": "Past 12 months",
-    "subscriptions": "Subscriptions",
-    "savings": "Potential savings",
-    "perMonth": "{{value}}/mo",
+    "sub": "What your AI plans cost, and how much of them you use",
+    "past12": "over 12 months",
+    "subscriptions": "Tracking",
+    "savings": "Unused last month",
     "accountCount_one": "{{count}} account",
     "accountCount_other": "{{count}} accounts",
     "monthlySpend": "Monthly spend",
-    "runRate": "Annual run rate",
-    "valuePerDollar": "Value per dollar"
+    "runRate": "Yearly cost",
+    "valuePerDollar": "API value per $1 paid"
   },
   "remove": {
     "confirm": "Remove",
@@ -80,11 +79,11 @@
     "title": "Remove {{name}}?"
   },
   "resets": {
-    "title": "Next up",
+    "title": "Upcoming weekly resets",
     "viewAll": "View all",
     "when": "Resets {{when}}",
     "leftLabel": "left",
-    "empty": "No weekly resets reported yet.",
+    "empty": "No weekly resets known yet.",
     "left": "{{left}} left"
   },
   "settings": {
@@ -95,7 +94,7 @@
     "liveTaken": "This folder already has a status line of its own.",
     "liveTitle": "Live limits from Claude Code",
     "liveToggle": "Live limits for {{home}}",
-    "shellDescription": "Makes claude and codex in your terminal use whichever account is switched on.",
+    "shellDescription": "Makes claude, codex and grok in your terminal use whichever account is switched on.",
     "shellInstall": "Add to my shell",
     "shellInstalled": "Installed in {{file}}",
     "shellNotInstalled": "Not installed",
@@ -142,14 +141,12 @@
       "tokens": "Tokens"
     },
     "kpi": {
-      "paid": "Paid for plans",
-      "api": "Value at API prices",
       "tokens": "Tokens",
       "perMillion": "Value per 1M tokens"
     },
     "chart": {
-      "spend": "Daily value at API prices",
-      "tokens": "Daily tokens"
+      "spend": "Value at API prices, adding up",
+      "tokens": "Tokens, adding up"
     },
     "pastDays": "Past {{days}} days",
     "groupBy": "Group by",
@@ -175,25 +172,25 @@
     "noMatch": "No usage matches these filters."
   },
   "value": {
-    "title": "What you'd pay at API prices",
-    "sub": "Plan usage priced at each provider's pay-as-you-go rates",
-    "paid": "You paid for plans",
-    "api": "Same usage via API",
-    "saved": "Saved",
-    "over": "Paid over API",
-    "multiple": "Value per dollar",
-    "chart": "API-equivalent cost",
-    "legendPaid": "Paid",
-    "legendApi": "At API prices",
-    "noUsage": "No usage",
-    "bar": "Paid against API value for {{name}}"
+    "title": "Are your plans paying off?",
+    "sub": "What your usage would cost at API prices, against what you paid for these {{days}} days",
+    "ofPaid": "of {{paid}} used",
+    "leftTotal": "{{amount}} not used yet",
+    "extraTotal": "{{amount}} more than you paid",
+    "total": "{{percent}}% of what you paid used",
+    "usedOf": "{{used}} of {{paid}}",
+    "left": "{{amount}} left to get your money's worth",
+    "paidOff": "Paid off · {{amount}} extra",
+    "noUsage": "Not used yet",
+    "noPrice": "No price set",
+    "bar": "{{name}}: {{percent}}% of what you paid used"
   },
   "status": {
     "active": "Active",
     "review": "Needs review",
     "limit": "At limit",
     "signin": "Sign in again",
-    "stale": "Stale"
+    "stale": "Out of date"
   },
   "toolbar": {
     "search": "Search accounts",
@@ -218,9 +215,9 @@
     "sub": "Every login of this provider, and how evenly the week is spread across them",
     "pickNext": "Pick next",
     "used": "{{used}} used",
-    "headroom": "{{left}} headroom this week · resets {{reset}}",
+    "headroom": "{{left}} left this week · resets {{reset}}",
     "weeklyTitle": "Weekly limit used, this week",
-    "busiest": "Busiest {{name}} at {{used}} · average {{average}}",
+    "busiest": "Busiest: {{name}} at {{used}} · average {{average}}",
     "weeklyHint": "The marker on each bar is the average. Aim to keep every account near it.",
     "next": "Next",
     "resets": "Resets {{at}}",
@@ -249,8 +246,8 @@
     "allTools": "All tools",
     "goal": {
       "expiring": "Use it or lose it",
-      "headroom": "Most headroom",
-      "value": "Most $ unused",
+      "headroom": "Most left",
+      "value": "Most money unused",
       "pace": "Safest pace"
     },
     "min": {
@@ -285,7 +282,7 @@
     "stats": {
       "risk": "Capacity at risk",
       "riskSub": "Projected to expire unused",
-      "util": "Average utilization",
+      "util": "Average use",
       "utilSub_one": "Across {{count}} account",
       "utilSub_other": "Across {{count}} accounts",
       "limit": "Accounts at limit",
@@ -383,7 +380,7 @@
     },
     "subscriptions": {
       "title": "No subscriptions yet",
-      "text": "Add the AI tools your team pays for. Claude Code and Codex sign in through the browser."
+      "text": "Add the AI tools your team pays for. Claude Code, Codex and Grok Build sign in through the browser."
     },
     "people": {
       "title": "No one here yet",
@@ -408,6 +405,7 @@
     "how": {
       "claude-code": "Sign in through claude.com",
       "codex": "Sign in with a code at openai.com",
+      "grok": "Sign in with a code at x.ai",
       "zai": "Add it by hand: plan, price and billing day",
       "bigmodel": "Mainland China. Add it by hand, like Z.AI"
     },
@@ -452,9 +450,22 @@
       "copyLink": "Copy link",
       "linkCopied": "Link copied"
     },
+    "grok": {
+      "title": "Enter this code at xAI",
+      "description": "Open the page, sign in with the X or Grok account you want to add and confirm the code. Grok Build may open the page in your browser by itself.",
+      "waiting": "Waiting for approval at accounts.x.ai",
+      "expires": "The code expires in a few minutes",
+      "copyCode": "Copy code",
+      "openPage": "Open page",
+      "preparing": "Asking xAI for a code…",
+      "otherTitle": "Signed in to a different account?",
+      "otherText": "Copy the link and open it in a private window, so you sign in as the account you want to add and the one you use now stays signed in.",
+      "copyLink": "Copy link",
+      "linkCopied": "Link copied"
+    },
     "desktop": {
       "title": "Add it from the desktop app",
-      "description": "Claude Code and Codex sign in on your computer.",
+      "description": "Claude Code, Codex and Grok Build sign in on your computer.",
       "text": "ResetOwl’s desktop app runs the sign-in and reads the plan from it, so nothing from your login ever reaches a browser tab. Open the app and choose Add subscription there."
     },
     "back": "Back",

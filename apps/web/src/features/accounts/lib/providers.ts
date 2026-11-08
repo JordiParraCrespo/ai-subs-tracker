@@ -4,6 +4,7 @@ import { type ProviderId, unofficialUsageReader } from '@flama/shared/subscripti
 export const PROVIDER_NAMES: Record<ProviderId, string> = {
   'claude-code': 'Claude Code',
   codex: 'Codex',
+  grok: 'Grok Build',
   zai: 'Z.AI',
   bigmodel: 'BigModel',
 };
@@ -16,11 +17,18 @@ export const PROVIDER_NAMES: Record<ProviderId, string> = {
 export const PROVIDER_VENDORS: Record<ProviderId, string> = {
   'claude-code': 'Anthropic',
   codex: 'OpenAI',
+  grok: 'xAI',
   zai: 'Z.AI',
   bigmodel: 'BigModel',
 };
 
-export const PROVIDER_ORDER: readonly ProviderId[] = ['claude-code', 'codex', 'zai', 'bigmodel'];
+export const PROVIDER_ORDER: readonly ProviderId[] = [
+  'claude-code',
+  'codex',
+  'grok',
+  'zai',
+  'bigmodel',
+];
 
 /**
  * Where the vendor shows a hand-tracked plan's usage to a person: Z.AI's

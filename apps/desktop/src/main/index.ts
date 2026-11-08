@@ -29,6 +29,7 @@ import {
   uninstallLiveFeed,
 } from './live-feed';
 import { buildSyncInput, type LocalAccount, readLocalAccounts, sinceDayFor } from './local-logins';
+import { resolveLocale } from './locale';
 import { pointerTargets, readPointer, writePointer } from './pointers';
 import { runRefresh } from './renew-login';
 import {
@@ -288,8 +289,19 @@ async function main(): Promise<void> {
     win.focus();
   };
 
+  // The system's languages, best first. Linux builds of Electron may list
+  // none; the locale Chromium chose (from LANG) stands in for them there.
+  const preferred = app.getPreferredSystemLanguages();
+  const systemLocales = preferred.length > 0 ? preferred : [app.getLocale()];
+  let shownLocale = resolveLocale(systemLocales);
+
   const openWindow = () => {
-    const created = createMainWindow(config, join(__dirname, 'preload.js'), iconPath);
+    const created = createMainWindow(
+      config,
+      join(__dirname, 'preload.js'),
+      iconPath,
+      systemLocales,
+    );
     created.on('close', (event) => {
       if (!quitting && tray && config.mode === 'app') {
         event.preventDefault();
@@ -371,6 +383,12 @@ async function main(): Promise<void> {
         return liveTargets();
       },
       openExternal: (url) => shell.openExternal(url),
+      setLocale(locale) {
+        if (config.mode === 'smoke') log(`screens show: ${locale}`);
+        if (locale === shownLocale) return;
+        shownLocale = locale;
+        tray?.setLocale(locale);
+      },
     },
     {
       rendererOrigin: config.rendererOrigin,
@@ -379,7 +397,9 @@ async function main(): Promise<void> {
   );
 
   if (config.mode === 'smoke') {
-    runSmoke(openWindow());
+    // The app's window, so its IPC is answered as it is in the app.
+    win = openWindow();
+    runSmoke(win);
     return;
   }
 
@@ -399,6 +419,7 @@ async function main(): Promise<void> {
   try {
     tray = createTray({
       assetsDir,
+      locale: shownLocale,
       onRefresh: () => void collector.refresh(),
       onOpen: showWindow,
       onQuit: () => app.quit(),

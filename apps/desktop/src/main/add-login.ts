@@ -58,8 +58,10 @@ export function stripTerminal(text: string): string {
 
 /**
  * What a login printed so far that the screens can show: the link it printed
- * (Claude's manual link, Codex's device page) and Codex's one-time code,
- * which the CLI prints on the line after the one that names it. A link
+ * (Claude's manual link, Codex's or Grok's device page) and the device code:
+ * Codex prints its one-time code on the line after the one that names it,
+ * Grok Build after "Then enter this code:" (RFC 8628 user codes, `A-Z0-9-`,
+ * on that line or the next). A link
  * counts once whitespace follows it (output arrives in chunks, so a link
  * without it may still be printing) and, with `linkHosts`, only on those hosts.
  */
@@ -71,7 +73,9 @@ export function readProgress(
   const link =
     extractUrls(text).find((url) => !linkHosts || linkHosts.includes(hostOf(url))) ?? null;
   const code =
-    text.match(/one-time code[^\n]*\r?\n\s*([A-Z0-9]{4,}(?:-[A-Z0-9]{4,})+)\s/)?.[1] ?? null;
+    text.match(/one-time code[^\n]*\r?\n\s*([A-Z0-9]{4,}(?:-[A-Z0-9]{4,})+)\s/)?.[1] ??
+    text.match(/enter this code:\s*([A-Z0-9]{4,}(?:-[A-Z0-9]{2,})*)\s/)?.[1] ??
+    null;
   return { link, code };
 }
 
