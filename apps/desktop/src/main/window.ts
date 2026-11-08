@@ -93,6 +93,7 @@ export function createMainWindow(
   config: DesktopConfig,
   preloadPath: string,
   iconPath: string,
+  systemLocales: readonly string[],
 ): BrowserWindow {
   const win = new BrowserWindow({
     width: 1280,
@@ -115,6 +116,7 @@ export function createMainWindow(
             version: config.version,
             platform: config.platform,
             apiUrl: config.apiUrl,
+            systemLocales,
           }),
         ).toString('base64')}`,
       ],

@@ -911,6 +911,18 @@
       }
     }
   },
+  "desktop": {
+    "tray": {
+      "notSynced": "Not synced yet",
+      "noRoom": "No account has room right now",
+      "noRoomTooltip": "ResetOwl: no account has room right now",
+      "useNext": "Use next: {{name}} — {{left}}% left",
+      "useNextTooltip": "ResetOwl: use {{name}} next ({{left}}% of the week left)",
+      "refresh": "Refresh now",
+      "open": "Open ResetOwl",
+      "quit": "Quit"
+    }
+  },
   "extension": {
     "chrome": {
       "extName": "Flama",

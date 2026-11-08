@@ -35,14 +35,19 @@ terminal follow the account marked active.
   | `add-login.ts` | "Add subscription": runs the provider's CLI login into a folder of its own, reports the link and code it prints, types a pasted code into it |
   | `live-feed.ts` | the opt-in Claude Code status-line feed |
   | `tray-model.ts`, `tray.ts` | "Use next: … — x% left", Refresh, Open, Quit |
+  | `locale.ts` | the tray's language: the system's at first, then whatever the screens show (`setLocale`); copy in `packages/translations/{locale}/desktop.json` |
   | `ipc.ts`, `ipc-validation.ts` | one handler per channel, arguments parsed, sender checked |
   | `index.ts` | wiring, `--collect-once`, `--smoke` |
 
 - **Preload** (`src/preload/index.ts`) — sandboxed; exposes `window.resetowl`
-  (`DesktopBridge`) and nothing else. `version`, `platform` and `apiUrl`
-  arrive as a `--resetowl-bridge=` argument.
+  (`DesktopBridge`) and nothing else. `version`, `platform`, `apiUrl` and
+  `systemLocales` (the OS's preferred languages, best first) arrive as a
+  `--resetowl-bridge=` argument.
 - **Renderer** — not in this package: the web app's static build, which finds
-  `window.resetowl` and talks to `apiUrl` with a bearer token.
+  `window.resetowl` and talks to `apiUrl` with a bearer token. Its language
+  is the one picked on this device, else the system's first supported one
+  (`systemLocales`), else English; it reports what it shows, so the tray
+  matches.
 
 ## The bridge
 
