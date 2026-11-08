@@ -401,13 +401,13 @@
   },
   "add": {
     "title": "Add subscription",
-    "description": "Pick the tool. Claude Code, Codex and Grok Build sign in through the browser; a GLM Coding Plan (Z.AI or BigModel) is added by hand.",
+    "description": "Pick the tool you subscribe to.",
     "how": {
       "claude-code": "Sign in through claude.com",
       "codex": "Sign in with a code at openai.com",
       "grok": "Sign in with a code at x.ai",
       "zai": "Add it by hand: plan, price and billing day",
-      "bigmodel": "Sold in mainland China. Add it by hand: plan, price and billing day"
+      "bigmodel": "Mainland China. Add it by hand, like Z.AI"
     },
     "claude": {
       "title": "Finish signing in to Claude",

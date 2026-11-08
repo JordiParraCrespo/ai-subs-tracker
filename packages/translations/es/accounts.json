@@ -401,13 +401,13 @@
   },
   "add": {
     "title": "Añadir suscripción",
-    "description": "Elige la herramienta. Claude Code, Codex y Grok Build inician sesión en el navegador; un GLM Coding Plan (Z.AI o BigModel) se añade a mano.",
+    "description": "Elige la herramienta que tienes contratada.",
     "how": {
       "claude-code": "Inicia sesión en claude.com",
       "codex": "Inicia sesión con un código en openai.com",
       "grok": "Inicia sesión con un código en x.ai",
       "zai": "Añádelo a mano: plan, precio y día de cobro",
-      "bigmodel": "Se vende en China continental. Añádelo a mano: plan, precio y día de cobro"
+      "bigmodel": "China continental. Añádelo a mano, como Z.AI"
     },
     "claude": {
       "title": "Termina de iniciar sesión en Claude",
