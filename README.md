@@ -2,8 +2,8 @@
 
 Use up the AI coding plans you pay for.
 
-ResetOwl is a desktop app for people who run several personal **Claude Code**
-and **Codex** subscriptions, and can track a **GLM Coding Plan** (Z.AI or BigModel) beside them. It finds the logins on your computer, shows how
+ResetOwl is a desktop app for people who run several personal **Claude Code**,
+**Codex** and **Grok Build** subscriptions, and can track a **GLM Coding Plan** (Z.AI or BigModel) beside them. It finds the logins on your computer, shows how
 much of each plan's 5-hour and weekly allowance is left, and tells you which
 account to use next so nothing you paid for expires unused ("tokenmaxxing").
 It also prices your usage at API rates, so you can see what each plan is worth.
@@ -36,18 +36,20 @@ The screens follow the designs in [`designs/`](designs/).
 - **Plans and limits.** For each login the collector reads the plan and asks
   the provider for its limit windows: Claude Code's OAuth usage endpoint, and
   Codex's ChatGPT usage endpoint, falling back to the rate limits Codex writes
-  in its session logs. It sends an honest `resetowl-desktop/<version>` client
+  in its session logs, and the weekly pool from Grok Build's billing view
+  (`~/.grok/auth.json`, `cli-chat-proxy.grok.com`). It sends an honest `resetowl-desktop/<version>` client
   name. Every 10 minutes, with back-off, and a 15-minute pause after a 429.
 - **Tokens.** Counted from the CLIs' own transcripts (`~/.claude/projects`,
-  `~/.codex/sessions`), per model and day, and priced with
+  `~/.codex/sessions`), per model and day (Grok Build's session logs carry no
+  token counts, so its logins report limits only), and priced with
   `packages/shared/src/subscriptions/model-prices.ts`.
 - **Plans** are data in `packages/shared/src/subscriptions/plans.ts`, with the
   names providers used before (Max 20x is now **Ultra**). You can override an
   account's plan and price in the app.
 - **Switching is a toggle.** Marking an account "in use" writes
-  `~/.resetowl/active/<provider>`. The opt-in shell snippet makes `claude` and
-  `codex` in your terminal follow it. **Add subscription** signs a new login into its
-  own folder with the provider's CLI (`claude auth login`, `codex login --device-auth`).
+  `~/.resetowl/active/<provider>`. The opt-in shell snippet makes `claude`,
+  `codex` and `grok` in your terminal follow it. **Add subscription** signs a new login into its
+  own folder with the provider's CLI (`claude auth login`, `codex login --device-auth`, `grok login --device-auth`).
 
 - **GLM Coding Plans (Z.AI, and BigModel in mainland China) are tracked by
   hand.** Neither vendor documents a usage API (Z.AI's usage page is
@@ -90,7 +92,7 @@ Built on the [Flama](https://github.com/JordiParraCrespo/flama-ai) boilerplate
 | `apps/web` | The screens (Vite + TanStack Router). One build serves the desktop app and, later, the web |
 | `apps/site` | The website (Astro): the home page and SEO guides on Claude Code and Codex plans, limits and prices, in English and Spanish |
 | `apps/api` | NestJS API (Domain-Driven Hexagon): auth, and the `accounts` module |
-| `packages/usage-providers` | One `CodingAgentProvider` interface; Claude Code and Codex readers; the opt-in Z.AI / BigModel quota reader |
+| `packages/usage-providers` | One `CodingAgentProvider` interface; Claude Code, Codex and Grok Build readers; the opt-in Z.AI / BigModel quota reader |
 | `packages/shared` | Wire contracts (`schemas/accounts`), plan catalog, model prices, Tokenmaxx ranking, desktop bridge types |
 | `packages/frontend/*` | Kernel, the consumer product package (accounts, profile), web kit, design system |
 | `packages/backend/*` | The API's toolkit |

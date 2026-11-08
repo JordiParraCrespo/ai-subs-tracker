@@ -32,7 +32,7 @@ export function RenewalsCalendar({
   const { t } = useTranslation();
   const locale = useLocale();
   const now = new Date(useNow(3_600_000));
-  const { data: accounts = [] } = useAccounts();
+  const { data: accounts = [], isPending } = useAccounts();
   const { year, month } = parseMonth(requested, now);
   const cells = monthGrid(year, month, accounts);
   const total = cells.reduce(
@@ -93,6 +93,10 @@ export function RenewalsCalendar({
                 type="button"
                 className="ds-cal__add"
                 aria-label={t('accounts.renewals.addOn', { date: dayName.format(cell.date) })}
+                // Not before the plans are in: the day dialog decides once, on
+                // open, whether a plan is waiting for a day, and an empty list
+                // would always send it to Add subscription.
+                disabled={isPending}
                 onClick={() => onDay(cell.date)}
               />
             )}

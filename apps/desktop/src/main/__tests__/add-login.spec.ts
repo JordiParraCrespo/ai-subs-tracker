@@ -348,6 +348,21 @@ describe('reading what a login printed', () => {
       code: 'K7QF-2XMB9',
     });
   });
+
+  it('takes Grok Build’s device page and the code after “enter this code:”', () => {
+    const printed = [
+      'Open this URL in your browser: https://accounts.x.ai/device?user_code=QWRT-PLKM',
+      'Then enter this code:',
+      '  QWRT-PLKM',
+      '',
+    ].join('\n');
+    expect(readProgress(printed, ['accounts.x.ai', 'auth.x.ai'])).toEqual({
+      link: 'https://accounts.x.ai/device?user_code=QWRT-PLKM',
+      code: 'QWRT-PLKM',
+    });
+    // Still printing: no whitespace after the code yet.
+    expect(readProgress('Then enter this code: QWRT-PL').code).toBeNull();
+  });
 });
 
 // "Account added" used to reach the screen before the collector had sent the

@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@flama/shared": "workspace:*",
+    "@flama/translations": "workspace:*",
     "@flama/tsconfig": "workspace:^",
     "@flama/usage-providers": "workspace:*",
     "@types/node": "^26.6.5",

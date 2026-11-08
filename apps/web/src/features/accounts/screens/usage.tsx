@@ -8,8 +8,8 @@ import { UsageToolbar } from '../sections/usage-toolbar';
 import { UsageValue } from '../sections/usage-value';
 
 /**
- * The design's Usage & tokens page: filters, the spend card, what the plans
- * returned at API prices, and the grouped table. The filters live in the URL
+ * The Usage & tokens page: filters, whether the plans are paying off, the
+ * running total, and the grouped table. The filters live in the URL
  * and every section reads them, so the screen holds only the query.
  */
 export function UsageScreen({
@@ -29,8 +29,8 @@ export function UsageScreen({
           sub={t('accounts.usage.sub', { days: query.days ?? 30 })}
         />
         <UsageToolbar query={query} onQuery={onQuery} />
-        <UsageSpend query={query} />
         <UsageValue query={query} />
+        <UsageSpend query={query} />
         <UsageBreakdown query={query} onQuery={onQuery} />
       </div>
     </FirstRun>

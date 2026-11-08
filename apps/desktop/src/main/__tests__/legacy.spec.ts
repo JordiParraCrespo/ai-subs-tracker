@@ -130,6 +130,24 @@ describe('the shell block', () => {
     expect(await readFile(rc, 'utf8')).toBe('export FOO=1\n');
   });
 
+  it('brings an older ResetOwl block up to the current snippet, and leaves a current one alone', async () => {
+    // Regression: a block installed before `grok` was added counted as
+    // installed, so terminals never got the function and Settings offered no
+    // way to add it.
+    const home = await tempDir();
+    const rc = join(home, '.bashrc');
+    const env = { home, platform: 'linux' as const, shell: '/bin/bash' };
+    const older = `${BEGIN_MARKER}\nfunction claude { command claude "$@"; }\n# <<< resetowl <<<`;
+    await writeFile(rc, `export FOO=1\n${older}\nalias ll="ls -l"\n`);
+    expect(await migrateShellIntegration(env)).toBe(true);
+    const after = await readFile(rc, 'utf8');
+    expect(after).toContain('function grok {');
+    expect(after.startsWith('export FOO=1\n# >>> resetowl >>>')).toBe(true);
+    expect(after.endsWith('# <<< resetowl <<<\nalias ll="ls -l"\n')).toBe(true);
+    expect(await migrateShellIntegration(env)).toBe(false);
+    expect(await readFile(rc, 'utf8')).toBe(after);
+  });
+
   it('counts the old block as installed until it is rewritten', async () => {
     const home = await tempDir();
     await writeFile(join(home, '.bashrc'), `${oldBlock}\n`);

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { extractUrls } from '../add-login';
 import { contentSecurityPolicy, resolveConfig } from '../config';
+import { resolveLocale, trayTranslator } from '../locale';
 import { resolveRendererFile } from '../renderer-files';
 import { createTokenStore } from '../token-store';
 import { trayModel } from '../tray-model';
@@ -78,7 +79,28 @@ describe('renderer files', () => {
   });
 });
 
+describe('locale', () => {
+  it('takes the first system language it has a catalog for', () => {
+    expect(resolveLocale(['ca-ES', 'es-ES', 'en-US'])).toBe('es');
+    expect(resolveLocale(['es_ES.UTF-8'])).toBe('es');
+    expect(resolveLocale(['en-US', 'es'])).toBe('en');
+  });
+
+  it('falls back to English when none is supported or none is given', () => {
+    expect(resolveLocale(['fr-FR', 'de'])).toBe('en');
+    expect(resolveLocale([])).toBe('en');
+  });
+});
+
 describe('tray model', () => {
+  const t = trayTranslator('en');
+
+  it('speaks the language it is given', () => {
+    const es = trayTranslator('es');
+    expect(trayModel(null, new Date(), es).headline).toBe('Aún sin sincronizar');
+    expect(es('quit')).toBe('Salir');
+  });
+
   it('names the account to use next and its weekly headroom', () => {
     const now = new Date('2026-11-02T12:00:00Z');
     const weekly = (utilization: number, hours: number) => ({
@@ -109,10 +131,15 @@ describe('tray model', () => {
         },
       ],
       now,
+      t,
     );
-    expect(model).toMatchObject({ headline: 'Use next: Home — 62% left', title: '62%' });
-    expect(trayModel(null, now).title).toBe('');
-    expect(trayModel([], now).headline).toBe('No account has room right now');
+    expect(model).toMatchObject({
+      headline: 'Use next: Home — 62% left',
+      title: '62%',
+      tooltip: 'ResetOwl: use Home next (62% of the week left)',
+    });
+    expect(trayModel(null, now, t).title).toBe('');
+    expect(trayModel([], now, t).headline).toBe('No account has room right now');
   });
 });
 

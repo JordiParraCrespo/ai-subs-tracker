@@ -209,6 +209,9 @@ importers:
       '@flama/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@flama/translations':
+        specifier: workspace:*
+        version: link:../../packages/translations
       '@flama/tsconfig':
         specifier: workspace:^
         version: link:../../packages/tsconfig

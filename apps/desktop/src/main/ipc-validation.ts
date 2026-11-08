@@ -5,6 +5,7 @@ import {
   type ManualProviderId,
   UNOFFICIAL_USAGE_READERS,
 } from '@flama/shared/subscriptions';
+import { type Locale, resolveLocale } from './locale';
 
 /**
  * Argument checks for every IPC handler: the renderer is web content, so
@@ -109,4 +110,16 @@ export function isTrustedSender(frameUrl: string | undefined, rendererOrigin: st
   } catch {
     return false;
   }
+}
+
+/** A language tag from the screens (`es`, `es-ES`), as the supported locale it names. */
+export function parseLocale(value: unknown): Locale {
+  if (
+    typeof value !== 'string' ||
+    value.length > 35 ||
+    !/^[A-Za-z]{2,8}([-_][A-Za-z0-9]{1,8})*$/.test(value)
+  ) {
+    throw new IpcArgumentError('Invalid language.');
+  }
+  return resolveLocale([value]);
 }

@@ -264,7 +264,7 @@ export type WeeklyPeakResponseDto = {
 
 export type AccountResponseDto = {
     id: string;
-    provider: 'claude-code' | 'codex' | 'zai' | 'bigmodel';
+    provider: 'claude-code' | 'codex' | 'grok' | 'zai' | 'bigmodel';
     externalId: string;
     /**
      * The person's label, else the email
@@ -410,7 +410,7 @@ export type SyncAccountsRequest = {
         platform: string;
     };
     accounts: Array<{
-        provider: 'claude-code' | 'codex';
+        provider: 'claude-code' | 'codex' | 'grok';
         externalId: string;
         email: string | null;
         organization: string | null;

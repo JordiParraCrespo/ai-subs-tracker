@@ -26,18 +26,17 @@ export function RenewalDayDialog({ date, onClose }: { date: Date; onClose: () =>
   const { t } = useTranslation();
   const locale = useLocale();
   const resolveError = useErrorMessage();
-  const { data, isError } = useAccounts();
-  const accounts = data ?? [];
-  // Decided once, when the list is first there: a sync that brings in a plan
-  // with no day must not swap a sign-in or a half-filled form for the picker.
-  // Not before it loads, or a day clicked as the page opens finds no plan
-  // waiting and is Add subscription for good. A list that failed to load has
-  // no plan to offer, so the day is Add subscription rather than nothing.
+  const { data: accounts, isError } = useAccounts();
+  // Decided once, when the accounts are first known (a day clicked before
+  // they load must not take an empty list for "no plan is waiting"): a sync
+  // that later brings in a plan with no day must not swap a sign-in or a
+  // half-filled form for the picker. A list that failed to load has no plan
+  // to offer, so the day is Add subscription rather than no dialog at all.
   const [adding, setAdding] = useState<boolean | null>(() =>
-    data ? unscheduled(data).length === 0 : null,
+    accounts ? unscheduled(accounts).length === 0 : null,
   );
-  if (adding === null && (data || isError)) {
-    setAdding(data ? unscheduled(data).length === 0 : true);
+  if (adding === null && (accounts || isError)) {
+    setAdding(accounts ? unscheduled(accounts).length === 0 : true);
   }
   const update = useUpdateAccount({
     onSuccess: () => {
@@ -46,7 +45,7 @@ export function RenewalDayDialog({ date, onClose }: { date: Date; onClose: () =>
     },
   });
   const day = date.getDate();
-  const missing = unscheduled(accounts);
+  const missing = unscheduled(accounts ?? []);
 
   if (adding === null) return null;
   if (adding) {

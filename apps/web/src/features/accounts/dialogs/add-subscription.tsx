@@ -21,7 +21,7 @@ import {
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClaudeSignIn } from '../components/claude-sign-in';
-import { CodexSignIn } from '../components/codex-sign-in';
+import { DeviceCodeSignIn } from '../components/device-code-sign-in';
 import { ProviderPickRow } from '../components/provider-pick-row';
 import { AddManualAccountForm } from '../forms/add-manual-account-form';
 import { SignInCodeForm } from '../forms/sign-in-code-form';
@@ -32,6 +32,7 @@ import { PROVIDER_NAMES, PROVIDER_ORDER } from '../lib/providers';
 const INITIALS = {
   'claude-code': 'CC',
   codex: 'CX',
+  grok: 'GB',
   zai: 'ZA',
   bigmodel: 'BM',
 } as const satisfies Record<ProviderId, string>;
@@ -47,8 +48,8 @@ type Step =
 
 /**
  * The design's Add subscription modal: pick a tool, then follow its CLI's
- * sign-in (Claude in a browser on this computer or by a pasted code, Codex by
- * a one-time code). The
+ * sign-in (Claude in a browser on this computer or by a pasted code, Codex and
+ * Grok Build by a one-time code). The
  * sign-in runs on the machine, so in a browser picking one says where to do
  * it instead. A tool with nothing to sign in to on the machine (Z.AI,
  * BigModel) is a short form instead, in the browser too: ResetOwl tracks its
@@ -135,8 +136,9 @@ export function AddSubscriptionDialog({
         />
       )}
 
-      {step.kind === 'sign-in' && step.provider === 'codex' && (
-        <CodexSignIn
+      {step.kind === 'sign-in' && (step.provider === 'codex' || step.provider === 'grok') && (
+        <DeviceCodeSignIn
+          provider={step.provider}
           code={login.progress.code}
           link={login.progress.link}
           onBack={back}

@@ -5,9 +5,9 @@ import { LEGACY_BEGIN_MARKER, LEGACY_END_MARKER } from './legacy';
 import { pointerPath } from './pointers';
 
 /**
- * Makes `claude` and `codex` in a terminal follow the account marked active
- * in ResetOwl: two shell functions that read the pointer file and, when it
- * names a home, run the CLI with `CLAUDE_CONFIG_DIR` / `CODEX_HOME` set for
+ * Makes `claude`, `codex` and `grok` in a terminal follow the account marked
+ * active in ResetOwl: shell functions that read the pointer file and, when it
+ * names a home, run the CLI with `CLAUDE_CONFIG_DIR` / `CODEX_HOME` / `GROK_HOME` set for
  * that one command. An empty pointer runs the plain CLI (the default login).
  *
  * Written to an rc file only when the person asks (`install`), inside
@@ -31,9 +31,10 @@ function psQuote(value: string): string {
 export function posixSnippet(home: string): string {
   const claude = shQuote(pointerPath(home, 'claude-code'));
   const codex = shQuote(pointerPath(home, 'codex'));
+  const grok = shQuote(pointerPath(home, 'grok'));
   return [
     BEGIN_MARKER,
-    '# Added by ResetOwl: `claude` and `codex` use the account marked active in the app.',
+    '# Added by ResetOwl: `claude`, `codex` and `grok` use the account marked active in the app.',
     '# Remove this block to undo it.',
     'function claude {',
     `  local _resetowl_home; _resetowl_home="$(cat ${claude} 2>/dev/null)"`,
@@ -49,6 +50,14 @@ export function posixSnippet(home: string): string {
     '    CODEX_HOME="$_resetowl_home" command codex "$@"',
     '  else',
     '    command codex "$@"',
+    '  fi',
+    '}',
+    'function grok {',
+    `  local _resetowl_home; _resetowl_home="$(cat ${grok} 2>/dev/null)"`,
+    '  if [ -n "$_resetowl_home" ]; then',
+    '    GROK_HOME="$_resetowl_home" command grok "$@"',
+    '  else',
+    '    command grok "$@"',
     '  fi',
     '}',
     END_MARKER,
@@ -70,9 +79,10 @@ export function powershellSnippet(home: string): string {
     ].join('\n');
   return [
     BEGIN_MARKER,
-    '# Added by ResetOwl: `claude` and `codex` use the account marked active in the app.',
+    '# Added by ResetOwl: `claude`, `codex` and `grok` use the account marked active in the app.',
     fn('claude', pointerPath(home, 'claude-code'), 'CLAUDE_CONFIG_DIR'),
     fn('codex', pointerPath(home, 'codex'), 'CODEX_HOME'),
+    fn('grok', pointerPath(home, 'grok'), 'GROK_HOME'),
     END_MARKER,
   ].join('\n');
 }
@@ -139,17 +149,21 @@ export async function shellIntegration(env: ShellEnv): Promise<ShellIntegration>
 }
 
 /**
- * Rewrites a block a Subtrack install left in the rc file into the current
- * one, so `claude` and `codex` read the moved pointers. Nothing is written
- * when there is no old block: installing stays the person's choice.
+ * Brings a block the person already installed up to the current snippet: one
+ * a Subtrack install left (so the functions read the moved pointers), or an
+ * older ResetOwl block missing a CLI added since (`grok`). Only the text
+ * between our own markers changes; nothing is written when there is no block,
+ * so installing stays the person's choice.
  */
 export async function migrateShellIntegration(env: ShellEnv): Promise<boolean> {
   const rcFile = rcFileFor(env.home, env.shell, env.platform, env.zdotdir);
   if (!rcFile) return false;
   const before = await readText(rcFile);
-  if (!before.includes(LEGACY_BEGIN_MARKER) || before.includes(BEGIN_MARKER)) return false;
+  if (findBlock(before) === null) return false;
   const snippet = env.platform === 'win32' ? powershellSnippet(env.home) : posixSnippet(env.home);
-  await writeFile(rcFile, upsertBlock(before, snippet));
+  const after = upsertBlock(before, snippet);
+  if (after === before) return false;
+  await writeFile(rcFile, after);
   return true;
 }
 

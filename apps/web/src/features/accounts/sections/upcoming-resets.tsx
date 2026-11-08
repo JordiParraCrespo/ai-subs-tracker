@@ -8,7 +8,7 @@ import { formatPercent, formatResetIn } from '../lib/format';
 import { upcomingResets } from '../lib/insights';
 import { accountTitle } from '../lib/marks';
 
-/** The design's "Next up" card: each account's next weekly reset as a date block. */
+/** The "Upcoming weekly resets" card: each account's next weekly reset as a date block. */
 export function UpcomingResets() {
   const { t } = useTranslation();
   const locale = useLocale();

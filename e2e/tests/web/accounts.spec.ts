@@ -154,20 +154,19 @@ test('a calendar day puts a plan on it, or adds a subscription that bills on it'
   await api.dispose();
 });
 
-test('a day clicked before the account list loads still offers the plan waiting for a day', async ({
+test('a day clicked before the accounts arrive still offers the plan waiting for one', async ({
   page,
 }) => {
+  // Regression: the dialog decided on an empty list while the accounts were
+  // loading, and offered Add subscription instead of the waiting plan.
   const { user, api } = await provisionedUser('renewalslow');
   await syncTwoAccounts(api);
   await signInAs(page, user);
-  // Regression: the dialog chose Add subscription from the list as it stood
-  // when the day was clicked, so a click before the list arrived found no plan
-  // waiting and stayed Add subscription. Seen when CI was loaded enough to be slow.
-  await page.evaluate(() => localStorage.clear());
-  await page.route(/\/api\/v1\/accounts(\?.*)?$/, async (route) => {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+  await page.route(/\/v1\/accounts(\?|$)/, async (route) => {
+    await new Promise((done) => setTimeout(done, 2000));
     await route.continue();
   });
+
   await page.goto('/renewals');
   await page
     .getByRole('button', { name: /^Add a subscription on / })

@@ -17,11 +17,17 @@ interface StaticInfo {
   version: string;
   platform: string;
   apiUrl: string;
+  systemLocales: string[];
 }
 
 function readStaticInfo(): StaticInfo {
   const arg = process.argv.find((a) => a.startsWith('--resetowl-bridge='));
-  const fallback: StaticInfo = { version: '0.0.0', platform: process.platform, apiUrl: '' };
+  const fallback: StaticInfo = {
+    version: '0.0.0',
+    platform: process.platform,
+    apiUrl: '',
+    systemLocales: [],
+  };
   if (!arg) return fallback;
   try {
     const parsed = JSON.parse(atob(arg.slice('--resetowl-bridge='.length))) as Partial<StaticInfo>;
@@ -29,6 +35,9 @@ function readStaticInfo(): StaticInfo {
       version: String(parsed.version ?? fallback.version),
       platform: String(parsed.platform ?? fallback.platform),
       apiUrl: String(parsed.apiUrl ?? ''),
+      systemLocales: Array.isArray(parsed.systemLocales)
+        ? parsed.systemLocales.filter((l): l is string => typeof l === 'string').slice(0, 20)
+        : [],
     };
   } catch {
     return fallback;
@@ -43,6 +52,8 @@ const bridge: DesktopBridge = {
   version: info.version,
   platform: info.platform,
   apiUrl: info.apiUrl,
+  systemLocales: Object.freeze(info.systemLocales),
+  setLocale: (locale) => invoke(DESKTOP_CHANNELS.setLocale, locale),
   auth: {
     getToken: () => invoke(DESKTOP_CHANNELS.authGetToken),
     setToken: (token) => invoke(DESKTOP_CHANNELS.authSetToken, token),

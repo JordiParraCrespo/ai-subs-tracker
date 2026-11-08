@@ -16,11 +16,13 @@ import {
   parseBoundedString,
   parseExternalUrl,
   parseHome,
+  parseLocale,
   parseLoginCode,
   parseProvider,
   parseReaderProvider,
   parseToken,
 } from './ipc-validation';
+import type { Locale } from './locale';
 
 /**
  * One `ipcMain.handle` per invoke channel of `DESKTOP_CHANNELS`, each parsing
@@ -50,6 +52,7 @@ export interface DesktopServices {
   liveFeedInstall(home: string): Promise<LiveFeedTarget[]>;
   liveFeedUninstall(home: string): Promise<LiveFeedTarget[]>;
   openExternal(url: string): Promise<void>;
+  setLocale(locale: Locale): void;
 }
 
 type Handler = (...args: unknown[]) => unknown;
@@ -83,6 +86,7 @@ export function ipcHandlers(services: DesktopServices): Record<string, Handler> 
     [DESKTOP_CHANNELS.liveFeedInstall]: (home) => services.liveFeedInstall(parseHome(home)),
     [DESKTOP_CHANNELS.liveFeedUninstall]: (home) => services.liveFeedUninstall(parseHome(home)),
     [DESKTOP_CHANNELS.openExternal]: (url) => services.openExternal(parseExternalUrl(url)),
+    [DESKTOP_CHANNELS.setLocale]: (locale) => services.setLocale(parseLocale(locale)),
   };
 }
 

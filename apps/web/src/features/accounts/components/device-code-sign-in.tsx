@@ -5,17 +5,19 @@ import { useTranslation } from 'react-i18next';
 import { WaitingCard } from './waiting-card';
 
 /**
- * Codex's sign-in step: the one-time code the CLI printed, to enter on
- * OpenAI's device page, and a wait for the approval to land. The page's link
- * can be copied into a private window, so the account the browser is signed
- * in to now is not the one added again.
+ * A device-code sign-in step (Codex, Grok Build): the code the CLI printed, to
+ * enter on the vendor's device page, and a wait for the approval to land. The
+ * page's link can be copied into a private window, so the account the browser
+ * is signed in to now is not the one added again.
  */
-export function CodexSignIn({
+export function DeviceCodeSignIn({
+  provider,
   code,
   link,
   onBack,
   onOpen,
 }: {
+  provider: 'codex' | 'grok';
   code: string | null;
   link: string | null;
   onBack: () => void;
@@ -29,8 +31,8 @@ export function CodexSignIn({
     <>
       <DsModalHeader
         closeLabel={t('common.close')}
-        title={t('accounts.add.codex.title')}
-        description={t('accounts.add.codex.description')}
+        title={t(`accounts.add.${provider}.title`)}
+        description={t(`accounts.add.${provider}.description`)}
       />
       <DsModalBody className="ds-modal__body--flow">
         {code ? (
@@ -41,7 +43,7 @@ export function CodexSignIn({
             <button
               type="button"
               className="ds-icon-btn ds-icon-btn--ghost"
-              aria-label={t('accounts.add.codex.copyCode')}
+              aria-label={t(`accounts.add.${provider}.copyCode`)}
               onClick={() => void copy(code)}
             >
               {copied ? <Check className="size-5" /> : <Copy className="size-5" />}
@@ -49,12 +51,14 @@ export function CodexSignIn({
           </div>
         ) : null}
         <WaitingCard
-          title={code ? t('accounts.add.codex.waiting') : t('accounts.add.codex.preparing')}
-          detail={t('accounts.add.codex.expires')}
+          title={
+            code ? t(`accounts.add.${provider}.waiting`) : t(`accounts.add.${provider}.preparing`)
+          }
+          detail={t(`accounts.add.${provider}.expires`)}
         />
         <div className="ds-stack-4">
-          <span className="ds-label-strong">{t('accounts.add.codex.otherTitle')}</span>
-          <span className="ds-t-sub">{t('accounts.add.codex.otherText')}</span>
+          <span className="ds-label-strong">{t(`accounts.add.${provider}.otherTitle`)}</span>
+          <span className="ds-t-sub">{t(`accounts.add.${provider}.otherText`)}</span>
         </div>
       </DsModalBody>
       <DsModalFooter
@@ -70,7 +74,9 @@ export function CodexSignIn({
           icon={linkCopy.copied ? <Check className="size-4" /> : <Copy className="size-4" />}
           onClick={() => link && void linkCopy.copy(link)}
         >
-          {linkCopy.copied ? t('accounts.add.codex.linkCopied') : t('accounts.add.codex.copyLink')}
+          {linkCopy.copied
+            ? t(`accounts.add.${provider}.linkCopied`)
+            : t(`accounts.add.${provider}.copyLink`)}
         </DsButton>
         <DsButton
           variant="primary"
@@ -79,7 +85,7 @@ export function CodexSignIn({
           iconEnd={<ArrowUpRight className="size-4" />}
           onClick={() => link && onOpen(link)}
         >
-          {t('accounts.add.codex.openPage')}
+          {t(`accounts.add.${provider}.openPage`)}
         </DsButton>
       </DsModalFooter>
     </>
