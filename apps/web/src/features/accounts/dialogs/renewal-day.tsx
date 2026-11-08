@@ -26,10 +26,16 @@ export function RenewalDayDialog({ date, onClose }: { date: Date; onClose: () =>
   const { t } = useTranslation();
   const locale = useLocale();
   const resolveError = useErrorMessage();
-  const { data: accounts = [] } = useAccounts();
-  // Decided once, when the day is clicked: a sync that brings in a plan with
-  // no day must not swap a sign-in or a half-filled form for the picker.
-  const [adding, setAdding] = useState(() => unscheduled(accounts).length === 0);
+  const { data } = useAccounts();
+  const accounts = data ?? [];
+  // Decided once, when the list is first there: a sync that brings in a plan
+  // with no day must not swap a sign-in or a half-filled form for the picker.
+  // Not before it loads, or a day clicked as the page opens finds no plan
+  // waiting and is Add subscription for good.
+  const [adding, setAdding] = useState<boolean | null>(() =>
+    data ? unscheduled(data).length === 0 : null,
+  );
+  if (adding === null && data) setAdding(unscheduled(data).length === 0);
   const update = useUpdateAccount({
     onSuccess: () => {
       toast.success(t('toasts.accountSaved'));
@@ -39,6 +45,7 @@ export function RenewalDayDialog({ date, onClose }: { date: Date; onClose: () =>
   const day = date.getDate();
   const missing = unscheduled(accounts);
 
+  if (adding === null) return null;
   if (adding) {
     return <AddSubscriptionDialog renewalDay={day} onClose={onClose} />;
   }

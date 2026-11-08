@@ -154,6 +154,32 @@ test('a calendar day puts a plan on it, or adds a subscription that bills on it'
   await api.dispose();
 });
 
+test('a day clicked before the account list loads still offers the plan waiting for a day', async ({
+  page,
+}) => {
+  const { user, api } = await provisionedUser('renewalslow');
+  await syncTwoAccounts(api);
+  await signInAs(page, user);
+  // Regression: the dialog chose Add subscription from the list as it stood
+  // when the day was clicked, so a click before the list arrived found no plan
+  // waiting and stayed Add subscription. Seen when CI was loaded enough to be slow.
+  await page.evaluate(() => localStorage.clear());
+  await page.route(/\/api\/v1\/accounts(\?.*)?$/, async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await route.continue();
+  });
+  await page.goto('/renewals');
+  await page
+    .getByRole('button', { name: /^Add a subscription on / })
+    .nth(14)
+    .click();
+  await expect(
+    page.getByRole('dialog').getByRole('heading', { name: /^Renews on .*15/ }),
+  ).toBeVisible();
+
+  await api.dispose();
+});
+
 test('a billing day the Codex login reports is on the calendar, and the person can override it', async ({
   page,
 }) => {
