@@ -41,6 +41,7 @@ function DsAreaChart({
   formatValue,
   restLabel,
   tone = 'up',
+  showChange = true,
   className,
 }: {
   data: readonly number[];
@@ -53,6 +54,8 @@ function DsAreaChart({
   formatValue: (value: number) => string;
   restLabel?: React.ReactNode;
   tone?: 'up' | 'down';
+  /** Off where the change from the first point repeats the value, as on a running total. */
+  showChange?: boolean;
   className?: string;
 }) {
   const ref = React.useRef<HTMLDivElement>(null);
@@ -83,10 +86,12 @@ function DsAreaChart({
           <span className="ds-chart__price">{n ? formatValue(current ?? 0) : '—'}</span>
           {n > 1 && (
             <span className="ds-chart__delta">
-              <span className={up ? 'ds-t-up' : 'ds-t-down'}>
-                {up ? '▲' : '▼'} {formatValue(Math.abs(diff))}
-                {data[0] ? ` (${Math.abs(pct).toFixed(2)}%)` : ''}
-              </span>
+              {showChange && (
+                <span className={up ? 'ds-t-up' : 'ds-t-down'}>
+                  {up ? '▲' : '▼'} {formatValue(Math.abs(diff))}
+                  {data[0] ? ` (${Math.abs(pct).toFixed(2)}%)` : ''}
+                </span>
+              )}
               <span>{hi !== null ? (labels[hi] ?? '') : restLabel}</span>
             </span>
           )}
