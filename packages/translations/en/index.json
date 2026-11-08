@@ -282,7 +282,10 @@
       "limitTitle": "{{name}} is at its limit",
       "limitEnd": "left",
       "showAll": "Show all {{count}}",
-      "showLess": "Show less"
+      "showLess": "Show less",
+      "planTitle": "{{provider}} reports {{name}} as {{plan}}",
+      "planDetail": "You chose {{chosen}}, which sets its limits and price.",
+      "planEnd": "reported"
     },
     "desktop": {
       "lastSync": "Last synced {{when}}",
@@ -312,7 +315,8 @@
       "personPlaceholder": "You",
       "personHint": "Who uses this login. Leave it empty if it is yours; accounts with the same name are one person.",
       "renewalReported": "Day {{day}}, as your {{provider}} login reports",
-      "renewalReportedHelp": "Leave it empty to follow your {{provider}} login, or type the day on your receipt."
+      "renewalReportedHelp": "Leave it empty to follow your {{provider}} login, or type the day on your receipt.",
+      "planReported": "{{provider}} reports {{plan}} for this key. The plan you choose here sets the limits and the price."
     },
     "list": {
       "title": "Subscriptions",
@@ -510,7 +514,9 @@
       "readerOff": "Turn on",
       "readerOn": "On",
       "readerFailing": "Not working",
-      "readUnofficially": "Read from {{name}}’s unofficial usage endpoint"
+      "readUnofficially": "Read from {{name}}’s unofficial usage endpoint",
+      "planReported": "{{name}} reports {{plan}}",
+      "planReview": "Review plan"
     },
     "tm": {
       "pickFor": "Pick next for",

@@ -1,4 +1,4 @@
-import { DsButton, DsCard, DsStatusBadge, Skeleton } from '@flama/design-system-web';
+import { DsBadge, DsButton, DsCard, DsStatusBadge, Skeleton } from '@flama/design-system-web';
 import { ArrowRightLeft, TrendingUp } from '@flama/design-system-web/icons';
 import type { AccountEntity } from '@flama/frontend-consumer';
 import { useAccounts } from '@flama/frontend-consumer/react';
@@ -118,6 +118,21 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
                 <span className="ds-t-sub">
                   {t('accounts.group.readUnofficially', { name: PROVIDER_NAMES[account.provider] })}
                 </span>
+              )}
+              {account.reportedPlanMismatch && (
+                <div className="flex items-center gap-2">
+                  <span className="min-w-0 flex-1">
+                    <DsBadge tone="review">
+                      {t('accounts.group.planReported', {
+                        name: PROVIDER_NAMES[account.provider],
+                        plan: account.reportedPlanMismatch.name,
+                      })}
+                    </DsBadge>
+                  </span>
+                  <DsButton size="text" onClick={() => setDialog({ kind: 'edit', account })}>
+                    {t('accounts.group.planReview')}
+                  </DsButton>
+                </div>
               )}
               <div className="flex flex-col gap-2 border-t border-border-default pt-3">
                 <div className="flex items-center gap-2">

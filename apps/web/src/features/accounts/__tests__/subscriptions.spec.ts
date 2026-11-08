@@ -2,6 +2,7 @@ import { AccountEntity, type UsageReading } from '@flama/frontend-consumer';
 import type { LimitWindow, SnapshotStatus } from '@flama/shared/schemas/accounts';
 import { paceOf } from '@flama/shared/subscriptions';
 import { describe, expect, it } from 'vitest';
+import { attentionItems } from '../lib/insights';
 import { subscriptionStatus } from '../lib/subscriptions';
 
 const NOW = new Date('2026-11-07T12:00:00Z');
@@ -68,5 +69,56 @@ describe('subscriptionStatus', () => {
   it('reads a healthy login by its pace', () => {
     const acc = account(reading('ok', [weekly]));
     expect(subscriptionStatus(acc, paceOf(acc, NOW))).toBe('active');
+  });
+});
+
+function zaiAccount(planId: string, reportedPlan: string | null): AccountEntity {
+  return new AccountEntity(
+    'zai-1',
+    'zai',
+    'zai-1',
+    'Side project',
+    'Side project',
+    null,
+    null,
+    null,
+    null,
+    reportedPlan,
+    planId,
+    'Lite',
+    true,
+    1_800,
+    false,
+    null,
+    false,
+    null,
+    false,
+    null,
+    new Date('2026-11-01T00:00:00Z'),
+    reading('ok', [weekly]),
+    [],
+  );
+}
+
+/**
+ * Regression: a Max subscriber who left the add form on Lite was tracked
+ * against Lite's credits with nothing on screen saying the vendor disagreed.
+ */
+describe('a hand-tracked plan its vendor reports as another tier', () => {
+  it('needs review instead of reading active', () => {
+    const acc = zaiAccount('zai-lite', 'max');
+    expect(subscriptionStatus(acc, paceOf(acc, NOW))).toBe('review');
+  });
+
+  it('is a "needs attention" item of its own', () => {
+    expect(attentionItems([zaiAccount('zai-lite', 'max')], NOW).map((i) => i.kind)).toEqual([
+      'plan',
+    ]);
+  });
+
+  it('stays active when the reported tier is the chosen one', () => {
+    const acc = zaiAccount('zai-max', 'max');
+    expect(subscriptionStatus(acc, paceOf(acc, NOW))).toBe('active');
+    expect(attentionItems([acc], NOW)).toEqual([]);
   });
 });

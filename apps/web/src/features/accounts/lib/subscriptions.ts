@@ -17,6 +17,8 @@ export function subscriptionStatus(account: AccountEntity, pace: AccountPace): S
   if (account.status === 'auth_stale') return 'stale';
   if (pace.status === 'limit') return 'limit';
   if (pace.status === 'behind' || pace.status === 'expiring') return 'review';
+  // The vendor reports another tier than the one chosen: the limits are suspect.
+  if (account.reportedPlanMismatch) return 'review';
   return 'active';
 }
 

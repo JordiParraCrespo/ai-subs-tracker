@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { formatMoney, formatPercent, formatResetIn } from '../lib/format';
 import { attentionItems, wastedLastMonthCents } from '../lib/insights';
 import { accountMark, accountTitle } from '../lib/marks';
+import { PROVIDER_NAMES } from '../lib/providers';
 
 const SHOWN = 4;
 
@@ -36,8 +37,31 @@ export function NeedsAttention() {
       {shown.map(({ account, pace, kind }) => {
         const mark = accountMark(account);
         const weeklyValue = (account.monthlyPriceCents * 7) / 30.44;
+        const reported = account.reportedPlanMismatch;
+        if (kind === 'plan' && reported) {
+          return (
+            <Link
+              key={`${kind}-${account.id}`}
+              to="/accounts/$provider"
+              params={{ provider: account.provider }}
+              className="contents"
+            >
+              <DsCardRow
+                leading={<DsAvatar initials={mark.initials} color={mark.color} size={32} />}
+                title={t('accounts.attention.planTitle', {
+                  name: account.displayName,
+                  provider: PROVIDER_NAMES[account.provider],
+                  plan: reported.name,
+                })}
+                subtitle={t('accounts.attention.planDetail', { chosen: account.planName ?? '—' })}
+                value={reported.name}
+                subvalue={t('accounts.attention.planEnd')}
+              />
+            </Link>
+          );
+        }
         return (
-          <Link key={account.id} to="/tokenmaxx" className="contents">
+          <Link key={`${kind}-${account.id}`} to="/tokenmaxx" className="contents">
             <DsCardRow
               leading={<DsAvatar initials={mark.initials} color={mark.color} size={32} />}
               title={t(`accounts.attention.${kind}Title`, { name: accountTitle(account) })}

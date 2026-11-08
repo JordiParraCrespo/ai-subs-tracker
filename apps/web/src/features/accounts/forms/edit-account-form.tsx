@@ -78,6 +78,8 @@ export function EditAccountForm({
       ? t('accounts.edit.planAuto', { plan: reported })
       : t('accounts.edit.planAutoNone');
   const reportedDay = account.renewalDayOverridden ? null : account.renewalDay;
+  // A hand-tracked plan's vendor naming another tier: said, never applied.
+  const mismatch = account.reportedPlanMismatch;
   const provider = PROVIDER_NAMES[account.provider];
   const planLabels: Record<string, string> = {
     ...(autoLabel ? { [AUTO_OPTION]: autoLabel } : {}),
@@ -151,6 +153,11 @@ export function EditAccountForm({
               </Select>
             )}
           />
+          {mismatch && (
+            <FieldDescription>
+              {t('accounts.edit.planReported', { provider, plan: mismatch.name })}
+            </FieldDescription>
+          )}
         </Field>
         <Field data-invalid={Boolean(errors.price)}>
           <FieldLabel htmlFor={`${id}-price`}>{t('accounts.edit.price')}</FieldLabel>

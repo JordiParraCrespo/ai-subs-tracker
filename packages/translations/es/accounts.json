@@ -13,7 +13,10 @@
     "limitTitle": "{{name}} está en su límite",
     "limitEnd": "queda",
     "showAll": "Ver las {{count}}",
-    "showLess": "Ver menos"
+    "showLess": "Ver menos",
+    "planTitle": "{{provider}} indica que {{name}} es {{plan}}",
+    "planDetail": "Elegiste {{chosen}}, que fija sus límites y precio.",
+    "planEnd": "según el proveedor"
   },
   "desktop": {
     "lastSync": "Última sincronización {{when}}",
@@ -43,7 +46,8 @@
     "personPlaceholder": "Tú",
     "personHint": "Quién usa este acceso. Déjalo vacío si es tuyo; las cuentas con el mismo nombre son una persona.",
     "renewalReported": "Día {{day}}, según tu sesión de {{provider}}",
-    "renewalReportedHelp": "Déjalo vacío para seguir tu sesión de {{provider}}, o escribe el día de tu recibo."
+    "renewalReportedHelp": "Déjalo vacío para seguir tu sesión de {{provider}}, o escribe el día de tu recibo.",
+    "planReported": "{{provider}} indica {{plan}} para esta clave. El plan que elijas aquí fija los límites y el precio."
   },
   "list": {
     "title": "Suscripciones",
@@ -241,7 +245,9 @@
     "readerOff": "Activar",
     "readerOn": "Activada",
     "readerFailing": "No funciona",
-    "readUnofficially": "Leído del endpoint de uso no oficial de {{name}}"
+    "readUnofficially": "Leído del endpoint de uso no oficial de {{name}}",
+    "planReported": "{{name}} indica {{plan}}",
+    "planReview": "Revisar plan"
   },
   "tm": {
     "pickFor": "Elegir siguiente para",
