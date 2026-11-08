@@ -44,7 +44,7 @@ export interface RenewDeps {
  * which for the default login would also change the macOS Keychain item it
  * reads. A non-default login's command re-adds the right one.
  */
-const LOGIN_SELECTORS = ['CLAUDE_CONFIG_DIR', 'CODEX_HOME'] as const;
+const LOGIN_SELECTORS = ['CLAUDE_CONFIG_DIR', 'CODEX_HOME', 'GROK_HOME'] as const;
 
 function baseEnv(env: Record<string, string | undefined>): Record<string, string | undefined> {
   const clean = { ...env };

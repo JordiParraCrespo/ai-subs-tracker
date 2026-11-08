@@ -363,7 +363,7 @@
       "liveTaken": "This folder already has a status line of its own.",
       "liveTitle": "Live limits from Claude Code",
       "liveToggle": "Live limits for {{home}}",
-      "shellDescription": "Makes claude and codex in your terminal use whichever account is switched on.",
+      "shellDescription": "Makes claude, codex and grok in your terminal use whichever account is switched on.",
       "shellInstall": "Add to my shell",
       "shellInstalled": "Installed in {{file}}",
       "shellNotInstalled": "Not installed",
@@ -649,7 +649,7 @@
       },
       "subscriptions": {
         "title": "No subscriptions yet",
-        "text": "Add the AI tools your team pays for. Claude Code and Codex sign in through the browser."
+        "text": "Add the AI tools your team pays for. Claude Code, Codex and Grok Build sign in through the browser."
       },
       "people": {
         "title": "No one here yet",
@@ -670,10 +670,11 @@
     },
     "add": {
       "title": "Add subscription",
-      "description": "Pick the tool. Claude Code and Codex sign in through the browser; a GLM Coding Plan (Z.AI or BigModel) is added by hand.",
+      "description": "Pick the tool. Claude Code, Codex and Grok Build sign in through the browser; a GLM Coding Plan (Z.AI or BigModel) is added by hand.",
       "how": {
         "claude-code": "Sign in through claude.com",
         "codex": "Sign in with a code at openai.com",
+        "grok": "Sign in with a code at x.ai",
         "zai": "Add it by hand: plan, price and billing day",
         "bigmodel": "Sold in mainland China. Add it by hand: plan, price and billing day"
       },
@@ -718,9 +719,22 @@
         "copyLink": "Copy link",
         "linkCopied": "Link copied"
       },
+      "grok": {
+        "title": "Enter this code at xAI",
+        "description": "Open the page, sign in with the X or Grok account you want to add and confirm the code. Grok Build may open the page in your browser by itself.",
+        "waiting": "Waiting for approval at accounts.x.ai",
+        "expires": "The code expires in a few minutes",
+        "copyCode": "Copy code",
+        "openPage": "Open page",
+        "preparing": "Asking xAI for a code…",
+        "otherTitle": "Signed in to a different account?",
+        "otherText": "Copy the link and open it in a private window, so you sign in as the account you want to add and the one you use now stays signed in.",
+        "copyLink": "Copy link",
+        "linkCopied": "Link copied"
+      },
       "desktop": {
         "title": "Add it from the desktop app",
-        "description": "Claude Code and Codex sign in on your computer.",
+        "description": "Claude Code, Codex and Grok Build sign in on your computer.",
         "text": "ResetOwl’s desktop app runs the sign-in and reads the plan from it, so nothing from your login ever reaches a browser tab. Open the app and choose Add subscription there."
       },
       "back": "Back",

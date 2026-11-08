@@ -75,7 +75,7 @@ resetowl/
 │   │   ├── queue/        # BullMQ job queues (@flama/backend-queue)
 │   │   └── storage/      # Pluggable file storage (@flama/backend-storage)
 │   ├── tsconfig/         # Shared TypeScript configs
-│   ├── usage-providers/  # Claude Code and Codex readers behind one interface (@flama/usage-providers)
+│   ├── usage-providers/  # Claude Code, Codex and Grok Build readers behind one interface (@flama/usage-providers)
 │   ├── env/              # Root .env loader (@flama/env)
 │   ├── frontend/         # The React tier: logic split by product, glue split by platform
 │   │   ├── core/         # Kernel every app loads: session, users, settings, DI (@flama/frontend-core)
@@ -372,7 +372,7 @@ the app's `useZodResolver`. The convention is `.agents/rules/forms.md`.
 packages/tsconfig         → used by all apps and packages (tsconfig extends)
 packages/env              → used by api (root .env loader)
 packages/shared           → used by api, frontend, api-client, backend/core, usage-providers, desktop (wire types)
-packages/usage-providers  → used by desktop (reads local Claude Code / Codex logins)
+packages/usage-providers  → used by desktop (reads local Claude Code / Codex / Grok Build logins)
 packages/auth             → used by api, web (shared Better Auth config)
 packages/backend/core     → used by api, other backend packages
 packages/backend/ddd      → used by api, backend/core (depends on nothing in the workspace)

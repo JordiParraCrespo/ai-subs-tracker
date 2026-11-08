@@ -363,7 +363,7 @@
       "liveTaken": "Esta carpeta ya tiene su propia línea de estado.",
       "liveTitle": "Límites en directo de Claude Code",
       "liveToggle": "Límites en directo para {{home}}",
-      "shellDescription": "Hace que claude y codex en tu terminal usen la cuenta que esté activada.",
+      "shellDescription": "Hace que claude, codex y grok en tu terminal usen la cuenta que esté activada.",
       "shellInstall": "Añadir a mi shell",
       "shellInstalled": "Instalado en {{file}}",
       "shellNotInstalled": "No instalado",
@@ -649,7 +649,7 @@
       },
       "subscriptions": {
         "title": "Aún no hay suscripciones",
-        "text": "Añade las herramientas de IA que paga tu equipo. Claude Code y Codex inician sesión en el navegador."
+        "text": "Añade las herramientas de IA que paga tu equipo. Claude Code, Codex y Grok Build inician sesión en el navegador."
       },
       "people": {
         "title": "Aún no hay nadie",
@@ -670,10 +670,11 @@
     },
     "add": {
       "title": "Añadir suscripción",
-      "description": "Elige la herramienta. Claude Code y Codex inician sesión en el navegador; un GLM Coding Plan (Z.AI o BigModel) se añade a mano.",
+      "description": "Elige la herramienta. Claude Code, Codex y Grok Build inician sesión en el navegador; un GLM Coding Plan (Z.AI o BigModel) se añade a mano.",
       "how": {
         "claude-code": "Inicia sesión en claude.com",
         "codex": "Inicia sesión con un código en openai.com",
+        "grok": "Inicia sesión con un código en x.ai",
         "zai": "Añádelo a mano: plan, precio y día de cobro",
         "bigmodel": "Se vende en China continental. Añádelo a mano: plan, precio y día de cobro"
       },
@@ -718,9 +719,22 @@
         "copyLink": "Copiar enlace",
         "linkCopied": "Enlace copiado"
       },
+      "grok": {
+        "title": "Introduce este código en xAI",
+        "description": "Abre la página, inicia sesión con la cuenta de X o Grok que quieres añadir y confirma el código. Grok Build puede abrir la página en tu navegador por sí solo.",
+        "waiting": "Esperando la aprobación en accounts.x.ai",
+        "expires": "El código caduca en unos minutos",
+        "copyCode": "Copiar código",
+        "openPage": "Abrir página",
+        "preparing": "Pidiendo un código a xAI…",
+        "otherTitle": "¿Has iniciado sesión con otra cuenta?",
+        "otherText": "Copia el enlace y ábrelo en una ventana privada, para iniciar sesión con la cuenta que quieres añadir y que la que usas ahora siga con la sesión iniciada.",
+        "copyLink": "Copiar enlace",
+        "linkCopied": "Enlace copiado"
+      },
       "desktop": {
         "title": "Añádela desde la app de escritorio",
-        "description": "Claude Code y Codex inician sesión en tu ordenador.",
+        "description": "Claude Code, Codex y Grok Build inician sesión en tu ordenador.",
         "text": "La app de escritorio de ResetOwl inicia la sesión y lee el plan, así nada de tu inicio de sesión llega a una pestaña del navegador. Abre la app y elige Añadir suscripción."
       },
       "back": "Atrás",

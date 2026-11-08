@@ -10,11 +10,14 @@
  *
  * Sources: claude.com/pricing and learn.chatgpt.com/docs/pricing, checked
  * 2026-11-02; docs.z.ai/devpack/overview and docs.z.ai/devpack/faq, checked
- * 2026-11-04; docs.bigmodel.cn/cn/coding-plan/overview, checked 2026-11-05.
+ * 2026-11-04; docs.bigmodel.cn/cn/coding-plan/overview, checked 2026-11-05;
+ * xAI's X Subscription (launched 2026-10-12): x.ai/pricing refuses automated
+ * reads, so the tiers are as several published summaries of it agree,
+ * checked 2026-11-07 — confirm against the page when touching them.
  */
 
 /** Providers the desktop collector reads on the machine and a terminal can switch between. */
-export const LOCAL_PROVIDER_IDS = ['claude-code', 'codex'] as const;
+export const LOCAL_PROVIDER_IDS = ['claude-code', 'codex', 'grok'] as const;
 export type LocalProviderId = (typeof LOCAL_PROVIDER_IDS)[number];
 
 /** Providers a person adds in the app and tracks by hand (see `ProviderTracking`). */
@@ -27,6 +30,7 @@ export type ProviderId = (typeof PROVIDER_IDS)[number];
 export const PROVIDER_LABELS: Record<ProviderId, { name: string; vendor: string }> = {
   'claude-code': { name: 'Claude Code', vendor: 'Anthropic' },
   codex: { name: 'Codex', vendor: 'OpenAI' },
+  grok: { name: 'Grok Build', vendor: 'xAI' },
   zai: { name: 'GLM Coding Plan', vendor: 'Z.AI' },
   bigmodel: { name: 'GLM Coding Plan', vendor: 'Zhipu BigModel' },
 };
@@ -259,6 +263,71 @@ export const PLANS: readonly PlanDefinition[] = [
     monthlyPriceCents: 0,
     windows: 'session+weekly',
     aliases: ['enterprise', 'edu'],
+  },
+  // xAI — The X Subscription, x.ai/pricing. One weekly pool shared by Grok,
+  // Grok Build and Cursor, sized as a multiple of Plus; xAI publishes no
+  // absolute counts. Grok Build's billing view reports the tier as a slug;
+  // SuperGrok and SuperGrok Heavy are the plans it replaced for new
+  // customers, which keep renewing for those who have them.
+  {
+    id: 'grok-free',
+    provider: 'grok',
+    name: 'Free',
+    monthlyPriceCents: 0,
+    windows: 'weekly',
+    aliases: ['free', 'x_basic', 'basic'],
+  },
+  {
+    id: 'grok-plus',
+    provider: 'grok',
+    name: 'Plus',
+    monthlyPriceCents: 800,
+    windows: 'weekly',
+    multiplier: 1,
+    aliases: ['plus', 'x plus', 'x_plus', 'x subscription plus'],
+  },
+  {
+    id: 'grok-premium',
+    provider: 'grok',
+    name: 'Premium',
+    monthlyPriceCents: 3000,
+    windows: 'weekly',
+    multiplier: 4,
+    aliases: ['premium', 'x subscription premium'],
+  },
+  {
+    id: 'grok-super',
+    provider: 'grok',
+    name: 'Super',
+    monthlyPriceCents: 10000,
+    windows: 'weekly',
+    multiplier: 15,
+    aliases: ['super', 'x subscription super'],
+  },
+  {
+    id: 'grok-ultra',
+    provider: 'grok',
+    name: 'Ultra',
+    monthlyPriceCents: 20000,
+    windows: 'weekly',
+    multiplier: 50,
+    aliases: ['ultra', 'x subscription ultra'],
+  },
+  {
+    id: 'grok-supergrok',
+    provider: 'grok',
+    name: 'SuperGrok',
+    monthlyPriceCents: 3000,
+    windows: 'weekly',
+    aliases: ['supergrok', 'super grok', 'super_grok'],
+  },
+  {
+    id: 'grok-supergrok-heavy',
+    provider: 'grok',
+    name: 'SuperGrok Heavy',
+    monthlyPriceCents: 30000,
+    windows: 'weekly',
+    aliases: ['supergrok heavy', 'supergrok_heavy', 'heavy'],
   },
   // Z.AI — docs.z.ai/devpack/overview. Credits per window are documented for
   // every tier; the 5-hour credits return 5 hours after they are spent and the
