@@ -148,7 +148,7 @@ test('a calendar day puts a plan on it, or adds a subscription that bills on it'
   // No plan waits for a day now: a click is Add subscription, with the day filled in.
   await days.nth(19).click();
   await expect(dialog.getByRole('heading', { name: 'Add subscription' })).toBeVisible();
-  await dialog.getByRole('button', { name: /Z\.AI/ }).click();
+  await dialog.getByRole('button', { name: /^ZA Z\.AI\b/ }).click();
   await expect(dialog.getByLabel('Renews on day of month')).toHaveValue('20');
 
   await api.dispose();
@@ -175,6 +175,27 @@ test('a day clicked before the accounts arrive still offers the plan waiting for
   await expect(
     page.getByRole('dialog').getByRole('heading', { name: /^Renews on .*15/ }),
   ).toBeVisible();
+
+  await api.dispose();
+});
+
+test('a day clicked when the account list fails still opens Add subscription', async ({ page }) => {
+  const { user, api } = await provisionedUser('renewalfail');
+  await signInAs(page, user);
+  // Regression: waiting for the list to decide left a failed list deciding
+  // nothing, so the click rendered no dialog at all.
+  await page.evaluate(() => localStorage.clear());
+  await page.route(/\/api\/v1\/accounts(\?.*)?$/, (route) =>
+    route.fulfill({ status: 500, body: '{}', contentType: 'application/problem+json' }),
+  );
+  await page.goto('/renewals');
+  await page
+    .getByRole('button', { name: /^Add a subscription on / })
+    .nth(14)
+    .click();
+  await expect(
+    page.getByRole('dialog').getByRole('heading', { name: 'Add subscription' }),
+  ).toBeVisible({ timeout: 20_000 });
 
   await api.dispose();
 });
@@ -244,7 +265,7 @@ test('a Z.AI Coding Plan is added by hand and its usage recorded', async ({ page
   // Works in a browser too: there is nothing to sign in to on the machine.
   await page.goto('/accounts');
   await page.getByRole('button', { name: 'Add subscription' }).click();
-  await page.getByRole('button', { name: /Z\.AI/ }).click();
+  await page.getByRole('button', { name: /^ZA Z\.AI\b/ }).click();
   await expect(page.getByText('No API key needed')).toBeVisible();
 
   // Pro has no published price, so the form asks for the one paid.

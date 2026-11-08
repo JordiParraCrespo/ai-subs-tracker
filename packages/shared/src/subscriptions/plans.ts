@@ -43,7 +43,7 @@ export const PROVIDER_LABELS: Record<ProviderId, { name: string; vendor: string 
  * - `manual`: there is no login to find and no documented usage API, so the
  *   person adds the subscription in the app and records its usage by hand.
  *   Z.AI's Coding Plan is an API key used inside other tools; Z.AI documents
- *   no usage endpoint (its usage page is z.ai/manage-apikey/billing).
+ *   no usage endpoint (its usage page is z.ai/manage-apikey/coding-plan/personal/usage).
  *   BigModel is the same plan sold in mainland China by Zhipu, with its own
  *   site, prices and keys.
  *
@@ -85,7 +85,7 @@ export const UNOFFICIAL_USAGE_READERS: Partial<Record<ManualProviderId, Unoffici
   zai: {
     origin: 'https://api.z.ai',
     keysUrl: 'https://z.ai/manage-apikey',
-    usageUrl: 'https://z.ai/manage-apikey/billing',
+    usageUrl: 'https://z.ai/manage-apikey/coding-plan/personal/usage',
   },
   bigmodel: {
     origin: 'https://open.bigmodel.cn',
@@ -414,6 +414,26 @@ export function resolvePlan(provider: ProviderId, reported: string | null | unde
       (plan.id === key ||
         plan.aliases.some((alias) => alias === key || alias.replace(/[\s_-]+/g, ' ') === loose)),
   );
+}
+
+/**
+ * The plan a hand-tracked account's vendor says it is on, when that is not
+ * the plan the person chose. A manual account's plan is the person's choice,
+ * and it sets the limits and the list price; an unofficial reader reports the
+ * tier the vendor names (`max`), which is only a hint, so a disagreement is
+ * shown for the person to settle and never applied on its own. Undefined when
+ * they agree, when nothing was reported, or when the report names no tier the
+ * catalog knows. Local providers are left out: their reported names are what
+ * the plan defaults to, and a person's override there is deliberate.
+ */
+export function reportedPlanMismatch(
+  provider: ProviderId,
+  planId: string | null | undefined,
+  reported: string | null | undefined,
+): PlanDefinition | undefined {
+  if (!isManualProvider(provider) || !planId) return undefined;
+  const plan = resolvePlan(provider, reported);
+  return plan && plan.id !== planId ? plan : undefined;
 }
 
 export function plansFor(provider: ProviderId): PlanDefinition[] {

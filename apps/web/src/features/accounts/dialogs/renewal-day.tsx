@@ -26,15 +26,18 @@ export function RenewalDayDialog({ date, onClose }: { date: Date; onClose: () =>
   const { t } = useTranslation();
   const locale = useLocale();
   const resolveError = useErrorMessage();
-  const { data: accounts } = useAccounts();
+  const { data: accounts, isError } = useAccounts();
   // Decided once, when the accounts are first known (a day clicked before
   // they load must not take an empty list for "no plan is waiting"): a sync
   // that later brings in a plan with no day must not swap a sign-in or a
-  // half-filled form for the picker.
+  // half-filled form for the picker. A list that failed to load has no plan
+  // to offer, so the day is Add subscription rather than no dialog at all.
   const [adding, setAdding] = useState<boolean | null>(() =>
     accounts ? unscheduled(accounts).length === 0 : null,
   );
-  if (adding === null && accounts) setAdding(unscheduled(accounts).length === 0);
+  if (adding === null && (accounts || isError)) {
+    setAdding(accounts ? unscheduled(accounts).length === 0 : true);
+  }
   const update = useUpdateAccount({
     onSuccess: () => {
       toast.success(t('toasts.accountSaved'));

@@ -7,8 +7,10 @@ import type {
 import {
   currentWindows,
   isManualProvider,
+  type PlanDefinition,
   type ProviderId,
   type RankableAccount,
+  reportedPlanMismatch,
   unofficialUsageReader,
 } from '@flama/shared/subscriptions';
 
@@ -102,6 +104,15 @@ export class AccountEntity implements RankableAccount {
   /** The last reading came from that unofficial endpoint, so the screens label it. */
   get readUnofficially(): boolean {
     return this.latest?.source === 'unofficial';
+  }
+
+  /**
+   * The tier the vendor reports for a hand-tracked plan (through its
+   * unofficial reader) when it is not the plan the person chose: flagged for
+   * the person to settle, never applied.
+   */
+  get reportedPlanMismatch(): PlanDefinition | undefined {
+    return reportedPlanMismatch(this.provider, this.planId, this.reportedPlan);
   }
 
   window(kind: LimitWindow['kind']): LimitWindow | undefined {

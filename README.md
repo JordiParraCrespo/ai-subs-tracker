@@ -53,7 +53,7 @@ The screens follow the designs in [`designs/`](designs/).
 
 - **GLM Coding Plans (Z.AI, and BigModel in mainland China) are tracked by
   hand.** Neither vendor documents a usage API (Z.AI's usage page is
-  z.ai/manage-apikey/billing) and the plan is an API key used inside other
+  z.ai/manage-apikey/coding-plan/personal/usage) and the plan is an API key used inside other
   tools, so there is no login for the collector to find. **Add subscription →
   Z.AI / BigModel** records the plan (Lite, Pro, Max), what you pay and the
   billing day, in the desktop app or a browser. **Record** stores the 5-hour

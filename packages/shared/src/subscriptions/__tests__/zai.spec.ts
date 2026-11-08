@@ -10,7 +10,9 @@ import {
   LOCAL_PROVIDER_IDS,
   PROVIDER_IDS,
   plansFor,
+  reportedPlanMismatch,
   resolvePlan,
+  UNOFFICIAL_USAGE_READERS,
 } from '../plans';
 import { paceOf } from '../tokenmaxx';
 
@@ -188,5 +190,35 @@ describe('a hand-recorded reading over time', () => {
   it('leaves a collected reading as it is: the next sync replaces it', () => {
     const account = { ...manual(hoursLater(24).toISOString()), reading: null };
     expect(paceOf(account, hoursLater(30)).weeklyUsed).toBe(40);
+  });
+});
+
+describe('a reported Z.AI tier that differs from the chosen plan', () => {
+  // Regression: the add form starts on Lite, so a Max subscriber who leaves it
+  // there is tracked against Lite's credits until something says otherwise.
+  it('names the tier the vendor reports when the person chose another', () => {
+    expect(reportedPlanMismatch('zai', 'zai-lite', 'max')?.id).toBe('zai-max');
+    expect(reportedPlanMismatch('bigmodel', 'bigmodel-pro', 'LITE')?.id).toBe('bigmodel-lite');
+  });
+
+  it('says nothing when they agree, nothing was reported, or the tier is unknown', () => {
+    expect(reportedPlanMismatch('zai', 'zai-max', 'max')).toBeUndefined();
+    expect(reportedPlanMismatch('zai', 'zai-max', null)).toBeUndefined();
+    expect(reportedPlanMismatch('zai', 'zai-max', 'enterprise')).toBeUndefined();
+    expect(reportedPlanMismatch('zai', null, 'max')).toBeUndefined();
+  });
+
+  // A Claude override is the person's deliberate answer to an ambiguous login name.
+  it('leaves local providers alone', () => {
+    expect(reportedPlanMismatch('claude-code', 'claude-ultra', 'max')).toBeUndefined();
+  });
+});
+
+describe('Z.AI usage page', () => {
+  // Regression: the link pointed at the billing page, which shows no usage.
+  it('opens the Coding Plan usage page', () => {
+    expect(UNOFFICIAL_USAGE_READERS.zai?.usageUrl).toBe(
+      'https://z.ai/manage-apikey/coding-plan/personal/usage',
+    );
   });
 });

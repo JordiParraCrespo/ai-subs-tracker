@@ -32,7 +32,7 @@ export const PROVIDER_ORDER: readonly ProviderId[] = [
 
 /**
  * Where the vendor shows a hand-tracked plan's usage to a person: Z.AI's
- * billing page (docs.z.ai/devpack/overview), BigModel's usage statistics
+ * Coding Plan usage page, BigModel's usage statistics
  * (docs.bigmodel.cn/cn/coding-plan/overview).
  */
 export function usagePageUrl(provider: ProviderId): string | undefined {

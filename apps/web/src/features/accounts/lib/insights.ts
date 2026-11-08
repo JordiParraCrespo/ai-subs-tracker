@@ -14,7 +14,7 @@ export function wastedLastMonthCents(accounts: readonly AccountEntity[]): number
   );
 }
 
-export type AttentionKind = 'signin' | 'expiring' | 'limit' | 'behind';
+export type AttentionKind = 'signin' | 'plan' | 'expiring' | 'limit' | 'behind';
 
 export interface AttentionItem {
   account: AccountEntity;
@@ -22,11 +22,19 @@ export interface AttentionItem {
   kind: AttentionKind;
 }
 
-const ORDER: Record<AttentionKind, number> = { signin: 0, expiring: 1, behind: 2, limit: 3 };
+const ORDER: Record<AttentionKind, number> = {
+  signin: 0,
+  plan: 1,
+  expiring: 2,
+  behind: 3,
+  limit: 4,
+};
 
 /**
- * What deserves a look: a login that stopped reporting, headroom about to
- * expire, an account well behind an even pace, one at its limit.
+ * What deserves a look: a login that stopped reporting, a hand-tracked plan
+ * its vendor reports as another tier, headroom about to expire, an account
+ * well behind an even pace, one at its limit. The plan is a second item beside
+ * any of the others, since a wrong tier skews every number the pace reads.
  */
 export function attentionItems(accounts: readonly AccountEntity[], now: Date): AttentionItem[] {
   const items: AttentionItem[] = [];
@@ -38,6 +46,7 @@ export function attentionItems(accounts: readonly AccountEntity[], now: Date): A
     } else if (pace.status === 'expiring') items.push({ account, pace, kind: 'expiring' });
     else if (pace.status === 'behind') items.push({ account, pace, kind: 'behind' });
     else if (pace.status === 'limit') items.push({ account, pace, kind: 'limit' });
+    if (account.reportedPlanMismatch) items.push({ account, pace, kind: 'plan' });
   }
   return items.sort((a, b) => ORDER[a.kind] - ORDER[b.kind]);
 }
