@@ -180,6 +180,27 @@ test('a day clicked before the account list loads still offers the plan waiting 
   await api.dispose();
 });
 
+test('a day clicked when the account list fails still opens Add subscription', async ({ page }) => {
+  const { user, api } = await provisionedUser('renewalfail');
+  await signInAs(page, user);
+  // Regression: waiting for the list to decide left a failed list deciding
+  // nothing, so the click rendered no dialog at all.
+  await page.evaluate(() => localStorage.clear());
+  await page.route(/\/api\/v1\/accounts(\?.*)?$/, (route) =>
+    route.fulfill({ status: 500, body: '{}', contentType: 'application/problem+json' }),
+  );
+  await page.goto('/renewals');
+  await page
+    .getByRole('button', { name: /^Add a subscription on / })
+    .nth(14)
+    .click();
+  await expect(
+    page.getByRole('dialog').getByRole('heading', { name: 'Add subscription' }),
+  ).toBeVisible({ timeout: 20_000 });
+
+  await api.dispose();
+});
+
 test('a billing day the Codex login reports is on the calendar, and the person can override it', async ({
   page,
 }) => {
