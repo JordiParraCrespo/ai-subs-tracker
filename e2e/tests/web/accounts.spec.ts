@@ -148,7 +148,7 @@ test('a calendar day puts a plan on it, or adds a subscription that bills on it'
   // No plan waits for a day now: a click is Add subscription, with the day filled in.
   await days.nth(19).click();
   await expect(dialog.getByRole('heading', { name: 'Add subscription' })).toBeVisible();
-  await dialog.getByRole('button', { name: /Z\.AI/ }).click();
+  await dialog.getByRole('button', { name: /^ZA Z\.AI\b/ }).click();
   await expect(dialog.getByLabel('Renews on day of month')).toHaveValue('20');
 
   await api.dispose();
@@ -265,7 +265,7 @@ test('a Z.AI Coding Plan is added by hand and its usage recorded', async ({ page
   // Works in a browser too: there is nothing to sign in to on the machine.
   await page.goto('/accounts');
   await page.getByRole('button', { name: 'Add subscription' }).click();
-  await page.getByRole('button', { name: /Z\.AI/ }).click();
+  await page.getByRole('button', { name: /^ZA Z\.AI\b/ }).click();
   await expect(page.getByText('No API key needed')).toBeVisible();
 
   // Pro has no published price, so the form asks for the one paid.
