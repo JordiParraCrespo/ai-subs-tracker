@@ -418,6 +418,9 @@ importers:
       '@flama/env':
         specifier: workspace:*
         version: link:../packages/env
+      '@flama/usage-providers':
+        specifier: workspace:*
+        version: link:../packages/usage-providers
     devDependencies:
       '@biomejs/biome':
         specifier: ^2.6.2
