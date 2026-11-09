@@ -287,6 +287,7 @@ describe('the collector over days of failing vendors and a failing API', () => {
       // The run did real work: it is not green because nothing happened.
       expect(result.syncs).toBeGreaterThan(50);
       expect(result.vendorRequests).toBeGreaterThan(100);
-    });
+      // Hundreds of real reads of a home on disk: seconds on a busy machine, not the default five.
+    }, 60_000);
   }
 });
