@@ -59,3 +59,15 @@ export function formatResetIn(at: string | null, now: number, locale: string): s
   if (size < 48) return format.format(Math.round(hours), 'hour');
   return format.format(Math.round(hours / 24), 'day');
 }
+
+/**
+ * True when a plan meters the week and has no 5-hour session: a reading with
+ * a weekly window and no session one. An account with no reading at all (a
+ * lapsed login, a failed read) is not "weekly only"; nothing is known of it.
+ */
+export function isWeeklyOnly(pace: {
+  weeklyUsed: number | null;
+  sessionUsed: number | null;
+}): boolean {
+  return pace.sessionUsed === null && pace.weeklyUsed !== null;
+}

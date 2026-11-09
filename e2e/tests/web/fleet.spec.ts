@@ -91,10 +91,20 @@ test('every screen draws a fleet of accounts in every state', async ({ page }) =
   await expect(page.getByText(`ultra.${tag}@fleet.e2e`).first()).toBeVisible();
   // The account named in markup is there too, as text (the API strips the tags on the way in).
   await expect(page.getByText(/__xss/).first()).toBeVisible();
+  // A login with no reading says nothing of its plan's shape; one with only a week does.
+  const stale = page.locator('.ds-card').filter({ hasText: `stale.${tag}@fleet.e2e` });
+  await expect(stale.getByText('Session')).toBeVisible();
+  await expect(stale.getByText('weekly only')).toHaveCount(0);
   await visit(page, '/accounts/codex');
   await expect(page.getByText(`limited.${tag}@fleet.e2e`).first()).toBeVisible();
   await visit(page, '/accounts/grok');
   await expect(page.getByText(`heavy.${tag}@fleet.e2e`).first()).toBeVisible();
+  await expect(
+    page
+      .locator('.ds-card')
+      .filter({ hasText: `heavy.${tag}@fleet.e2e` })
+      .getByText('weekly only'),
+  ).toBeVisible();
 
   expect(problems).toEqual([]);
   await api.dispose();

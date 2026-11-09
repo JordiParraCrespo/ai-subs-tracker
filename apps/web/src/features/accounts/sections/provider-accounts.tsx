@@ -13,7 +13,7 @@ import { RecordUsageDialog } from '../dialogs/record-usage';
 import { RemoveAccountDialog } from '../dialogs/remove-account';
 import { useDesktopStatus } from '../hooks/use-desktop-status';
 import { useSwitchAccount } from '../hooks/use-switch-account';
-import { formatPercent } from '../lib/format';
+import { formatPercent, isWeeklyOnly } from '../lib/format';
 import { providerGroup } from '../lib/provider-group';
 import { PROVIDER_NAMES } from '../lib/providers';
 
@@ -140,7 +140,7 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
                     {t('accounts.table.session')}
                   </span>
                   <span className="ds-text-label ds-muted">
-                    {pace.sessionUsed === null
+                    {isWeeklyOnly(pace)
                       ? t('accounts.table.noSession')
                       : formatPercent(pace.sessionUsed)}
                   </span>

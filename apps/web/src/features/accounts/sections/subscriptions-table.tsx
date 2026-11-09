@@ -6,7 +6,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { SubscriptionStatusPill } from '../components/subscription-status';
 import { UsageCell } from '../components/usage-cell';
-import { formatMoney, formatResetIn } from '../lib/format';
+import { formatMoney, formatResetIn, isWeeklyOnly } from '../lib/format';
 import { accountMark, accountTitle } from '../lib/marks';
 import {
   type SubscriptionRow,
@@ -85,9 +85,11 @@ export function SubscriptionsTable({
             {pace.sessionUsed === null ? '—' : `${Math.round(pace.sessionUsed)}%`}
           </span>
           <span className="ds-cell-sub">
-            {pace.sessionUsed === null
+            {isWeeklyOnly(pace)
               ? t('accounts.table.noSession')
-              : t('accounts.table.sessionSub')}
+              : pace.sessionUsed === null
+                ? ''
+                : t('accounts.table.sessionSub')}
           </span>
         </>
       ),
