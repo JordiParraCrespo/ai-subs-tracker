@@ -129,19 +129,29 @@ export function localDayStart(day: string): number {
 }
 
 /**
+ * The years a timestamp may fall in. The contract's dates are ISO with a
+ * four-digit year, and a `Date` reaches year 275760; nothing a vendor or a
+ * transcript dates outside this range is a real time.
+ */
+const MIN_INSTANT_MS = Date.UTC(1970, 0, 1);
+const MAX_INSTANT_MS = Date.UTC(9999, 0, 1);
+
+/** `date` as ISO; null when it is not a time, or not one the contract can carry. */
+export function isoOrNull(date: Date): string | null {
+  const ms = date.getTime();
+  if (!Number.isFinite(ms) || ms < MIN_INSTANT_MS || ms > MAX_INSTANT_MS) return null;
+  return date.toISOString();
+}
+
+/**
  * A timestamp as ISO, from an ISO string or an epoch number. Epoch values
  * below 1e12 are seconds, above are milliseconds.
  */
 export function toIso(value: unknown): string | null {
   const n = num(value);
-  if (n !== null) {
-    const ms = n < 1e12 ? n * 1000 : n;
-    const date = new Date(ms);
-    return Number.isNaN(date.getTime()) ? null : date.toISOString();
-  }
+  if (n !== null) return isoOrNull(new Date(n < 1e12 ? n * 1000 : n));
   if (typeof value !== 'string') return null;
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+  return isoOrNull(new Date(value));
 }
 
 export function sha256Hex(value: string): string {
@@ -170,6 +180,35 @@ export function clip(text: string, max: number): string {
   return text.length <= max ? text : `${text.slice(0, max - 1)}…`;
 }
 
+/** Ten years of minutes: no plan meters a longer window, and a larger number is a vendor's mistake. */
+const MAX_WINDOW_MINUTES = 10 * 366 * 24 * 60;
+
+/**
+ * A window as the contract accepts it. The vendors' answers are undocumented,
+ * so a parser may hand over an empty key, a reset in year 275760 or a window
+ * of 1e308 minutes; one such window makes the API refuse the whole sync, for
+ * every account on the machine. What cannot be carried becomes null (or, for
+ * a name, a placeholder) and the rest of the window is kept.
+ */
+export function fitWindow(window: LimitWindow): LimitWindow {
+  const key = window.key.trim().slice(0, 80) || 'limit';
+  const minutes = window.windowMinutes;
+  const reset = window.resetsAt === null ? null : isoOrNull(new Date(window.resetsAt));
+  return {
+    key,
+    kind: window.kind,
+    label: window.label.trim().slice(0, 80) || key,
+    utilization: percent(window.utilization),
+    resetsAt: reset,
+    windowMinutes:
+      minutes !== null && Number.isFinite(minutes) && minutes >= 0.5
+        ? Math.round(minutes) <= MAX_WINDOW_MINUTES
+          ? Math.round(minutes)
+          : null
+        : null,
+  };
+}
+
 export function snapshot(
   now: Date,
   status: SnapshotStatus,
@@ -183,7 +222,7 @@ export function snapshot(
     source: 'poll',
     status,
     message: message === null ? null : clip(message, 500),
-    windows: windows.slice(0, 20),
+    windows: windows.slice(0, 20).map(fitWindow),
     extraUsage,
   };
 }
@@ -194,6 +233,12 @@ export function errorMessage(err: unknown): string {
     return err.message;
   }
   return String(err);
+}
+
+/** A running token count: whole, never negative, never past what an integer holds exactly. */
+function addTokens(total: number, more: number): number {
+  const add = Number.isFinite(more) ? Math.max(0, Math.round(more)) : 0;
+  return Math.min(total + add, Number.MAX_SAFE_INTEGER);
 }
 
 /** Collects tokens into one row per local day and model. */
@@ -207,6 +252,8 @@ export class DailyTokenBuckets {
     model: string,
     tokens: { input: number; output: number; cacheWrite: number; cacheRead: number },
   ): void {
+    // A transcript dated outside the contract's years is not a day anyone used tokens on.
+    if (isoOrNull(timestamp) === null) return;
     const day = localDay(timestamp);
     if (day < this.sinceDay) return;
     const name = clip(model, 120);
@@ -216,10 +263,10 @@ export class DailyTokenBuckets {
       row = { day, model: name, input: 0, output: 0, cacheWrite: 0, cacheRead: 0, messages: 0 };
       this.rows.set(key, row);
     }
-    row.input += Math.max(0, Math.round(tokens.input));
-    row.output += Math.max(0, Math.round(tokens.output));
-    row.cacheWrite += Math.max(0, Math.round(tokens.cacheWrite));
-    row.cacheRead += Math.max(0, Math.round(tokens.cacheRead));
+    row.input = addTokens(row.input, tokens.input);
+    row.output = addTokens(row.output, tokens.output);
+    row.cacheWrite = addTokens(row.cacheWrite, tokens.cacheWrite);
+    row.cacheRead = addTokens(row.cacheRead, tokens.cacheRead);
     row.messages += 1;
   }
 

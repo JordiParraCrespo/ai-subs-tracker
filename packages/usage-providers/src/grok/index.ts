@@ -147,7 +147,7 @@ async function read(
   return {
     provider: 'grok',
     externalId: externalIdFor(auth?.userId ?? null, auth?.email ?? null, login.home),
-    email: auth?.email ?? null,
+    email: auth?.email?.slice(0, 320) ?? null,
     // `team_id` is an opaque id, not a name to show.
     organization: null,
     reportedPlan: tier?.slice(0, 80) ?? null,

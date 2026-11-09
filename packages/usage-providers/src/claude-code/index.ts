@@ -177,7 +177,7 @@ async function read(
   return {
     provider: 'claude-code',
     externalId: externalIdFor(identity.accountUuid, identity.email, login.home),
-    email: identity.email,
+    email: identity.email?.slice(0, 320) ?? null,
     organization: identity.organization?.slice(0, 200) ?? null,
     reportedPlan: limits.plan?.slice(0, 80) ?? null,
     location: login.home.slice(0, 300),

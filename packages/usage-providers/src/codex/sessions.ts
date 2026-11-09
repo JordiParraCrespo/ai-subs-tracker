@@ -3,6 +3,7 @@ import type { DailyTokens, LimitWindow } from '@flama/shared/schemas/accounts';
 import {
   DailyTokenBuckets,
   forEachLine,
+  isoOrNull,
   isRecord,
   type JsonlFile,
   type JsonRecord,
@@ -95,7 +96,7 @@ function sessionWindow(key: string, value: unknown, observed: Date): LimitWindow
     minutes: minutes !== null && minutes > 0 ? Math.round(minutes) : null,
     resetsAt:
       toIso(value.resets_at) ??
-      (relative === null ? null : new Date(observed.getTime() + relative * 1000).toISOString()),
+      (relative === null ? null : isoOrNull(new Date(observed.getTime() + relative * 1000))),
   });
 }
 
@@ -144,7 +145,7 @@ async function scanFile(
     if (record.type !== 'event_msg' || payload.type !== 'token_count') return;
     const ts = str(record.timestamp);
     const at = ts ? new Date(ts) : null;
-    if (!at || Number.isNaN(at.getTime())) return;
+    if (!at || isoOrNull(at) === null) return;
 
     const limits = parseSessionRateLimits(payload, at);
     if (limits && (!latest || limits.observedAt >= latest.observedAt)) latest = limits;

@@ -10,6 +10,7 @@ import {
   exists,
   externalIdFor,
   isDirectory,
+  isoOrNull,
   snapshot,
   subdirectories,
 } from '../lib/util';
@@ -73,11 +74,9 @@ async function detect(env: ProviderEnv): Promise<DetectedLogin[]> {
  */
 export function reportedRenewal(auth: CodexAuth | null): ReportedRenewal | null {
   const until = auth?.subscriptionActiveUntil;
-  if (!until) return null;
-  return {
-    day: until.getDate(),
-    checkedAt: auth.subscriptionLastChecked?.toISOString() ?? null,
-  };
+  if (!until || isoOrNull(until) === null) return null;
+  const checked = auth.subscriptionLastChecked;
+  return { day: until.getDate(), checkedAt: checked ? isoOrNull(checked) : null };
 }
 
 /** Limits from the newest session log, for when the server cannot be asked. */
@@ -196,7 +195,7 @@ async function read(
   return {
     provider: 'codex',
     externalId: externalIdFor(auth?.accountId ?? null, auth?.email ?? null, login.home),
-    email: auth?.email ?? null,
+    email: auth?.email?.slice(0, 320) ?? null,
     organization: auth?.organization?.slice(0, 200) ?? null,
     reportedPlan: plan?.slice(0, 80) ?? null,
     location: login.home.slice(0, 300),
