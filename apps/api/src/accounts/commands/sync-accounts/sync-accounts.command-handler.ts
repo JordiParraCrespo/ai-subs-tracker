@@ -44,7 +44,7 @@ export class SyncAccountsCommandHandler implements ICommandHandler<SyncAccountsC
 
   private async upsert(userId: string, input: SyncAccount): Promise<AccountEntity | null> {
     const sighting = this.mapper.toSighting(input, new Date());
-    const found = await this.accounts.findByLogin(userId, input.provider, input.externalId);
+    let found = await this.accounts.findByLogin(userId, input.provider, input.externalId);
     if (found.isNone()) {
       const account = AccountEntity.register(randomUUID(), {
         userId,
@@ -52,8 +52,12 @@ export class SyncAccountsCommandHandler implements ICommandHandler<SyncAccountsC
         externalId: input.externalId,
         ...sighting,
       });
-      await this.accounts.insert(account);
-      return account;
+      if (await this.accounts.register(account)) return account;
+      // Another sync of the same machine registered it between the look and
+      // the write (the collector's run and a live reading, two windows of the
+      // app). The login is known now: record this sighting on that row.
+      found = await this.accounts.findByLogin(userId, input.provider, input.externalId);
+      if (found.isNone()) return null;
     }
     const account = found.unwrap();
     if (account.isArchived) return null;

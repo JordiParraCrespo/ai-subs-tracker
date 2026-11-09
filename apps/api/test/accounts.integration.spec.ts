@@ -109,6 +109,24 @@ describe('the accounts repositories (integration)', () => {
     await expect(accounts.insert(register(await newUser(), 'login-1'))).resolves.toBeUndefined();
   });
 
+  it('registers a login once when two syncs race: one wins, the other is told it lost', async () => {
+    const userId = await newUser();
+    // Two requests that both looked, both found nothing, and both write.
+    const results = await Promise.all(
+      Array.from({ length: 6 }, () => accounts.register(register(userId, 'raced'))),
+    );
+    expect(results.filter(Boolean)).toHaveLength(1);
+    const rows = await dataSource.query(
+      `SELECT "id" FROM "provider_account" WHERE "userId" = $1 AND "externalId" = 'raced'`,
+      [userId],
+    );
+    expect(rows).toHaveLength(1);
+    // The loser is told, not thrown at, and the row is there to record its sighting on.
+    expect((await accounts.findByLogin(userId, 'claude-code', 'raced')).isSome()).toBe(true);
+    // Any other refusal is still an error: a login for a person who does not exist.
+    await expect(accounts.register(register(randomUUID(), 'orphan'))).rejects.toThrow();
+  });
+
   it('keeps one active account per provider, switching in one write', async () => {
     const userId = await newUser();
     const first = register(userId, 'a');
