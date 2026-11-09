@@ -47,7 +47,11 @@ import { CredentialThrottlerGuard } from './throttling/guards/credential-throttl
 import { RedisThrottlerStorage } from './throttling/infrastructure/redis-throttler.adapter';
 import { ThrottlingModule } from './throttling/throttling.module';
 import { UsersModule } from './users/user.module';
+
 // flama:plugins api-module-imports
+
+/** The largest JSON body a route takes; see `bodyParser` below for what sets it. */
+const JSON_BODY_LIMIT = '2mb';
 
 @Module({
   imports: [
@@ -143,7 +147,11 @@ import { UsersModule } from './users/user.module';
     BetterAuthModule.forRoot({
       auth,
       disableGlobalAuthGuard: true,
-      bodyParser: { rawBody: true },
+      // The JSON limit is body-parser's 100 KB unless said otherwise, which
+      // is less than the accounts sync may carry: a machine with a few dozen
+      // logins, each with its windows and a week of tokens per model, passes
+      // it, and would then never sync. `syncAccountsSchema` bounds the counts.
+      bodyParser: { rawBody: true, json: { limit: JSON_BODY_LIMIT } },
       middleware: createAuthRouteLoggingMiddleware({
         pretty: process.env.NODE_ENV !== 'production',
       }),

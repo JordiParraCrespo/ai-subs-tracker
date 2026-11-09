@@ -189,6 +189,32 @@ describe('AllExceptionsFilter', () => {
     expect(JSON.stringify(problem)).not.toContain('hunter2');
   });
 
+  it("answers a body the parser refused as the caller's mistake, without its message", () => {
+    // What `raw-body` throws for a body past the limit: an `http-errors` error.
+    const tooLarge = Object.assign(new Error('request entity too large (limit 2097152)'), {
+      status: 413,
+      expose: true,
+      type: 'entity.too.large',
+    });
+    const recorder = handle(tooLarge);
+
+    expect(recorder.status).toHaveBeenCalledWith(413);
+    expect(recorder.problem()).toMatchObject({ status: 413, title: 'Payload Too Large' });
+    expect(JSON.stringify(recorder.problem())).not.toContain('2097152');
+  });
+
+  it('does not trust a status on an error that is not marked safe to show', () => {
+    // A driver error may carry a `status` of its own; only `expose` makes it the answer.
+    for (const error of [
+      Object.assign(new Error('upstream said no'), { status: 404 }),
+      Object.assign(new Error('not for clients'), { status: 418, expose: false }),
+      Object.assign(new Error('a server fault'), { status: 502, expose: true }),
+      Object.assign(new Error('not a status'), { status: '413', expose: true }),
+    ]) {
+      expect(handle(error).problem().status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  });
+
   it('gives a bare HttpException no code — a code requires a catalog entry', () => {
     // Documented, deliberate behaviour, and the reason the Better Auth façades
     // throw `AppError` rather than passing an upstream `{ message, code }` body
