@@ -9,10 +9,11 @@ projects share one runner:
   actually sees: sign-in, the accounts, usage, Tokenmaxx, People, Renewals,
   the profile and settings.
 - **`desktop`** — launches the Electron app (`apps/desktop`) on a throwaway
-  home with Claude Code and Codex logins written to disk, signs in through its
-  screens, waits for its collector to sync to the API, and switches a login
-  on, checking the pointer file the terminals read. Its logins never reach a
-  provider, so it runs offline.
+  home with Claude Code, Codex and Grok logins written to disk, signs in
+  through its screens, waits for its collector to sync to the API, and
+  switches a login on, checking the pointer file the terminals read. It never
+  reaches a provider: `collector.spec.ts` keeps its logins lapsed so none is
+  asked, and `vendors.spec.ts` has the suite answer for every vendor (below).
 - **`screens`** — `pnpm screens`: the routes it names, photographed light and
   dark for a pull request. Not a test of anything; with no routes named it
   skips.
@@ -86,6 +87,36 @@ specs about registration and onboarding go through those screens themselves.
 Every browser spec mints its own account, so the `web` project runs fully in
 parallel and nothing has to be put back afterwards.
 
+## Vendors, a machine and a fleet
+
+Three fakes carry the suites that are about accounts:
+
+- **`FakeMachine`** and **`FakeVendors`** come from
+  `@flama/usage-providers/testing`, the same ones the unit specs use. The
+  desktop suite writes its logins with the first. For the second,
+  `support/vendors.ts` puts the fake behind a socket and `route(app)` sends
+  the main process's outbound requests to it, from outside the app: the build
+  under test is the one that ships. A request to this machine (the API) goes
+  through; any other host is refused and recorded, so
+  `vendors.requests` shows nothing left the machine, and `vendors.audit()`
+  that each credential went only to its vendor under ResetOwl's own name. Call
+  `route` before signing in: the collector asks no vendor without a session.
+- **`fleet(tag)`** in `support/accounts.ts` is a machine's worth of synced
+  accounts in every state the screens must draw (each failure status, a plan
+  the catalog does not know, usage past 100%, names at the contract's lengths,
+  markup as a name). `tests/web/fleet.spec.ts` walks every signed-in route
+  over it, at desktop and phone width, and over no accounts at all. A new
+  state a screen must draw is a new entry there, and a new route a new row in
+  that spec's `ROUTES`.
+
+`tests/api/sync-contract.spec.ts` is the sync endpoint under pressure: its
+largest payload, the same payload repeated and at once, every wrong payload.
+
+**Mind the API's rate limit.** A browser session is counted per address, 100
+requests a minute, and every spec shares it. One full page load is about
+seven requests, so a spec that visits many routes moves inside the app
+(`visit` in `fleet.spec.ts`) rather than calling `page.goto` for each.
+
 ## Two conventions worth knowing
 
 **Every test here asserts behaviour the app actually has.** Earlier revisions
@@ -120,10 +151,12 @@ re-tested by accident everywhere else.
 ```
 e2e/
 ├── support/
-│   ├── accounts.ts # a desktop collector's sync, sent straight to the API
+│   ├── accounts.ts # a desktop collector's sync, sent straight to the API; the fleet
 │   ├── auth.ts     # request contexts, sign-up/in/out, reset helpers, problem-doc assertions
 │   ├── db.ts       # reset tokens, roles, orgs, sessions, password hashes
+│   ├── desktop.ts  # launches the Electron build on a home the suite made
 │   ├── mail.ts     # reads the console-provider "mailbox" out of the API log
+│   ├── vendors.ts  # the fake vendors behind a socket, and the route to them
 │   └── web.ts      # browser sign-in and a fresh account per spec
 └── tests/
     ├── api/        # sign-up, sign-in, password reset, verification, protected

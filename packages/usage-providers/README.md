@@ -57,9 +57,40 @@ hold a marker (`.credentials.json`, `.claude.json`, `projects/`,
   (other than 401/403) the newest `rate_limits` a session logged
 - Tokens: `token_count` events in `<home>/sessions/**/*.jsonl`
 
+## Testing against it
+
+`@flama/usage-providers/testing` is the fakes the package's own specs, the
+desktop app's and the e2e desktop suite share. Nothing that ships imports it.
+
+```ts
+import { claudeUsageBody, FakeMachine, FakeVendors, reply } from '@flama/usage-providers/testing';
+
+const machine = await FakeMachine.create({ now });
+const login = await machine.claude({ name: 'maya', rateLimitTier: 'default_claude_max_20x' });
+const vendors = new FakeVendors().set(
+  'anthropic',
+  login.credential,
+  reply.status(429), // the first answer
+  reply.json(claudeUsageBody({ session: 40, weekly: 12 })), // every answer after it
+);
+
+const accounts = await collectAll(machine.env({ fetch: vendors.fetch }), opts);
+expect(vendors.audit()).toEqual([]); // honest client name, each credential only at its vendor
+```
+
+| Export | What it is |
+| --- | --- |
+| `FakeMachine` | A throwaway home with Claude Code, Codex and Grok logins on it (`claude`, `codex`, `grok`), each with a token `valid`, `renewable`, `lapsed` or `none`, transcripts to count tokens from, and `env()` for a `ProviderEnv` that refuses the network unless given a `fetch` |
+| `FakeVendors` | Every usage endpoint (Anthropic, ChatGPT, xAI, Z.AI, BigModel): `set(vendor, credential, ...replies)`, `fetch`, `requests`, `audit()`, and `handle()` for putting it behind a socket |
+| `reply` | `json`, `status`, `text`, `network`, `timeout` |
+| `claudeUsageBody`, `codexUsageBody`, `grokBillingBody`, `zaiQuotaBody` | The vendors' answers, from a few numbers |
+| `HOSTILE_BODIES` | Answers that are not the expected shape, each named for what it stands for |
+| `claudeAssistantLine`, `codexSessionLines`, `fakeJwt`, `jsonl`, `writeJson`, `writeText` | The files underneath, for a case the machine does not cover |
+
 ## Scripts
 
 ```bash
 pnpm --filter @flama/usage-providers build
 pnpm --filter @flama/usage-providers test
+FUZZ_RUNS=40000 pnpm --filter @flama/usage-providers test   # the parser properties, run longer
 ```

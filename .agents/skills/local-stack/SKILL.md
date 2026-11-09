@@ -39,8 +39,10 @@ answering on 3001 alone, and `pnpm ci:local` refuses an API it did not start.
 The desktop suite launches the real Electron build on a throwaway home with
 Claude Code and Codex logins written to disk, signs in through the app,
 waits for its collector to sync to the stack's API, and switches a login on
-through the screens. Its logins never reach a provider (expired, or no
-access token), so it runs offline and sends no credential anywhere.
+through the screens. It never reaches a provider, so it runs offline and
+sends no credential anywhere: one spec keeps its logins lapsed so none is
+asked, the other has the suite's fake vendors answer for every one
+(`e2e/README.md`, "Vendors, a machine and a fleet").
 
 Playwright uses the machine's own Chromium where it ships one
 (`scripts/chromium.mjs`: `PLAYWRIGHT_CHROMIUM_PATH`, or

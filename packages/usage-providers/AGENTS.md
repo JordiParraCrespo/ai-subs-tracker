@@ -21,7 +21,8 @@ src/
 ├── codex/             # auth (JWT claims), usage-api (wham), sessions (tokens + offline limits), the provider
 ├── grok/              # auth (GROK_HOME/auth.json), billing (the CLI chat proxy's usage view), the provider
 ├── zai/               # quota: the opt-in unofficial reader for Z.AI / BigModel Coding Plans (not a provider)
-└── __tests__/         # vitest; fake homes in os.tmpdir(), fake fetch and keychain
+├── testing/           # `@flama/usage-providers/testing`: FakeMachine, FakeVendors, vendor bodies (nothing that ships imports it)
+└── __tests__/         # vitest over the fakes; `battle/` is every reader against failing vendors, broken homes and any input
 ```
 
 ## Rules
@@ -61,6 +62,35 @@ src/
   (`fetch`, `readKeychain`, `now`, `env`, `home`), so tests never touch the
   network or the real home. A new provider is a folder plus one line in
   `registry.ts`, with specs over a fake home.
+
+## Tests
+
+A spec builds on `src/testing` rather than on fakes of its own: `FakeMachine`
+writes logins to a throwaway home as the vendors' CLIs leave them (a token
+`valid`, `renewable`, `lapsed` or absent), `FakeVendors` answers every usage
+endpoint from a script per credential and its `audit()` names any request
+that broke a rule above (a credential at another vendor, a borrowed client
+name, a host that is no vendor), and `HOSTILE_BODIES` are the answers a reader
+must survive. The desktop app's specs and the e2e desktop suite use the same
+three, so a new vendor shape is added once.
+
+`__tests__/battle/` holds what every reader owes, and a new provider or
+parser joins it in the same diff:
+
+- `vendor-chaos.spec.ts`: a row in `VENDOR_OF`, so each failure a vendor can
+  answer with is read as the right status, with the other logins still read;
+- `parsers.property.spec.ts`: a property per parser (fast-check). Whatever a
+  parser returns must pass the schema in `packages/shared`: one window the API
+  refuses fails the sync for every account on the machine. A failure prints
+  its seed and the shrunk input; pin that input in `contract.spec.ts`.
+  `FUZZ_RUNS=40000` runs it longer;
+- `machine-chaos.spec.ts`: many logins, each stage of a login's life, and
+  homes whose files are broken.
+
+Everything a snapshot carries goes through `snapshot()` (`lib/util.ts`), which
+fits each window to the contract (`fitWindow`), and every date through
+`isoOrNull` / `toIso`: build a reading any other way and a vendor's odd value
+reaches the API as it came.
 
 Only providers in `LOCAL_PROVIDER_IDS` are `CodingAgentProvider`s. The one
 other thing here is `zai/quota.ts`, the **unofficial usage reader** for the
