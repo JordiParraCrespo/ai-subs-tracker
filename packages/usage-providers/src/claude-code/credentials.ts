@@ -110,17 +110,38 @@ export async function readCredentials(
 }
 
 /**
- * The plan as Claude Code reports it: `rateLimitTier` when it names a plan
- * the catalog knows (`default_claude_max_20x`), else `subscriptionType`.
+ * The plan as Claude Code reports it.
+ *
+ * A seat in a Team or Enterprise organization is that plan, whatever its
+ * `rateLimitTier` says: a Team Premium seat carries a Max-sized tier
+ * (`default_claude_max_5x`, sometimes `_20x`), which read alone would call it
+ * a personal Max or Ultra subscription with the wrong price and windows. So
+ * `subscriptionType` decides for an organization seat, and the tier only says
+ * which seat (a Max-sized or premium tier is a Premium seat). For a personal
+ * plan, `rateLimitTier` wins when it names a plan the catalog knows
+ * (`default_claude_max_20x` is Ultra), else `subscriptionType`.
  */
 export function reportedPlan(
   creds: Pick<ClaudeOAuth, 'subscriptionType' | 'rateLimitTier'> | null,
 ): string | null {
   if (!creds) return null;
+  const subscription = creds.subscriptionType?.trim().toLowerCase() ?? null;
+  if (subscription === 'team') {
+    return isPremiumSeatTier(creds.rateLimitTier) ? 'team_premium' : 'team';
+  }
+  if (subscription === 'enterprise') return 'enterprise';
   if (creds.rateLimitTier && resolvePlan('claude-code', creds.rateLimitTier)) {
     return creds.rateLimitTier;
   }
   return creds.subscriptionType ?? creds.rateLimitTier;
+}
+
+/** Whether an organization seat's tier is a Premium seat: Max-sized, or named premium. */
+function isPremiumSeatTier(tier: string | null): boolean {
+  if (!tier) return false;
+  if (/premium/i.test(tier)) return true;
+  const plan = resolvePlan('claude-code', tier);
+  return plan?.id === 'claude-max' || plan?.id === 'claude-ultra';
 }
 
 /**
