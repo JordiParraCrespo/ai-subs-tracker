@@ -125,6 +125,25 @@ describe('claude-code credentials', () => {
       'pro',
     );
   });
+  it('reports a Team seat as Team, not as the Max-sized tier it carries', () => {
+    // A Team Premium seat reads as Max (or Ultra) by its tier alone, with
+    // the wrong price and windows; the subscription decides for a seat.
+    for (const tier of ['default_claude_max_5x', 'default_claude_max_20x']) {
+      const plan = reportedPlan({ subscriptionType: 'team', rateLimitTier: tier });
+      expect(resolvePlan('claude-code', plan)?.id).toBe('claude-team-premium');
+    }
+    const standard = reportedPlan({ subscriptionType: 'team', rateLimitTier: 'default_claude_ai' });
+    expect(resolvePlan('claude-code', standard)?.id).toBe('claude-team-standard');
+    expect(
+      resolvePlan('claude-code', reportedPlan({ subscriptionType: 'team', rateLimitTier: null }))
+        ?.id,
+    ).toBe('claude-team-standard');
+    const enterprise = reportedPlan({
+      subscriptionType: 'enterprise',
+      rateLimitTier: 'default_claude_max_5x',
+    });
+    expect(resolvePlan('claude-code', enterprise)?.id).toBe('claude-enterprise');
+  });
 });
 
 describe('claude-code usage parsing', () => {
