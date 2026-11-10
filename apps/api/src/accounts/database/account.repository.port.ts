@@ -14,6 +14,12 @@ export interface AccountRepositoryPort extends RepositoryPort<AccountEntity> {
     provider: ProviderId,
     externalId: string,
   ): Promise<Option<AccountEntity>>;
+  /**
+   * Inserts a login seen for the first time. False when another request
+   * registered the same login first (two syncs of one machine at once): the
+   * row is theirs, nothing was written, and `findByLogin` now finds it.
+   */
+  register(entity: AccountEntity): Promise<boolean>;
   /** The owner's tracked accounts, archived ones left out. */
   findForUser(userId: string): Promise<AccountEntity[]>;
   /** Writes several aggregates of one owner in one transaction (activation). */

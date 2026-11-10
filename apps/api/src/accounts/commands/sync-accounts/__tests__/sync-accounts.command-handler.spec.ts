@@ -44,14 +44,14 @@ const command = (accounts = [login]) =>
   });
 
 describe('SyncAccountsCommandHandler', () => {
-  let accounts: Pick<AccountRepositoryPort, 'findByLogin' | 'insert' | 'save'>;
+  let accounts: Pick<AccountRepositoryPort, 'findByLogin' | 'register' | 'save'>;
   let usage: Pick<UsageRepositoryPort, 'recordSnapshot' | 'replaceDailyTokens'>;
   let handler: SyncAccountsCommandHandler;
 
   beforeEach(() => {
     accounts = {
       findByLogin: vi.fn().mockResolvedValue(None),
-      insert: vi.fn().mockResolvedValue(undefined),
+      register: vi.fn().mockResolvedValue(true),
       save: vi.fn().mockImplementation((entity: AccountEntity) => Promise.resolve(entity)),
     };
     usage = {
@@ -67,8 +67,8 @@ describe('SyncAccountsCommandHandler', () => {
 
   it('registers a login seen for the first time and records its telemetry', async () => {
     const ids = await handler.execute(command());
-    expect(accounts.insert).toHaveBeenCalledTimes(1);
-    const created = vi.mocked(accounts.insert).mock.calls[0][0] as AccountEntity;
+    expect(accounts.register).toHaveBeenCalledTimes(1);
+    const created = vi.mocked(accounts.register).mock.calls[0][0] as AccountEntity;
     expect(created.userId).toBe('user-1');
     expect(created.plan?.id).toBe('codex-plus');
     expect(ids).toEqual([created.id]);
@@ -83,13 +83,36 @@ describe('SyncAccountsCommandHandler', () => {
     await handler.execute(
       command([{ ...login, reportedRenewal: { day: 23, checkedAt: '2026-09-22T10:09:48Z' } }]),
     );
-    const created = vi.mocked(accounts.insert).mock.calls[0][0] as AccountEntity;
+    const created = vi.mocked(accounts.register).mock.calls[0][0] as AccountEntity;
     expect(created.renewalDay).toBe(23);
     expect(created.renewalDayOverridden).toBe(false);
     expect(created.renewalCheckedAt?.toISOString()).toBe('2026-09-22T10:09:48.000Z');
   });
 
   // Without this, removing an account in the app would be undone by the next sync.
+  // Two syncs of one machine at once (the collector's run and a live reading)
+  // both find no row; the one that loses the write must not fail the sync.
+  it('records the sighting on the row another sync registered first, instead of failing', async () => {
+    const theirs = AccountEntity.register('acc-theirs', {
+      userId: 'user-1',
+      provider: 'codex',
+      externalId: 'chatgpt-acct',
+      email: null,
+      organization: null,
+      reportedPlan: null,
+      location: null,
+      reportedRenewal: null,
+      at: new Date(),
+    });
+    vi.mocked(accounts.findByLogin).mockResolvedValueOnce(None).mockResolvedValueOnce(Some(theirs));
+    vi.mocked(accounts.register).mockResolvedValue(false);
+
+    expect(await handler.execute(command())).toEqual(['acc-theirs']);
+    expect(accounts.save).toHaveBeenCalledWith(theirs);
+    expect(theirs.email).toBe('me@example.com');
+    expect(usage.recordSnapshot).toHaveBeenCalledWith('acc-theirs', login.snapshot, 90);
+  });
+
   it('ignores a login its owner removed', async () => {
     const archived = AccountEntity.register('acc-1', {
       userId: 'user-1',

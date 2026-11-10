@@ -23,6 +23,7 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "@flama/env": "workspace:*"
+    "@flama/env": "workspace:*",
+    "@flama/usage-providers": "workspace:*"
   }
 }

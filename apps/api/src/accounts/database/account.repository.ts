@@ -8,11 +8,18 @@ import type { ProviderId } from '@flama/shared/subscriptions';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { None, type Option, Some } from 'oxide.ts';
-import { DataSource, IsNull, type Repository } from 'typeorm';
+import { DataSource, IsNull, QueryFailedError, type Repository } from 'typeorm';
 import { AccountMapper } from '../account.mapper';
 import type { AccountEntity } from '../domain/account.entity';
 import { AccountOrmEntity } from './account.orm-entity';
 import type { AccountRepositoryPort } from './account.repository.port';
+
+/** Postgres `unique_violation` on the one-row-per-login constraint. */
+function isDuplicateLogin(error: unknown): boolean {
+  if (!(error instanceof QueryFailedError)) return false;
+  const driver = error.driverError as { code?: unknown; constraint?: unknown };
+  return driver.code === '23505' && driver.constraint === 'UQ_provider_account_login';
+}
 
 /** TypeORM adapter for the account aggregate. */
 @Injectable()
@@ -32,6 +39,17 @@ export class AccountRepository implements AccountRepositoryPort {
         .getRepository(AccountOrmEntity)
         .insert(entities.map((e) => this.mapper.toPersistence(e))),
     );
+  }
+
+  async register(entity: AccountEntity): Promise<boolean> {
+    try {
+      await this.insert(entity);
+      return true;
+    } catch (error) {
+      // The write and its events rolled back together, so losing the race leaves nothing behind.
+      if (isDuplicateLogin(error)) return false;
+      throw error;
+    }
   }
 
   async save(entity: AccountEntity): Promise<AccountEntity> {

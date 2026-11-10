@@ -1,5 +1,5 @@
 import type { ExtraUsage, LimitWindow, WindowKind } from '@flama/shared/schemas/accounts';
-import { isRecord, type JsonRecord, num, percent, str, toIso } from '../lib/util';
+import { isoOrNull, isRecord, type JsonRecord, num, percent, str, toIso } from '../lib/util';
 
 /**
  * The endpoint behind ChatGPT's Codex usage page. Undocumented, so parsing
@@ -84,7 +84,7 @@ export function codexWindow(key: string, raw: RawCodexWindow): LimitWindow | nul
 
 function relativeReset(seconds: unknown, from: Date): string | null {
   const n = num(seconds);
-  return n === null ? null : new Date(from.getTime() + n * 1000).toISOString();
+  return n === null ? null : isoOrNull(new Date(from.getTime() + n * 1000));
 }
 
 function backendWindow(key: string, value: unknown, now: Date): LimitWindow | null {

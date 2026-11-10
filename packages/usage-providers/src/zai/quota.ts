@@ -5,7 +5,7 @@ import type {
   WindowKind,
 } from '@flama/shared/schemas/accounts';
 import { type ManualProviderId, UNOFFICIAL_USAGE_READERS } from '@flama/shared/subscriptions';
-import { errorMessage, isRecord, num, percent, snapshot, str } from '../lib/util';
+import { errorMessage, isoOrNull, isRecord, num, percent, snapshot, str } from '../lib/util';
 import type { ProviderEnv } from '../types';
 
 /**
@@ -117,7 +117,7 @@ export function parseZaiQuota(
       kind: shape.kind,
       label: shape.label,
       utilization: Math.round(utilization * 100) / 100,
-      resetsAt: resetsAt && Number.isFinite(resetsAt.getTime()) ? resetsAt.toISOString() : null,
+      resetsAt: resetsAt ? isoOrNull(resetsAt) : null,
       windowMinutes: minutes,
     });
   }

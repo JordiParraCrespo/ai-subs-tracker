@@ -142,6 +142,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
       );
     }
 
+    // The body parser refuses a request before Nest sees it (too large, an
+    // encoding it does not take), with an `http-errors` error rather than an
+    // `HttpException`. It is the caller's mistake and keeps its status;
+    // answering 500 would also log every oversized body as a server fault.
+    const refused = clientErrorStatusOf(exception);
+    if (refused !== null) {
+      return buildProblemDetails({ status: refused, title: titleForStatus(refused) }, context);
+    }
+
     return this.internalProblem(context);
   }
 
@@ -158,6 +167,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
       context,
     );
   }
+}
+
+/**
+ * The 4xx status of an `http-errors` error marked safe to show (`expose`), as
+ * `body-parser` and `raw-body` throw them; null for anything else. Only the
+ * status is taken: the message stays out of the response.
+ */
+function clientErrorStatusOf(exception: unknown): number | null {
+  if (!(exception instanceof Error)) return null;
+  const { status, expose } = exception as Error & { status?: unknown; expose?: unknown };
+  if (expose !== true || typeof status !== 'number' || !Number.isInteger(status)) return null;
+  return status >= 400 && status < 500 ? status : null;
 }
 
 /**

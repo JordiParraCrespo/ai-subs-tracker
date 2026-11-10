@@ -1,5 +1,5 @@
 import type { ExtraUsage, LimitWindow, WindowKind } from '@flama/shared/schemas/accounts';
-import { isRecord, type JsonRecord, num, percent, str, toIso } from '../lib/util';
+import { fitWindow, isRecord, type JsonRecord, num, percent, str, toIso } from '../lib/util';
 
 /**
  * The endpoint behind Claude Code's `/usage` screen. It is not a documented
@@ -216,5 +216,5 @@ export function parseClaudeStatusline(json: unknown): LimitWindow[] | null {
     if (window.utilization === null && window.resetsAt === null) continue;
     windows.push(window);
   }
-  return windows.length > 0 ? sortWindows(windows).slice(0, 20) : null;
+  return windows.length > 0 ? sortWindows(windows).slice(0, 20).map(fitWindow) : null;
 }

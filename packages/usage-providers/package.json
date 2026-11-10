@@ -12,6 +12,13 @@
       "import": "./dist/index.js",
       "require": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "flama-source": "./src/testing/index.ts",
+      "import": "./dist/testing/index.js",
+      "require": "./dist/testing/index.js",
+      "default": "./dist/testing/index.js"
     }
   },
   "scripts": {
@@ -28,6 +35,7 @@
   "devDependencies": {
     "@flama/tsconfig": "workspace:^",
     "@types/node": "^26.6.5",
+    "fast-check": "^4.10.2",
     "typescript": "^6.0.3",
     "vitest": "^5.0.5"
   }
