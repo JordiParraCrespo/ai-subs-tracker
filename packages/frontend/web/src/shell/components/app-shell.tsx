@@ -54,7 +54,7 @@ export function AppShell({ children, ...config }: ShellConfig & { children: Reac
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <MobileBar onMenu={() => setDrawerOpen(true)} />
           <main className="m-3 mt-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-2xl bg-panel outline-1 -outline-offset-1 outline-panel-outline lg:mt-3 lg:ml-0">
-            <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
+            <div className="min-h-0 flex-1 scrollbar-thin overflow-x-hidden overflow-y-auto [&::-webkit-scrollbar-track]:my-3">
               <div className="mx-auto flex min-h-full w-full max-w-7xl flex-col px-4 pt-7 pb-14 [@media(max-height:800px)]:pb-8 sm:px-6 lg:px-[clamp(32px,4vw,64px)]">
                 {children}
               </div>
