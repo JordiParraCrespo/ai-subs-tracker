@@ -5,6 +5,7 @@ import {
   IpcArgumentError,
   isTrustedSender,
   parseAccountId,
+  parseAddLoginOptions,
   parseApiKey,
   parseExternalUrl,
   parseHome,
@@ -50,6 +51,16 @@ describe('IPC argument validation', () => {
     expect(parseProvider('codex')).toBe('codex');
     for (const bad of ['gemini', '', null, 1, { id: 'codex' }]) {
       expect(() => parseProvider(bad)).toThrow(IpcArgumentError);
+    }
+  });
+
+  it('takes a device-code sign-in only as a boolean flag', () => {
+    expect(parseAddLoginOptions(undefined)).toEqual({});
+    expect(parseAddLoginOptions({})).toEqual({});
+    expect(parseAddLoginOptions({ deviceCode: true })).toEqual({ deviceCode: true });
+    expect(parseAddLoginOptions({ deviceCode: false })).toEqual({});
+    for (const bad of [{ deviceCode: 'yes' }, [], 'device', 1]) {
+      expect(() => parseAddLoginOptions(bad)).toThrow(IpcArgumentError);
     }
   });
 

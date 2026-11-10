@@ -34,11 +34,13 @@ The screens follow the designs in [`designs/`](designs/).
 ```
 
 - **Plans and limits.** For each login the collector reads the plan and asks
-  the provider for its limit windows: Claude Code's OAuth usage endpoint, and
-  Codex's ChatGPT usage endpoint, falling back to the rate limits Codex writes
-  in its session logs, and the weekly pool from Grok Build's billing view
-  (`~/.grok/auth.json`, `cli-chat-proxy.grok.com`). It sends an honest `resetowl-desktop/<version>` client
-  name. Every 10 minutes, with back-off, and a 15-minute pause after a 429.
+  the provider for its limit windows, the way the open-source Orca app does:
+  Claude Code's OAuth usage endpoint; Codex's own CLI (`codex app-server`,
+  which renews the login as it answers), falling back to its ChatGPT usage
+  endpoint and then to the rate limits Codex writes in its session logs; and
+  the usage pool from Grok Build's billing view (`~/.grok/auth.json`,
+  `cli-chat-proxy.grok.com`). The requests carry the client headers Orca
+  sends. Every 10 minutes, with back-off, and a 15-minute pause after a 429.
 - **Tokens.** Counted from the CLIs' own transcripts (`~/.claude/projects`,
   `~/.codex/sessions`), per model and day (Grok Build's session logs carry no
   token counts, so its logins report limits only), and priced with

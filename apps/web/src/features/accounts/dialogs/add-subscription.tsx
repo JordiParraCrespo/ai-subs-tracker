@@ -139,10 +139,12 @@ export function AddSubscriptionDialog({
       {step.kind === 'sign-in' && (step.provider === 'codex' || step.provider === 'grok') && (
         <DeviceCodeSignIn
           provider={step.provider}
+          deviceCode={login.deviceCode}
           code={login.progress.code}
           link={login.progress.link}
           onBack={back}
           onOpen={(link) => void desktopBridge?.openExternal(link)}
+          onSwitch={login.switchMode}
         />
       )}
 

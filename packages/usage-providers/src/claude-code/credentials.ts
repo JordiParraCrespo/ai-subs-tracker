@@ -1,4 +1,5 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, realpath } from 'node:fs/promises';
+import { userInfo } from 'node:os';
 import { join, resolve } from 'node:path';
 import { resolvePlan } from '@flama/shared/subscriptions';
 import { isRecord, num, readJson, sha256Hex, str } from '../lib/util';
@@ -9,7 +10,10 @@ import type { ProviderEnv } from '../types';
  *
  * - Linux / Windows: `<configDir>/.credentials.json`
  * - macOS: the login Keychain, service `Claude Code-credentials`, with an
- *   8-hex suffix for any config dir other than `~/.claude`
+ *   8-hex suffix for any config dir other than `~/.claude`, under the
+ *   account `$USER` (Claude 2.1+). Read first, as Orca does: Claude Code
+ *   refreshes the Keychain item, so a `.credentials.json` left behind in the
+ *   folder is older and must not hide it.
  *
  * Read only. The token is never refreshed here: refresh tokens rotate, so a
  * refresh would silently sign Claude Code out. Using Claude Code once
@@ -47,13 +51,45 @@ export function isDefaultConfigDir(configDir: string, home: string): boolean {
   return resolve(configDir) === resolve(defaultConfigDir(home));
 }
 
+/** The account Claude Code 2.1+ files its Keychain item under. */
+export const KEYCHAIN_FALLBACK_ACCOUNT = 'claude-code-user';
+const KEYCHAIN_ACCOUNT_PATTERN = /^[a-zA-Z0-9._-]+$/;
+
+/**
+ * The Keychain account Claude Code uses: the login name, or
+ * `claude-code-user` for a name it would not use (an SSO email, say).
+ */
+export function keychainAccount(env: Record<string, string | undefined>): string {
+  let user: string | undefined;
+  try {
+    user = env.USER || env.USERNAME || userInfo().username;
+  } catch {
+    return KEYCHAIN_FALLBACK_ACCOUNT;
+  }
+  return user && KEYCHAIN_ACCOUNT_PATTERN.test(user) ? user : KEYCHAIN_FALLBACK_ACCOUNT;
+}
+
 /**
  * The Keychain service Claude Code uses for a config dir: the bare name for
- * `~/.claude`, else suffixed with the first 8 hex of sha256(configDir).
+ * `~/.claude`, else suffixed with the first 8 hex of sha256 of the dir in
+ * Unicode NFC.
  */
 export function keychainServiceFor(configDir: string, home: string): string {
   if (isDefaultConfigDir(configDir, home)) return KEYCHAIN_BASE_SERVICE;
-  return `${KEYCHAIN_BASE_SERVICE}-${sha256Hex(configDir).slice(0, 8)}`;
+  return `${KEYCHAIN_BASE_SERVICE}-${sha256Hex(configDir.normalize('NFC')).slice(0, 8)}`;
+}
+
+/**
+ * The spellings of a config dir Claude may have hashed into its Keychain
+ * item: as given, and through its symlinks. A non-default dir never falls
+ * back to the bare service, which is the default login's.
+ */
+async function keychainServices(configDir: string, home: string): Promise<string[]> {
+  if (isDefaultConfigDir(configDir, home)) return [KEYCHAIN_BASE_SERVICE];
+  const services = [keychainServiceFor(configDir, home)];
+  const canonical = await realpath(configDir).catch(() => null);
+  if (canonical && canonical !== configDir) services.push(keychainServiceFor(canonical, home));
+  return services;
 }
 
 export function parseCredentials(raw: string): ClaudeOAuth | null {
@@ -93,20 +129,30 @@ export function isRenewable(
   return creds.refreshTokenExpiresAt === null || creds.refreshTokenExpiresAt > now.getTime();
 }
 
+async function readKeychainCredentials(
+  configDir: string,
+  env: ProviderEnv,
+): Promise<ClaudeOAuth | null> {
+  const account = keychainAccount(env.env);
+  for (const service of await keychainServices(configDir, env.home)) {
+    const raw = await env.readKeychain(service, account).catch(() => null);
+    const creds = raw ? parseCredentials(raw.trim()) : null;
+    if (creds) return creds;
+  }
+  return null;
+}
+
+/** On macOS the Keychain first, then the file; elsewhere the file. */
 export async function readCredentials(
   configDir: string,
   env: ProviderEnv,
 ): Promise<ClaudeOAuth | null> {
-  const file = await readFile(join(configDir, '.credentials.json'), 'utf8').catch(() => null);
-  const fromFile = file ? parseCredentials(file) : null;
-  if (fromFile) return fromFile;
-  if (env.platform !== 'darwin') return null;
-  try {
-    const raw = await env.readKeychain(keychainServiceFor(configDir, env.home));
-    return raw ? parseCredentials(raw.trim()) : null;
-  } catch {
-    return null;
+  if (env.platform === 'darwin') {
+    const fromKeychain = await readKeychainCredentials(configDir, env);
+    if (fromKeychain) return fromKeychain;
   }
+  const file = await readFile(join(configDir, '.credentials.json'), 'utf8').catch(() => null);
+  return file ? parseCredentials(file) : null;
 }
 
 /**

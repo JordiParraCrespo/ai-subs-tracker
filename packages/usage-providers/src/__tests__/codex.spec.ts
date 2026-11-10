@@ -4,11 +4,13 @@ import { syncAccountSchema } from '@flama/shared/schemas/accounts';
 import { resolvePlan } from '@flama/shared/subscriptions';
 import { describe, expect, it } from 'vitest';
 import { codexProvider, reportedRenewal } from '../codex';
-import { parseCodexAuth } from '../codex/auth';
+import { CODEX_PROBE_ARGS } from '../codex/app-server';
+import { parseCodexAuth, readCodexAuthWithGrace } from '../codex/auth';
 import { parseCodexUsage } from '../codex/usage-api';
 import { localDay } from '../lib/util';
 import type { DetectedLogin } from '../types';
 import {
+  fakeAppServer,
   fakeFetch,
   fakeJwt,
   jsonl,
@@ -181,17 +183,89 @@ describe('codex usage parsing', () => {
 });
 
 describe('codex read', () => {
-  it('asks wham/usage with the account header and an honest User-Agent', async () => {
+  it("asks Codex's own CLI first, through app-server, in the login's CODEX_HOME", async () => {
     const { home, dir, login } = await codexHome();
+    const server = fakeAppServer({
+      result: {
+        rateLimits: {
+          primary: { usedPercent: 30, windowDurationMins: 300, resetsAt: 1_793_000_000 },
+          secondary: { usedPercent: 60, windowDurationMins: 10080, resetsAt: 1_793_500_000 },
+          credits: { hasCredits: true, balance: '5' },
+        },
+      },
+    });
     const { fn, calls } = fakeFetch(WHAM);
-    const account = await codexProvider.read(login, testEnv(home, { fetch: fn }), opts);
+    const account = await codexProvider.read(
+      login,
+      testEnv(home, { fetch: fn, spawnCli: server.spawnCli }),
+      opts,
+    );
+    expect(server.calls).toEqual([
+      { command: 'codex', args: CODEX_PROBE_ARGS, env: { CODEX_HOME: dir } },
+    ]);
+    // Both windows came from the CLI: wham/usage is not asked.
+    expect(calls).toHaveLength(0);
+    expect(account.snapshot?.status).toBe('ok');
+    expect(account.snapshot?.windows.map((w) => [w.kind, w.utilization])).toEqual([
+      ['session', 30],
+      ['weekly', 60],
+    ]);
+    expect(account.snapshot?.extraUsage?.enabled).toBe(true);
+    // The plan comes from the login when the CLI does not name it.
+    expect(account.reportedPlan).toBe('pro');
+  });
+
+  it('fills a session window the CLI left out from wham/usage', async () => {
+    const { home, login } = await codexHome();
+    const server = fakeAppServer({
+      result: { rateLimits: { secondary: { usedPercent: 60, windowDurationMins: 10080 } } },
+    });
+    const { fn, calls } = fakeFetch(WHAM);
+    const account = await codexProvider.read(
+      login,
+      testEnv(home, { fetch: fn, spawnCli: server.spawnCli }),
+      opts,
+    );
+    expect(calls).toHaveLength(1);
+    expect(account.snapshot?.windows.map((w) => w.kind)).toEqual(['session', 'weekly']);
+  });
+
+  it('marks the login signed out only when the CLI says it cannot refresh it', async () => {
+    const { home, login } = await codexHome();
+    const server = fakeAppServer({
+      exit: 1,
+      stderr: 'Error: refresh token was already used\n',
+    });
+    const { fn, calls } = fakeFetch(WHAM);
+    const account = await codexProvider.read(
+      login,
+      testEnv(home, { fetch: fn, spawnCli: server.spawnCli }),
+      opts,
+    );
+    expect(calls).toHaveLength(0);
+    expect(account.snapshot).toMatchObject({
+      status: 'auth_expired',
+      message: 'Your ChatGPT session could not be refreshed. Please sign in again.',
+    });
+  });
+
+  it("falls back to wham/usage with Codex's client headers when the CLI cannot run", async () => {
+    const { home, dir, login } = await codexHome();
+    const server = fakeAppServer({ enoent: true });
+    const { fn, calls } = fakeFetch(WHAM);
+    const account = await codexProvider.read(
+      login,
+      testEnv(home, { fetch: fn, spawnCli: server.spawnCli }),
+      opts,
+    );
     expect(calls[0]?.url).toBe('https://chatgpt.com/backend-api/wham/usage');
-    expect(calls[0]?.headers).toMatchObject({
+    expect(calls[0]?.headers).toEqual({
       Authorization: 'Bearer codex-access',
       'ChatGPT-Account-Id': 'acct-1',
-      'User-Agent': 'resetowl-desktop/test',
+      'User-Agent': 'codex-cli',
+      'OpenAI-Beta': 'codex-1',
+      originator: 'Codex Desktop',
     });
-    expect(calls[0]?.headers).not.toHaveProperty('originator');
     expect(account).toMatchObject({
       provider: 'codex',
       externalId: 'acct-1',
@@ -203,7 +277,7 @@ describe('codex read', () => {
     expect(account.snapshot?.windows).toHaveLength(2);
   });
 
-  it('turns 401 and 403 into auth_expired', async () => {
+  it('never reads a 401 or 403 from wham/usage as a sign-out', async () => {
     for (const status of [401, 403]) {
       const { home, login } = await codexHome();
       const account = await codexProvider.read(
@@ -211,8 +285,8 @@ describe('codex read', () => {
         testEnv(home, { fetch: fakeFetch({}, status).fn }),
         opts,
       );
-      expect(account.snapshot?.status).toBe('auth_expired');
-      expect(account.snapshot?.windows).toEqual([]);
+      expect(account.snapshot?.status).toBe('error');
+      expect(account.snapshot?.message).toContain(`HTTP ${status}`);
     }
   });
 
@@ -224,6 +298,20 @@ describe('codex read', () => {
       opts,
     );
     expect(account.snapshot?.status).toBe('rate_limited');
+  });
+
+  it('waits out auth.json being rewritten before calling a login gone', async () => {
+    const { dir } = await codexHome();
+    expect(await readCodexAuthWithGrace(dir, 2_000)).not.toBeNull();
+    const authFile = join(dir, 'auth.json');
+    const { rename } = await import('node:fs/promises');
+    await rename(authFile, `${authFile}.tmp`);
+    setTimeout(() => void rename(`${authFile}.tmp`, authFile), 300);
+    expect((await readCodexAuthWithGrace(dir, 2_000))?.accountId).toBe('acct-1');
+    // A home that never had a login is not waited for.
+    const started = Date.now();
+    expect(await readCodexAuthWithGrace(join(dir, 'never'), 2_000)).toBeNull();
+    expect(Date.now() - started).toBeLessThan(500);
   });
 
   it('says only a ChatGPT sign-in has plan limits for an API-key login', async () => {
@@ -390,13 +478,17 @@ describe('codex commands', () => {
     expect(await codexProvider.signedInAs(dir)).toBe('acct-1');
   });
 
-  it('signs a new account into its own CODEX_HOME', () => {
+  it('signs a new account into its own CODEX_HOME, by browser or by device code', () => {
     expect(codexProvider.loginCommand('/m/codex/c1')).toEqual({
       command: 'codex',
-      args: ['login', '--device-auth'],
+      args: ['login'],
       env: { CODEX_HOME: '/m/codex/c1' },
       linkHosts: ['auth.openai.com'],
     });
+    expect(codexProvider.loginCommand('/m/codex/c1', { deviceCode: true }).args).toEqual([
+      'login',
+      '--device-auth',
+    ]);
     const base = { provider: 'codex' as const, managed: true };
     expect(codexProvider.launchEnv({ ...base, home: '/h/.codex', isDefault: true })).toEqual({});
     expect(codexProvider.launchEnv({ ...base, home: '/m/codex/c1', isDefault: false })).toEqual({

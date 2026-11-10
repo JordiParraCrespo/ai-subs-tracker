@@ -1,17 +1,17 @@
 import type { AccountEntity } from '@flama/frontend-consumer';
 import { type AccountPace, type ProviderId, paceOf } from '@flama/shared/subscriptions';
 
-/** The status column: the design's Active, review wash, stale note, or the red limit pill. */
-export type SubscriptionStatus = 'active' | 'review' | 'limit' | 'signin' | 'stale';
+/**
+ * The status column: the design's Active, review wash, stale note, the red
+ * limit pill, a sign-in, or a reading that failed with the login intact.
+ */
+export type SubscriptionStatus = 'active' | 'review' | 'limit' | 'signin' | 'stale' | 'unreadable';
 
 export function subscriptionStatus(account: AccountEntity, pace: AccountPace): SubscriptionStatus {
-  if (
-    account.status === 'auth_expired' ||
-    account.status === 'no_credentials' ||
-    account.status === 'error'
-  ) {
-    return 'signin';
-  }
+  // Only a login the provider says is gone asks for a sign-in.
+  if (account.status === 'auth_expired' || account.status === 'no_credentials') return 'signin';
+  // The usage could not be read (a rejected request, the network): signing in again would not help.
+  if (account.status === 'error') return 'unreadable';
   // Renewable-but-stale: the last good reading still shows (so the bars are
   // real), marked stale — the token refreshes the next time Claude runs.
   if (account.status === 'auth_stale') return 'stale';
@@ -58,7 +58,10 @@ export function subscriptionRows(
       if (query.status && query.status !== 'all') {
         if (
           query.status === 'review'
-            ? status !== 'review' && status !== 'signin' && status !== 'stale'
+            ? status !== 'review' &&
+              status !== 'signin' &&
+              status !== 'stale' &&
+              status !== 'unreadable'
             : status !== query.status
         ) {
           return false;

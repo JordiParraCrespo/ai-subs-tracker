@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { resolvePlan } from '@flama/shared/subscriptions';
 import { describe, expect, it } from 'vitest';
 import { claudeCodeProvider } from '../claude-code';
-import { keychainServiceFor, reportedPlan } from '../claude-code/credentials';
+import { keychainAccount, keychainServiceFor, reportedPlan } from '../claude-code/credentials';
 import { parseClaudeStatusline, parseClaudeUsage } from '../claude-code/usage-api';
 import { localDay, sha256Hex } from '../lib/util';
 import type { DetectedLogin } from '../types';
@@ -101,9 +101,10 @@ describe('claude-code credentials', () => {
     const { fn, calls } = fakeFetch({ seven_day: { utilization: 10, resets_at: null } });
     const env = testEnv(home, {
       platform: 'darwin',
+      env: { USER: 'me' },
       fetch: fn,
-      readKeychain: async (service) => {
-        asked.push(service);
+      readKeychain: async (service, account) => {
+        asked.push(`${service}/${account}`);
         return JSON.stringify({ claudeAiOauth: { accessToken: 'kc-token', expiresAt: FUTURE } });
       },
     });
@@ -112,9 +113,38 @@ describe('claude-code credentials', () => {
       env,
       opts,
     );
-    expect(asked).toEqual([keychainServiceFor(dir, home)]);
+    // Under the login name, as Claude Code 2.1+ files it.
+    expect(asked).toEqual([`${keychainServiceFor(dir, home)}/me`]);
     expect(calls[0]?.headers.Authorization).toBe('Bearer kc-token');
     expect(account.snapshot?.status).toBe('ok');
+  });
+
+  it('prefers the Keychain over a leftover credentials file on macOS', async () => {
+    const { home, login } = await loggedIn('.claude-both', {
+      accessToken: 'stale-file-token',
+      expiresAt: NOW.getTime() - 1,
+    });
+    const { fn, calls } = fakeFetch({ seven_day: { utilization: 10, resets_at: null } });
+    const env = testEnv(home, {
+      platform: 'darwin',
+      fetch: fn,
+      readKeychain: async () =>
+        JSON.stringify({ claudeAiOauth: { accessToken: 'kc-token', expiresAt: FUTURE } }),
+    });
+    await claudeCodeProvider.read(login, env, opts);
+    expect(calls[0]?.headers.Authorization).toBe('Bearer kc-token');
+  });
+
+  it('files the Keychain item under claude-code-user for a login name Claude would not use', () => {
+    expect(keychainAccount({ USER: 'me.dev' })).toBe('me.dev');
+    expect(keychainAccount({ USER: 'me@sso.example.com' })).toBe('claude-code-user');
+  });
+
+  it('hashes the config dir in Unicode NFC', () => {
+    const decomposed = '/Users/me/.claude-cafe\u0301';
+    expect(keychainServiceFor(decomposed, '/Users/me')).toBe(
+      `Claude Code-credentials-${sha256Hex(decomposed.normalize('NFC')).slice(0, 8)}`,
+    );
   });
 
   it('reports the tier when the catalog knows it, and Max 20x resolves to Ultra', () => {
@@ -196,7 +226,7 @@ describe('claude-code usage parsing', () => {
 });
 
 describe('claude-code read', () => {
-  it('combines identity, plan, limits and tokens, with an honest User-Agent', async () => {
+  it("combines identity, plan, limits and tokens, sending Orca's User-Agent", async () => {
     const { dir, home, login } = await loggedIn();
     await writeText(
       join(dir, 'projects', 'p', 's.jsonl'),
@@ -218,7 +248,7 @@ describe('claude-code read', () => {
     expect(calls[0]?.headers).toMatchObject({
       Authorization: 'Bearer tok-work',
       'anthropic-beta': 'oauth-2025-04-20',
-      'User-Agent': 'resetowl-desktop/test',
+      'User-Agent': 'claude-code/2.1.0',
     });
     expect(account).toMatchObject({
       provider: 'claude-code',
@@ -233,75 +263,113 @@ describe('claude-code read', () => {
     expect(account.dailyTokens).toHaveLength(1);
   });
 
-  it('turns a 401 into auth_expired with the command to refresh', async () => {
-    const { home, dir, login } = await loggedIn();
+  it('turns a 401 on a login with no refresh token into auth_expired', async () => {
+    const { home, login } = await loggedIn();
     const account = await claudeCodeProvider.read(
       login,
       testEnv(home, { fetch: fakeFetch({}, 401).fn }),
       opts,
     );
-    expect(account.snapshot?.status).toBe('auth_expired');
-    expect(account.snapshot?.message).toContain(`CLAUDE_CONFIG_DIR=${dir} claude`);
+    expect(account.snapshot).toMatchObject({
+      status: 'auth_expired',
+      message: 'Sign in again to use this account.',
+    });
   });
 
-  it('turns a 429 into rate_limited', async () => {
+  it("turns a 429 into rate_limited with Orca's message", async () => {
     const { home, login } = await loggedIn();
     const account = await claudeCodeProvider.read(
       login,
       testEnv(home, { fetch: fakeFetch({}, 429).fn }),
       opts,
     );
-    expect(account.snapshot?.status).toBe('rate_limited');
+    expect(account.snapshot).toMatchObject({
+      status: 'rate_limited',
+      message: 'Claude usage is rate limited right now.',
+    });
   });
 
-  it('does not call the API with an expired token', async () => {
+  it('asks the server even when the stored token looks expired', async () => {
     const { home, login } = await loggedIn('.claude-old', {
       accessToken: 't',
       expiresAt: NOW.getTime() - 1,
     });
-    const { fn, calls } = fakeFetch({});
+    const { fn, calls } = fakeFetch({ five_hour: { utilization: 5, resets_at: null } });
     const account = await claudeCodeProvider.read(login, testEnv(home, { fetch: fn }), opts);
-    expect(account.snapshot?.status).toBe('auth_expired');
-    expect(calls).toHaveLength(0);
+    // The usage server, not the stored expiresAt, decides whether the token is valid.
+    expect(calls).toHaveLength(1);
+    expect(account.snapshot?.status).toBe('ok');
   });
 
-  it('reads a lapsed but renewable token as auth_stale, without a network call', async () => {
+  it('turns a rejection of a renewable login into auth_stale, for `claude auth status`', async () => {
     const { home, login } = await loggedIn('.claude-idle', {
       accessToken: 't',
       expiresAt: NOW.getTime() - 1,
       refreshToken: 'refresh-me',
       refreshTokenExpiresAt: NOW.getTime() + 30 * 86_400_000,
     });
-    const { fn, calls } = fakeFetch({});
-    const account = await claudeCodeProvider.read(login, testEnv(home, { fetch: fn }), opts);
-    expect(account.snapshot?.status).toBe('auth_stale');
-    expect(account.snapshot?.message).toMatch(/next time Claude runs/i);
-    expect(calls).toHaveLength(0);
+    for (const status of [401, 403]) {
+      const account = await claudeCodeProvider.read(
+        login,
+        testEnv(home, { fetch: fakeFetch({}, status).fn }),
+        opts,
+      );
+      expect(account.snapshot).toMatchObject({
+        status: 'auth_stale',
+        message: 'Claude usage updates the next time Claude runs.',
+      });
+    }
   });
 
-  it('treats a lapsed token as auth_expired once its refresh token has also expired', async () => {
+  it('needs a sign-in once the refresh token expired or the server says revoked', async () => {
     const { home, login } = await loggedIn('.claude-gone', {
       accessToken: 't',
-      expiresAt: NOW.getTime() - 1,
       refreshToken: 'refresh-me',
       refreshTokenExpiresAt: NOW.getTime() - 1,
     });
-    const account = await claudeCodeProvider.read(login, testEnv(home), opts);
-    expect(account.snapshot?.status).toBe('auth_expired');
-  });
-
-  it('turns a 401 on a renewable login into auth_stale, not auth_expired', async () => {
-    const { home, login } = await loggedIn('.claude-renewable', {
-      accessToken: 'tok',
-      expiresAt: FUTURE,
-      refreshToken: 'refresh-me',
-    });
-    const account = await claudeCodeProvider.read(
+    const expired = await claudeCodeProvider.read(
       login,
       testEnv(home, { fetch: fakeFetch({}, 401).fn }),
       opts,
     );
-    expect(account.snapshot?.status).toBe('auth_stale');
+    expect(expired.snapshot?.status).toBe('auth_expired');
+
+    const renewable = await loggedIn('.claude-revoked', { accessToken: 't', refreshToken: 'r' });
+    const revoked = await claudeCodeProvider.read(
+      renewable.login,
+      testEnv(renewable.home, {
+        fetch: fakeFetch({ error: { message: 'OAuth token has been revoked' } }, 401).fn,
+      }),
+      opts,
+    );
+    expect(revoked.snapshot?.status).toBe('auth_expired');
+  });
+
+  it('shows a missing-scope 403 as the server says it, not as a sign-out', async () => {
+    const { home, login } = await loggedIn('.claude-scope', {
+      accessToken: 't',
+      refreshToken: 'r',
+    });
+    const message = 'OAuth token does not meet scope requirement user:profile';
+    const account = await claudeCodeProvider.read(
+      login,
+      testEnv(home, { fetch: fakeFetch({ error: { message } }, 403).fn }),
+      opts,
+    );
+    expect(account.snapshot).toMatchObject({ status: 'error', message });
+  });
+
+  it('reports a server error as unavailable, keeping the login', async () => {
+    const { home, login } = await loggedIn();
+    const account = await claudeCodeProvider.read(
+      login,
+      testEnv(home, { fetch: fakeFetch({}, 503).fn }),
+      opts,
+    );
+    expect(account.snapshot).toMatchObject({
+      status: 'error',
+      message: 'Claude usage is unavailable (HTTP 503).',
+    });
   });
 
   it('turns a network failure into an error status instead of throwing', async () => {

@@ -5,25 +5,46 @@ import { useTranslation } from 'react-i18next';
 import { WaitingCard } from './waiting-card';
 
 /**
- * A device-code sign-in step (Codex, Grok Build): the code the CLI printed, to
- * enter on the vendor's device page, and a wait for the approval to land. The
- * page's link can be copied into a private window, so the account the browser
- * is signed in to now is not the one added again.
+ * The Codex or Grok Build sign-in step. By default the CLI signs in through
+ * the browser on this computer (its callback is on localhost): the page it
+ * printed, and a wait for the sign-in to land. For another device, the
+ * device-code flow: the code the CLI printed, to enter on the vendor's device
+ * page. Either page's link can be copied into a private window, so the
+ * account the browser is signed in to now is not the one added again.
  */
 export function DeviceCodeSignIn({
   provider,
+  deviceCode,
   code,
   link,
   onBack,
   onOpen,
+  onSwitch,
 }: {
   provider: 'codex' | 'grok';
+  /** The device-code flow, for another device; the browser one otherwise. */
+  deviceCode: boolean;
   code: string | null;
   link: string | null;
   onBack: () => void;
   onOpen: (link: string) => void;
+  /** Restarts the sign-in the other way. */
+  onSwitch: () => void;
 }) {
   const { t } = useTranslation();
+  const text = deviceCode
+    ? {
+        title: t(`accounts.add.${provider}.title`),
+        description: t(`accounts.add.${provider}.description`),
+        waiting: t(`accounts.add.${provider}.waiting`),
+        expires: t(`accounts.add.${provider}.expires`),
+      }
+    : {
+        title: t(`accounts.add.${provider}.browser.title`),
+        description: t(`accounts.add.${provider}.browser.description`),
+        waiting: t(`accounts.add.${provider}.browser.waiting`),
+        expires: t(`accounts.add.${provider}.browser.expires`),
+      };
   const { copied, copy } = useCopy();
   const linkCopy = useCopy();
 
@@ -31,11 +52,11 @@ export function DeviceCodeSignIn({
     <>
       <DsModalHeader
         closeLabel={t('common.close')}
-        title={t(`accounts.add.${provider}.title`)}
-        description={t(`accounts.add.${provider}.description`)}
+        title={text.title}
+        description={text.description}
       />
       <DsModalBody className="ds-modal__body--flow">
-        {code ? (
+        {deviceCode && code ? (
           <div className="ds-device-code">
             <span className="ds-device-code__value" data-testid="device-code">
               {code}
@@ -51,14 +72,20 @@ export function DeviceCodeSignIn({
           </div>
         ) : null}
         <WaitingCard
-          title={
-            code ? t(`accounts.add.${provider}.waiting`) : t(`accounts.add.${provider}.preparing`)
-          }
-          detail={t(`accounts.add.${provider}.expires`)}
+          title={deviceCode && !code ? t(`accounts.add.${provider}.preparing`) : text.waiting}
+          detail={text.expires}
         />
         <div className="ds-stack-4">
           <span className="ds-label-strong">{t(`accounts.add.${provider}.otherTitle`)}</span>
           <span className="ds-t-sub">{t(`accounts.add.${provider}.otherText`)}</span>
+        </div>
+        <div className="ds-stack-4">
+          <span className="ds-t-sub">
+            {deviceCode ? t('accounts.add.thisComputerText') : t('accounts.add.otherDeviceText')}
+          </span>
+          <DsButton size="text" onClick={onSwitch} data-testid="sign-in-switch">
+            {deviceCode ? t('accounts.add.useBrowser') : t('accounts.add.useCode')}
+          </DsButton>
         </div>
       </DsModalBody>
       <DsModalFooter

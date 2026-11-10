@@ -83,22 +83,39 @@ async function detect(env: ProviderEnv): Promise<DetectedLogin[]> {
 }
 
 /**
- * The login's access token lapsed, or Anthropic rejected it. Whether that is
- * "signed out" or "just stale" is not this read's to decide from the token
- * alone: a refresh token that has not itself expired means the vendor's own
- * CLI can renew the login, so the desktop collector runs it and reads again.
- * Only a login that cannot be renewed is `auth_expired` ("sign in again"); a
- * renewable one is `auth_stale`, and the last good reading stays on screen.
+ * Whether Claude Code could renew a rejected login itself, as Orca checks
+ * it: a refresh token that has not expired, and a rejection that does not
+ * say the login was revoked. Anything else needs a new sign-in.
  */
-function lapsedSnapshot(now: Date, creds: ClaudeOAuth, run: string): UsageSnapshot {
-  if (isRenewable(creds, now)) {
-    return snapshot(
-      now,
-      'auth_stale',
-      "Claude Code's access token has expired; it refreshes the next time Claude runs.",
-    );
+function canRenew(creds: ClaudeOAuth, now: Date, err: UsageHttpError): boolean {
+  return isRenewable(creds, now) && !/revoked/i.test(err.message);
+}
+
+/**
+ * Anthropic's answer, classified as Orca classifies it. The usage server, not
+ * the stored `expiresAt`, decides whether a token is valid:
+ *
+ * - 401, and a 403 other than a missing `user:profile` scope, is a stale
+ *   token: `auth_stale` when Claude Code can renew it (the collector then
+ *   runs `claude auth status`), `auth_expired` when it cannot;
+ * - a 403 for a missing scope, and 429, are the server's own words;
+ * - anything else (5xx, an unexpected status, the network) is an error.
+ */
+function failedSnapshot(now: Date, creds: ClaudeOAuth, err: unknown): UsageSnapshot {
+  if (!(err instanceof UsageHttpError)) {
+    return snapshot(now, 'error', `Claude usage is unavailable (${errorMessage(err)}).`);
   }
-  return snapshot(now, 'auth_expired', `The Claude Code login expired. Run \`${run}\` to sign in.`);
+  if (err.status === 429) return snapshot(now, 'rate_limited', err.message);
+  if (err.status === 403 && err.message.includes('user:profile')) {
+    return snapshot(now, 'error', err.message);
+  }
+  if (err.status === 401 || err.status === 403) {
+    // An idle login's access token lapsed, not the login: Claude refreshes it when it next runs.
+    return canRenew(creds, now, err)
+      ? snapshot(now, 'auth_stale', 'Claude usage updates the next time Claude runs.')
+      : snapshot(now, 'auth_expired', 'Sign in again to use this account.');
+  }
+  return snapshot(now, 'error', `Claude usage is unavailable (HTTP ${err.status}).`);
 }
 
 async function readLimits(
@@ -119,37 +136,11 @@ async function readLimits(
       ),
     };
   }
-  // A lapsed access token is not asked about: the request would only be
-  // rejected. The stored refresh token decides stale-vs-signed-out, and the
-  // collector renews a renewable one through the CLI before the next read.
-  if (creds.expiresAt !== null && creds.expiresAt <= now.getTime()) {
-    return { plan, snapshot: lapsedSnapshot(now, creds, run) };
-  }
   try {
-    const parsed = parseClaudeUsage(
-      await fetchClaudeUsage(creds.accessToken, env.fetch, env.userAgent),
-    );
+    const parsed = parseClaudeUsage(await fetchClaudeUsage(creds.accessToken, env.fetch));
     return { plan, snapshot: snapshot(now, 'ok', null, parsed.windows, parsed.extraUsage) };
   } catch (err) {
-    if (err instanceof UsageHttpError) {
-      if (err.status === 401 || err.status === 403) {
-        return { plan, snapshot: lapsedSnapshot(now, creds, run) };
-      }
-      if (err.status === 429) {
-        return {
-          plan,
-          snapshot: snapshot(
-            now,
-            'rate_limited',
-            'Anthropic is rate limiting usage requests; try again in a few minutes.',
-          ),
-        };
-      }
-    }
-    return {
-      plan,
-      snapshot: snapshot(now, 'error', `Could not read Claude limits: ${errorMessage(err)}`),
-    };
+    return { plan, snapshot: failedSnapshot(now, creds, err) };
   }
 }
 

@@ -4,15 +4,17 @@ import { chmod, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { AddLoginResult, LoginProgress } from '@flama/shared/desktop';
-import type { LoginCommand } from '@flama/usage-providers';
+import { cleanCliEnv, type LoginCommand } from '@flama/usage-providers';
 import type { Timers } from './collector';
 
 /**
  * "Add account": signs a new login into a folder of its own by running the
- * provider's CLI login (`claude auth login`, `codex login --device-auth`) with
- * `CLAUDE_CONFIG_DIR` / `CODEX_HOME` pointed there. ResetOwl passes on what
- * the CLI gives (Claude's automatic link, caught through `$BROWSER`, and its
- * manual one; Codex's page and one-time code) so the screens can offer them,
+ * provider's CLI login (`claude auth login`, `codex login`, `grok login`, or
+ * with `--device-auth` to finish on another device) with `CLAUDE_CONFIG_DIR`
+ * / `CODEX_HOME` / `GROK_HOME` pointed there. ResetOwl passes on what the CLI
+ * gives (Claude's automatic link, caught through `$BROWSER`, and its manual
+ * one; the sign-in page Codex and Grok print, and their one-time code in the
+ * device flow) so the screens can offer them,
  * types a code the person pastes into the CLI's own prompt, and waits for it
  * to exit with an account in the folder. The credentials it writes stay in
  * that folder and are never read for anything but the provider's own usage
@@ -235,7 +237,13 @@ export function startLogin(deps: AddLoginDeps): LoginHandle {
         // stdin is a pipe, not closed: Claude Code only prints its manual
         // link and reads a pasted code when it has somewhere to read from.
         child = doSpawn(cmd.command, cmd.args, {
-          env: { ...deps.env, ...cmd.env, ...(capture ? { BROWSER: capture.script } : {}) },
+          // Only the command's own env picks the login: an inherited selector,
+          // token or Claude session identity is dropped first, as Orca does.
+          env: {
+            ...cleanCliEnv(deps.env),
+            ...cmd.env,
+            ...(capture ? { BROWSER: capture.script } : {}),
+          },
           stdio: ['pipe', 'pipe', 'pipe'],
           detached: group,
           windowsHide: true,

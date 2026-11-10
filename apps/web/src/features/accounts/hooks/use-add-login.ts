@@ -1,6 +1,6 @@
 import { toast } from '@flama/design-system-web';
 import { desktopBridge } from '@flama/frontend-web';
-import type { LoginProgress } from '@flama/shared/desktop';
+import type { AddLoginOptions, LoginProgress } from '@flama/shared/desktop';
 import type { LocalProviderId } from '@flama/shared/subscriptions';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,8 @@ const NOTHING_YET: LoginProgress = { link: null, codeLink: null, code: null, dea
 
 /**
  * One add-account sign-in through the desktop app: starts the provider's CLI
- * login, follows what it gives (its links, Codex's code, its deadline), types a pasted code
+ * login (through the browser, or by a code for another device), follows what it
+ * gives (its links, a device code, its deadline), types a pasted code
  * into it, and stops it when the person goes back or closes the dialog.
  * `onAdded` runs once the CLI has signed the new account in, `onFailed` when
  * it stopped without one (the reason is `failure`).
@@ -18,6 +19,8 @@ export function useAddLogin({ onAdded, onFailed }: { onAdded: () => void; onFail
   const { t } = useTranslation();
   const [progress, setProgress] = useState<LoginProgress>(NOTHING_YET);
   const [running, setRunning] = useState<LocalProviderId | null>(null);
+  /** Whether the running sign-in is the device-code one, for another device. */
+  const [deviceCode, setDeviceCode] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   // Which start a result belongs to: a login stopped by Back resolves later,
@@ -36,7 +39,7 @@ export function useAddLogin({ onAdded, onFailed }: { onAdded: () => void; onFail
     [],
   );
 
-  const start = async (provider: LocalProviderId) => {
+  const start = async (provider: LocalProviderId, options: AddLoginOptions = {}) => {
     const bridge = desktopBridge;
     if (!bridge) return;
     const mine = ++generation.current;
@@ -45,7 +48,8 @@ export function useAddLogin({ onAdded, onFailed }: { onAdded: () => void; onFail
     setSubmitting(false);
     setFailure(null);
     setRunning(provider);
-    const result = await bridge.accounts.addLogin(provider);
+    setDeviceCode(options.deviceCode === true);
+    const result = await bridge.accounts.addLogin(provider, options);
     if (mine !== generation.current) return;
     active.current = false;
     setRunning(null);
@@ -73,5 +77,24 @@ export function useAddLogin({ onAdded, onFailed }: { onAdded: () => void; onFail
     void desktopBridge?.accounts.submitLoginCode(code);
   };
 
-  return { progress, running, submitting, failure, start, cancel, submitCode };
+  /**
+   * Restarts the running sign-in the other way: a code for another device,
+   * or back to the browser on this computer. The desktop app stops the first.
+   */
+  const switchMode = () => {
+    if (!running) return;
+    void start(running, { deviceCode: !deviceCode });
+  };
+
+  return {
+    progress,
+    running,
+    deviceCode,
+    submitting,
+    failure,
+    start,
+    cancel,
+    submitCode,
+    switchMode,
+  };
 }

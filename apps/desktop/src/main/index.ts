@@ -13,7 +13,7 @@ import {
   parseClaudeStatusline,
   readZaiQuota,
 } from '@flama/usage-providers';
-import { app, type BrowserWindow, ipcMain, safeStorage, shell } from 'electron';
+import { app, type BrowserWindow, ipcMain, net, safeStorage, shell } from 'electron';
 import { type LoginHandle, loginShellPath, startLogin, syncAfterLogin } from './add-login';
 import { postReading, postSync, type SyncedAccount } from './api-client';
 import { Collector, type Timers } from './collector';
@@ -77,8 +77,33 @@ const userData = app.getPath('userData');
 const managedRoot = join(userData, 'accounts');
 const home = homedir();
 
+/**
+ * PATH as the login shell sets it, for the vendor CLIs ResetOwl runs (`claude
+ * auth status`, `codex app-server`, a sign-in): an app started from the Dock
+ * gets a bare PATH. Looked up once; until it is known, no CLI is started.
+ */
+let cliPath: Promise<string | undefined> | null = null;
+let cliEnvNow: Record<string, string | undefined> | null = null;
+function cliEnv(): Promise<Record<string, string | undefined>> {
+  if (!cliPath) cliPath = loginShellPath(process.env.SHELL, process.env.PATH);
+  return cliPath.then((path) => {
+    cliEnvNow = { ...process.env, PATH: path };
+    return cliEnvNow;
+  });
+}
+
+/**
+ * The machine as the providers see it. Requests go through Electron's own
+ * network stack once the app is ready (Chromium's User-Agent and the system
+ * proxy, as Orca sends them); vendor CLIs run with the login shell's PATH.
+ */
 function providerEnv(): ProviderEnv {
-  return nodeProviderEnv({ managedRoot, userAgent: config.userAgent });
+  return nodeProviderEnv({
+    managedRoot,
+    userAgent: config.userAgent,
+    ...(app.isReady() ? { fetch: (input, init) => net.fetch(String(input), init) } : {}),
+    ...(cliEnvNow ? { cliEnv: cliEnvNow } : {}),
+  });
 }
 
 if (config.mode === 'collect-once') {
@@ -97,6 +122,7 @@ if (config.mode === 'collect-once') {
 /** Prints what a sync would send (identity, limits, token counts — never a credential). */
 async function collectOnce(): Promise<void> {
   try {
+    await cliEnv();
     const accounts = await readLocalAccounts(providerEnv(), {
       sinceDay: sinceDayFor(new Date()),
       fetchLimitsFor: () => true,
@@ -180,14 +206,6 @@ async function main(): Promise<void> {
     const out: Partial<Record<LocalProviderId, string>> = {};
     for (const id of LOCAL_PROVIDER_IDS) out[id] = await readPointer(home, id);
     return out;
-  };
-
-  // The CLI the collector runs to refresh a lapsed login needs the login
-  // shell's PATH, the same as "Add account"; it is looked up once and reused.
-  let cliPath: Promise<string | undefined> | null = null;
-  const cliEnv = async () => {
-    if (!cliPath) cliPath = loginShellPath(process.env.SHELL, process.env.PATH);
-    return { ...process.env, PATH: await cliPath };
   };
 
   /**
@@ -322,26 +340,26 @@ async function main(): Promise<void> {
       },
       collectorStatus: () => collector.status(),
       collectorRefresh: () => collector.refresh(),
-      async addLogin(provider) {
+      async addLogin(provider, options) {
         const impl = getProvider(provider);
         if (!impl) return { ok: false, message: 'Unknown provider.' };
         // One login at a time: a second "Add" stops the first, whose folder
         // is then removed like any sign-in that did not finish.
         login?.cancel();
         const generation = ++loginGeneration;
-        const path = await loginShellPath(process.env.SHELL, process.env.PATH);
+        const env = await cliEnv();
         // Back, a close or another pick while the shell answered: never start.
         if (generation !== loginGeneration) return { ok: false, message: 'Sign-in cancelled.' };
         const handle = startLogin({
           managedRoot,
           provider,
-          command: (dir) => impl.loginCommand(dir),
+          command: (dir) => impl.loginCommand(dir, { deviceCode: options.deviceCode === true }),
           check: (dir) => checkNewLogin(impl, dir, collector.localAccounts(), providerEnv()),
           onProgress: (progress) => {
             if (win && !win.isDestroyed())
               win.webContents.send(DESKTOP_CHANNELS.accountsLoginProgress, progress);
           },
-          env: { ...process.env, PATH: path },
+          env,
           log,
         });
         login = handle;
@@ -444,7 +462,9 @@ async function main(): Promise<void> {
     log(`live feed unavailable: ${String(err)}`);
   }
 
-  void collector.start();
+  // The first read waits for the login shell's PATH, so `codex app-server`
+  // can run from it; the lookup gives up after five seconds.
+  void cliEnv().then(() => collector.start());
 }
 
 function runSmoke(win: BrowserWindow): void {

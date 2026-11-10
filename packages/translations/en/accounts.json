@@ -16,7 +16,9 @@
     "showLess": "Show less",
     "planTitle": "{{provider}} reports {{name}} as {{plan}}",
     "planDetail": "You chose {{chosen}}, which sets its limits and price.",
-    "planEnd": "reported"
+    "planEnd": "reported",
+    "unreadableTitle": "Can't read {{name}}'s usage",
+    "unreadableEnd": "not syncing"
   },
   "desktop": {
     "lastSync": "Last synced {{when}}",
@@ -194,7 +196,8 @@
     "review": "Needs review",
     "limit": "At limit",
     "signin": "Sign in again",
-    "stale": "Out of date"
+    "stale": "Out of date",
+    "unreadable": "Can't read usage"
   },
   "toolbar": {
     "search": "Search accounts",
@@ -410,8 +413,8 @@
     "description": "Pick the tool you subscribe to.",
     "how": {
       "claude-code": "Sign in through claude.com",
-      "codex": "Sign in with a code at openai.com",
-      "grok": "Sign in with a code at x.ai",
+      "codex": "Sign in through openai.com",
+      "grok": "Sign in through x.ai",
       "zai": "Add it by hand: plan, price and billing day",
       "bigmodel": "Mainland China. Add it by hand, like Z.AI"
     },
@@ -454,7 +457,13 @@
       "otherTitle": "Signed in to a different account?",
       "otherText": "Copy the link and open it in a private window, so you sign in as the account you want to add and the one you use now stays signed in.",
       "copyLink": "Copy link",
-      "linkCopied": "Link copied"
+      "linkCopied": "Link copied",
+      "browser": {
+        "title": "Sign in to OpenAI",
+        "description": "Codex opens its sign-in page in your browser. Sign in with the account you want to add; the page hands it back to this computer.",
+        "waiting": "Waiting for the sign-in in your browser",
+        "expires": "The sign-in stops after 15 minutes"
+      }
     },
     "grok": {
       "title": "Enter this code at xAI",
@@ -467,7 +476,13 @@
       "otherTitle": "Signed in to a different account?",
       "otherText": "Copy the link and open it in a private window, so you sign in as the account you want to add and the one you use now stays signed in.",
       "copyLink": "Copy link",
-      "linkCopied": "Link copied"
+      "linkCopied": "Link copied",
+      "browser": {
+        "title": "Sign in to xAI",
+        "description": "Grok Build opens its sign-in page in your browser. Sign in with the X or Grok account you want to add.",
+        "waiting": "Waiting for the sign-in in your browser",
+        "expires": "The sign-in stops after 15 minutes"
+      }
     },
     "desktop": {
       "title": "Add it from the desktop app",
@@ -491,7 +506,11 @@
       "renewalPlaceholder": "1 to 31, from your receipt",
       "noKey": "No API key needed to add it. Reading usage automatically is a separate, optional step in the desktop app.",
       "submit": "Add subscription"
-    }
+    },
+    "useCode": "Use a code on another device",
+    "useBrowser": "Sign in on this computer instead",
+    "otherDeviceText": "Signing in on a phone or another computer?",
+    "thisComputerText": "Have a browser on this computer?"
   },
   "search": {
     "group": "Subscriptions"

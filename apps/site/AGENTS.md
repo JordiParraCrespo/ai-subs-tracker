@@ -7,8 +7,8 @@ and the build.
 
 **The name:** ResetOwl, on resetowl.com (the product was called Subtrack
 until November 2026; tokenaitor.com redirects here, `nginx.conf`). The app
-identifies itself to vendors as `resetowl-desktop`; the copy quotes that
-literal because it is what the app sends.
+reads usage the way Orca does, with the client headers the vendors' own CLIs
+send, so the copy makes no claim about the name it sends to vendors.
 
 ## Rules
 

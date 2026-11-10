@@ -95,7 +95,7 @@
   "privacy": {
     "eyebrow": "Privacidad",
     "title": "Tus sesiones nunca salen de tu ordenador",
-    "lede": "ResetOwl nunca renueva el token de un proveedor, se presenta ante cada proveedor con su propio nombre (resetowl-desktop) y nunca sustituye una línea de estado que ya tengas.",
+    "lede": "ResetOwl nunca renueva por su cuenta el token de un proveedor, envía las credenciales de cada sesión solo al proveedor que las emitió y nunca sustituye una línea de estado que ya tengas.",
     "local": {
       "title": "Se queda en tu ordenador",
       "badge": "Nunca se envía",

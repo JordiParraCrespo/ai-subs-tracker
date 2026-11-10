@@ -23,7 +23,7 @@ terminal follow the account marked active.
 
   | Module | Job |
   | --- | --- |
-  | `config.ts` | API URL, renderer URL, honest user agent, run mode, CSP |
+  | `config.ts` | API URL, renderer URL, ResetOwl's user agent, run mode, CSP |
   | `window.ts`, `renderer-files.ts` | the `app://resetowl/` scheme (SPA fallback, CSP on HTML), the window and its navigation guards |
   | `token-store.ts` | the API session token, `safeStorage`-encrypted in `userData/session.bin` |
   | `local-logins.ts` | reads every login (`@flama/usage-providers`), builds `SyncAccountsInput` |
@@ -67,8 +67,9 @@ http(s)-only URLs).
   usage endpoint.
 - **Never** refreshes a provider credential, and **never** sends one anywhere:
   the API receives identity, plan, limit windows and token counts.
-- Introduces itself honestly: `resetowl-desktop/<version> (<platform>)`, never
-  as claude-code or codex.
+- Calls ResetOwl's API as `resetowl-desktop/<version> (<platform>)`. Usage
+  requests to the vendors carry the client headers Orca sends (see
+  `packages/usage-providers`), through Electron's network stack.
 - The API token is ResetOwl's own session, encrypted with the OS keystore;
   without one it is kept in memory only. It is never logged.
 - **Opt-in and reversible:**

@@ -19,12 +19,20 @@ billing are available as Flama plugins (see [Plugins](#plugins)).
   pastes for an unofficial reader included): Claude Code's refresh tokens
   rotate, so calling `oauth/token` here would sign the CLI out. The vendor's
   own CLI may renew its own login — the desktop collector runs
-  `claude auth status` for a lapsed-but-renewable Claude login, and Claude
-  Code (not ResetOwl) refreshes the token and rewrites its credential file.
+  `claude auth status` for a lapsed-but-renewable Claude login, and Codex's
+  usage is read through `codex app-server`, so Claude Code and Codex (not
+  ResetOwl) refresh the token and rewrite their credential files.
   Only identity, limit windows and token counts reach the API
   (`packages/shared/src/schemas/accounts.schema.ts`).
-- **Name ourselves honestly** to every vendor (`resetowl-desktop/<version>`);
-  never pose as Claude Code or Codex.
+- **Read usage the way Orca does.** The owner's decision (November 2026):
+  sessions are handled and usage requested as the open-source Orca app does
+  it, which works against the vendors today — its client headers included
+  (`User-Agent: claude-code/2.1.0` to Anthropic; `codex-cli`, `OpenAI-Beta`
+  and `originator: Codex Desktop` to ChatGPT; Grok's `x-userid` with the
+  HTTP client's own User-Agent). Only the CLI's own words, or a login with
+  nothing to renew it, make an account "sign in again"; a rejected request
+  is an error. ResetOwl's own calls (the API, the Z.AI reader) send
+  `resetowl-desktop/<version>`.
 - **Plans are data.** Names and prices live in
   `packages/shared/src/subscriptions/plans.ts` with the old names as aliases;
   model prices in `model-prices.ts`. Check the vendors' pricing pages when

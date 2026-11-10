@@ -17,20 +17,30 @@ export class CodexHttpError extends Error {
   }
 }
 
+/** The client headers Orca sends to wham/usage: Codex's own. */
+export function codexBackendHeaders(
+  accessToken: string,
+  accountId: string | null,
+): Record<string, string> {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${accessToken}`,
+    'User-Agent': 'codex-cli',
+    'OpenAI-Beta': 'codex-1',
+    originator: 'Codex Desktop',
+  };
+  if (accountId) headers['ChatGPT-Account-Id'] = accountId;
+  return headers;
+}
+
 export async function fetchCodexUsage(
   accessToken: string,
   accountId: string | null,
   fetchImpl: typeof fetch,
-  userAgent: string,
 ): Promise<unknown> {
-  const headers: Record<string, string> = {
-    Authorization: `Bearer ${accessToken}`,
-    Accept: 'application/json',
-    'User-Agent': userAgent,
-  };
-  if (accountId) headers['ChatGPT-Account-Id'] = accountId;
   const res = await fetchImpl(WHAM_USAGE_URL, {
-    headers,
+    headers: codexBackendHeaders(accessToken, accountId),
+    // The account's token is the only credential: no cookies the app's session may hold.
+    credentials: 'omit',
     signal: AbortSignal.timeout(WHAM_TIMEOUT_MS),
   });
   if (!res.ok) {

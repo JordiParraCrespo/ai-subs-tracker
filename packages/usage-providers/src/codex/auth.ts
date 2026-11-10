@@ -1,3 +1,4 @@
+import { stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { isRecord, type JsonRecord, readJson, str } from '../lib/util';
 
@@ -91,4 +92,43 @@ export function parseCodexAuth(data: JsonRecord): CodexAuth | null {
 export async function readCodexAuth(home: string): Promise<CodexAuth | null> {
   const data = await readJson(join(home, 'auth.json'));
   return data ? parseCodexAuth(data) : null;
+}
+
+/** How long a missing `auth.json` is waited for in a home that had one: the CLI rewrites it. */
+export const CODEX_AUTH_ABSENCE_GRACE_MS = 5_000;
+const GRACE_POLL_MS = 250;
+
+/** Homes whose `auth.json` was last read with a login in it. */
+const homesWithAuth = new Set<string>();
+
+/**
+ * The login, riding out Codex rewriting `auth.json` as it refreshes: in a
+ * home that held a login when last read, a missing or unreadable file is
+ * waited for up to five seconds (Orca's grace) before the login counts as
+ * gone. A home whose folder is itself gone is not waited for.
+ */
+export async function readCodexAuthWithGrace(
+  home: string,
+  graceMs = CODEX_AUTH_ABSENCE_GRACE_MS,
+): Promise<CodexAuth | null> {
+  const read = () => readCodexAuth(home).catch(() => null);
+  let auth = await read();
+  if (!auth && homesWithAuth.has(home)) {
+    const deadline = Date.now() + graceMs;
+    while (!auth && Date.now() < deadline) {
+      if (
+        !(await stat(home).then(
+          () => true,
+          () => false,
+        ))
+      ) {
+        break;
+      }
+      await new Promise((resolve) => setTimeout(resolve, GRACE_POLL_MS));
+      auth = await read();
+    }
+  }
+  if (auth) homesWithAuth.add(home);
+  else homesWithAuth.delete(home);
+  return auth;
 }

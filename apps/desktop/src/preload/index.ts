@@ -70,7 +70,8 @@ const bridge: DesktopBridge = {
     },
   },
   accounts: {
-    addLogin: (provider) => invoke(DESKTOP_CHANNELS.accountsAddLogin, provider),
+    addLogin: (provider, options) =>
+      invoke(DESKTOP_CHANNELS.accountsAddLogin, provider, options ?? {}),
     onLoginProgress(listener) {
       const handler = (_event: IpcRendererEvent, progress: LoginProgress) => listener(progress);
       ipcRenderer.on(DESKTOP_CHANNELS.accountsLoginProgress, handler);

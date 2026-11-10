@@ -17,10 +17,12 @@ import type {
   CodingAgentProvider,
   DetectedLogin,
   LoginCommand,
+  LoginOptions,
   ProviderEnv,
   ReadOptions,
 } from '../types';
-import { type CodexAuth, readCodexAuth } from './auth';
+import { CODEX_SIGNED_OUT_MESSAGE, readCodexRateLimitsViaRpc } from './app-server';
+import { type CodexAuth, readCodexAuth, readCodexAuthWithGrace } from './auth';
 import { type SessionRateLimits, scanCodexSessions } from './sessions';
 import { CodexHttpError, fetchCodexUsage, parseCodexUsage } from './usage-api';
 
@@ -102,6 +104,41 @@ function offlineSnapshot(
   );
 }
 
+/** What wham/usage gave, or why it did not. */
+type BackendRead =
+  | {
+      ok: true;
+      planType: string | null;
+      windows: LimitWindow[];
+      extraUsage: UsageSnapshot['extraUsage'];
+    }
+  | { ok: false; status: number | null; message: string };
+
+async function readBackend(auth: CodexAuth, env: ProviderEnv): Promise<BackendRead> {
+  if (!auth.accessToken) return { ok: false, status: null, message: 'No ChatGPT token.' };
+  try {
+    const parsed = parseCodexUsage(
+      await fetchCodexUsage(auth.accessToken, auth.accountId, env.fetch),
+      env.now(),
+    );
+    return { ok: true, ...parsed };
+  } catch (err) {
+    return {
+      ok: false,
+      status: err instanceof CodexHttpError ? err.status : null,
+      message: errorMessage(err),
+    };
+  }
+}
+
+/**
+ * The plan's limits, read as Orca reads them. Codex's own CLI is asked first
+ * (`codex app-server`, `account/rateLimits/read`), which also renews a lapsed
+ * login: the CLI refreshes its own token to answer. wham/usage fills in a
+ * session window the CLI left out, and stands in when the CLI cannot run or
+ * failed. Only the CLI's own words make a login signed out; an HTTP 401 or
+ * 403 from wham/usage never does.
+ */
 async function readLimits(
   login: DetectedLogin,
   auth: CodexAuth | null,
@@ -116,7 +153,7 @@ async function readLimits(
       snapshot: snapshot(
         now,
         'no_credentials',
-        `No Codex login found in ${login.home}. Run \`${run} login\` and sign in with ChatGPT.`,
+        `Codex not signed in. Run \`${run} login\` and sign in with ChatGPT.`,
       ),
     };
   }
@@ -130,43 +167,50 @@ async function readLimits(
       ),
     };
   }
-  try {
-    const parsed = parseCodexUsage(
-      await fetchCodexUsage(auth.accessToken, auth.accountId, env.fetch, env.userAgent),
-      now,
-    );
-    return {
-      planType: parsed.planType,
-      snapshot: snapshot(now, 'ok', null, parsed.windows, parsed.extraUsage),
-    };
-  } catch (err) {
-    if (err instanceof CodexHttpError && (err.status === 401 || err.status === 403)) {
-      return {
-        planType: null,
-        snapshot: snapshot(
-          now,
-          'auth_expired',
-          `OpenAI rejected the Codex login. Run \`${run}\` once to refresh it.`,
-        ),
-      };
+
+  const rpc = await readCodexRateLimitsViaRpc(login.home, env);
+  if (rpc.kind === 'ok') {
+    let { windows, planType } = rpc;
+    if (!windows.some((w) => w.kind === 'session') && windows.some((w) => w.kind === 'weekly')) {
+      const backend = await readBackend(auth, env);
+      if (backend.ok && backend.windows.some((w) => w.kind === 'session')) {
+        windows = backend.windows;
+        planType = backend.planType ?? planType;
+      }
     }
-    if (err instanceof CodexHttpError && err.status === 429) {
-      return {
-        planType: fromLogs?.planType ?? null,
-        snapshot: offlineSnapshot(
-          now,
-          'rate_limited',
-          'OpenAI is rate limiting usage requests; try again in a few minutes.',
-          fromLogs,
-        ),
-      };
-    }
-    const reason = `Could not reach OpenAI (${errorMessage(err)}).`;
+    return { planType, snapshot: snapshot(now, 'ok', null, windows, rpc.extraUsage) };
+  }
+  if (rpc.kind === 'signed_out') {
+    return { planType: null, snapshot: snapshot(now, 'auth_expired', CODEX_SIGNED_OUT_MESSAGE) };
+  }
+
+  // The CLI could not answer: wham/usage stands in, with the token as it is.
+  const backend = await readBackend(auth, env);
+  if (backend.ok) {
     return {
-      planType: fromLogs?.planType ?? null,
-      snapshot: offlineSnapshot(now, fromLogs ? 'ok' : 'error', reason, fromLogs),
+      planType: backend.planType,
+      snapshot: snapshot(now, 'ok', null, backend.windows, backend.extraUsage),
     };
   }
+  if (backend.status === 429) {
+    return {
+      planType: fromLogs?.planType ?? null,
+      snapshot: offlineSnapshot(
+        now,
+        'rate_limited',
+        'OpenAI is rate limiting usage requests; try again in a few minutes.',
+        fromLogs,
+      ),
+    };
+  }
+  const reason =
+    rpc.kind === 'unavailable'
+      ? `Could not read Codex usage (${rpc.message} wham/usage: ${backend.message}).`
+      : `Could not read Codex usage (${rpc.message})`;
+  return {
+    planType: fromLogs?.planType ?? null,
+    snapshot: offlineSnapshot(now, fromLogs ? 'ok' : 'error', reason, fromLogs),
+  };
 }
 
 async function read(
@@ -175,7 +219,7 @@ async function read(
   opts: ReadOptions,
 ): Promise<SyncAccount> {
   const [auth, sessions] = await Promise.all([
-    readCodexAuth(login.home).catch(() => null),
+    readCodexAuthWithGrace(login.home),
     scanCodexSessions(login.home, opts.sinceDay).catch(() => ({
       dailyTokens: [],
       rateLimits: null,
@@ -206,12 +250,15 @@ async function read(
   };
 }
 
-function loginCommand(home: string): LoginCommand {
-  // The device-code flow: a page and a one-time code the screens can show,
-  // rather than a callback on a localhost port another app may hold.
+/**
+ * `codex login` signs in through the browser on this computer by default (its
+ * callback is on localhost), as Orca runs it; the device-code flow, a page
+ * and a one-time code, is for finishing the sign-in on another device.
+ */
+function loginCommand(home: string, opts: LoginOptions = {}): LoginCommand {
   return {
     command: 'codex',
-    args: ['login', '--device-auth'],
+    args: opts.deviceCode ? ['login', '--device-auth'] : ['login'],
     env: { CODEX_HOME: home },
     linkHosts: ['auth.openai.com'],
   };
@@ -234,6 +281,7 @@ export const codexProvider: CodingAgentProvider = {
   detect,
   read,
   loginCommand,
+  supportsDeviceCode: true,
   signedInAs,
   launchEnv,
 };

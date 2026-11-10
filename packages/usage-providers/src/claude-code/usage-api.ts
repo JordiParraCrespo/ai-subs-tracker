@@ -17,31 +17,53 @@ export const WEEK_MINUTES = 10_080;
 /** `seven_day_<suffix>` keys whose suffix is not a model family. */
 const NON_MODEL_SUFFIXES = new Set(['oauth_apps']);
 
+/**
+ * The client Orca names itself as on this endpoint, which Anthropic serves
+ * without question; ResetOwl sends the same.
+ */
+export const CLAUDE_USAGE_USER_AGENT = 'claude-code/2.1.0';
+
 export class UsageHttpError extends Error {
-  constructor(readonly status: number) {
-    super(`HTTP ${status}`);
+  /** `message` is the server's own `error.message` when it gave one. */
+  constructor(
+    readonly status: number,
+    message: string,
+  ) {
+    super(message);
     this.name = 'UsageHttpError';
   }
+}
+
+async function describeUsageError(res: Response): Promise<string> {
+  if (res.status === 429) {
+    await res.body?.cancel().catch(() => undefined);
+    return 'Claude usage is rate limited right now.';
+  }
+  try {
+    const data: unknown = await res.json();
+    const error = isRecord(data) && isRecord(data.error) ? data.error : null;
+    const message = str(error?.message);
+    if (message) return message.slice(0, 300);
+  } catch {
+    // A malformed error body falls back to the status below.
+  }
+  return `OAuth API returned ${res.status}`;
 }
 
 export async function fetchClaudeUsage(
   accessToken: string,
   fetchImpl: typeof fetch,
-  userAgent: string,
 ): Promise<unknown> {
   const res = await fetchImpl(USAGE_URL, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       'anthropic-beta': OAUTH_BETA_HEADER,
       Accept: 'application/json',
-      'User-Agent': userAgent,
+      'User-Agent': CLAUDE_USAGE_USER_AGENT,
     },
     signal: AbortSignal.timeout(USAGE_TIMEOUT_MS),
   });
-  if (!res.ok) {
-    await res.body?.cancel().catch(() => undefined);
-    throw new UsageHttpError(res.status);
-  }
+  if (!res.ok) throw new UsageHttpError(res.status, await describeUsageError(res));
   return res.json();
 }
 

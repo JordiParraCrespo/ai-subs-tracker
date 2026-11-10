@@ -66,6 +66,15 @@ export interface CollectorStatus {
   readers: UsageReaderState[];
 }
 
+/** How a new account signs in. */
+export interface AddLoginOptions {
+  /**
+   * Sign in with a page and a one-time code, to finish on another device
+   * (Codex and Grok Build); otherwise through the browser on this computer.
+   */
+  deviceCode?: boolean;
+}
+
 export interface AddLoginResult {
   ok: boolean;
   /** Why it did not work, e.g. the CLI is not installed. */
@@ -80,7 +89,8 @@ export interface LoginProgress {
   /**
    * The link that finishes the sign-in by itself once it is opened in a
    * browser on this computer: Claude Code's automatic link (its callback is
-   * on localhost), Codex's device page.
+   * on localhost), the sign-in page Codex or Grok Build printed (in the device
+   * flow, the page to enter the code on).
    */
   link: string | null;
   /**
@@ -88,7 +98,7 @@ export interface LoginProgress {
    * nothing finishes until that code is pasted back (`submitLoginCode`).
    */
   codeLink: string | null;
-  /** Codex's one-time code, to enter on its device page. */
+  /** The device flow's one-time code (Codex, Grok Build), to enter on its page. */
   code: string | null;
   /** When the CLI is stopped if the sign-in has not finished, ISO 8601. */
   deadline: string | null;
@@ -142,7 +152,7 @@ export interface DesktopBridge {
      * Signs a new account into its own folder by running the provider's CLI
      * login; resolves when the CLI exits. One login runs at a time.
      */
-    addLogin(provider: LocalProviderId): Promise<AddLoginResult>;
+    addLogin(provider: LocalProviderId, options?: AddLoginOptions): Promise<AddLoginResult>;
     /** What the running login gave so far: its links, Codex's code, its deadline. */
     onLoginProgress(listener: (progress: LoginProgress) => void): () => void;
     /** Types a code the person pasted into the running login's prompt. */
