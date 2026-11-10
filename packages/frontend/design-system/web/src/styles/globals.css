@@ -591,12 +591,20 @@
   max-height: min(20rem, max(var(--available-height, 20rem), 8.5rem));
 }
 
-/* A quiet 8px scrollbar for panes that scroll inside a card — the product's
-   tables and menus. The default 15px bar eats real estate and reads as chrome
-   the flat system does not otherwise have. */
+/* A quiet 8px scrollbar for panes that scroll — the page pane, the product's
+   tables and menus. The default 15px bar, with its arrow buttons, eats real
+   estate and reads as chrome the flat system does not otherwise have.
+
+   Chromium (Electron included) ignores the `::-webkit-scrollbar` styling as
+   soon as `scrollbar-width` or `scrollbar-color` is set, and falls back to a
+   native bar that keeps its arrows on Linux and Windows. So the standard
+   properties go only to engines without the pseudo-elements (Firefox), and
+   Chromium and Safari draw the rounded pill below. */
 @utility scrollbar-thin {
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-strong) transparent;
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
 
   &::-webkit-scrollbar {
     height: 8px;
@@ -606,13 +614,16 @@
     background: transparent;
   }
   &::-webkit-scrollbar-thumb {
-    background: var(--border-default);
+    background: var(--border-strong);
     border: 2px solid transparent;
     background-clip: padding-box;
     border-radius: 999px;
   }
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
   &::-webkit-scrollbar-thumb:hover {
-    background: var(--border-strong);
+    background: color-mix(in oklab, var(--ink-400) 70%, transparent);
     border: 2px solid transparent;
     background-clip: padding-box;
   }
