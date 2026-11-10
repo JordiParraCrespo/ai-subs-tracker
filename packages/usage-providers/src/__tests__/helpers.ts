@@ -110,20 +110,34 @@ export interface SpawnCall {
  * A `spawnCli` whose child speaks the app-server's JSON-RPC: it answers
  * `initialize`, then `account/rateLimits/read` as `behaviour` says.
  */
-export function fakeAppServer(behaviour: FakeAppServer) {
+export function fakeAppServer(
+  behaviour: FakeAppServer,
+  /** Runs while the probe answers, as the real CLI may rewrite `auth.json`. */
+  onRead?: () => Promise<void>,
+) {
   const calls: SpawnCall[] = [];
   const spawnCli: NonNullable<ProviderEnv['spawnCli']> = (command, args, env) => {
     calls.push({ command, args, env });
     const child = new EventEmitter() as EventEmitter & CliChild;
     const stdout = new EventEmitter();
     const stderr = new EventEmitter();
+    let closed = false;
     const say = (message: unknown) =>
       queueMicrotask(() => stdout.emit('data', Buffer.from(`${JSON.stringify(message)}\n`)));
-    const close = (code: number) => queueMicrotask(() => child.emit('close', code, null));
+    const close = (code: number | null, signal: NodeJS.Signals | null = null) =>
+      queueMicrotask(() => {
+        if (closed) return;
+        closed = true;
+        child.emit('close', code, signal);
+      });
     Object.assign(child, {
       stdout,
       stderr,
-      kill: () => true,
+      // Exits when told to, as the real CLI does.
+      kill: (signal: NodeJS.Signals = 'SIGTERM') => {
+        close(null, signal);
+        return true;
+      },
       stdin: {
         on: () => undefined,
         write(data: string) {
@@ -131,7 +145,12 @@ export function fakeAppServer(behaviour: FakeAppServer) {
             const msg = JSON.parse(line) as { id?: number; method: string };
             if (msg.method === 'initialize') say({ id: msg.id, result: {} });
             if (msg.method !== 'account/rateLimits/read') continue;
-            if ('result' in behaviour) say({ id: msg.id, result: behaviour.result });
+            if ('result' in behaviour) {
+              const id = msg.id;
+              void (onRead?.() ?? Promise.resolve()).then(() =>
+                say({ id, result: behaviour.result }),
+              );
+            }
             if ('error' in behaviour) {
               if (behaviour.stderr) stderr.emit('data', Buffer.from(behaviour.stderr));
               say({ id: msg.id, error: { code: -1, message: behaviour.error } });

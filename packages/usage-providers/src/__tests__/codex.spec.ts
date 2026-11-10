@@ -4,7 +4,7 @@ import { syncAccountSchema } from '@flama/shared/schemas/accounts';
 import { resolvePlan } from '@flama/shared/subscriptions';
 import { describe, expect, it } from 'vitest';
 import { codexProvider, reportedRenewal } from '../codex';
-import { CODEX_PROBE_ARGS } from '../codex/app-server';
+import { CODEX_PROBE_ARGS, exchangeRateLimits } from '../codex/app-server';
 import { parseCodexAuth, readCodexAuthWithGrace } from '../codex/auth';
 import { parseCodexUsage } from '../codex/usage-api';
 import { localDay } from '../lib/util';
@@ -230,6 +230,21 @@ describe('codex read', () => {
     expect(account.snapshot?.windows.map((w) => w.kind)).toEqual(['session', 'weekly']);
   });
 
+  it('asks wham/usage with the token the probe just refreshed, not the one read before it', async () => {
+    const { home, dir, login } = await codexHome({ access_token: 'lapsed-token' });
+    const server = fakeAppServer(
+      { result: { rateLimits: { secondary: { usedPercent: 60, windowDurationMins: 10080 } } } },
+      // Codex refreshes its own login to answer, rewriting auth.json.
+      () =>
+        writeJson(join(dir, 'auth.json'), {
+          tokens: { id_token: ID_TOKEN, access_token: 'fresh-token', account_id: 'acct-1' },
+        }),
+    );
+    const { fn, calls } = fakeFetch(WHAM);
+    await codexProvider.read(login, testEnv(home, { fetch: fn, spawnCli: server.spawnCli }), opts);
+    expect(calls[0]?.headers.Authorization).toBe('Bearer fresh-token');
+  });
+
   it('marks the login signed out only when the CLI says it cannot refresh it', async () => {
     const { home, login } = await codexHome();
     const server = fakeAppServer({
@@ -378,6 +393,39 @@ describe('codex read', () => {
     const account = await codexProvider.read(login, testEnv(home), opts);
     expect(account.snapshot?.status).toBe('error');
     expect(account.snapshot?.windows).toEqual([]);
+  });
+});
+
+describe('codex app-server probe', () => {
+  it('holds the result until a probe that ignores SIGTERM has been killed and exited', async () => {
+    const { EventEmitter } = await import('node:events');
+    const signals: string[] = [];
+    const child = Object.assign(new EventEmitter(), {
+      stdin: { write: () => true, on: () => undefined },
+      stdout: new EventEmitter(),
+      stderr: new EventEmitter(),
+      kill(signal: NodeJS.Signals) {
+        signals.push(signal);
+        // A probe stuck refreshing: only SIGKILL ends it.
+        if (signal === 'SIGKILL') setTimeout(() => child.emit('close', null, 'SIGKILL'), 20);
+        return true;
+      },
+    });
+    let resolved = false;
+    const result = exchangeRateLimits(child, {
+      initMs: 10,
+      termGraceMs: 50,
+      killGraceMs: 500,
+    }).then((r) => {
+      resolved = true;
+      return r;
+    });
+    await new Promise((r) => setTimeout(r, 30));
+    // Timed out and sent SIGTERM, but the process is still there: no answer yet.
+    expect(signals).toEqual(['SIGTERM']);
+    expect(resolved).toBe(false);
+    expect(await result).toMatchObject({ kind: 'failed' });
+    expect(signals).toEqual(['SIGTERM', 'SIGKILL']);
   });
 });
 

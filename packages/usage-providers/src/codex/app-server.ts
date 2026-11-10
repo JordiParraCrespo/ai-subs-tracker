@@ -29,6 +29,9 @@ export const CODEX_PROBE_ARGS = [
 
 export const RPC_INIT_TIMEOUT_MS = 30_000;
 export const RPC_TIMEOUT_MS = 10_000;
+/** How long a probe has to exit after SIGTERM before SIGKILL, and after SIGKILL. */
+export const PROBE_TERM_GRACE_MS = 5_000;
+export const PROBE_KILL_GRACE_MS = 2_000;
 const MAX_STDERR = 100_000;
 
 /** What the CLI prints when its login cannot be renewed: only a new sign-in helps. */
@@ -133,32 +136,81 @@ function rpcMessage(id: number, method: string, params: unknown = {}): string {
   return `${JSON.stringify({ jsonrpc: '2.0', id, method, params })}\n`;
 }
 
-/** The exchange over one spawned `codex app-server`. Never throws. */
+export interface ProbeTimeouts {
+  initMs: number;
+  rpcMs: number;
+  termGraceMs: number;
+  killGraceMs: number;
+}
+
+const DEFAULT_TIMEOUTS: ProbeTimeouts = {
+  initMs: RPC_INIT_TIMEOUT_MS,
+  rpcMs: RPC_TIMEOUT_MS,
+  termGraceMs: PROBE_TERM_GRACE_MS,
+  killGraceMs: PROBE_KILL_GRACE_MS,
+};
+
+/**
+ * The exchange over one spawned `codex app-server`. Never throws, and only
+ * resolves once the process has exited (SIGTERM, then SIGKILL if it lingers):
+ * the home's lock must not pass to the next probe while this one may still be
+ * refreshing the login with the same rotating refresh token.
+ */
 export function exchangeRateLimits(
   child: CliChild,
-  timeouts: { initMs: number; rpcMs: number } = {
-    initMs: RPC_INIT_TIMEOUT_MS,
-    rpcMs: RPC_TIMEOUT_MS,
-  },
+  timeouts: Partial<ProbeTimeouts> = {},
 ): Promise<CodexRpcResult> {
+  const limits = { ...DEFAULT_TIMEOUTS, ...timeouts };
   return new Promise((resolve) => {
     let buffer = '';
     let stderr = '';
     let settled = false;
+    let exited = false;
+    let onExit: (() => void) | null = null;
     let initId = -1;
     let limitsId = -1;
     let timer: ReturnType<typeof setTimeout> | null = null;
+
+    /** Resolves once the process is gone, or after the grace period if it never says so. */
+    const exitWithin = (ms: number) =>
+      new Promise<void>((done) => {
+        if (exited) {
+          done();
+          return;
+        }
+        const wait = setTimeout(done, ms);
+        onExit = () => {
+          clearTimeout(wait);
+          done();
+        };
+      });
+    const signal = (sig: NodeJS.Signals) => {
+      try {
+        child.kill(sig);
+      } catch {
+        // gone already
+      }
+    };
 
     const settle = (result: CodexRpcResult) => {
       if (settled) return;
       settled = true;
       if (timer) clearTimeout(timer);
-      try {
-        child.kill('SIGTERM');
-      } catch {
-        // gone already
-      }
-      resolve(result);
+      void (async () => {
+        if (!exited) {
+          signal('SIGTERM');
+          await exitWithin(limits.termGraceMs);
+        }
+        if (!exited) {
+          signal('SIGKILL');
+          await exitWithin(limits.killGraceMs);
+        }
+        resolve(result);
+      })();
+    };
+    const markExited = () => {
+      exited = true;
+      onExit?.();
     };
     const arm = (ms: number) => {
       if (timer) clearTimeout(timer);
@@ -169,25 +221,32 @@ export function exchangeRateLimits(
     };
     const send = (id: number, method: string) => child.stdin?.write(rpcMessage(id, method));
 
-    arm(timeouts.initMs);
+    arm(limits.initMs);
     child.stdin?.on('error', () => undefined);
     child.stderr?.on('data', (chunk: Buffer) => {
       stderr = (stderr + chunk.toString('utf8')).slice(-MAX_STDERR);
     });
     child.on('error', (err: NodeJS.ErrnoException) => {
+      // A process that could not start has nothing to wait for.
+      if (err.code === 'ENOENT') markExited();
       settle(
         err.code === 'ENOENT'
           ? { kind: 'unavailable', message: '`codex` is not installed or not on your PATH.' }
           : { kind: 'failed', message: err.message },
       );
     });
-    child.on('close', (code, signal) => {
+    child.on('close', (code, exitSignal) => {
+      markExited();
       if (isCodexAuthError(stderr)) {
         settle({ kind: 'signed_out' });
         return;
       }
       const reason =
-        code !== null ? `exit code ${code}` : signal ? `signal ${signal}` : 'no exit status';
+        code !== null
+          ? `exit code ${code}`
+          : exitSignal
+            ? `signal ${exitSignal}`
+            : 'no exit status';
       settle({ kind: 'failed', message: `Codex RPC process exited (${reason}).` });
     });
     child.stdout?.on('data', (chunk: Buffer) => {
@@ -207,7 +266,7 @@ export function exchangeRateLimits(
           continue; // not part of the protocol stream
         }
         if (message.id === initId) {
-          arm(timeouts.rpcMs);
+          arm(limits.rpcMs);
           child.stdin?.write(
             `${JSON.stringify({ jsonrpc: '2.0', method: 'initialized', params: {} })}\n`,
           );

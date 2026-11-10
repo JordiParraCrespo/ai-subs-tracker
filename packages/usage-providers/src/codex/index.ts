@@ -169,10 +169,13 @@ async function readLimits(
   }
 
   const rpc = await readCodexRateLimitsViaRpc(login.home, env);
+  // The probe may have refreshed the login and rewritten auth.json: wham/usage
+  // is asked with the token as it is now, not as it was before the probe.
+  const current = (await readCodexAuth(login.home).catch(() => null)) ?? auth;
   if (rpc.kind === 'ok') {
     let { windows, planType } = rpc;
     if (!windows.some((w) => w.kind === 'session') && windows.some((w) => w.kind === 'weekly')) {
-      const backend = await readBackend(auth, env);
+      const backend = await readBackend(current, env);
       if (backend.ok && backend.windows.some((w) => w.kind === 'session')) {
         windows = backend.windows;
         planType = backend.planType ?? planType;
@@ -184,8 +187,8 @@ async function readLimits(
     return { planType: null, snapshot: snapshot(now, 'auth_expired', CODEX_SIGNED_OUT_MESSAGE) };
   }
 
-  // The CLI could not answer: wham/usage stands in, with the token as it is.
-  const backend = await readBackend(auth, env);
+  // The CLI could not answer: wham/usage stands in, with the token as it is now.
+  const backend = await readBackend(current, env);
   if (backend.ok) {
     return {
       planType: backend.planType,
