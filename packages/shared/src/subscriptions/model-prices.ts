@@ -9,7 +9,7 @@
  * matters where one pattern is a prefix of another. Every model Claude Code
  * offers has a rule of its own, so none is shown or priced as its family.
  *
- * Sources (checked 2026-11-07): Anthropic's model table; OpenAI's published
+ * Sources (checked 2026-11-10): Anthropic's model table; OpenAI's published
  * rates as reported by pricing trackers (openai.com/api/pricing blocks
  * automated reads). Cache writes default to 1.25x input where the vendor
  * states no separate rate.
@@ -42,6 +42,7 @@ const openai = (
 ): ModelPrice => ({ match, label, input, output, cacheWrite, cacheRead });
 
 export const MODEL_PRICES: readonly ModelPrice[] = [
+  anthropic('fable-5-2', 'Claude Fable 5.2', 8, 40, 0.2),
   anthropic('fable-5-1', 'Claude Fable 5.1', 10, 50, 0.25),
   anthropic('mythos-5-1', 'Claude Mythos 5.1', 10, 50, 0.25),
   anthropic('mythos', 'Claude Mythos 5', 10, 50),
