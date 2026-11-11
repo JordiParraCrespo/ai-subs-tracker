@@ -1,7 +1,8 @@
+import { EventEmitter } from 'node:events';
 import { mkdir, mkdtemp, utimes, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import type { ProviderEnv } from '../types';
+import type { CliChild, ProviderEnv } from '../types';
 
 export const NOW = new Date('2026-11-02T12:00:00Z');
 export const SINCE = '2026-10-01';
@@ -90,4 +91,85 @@ export function claudeAssistantLine(opts: {
       },
     },
   };
+}
+
+/** What a fake `codex app-server` does when asked `account/rateLimits/read`. */
+export type FakeAppServer =
+  | { result: unknown }
+  | { error: string; stderr?: string }
+  | { exit: number; stderr?: string }
+  | { enoent: true };
+
+export interface SpawnCall {
+  command: string;
+  args: readonly string[];
+  env: Record<string, string>;
+}
+
+/**
+ * A `spawnCli` whose child speaks the app-server's JSON-RPC: it answers
+ * `initialize`, then `account/rateLimits/read` as `behaviour` says.
+ */
+export function fakeAppServer(
+  behaviour: FakeAppServer,
+  /** Runs while the probe answers, as the real CLI may rewrite `auth.json`. */
+  onRead?: () => Promise<void>,
+) {
+  const calls: SpawnCall[] = [];
+  const spawnCli: NonNullable<ProviderEnv['spawnCli']> = (command, args, env) => {
+    calls.push({ command, args, env });
+    const child = new EventEmitter() as EventEmitter & CliChild;
+    const stdout = new EventEmitter();
+    const stderr = new EventEmitter();
+    let closed = false;
+    const say = (message: unknown) =>
+      queueMicrotask(() => stdout.emit('data', Buffer.from(`${JSON.stringify(message)}\n`)));
+    const close = (code: number | null, signal: NodeJS.Signals | null = null) =>
+      queueMicrotask(() => {
+        if (closed) return;
+        closed = true;
+        child.emit('close', code, signal);
+      });
+    Object.assign(child, {
+      stdout,
+      stderr,
+      // Exits when told to, as the real CLI does.
+      kill: (signal: NodeJS.Signals = 'SIGTERM') => {
+        close(null, signal);
+        return true;
+      },
+      stdin: {
+        on: () => undefined,
+        write(data: string) {
+          for (const line of data.split('\n').filter(Boolean)) {
+            const msg = JSON.parse(line) as { id?: number; method: string };
+            if (msg.method === 'initialize') say({ id: msg.id, result: {} });
+            if (msg.method !== 'account/rateLimits/read') continue;
+            if ('result' in behaviour) {
+              const id = msg.id;
+              void (onRead?.() ?? Promise.resolve()).then(() =>
+                say({ id, result: behaviour.result }),
+              );
+            }
+            if ('error' in behaviour) {
+              if (behaviour.stderr) stderr.emit('data', Buffer.from(behaviour.stderr));
+              say({ id: msg.id, error: { code: -1, message: behaviour.error } });
+            }
+            if ('exit' in behaviour) {
+              if (behaviour.stderr) stderr.emit('data', Buffer.from(behaviour.stderr));
+              close(behaviour.exit);
+            }
+          }
+          return true;
+        },
+      },
+    });
+    if ('enoent' in behaviour) {
+      queueMicrotask(() =>
+        child.emit('error', Object.assign(new Error('spawn codex ENOENT'), { code: 'ENOENT' })),
+      );
+    }
+    return child;
+  };
+  return { spawnCli, calls };
 }

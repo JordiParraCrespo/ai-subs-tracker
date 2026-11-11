@@ -114,6 +114,11 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
                 {account.planName ?? '—'} ·{' '}
                 {t('accounts.group.resets', { at: reset(pace.weeklyResetsAt) })}
               </span>
+              {account.status !== 'ok' && account.latest?.message && (
+                <span className="ds-t-sub" data-testid="reading-message">
+                  {account.latest.message}
+                </span>
+              )}
               {account.readUnofficially && (
                 <span className="ds-t-sub">
                   {t('accounts.group.readUnofficially', { name: PROVIDER_NAMES[account.provider] })}

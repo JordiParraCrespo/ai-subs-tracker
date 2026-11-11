@@ -1,4 +1,5 @@
 import {
+  type AddLoginOptions,
   type AddLoginResult,
   type CollectorStatus,
   type ConnectUsageReaderResult,
@@ -12,6 +13,7 @@ import {
   isTrustedSender,
   MAX_ID_LENGTH,
   parseAccountId,
+  parseAddLoginOptions,
   parseApiKey,
   parseBoundedString,
   parseExternalUrl,
@@ -36,7 +38,7 @@ export interface DesktopServices {
   setToken(token: string | null): Promise<void>;
   collectorStatus(): CollectorStatus;
   collectorRefresh(): Promise<CollectorStatus>;
-  addLogin(provider: LocalProviderId): Promise<AddLoginResult>;
+  addLogin(provider: LocalProviderId, options: AddLoginOptions): Promise<AddLoginResult>;
   submitLoginCode(code: string): void;
   cancelLogin(): void;
   activate(provider: LocalProviderId, externalId: string): Promise<void>;
@@ -64,7 +66,8 @@ export function ipcHandlers(services: DesktopServices): Record<string, Handler> 
     [DESKTOP_CHANNELS.authSetToken]: (token) => services.setToken(parseToken(token)),
     [DESKTOP_CHANNELS.collectorStatus]: () => services.collectorStatus(),
     [DESKTOP_CHANNELS.collectorRefresh]: () => services.collectorRefresh(),
-    [DESKTOP_CHANNELS.accountsAddLogin]: (provider) => services.addLogin(parseProvider(provider)),
+    [DESKTOP_CHANNELS.accountsAddLogin]: (provider, options) =>
+      services.addLogin(parseProvider(provider), parseAddLoginOptions(options)),
     [DESKTOP_CHANNELS.accountsLoginCode]: (code) => services.submitLoginCode(parseLoginCode(code)),
     [DESKTOP_CHANNELS.accountsLoginCancel]: () => services.cancelLogin(),
     [DESKTOP_CHANNELS.accountsActivate]: (provider, externalId) =>

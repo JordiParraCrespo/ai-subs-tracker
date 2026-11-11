@@ -1,4 +1,5 @@
 import { isAbsolute } from 'node:path';
+import type { AddLoginOptions } from '@flama/shared/desktop';
 import {
   LOCAL_PROVIDER_IDS,
   type LocalProviderId,
@@ -38,6 +39,19 @@ export function parseProvider(value: unknown): LocalProviderId {
     return value as LocalProviderId;
   }
   throw new IpcArgumentError('Unknown provider.');
+}
+
+/** How to sign in: only `deviceCode`, a boolean; anything else is the default. */
+export function parseAddLoginOptions(value: unknown): AddLoginOptions {
+  if (value === undefined || value === null) return {};
+  if (typeof value !== 'object' || Array.isArray(value)) {
+    throw new IpcArgumentError('Invalid sign-in options.');
+  }
+  const deviceCode = (value as { deviceCode?: unknown }).deviceCode;
+  if (deviceCode !== undefined && typeof deviceCode !== 'boolean') {
+    throw new IpcArgumentError('Invalid sign-in options.');
+  }
+  return deviceCode ? { deviceCode: true } : {};
 }
 
 /** A hand-tracked provider whose usage can be read with a key (Z.AI, BigModel). */

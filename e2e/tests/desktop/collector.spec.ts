@@ -14,11 +14,14 @@ import { provisionedUser } from '../../support/web';
  * `@flama/web` and `@flama/desktop`; on Linux without a display, under
  * `xvfb-run -a`.
  *
- * The logins are written so no provider is ever called: the Claude logins
- * expired and the Codex one has no access token, which the providers answer
- * from disk (`auth_expired`, `no_credentials`). Identity, plan and token
- * counts still sync, which is the path under test; no credential, real or
- * not, leaves the machine.
+ * No provider is ever reached. The Codex login has no access token, which
+ * the provider answers from disk (`no_credentials`). The Claude logins are
+ * asked of Anthropic, as Orca asks (the server, not the stored expiry,
+ * decides), but the app runs behind a proxy that goes nowhere, which
+ * Chromium skips for localhost: the request fails on this machine and the
+ * login reads as unreadable (`error`), never as signed out. Identity, plan
+ * and token counts still sync, which is the path under test; no credential,
+ * real or not, leaves the machine.
  */
 
 const DESKTOP = resolve(
@@ -152,7 +155,9 @@ test('the desktop app finds the logins on disk, syncs them, and switches the ter
 
   const app = await electron.launch({
     executablePath: electronPath,
-    args: [DESKTOP, '--no-sandbox'],
+    // Vendor requests go through Electron's network stack: a proxy that goes
+    // nowhere keeps them on this machine, and loopback (the stack) is direct.
+    args: [DESKTOP, '--no-sandbox', '--proxy-server=http://127.0.0.1:9'],
     env: {
       ...process.env,
       HOME: home,
@@ -189,7 +194,8 @@ test('the desktop app finds the logins on disk, syncs them, and switches the ter
       planName: 'Ultra',
     });
     expect(byEmail(`${tag}@codex.e2e`)).toMatchObject({ provider: 'codex', planName: 'Plus' });
-    expect(byEmail(`${tag}@claude.e2e`)?.latest?.status).toBe('auth_expired');
+    // The request failed here: the login is unreadable, not signed out.
+    expect(byEmail(`${tag}@claude.e2e`)?.latest?.status).toBe('error');
     expect(byEmail(`${tag}@codex.e2e`)?.latest?.status).toBe('no_credentials');
 
     // Token counts read from the transcripts, priced by model.
@@ -257,7 +263,8 @@ test('adds a Claude Code account through the add-subscription modal, by pasted c
 
   const app = await electron.launch({
     executablePath: electronPath,
-    args: [DESKTOP, '--no-sandbox'],
+    // As above: vendor requests stay on this machine, the stack is direct.
+    args: [DESKTOP, '--no-sandbox', '--proxy-server=http://127.0.0.1:9'],
     env: {
       ...process.env,
       HOME: home,

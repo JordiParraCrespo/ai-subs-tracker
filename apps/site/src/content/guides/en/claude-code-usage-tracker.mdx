@@ -39,7 +39,7 @@ A useful tracker answers four questions for every account, not just the current 
 
 ## How ResetOwl tracks your usage
 
-ResetOwl is a desktop app. It finds the Claude Code and Codex logins already on your computer and, for each one, asks the provider for its limit windows: Claude Code's own usage endpoint, and Codex's ChatGPT usage endpoint, falling back to the rate limits Codex writes in its session logs. It identifies itself honestly to each vendor as `resetowl-desktop`.
+ResetOwl is a desktop app. It finds the Claude Code and Codex logins already on your computer and, for each one, asks the provider for its limit windows: Claude Code's own usage endpoint, and for Codex the Codex CLI itself, falling back to its ChatGPT usage endpoint and to the rate limits Codex writes in its session logs. Each login's credentials go only to the provider that issued them.
 
 Tokens are counted from the CLIs' own transcripts, per model and per day, and priced at the vendors' API rates. That is how the [pricing guide](/claude-code-pricing/) can compare a plan's price with what the same usage would cost on the API.
 

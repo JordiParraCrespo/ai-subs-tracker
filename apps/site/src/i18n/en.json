@@ -95,7 +95,7 @@
   "privacy": {
     "eyebrow": "Privacy",
     "title": "Your logins never leave your computer",
-    "lede": "ResetOwl never refreshes a provider’s token, talks to each provider as itself (resetowl-desktop), and never replaces a status line you already have.",
+    "lede": "ResetOwl never refreshes a provider’s token itself, sends a login’s credentials only to the provider that issued them, and never replaces a status line you already have.",
     "local": {
       "title": "Stays on your computer",
       "badge": "Never sent",

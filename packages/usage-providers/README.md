@@ -14,7 +14,8 @@ import { collectAll, nodeProviderEnv } from '@flama/usage-providers';
 
 const env = nodeProviderEnv({
   managedRoot: '/path/to/app-data/homes',
-  userAgent: 'resetowl-desktop/0.1.0',
+  userAgent: 'resetowl-desktop/0.1.0', // ResetOwl's own calls (the Z.AI reader)
+  cliEnv: process.env, // lets the Codex reader start `codex app-server`
 });
 const accounts = await collectAll(env, { sinceDay: '2026-10-01', fetchLimits: true });
 // [{ login: DetectedLogin, account: SyncAccount }, …]

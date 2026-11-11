@@ -10,16 +10,24 @@ export { decodeJwtPayload, parseCodexAuth } from './codex/auth';
 export { parseSessionRateLimits } from './codex/sessions';
 export { parseCodexUsage } from './codex/usage-api';
 export { type CollectedAccount, collectAll } from './collect';
-export { type NodeProviderEnvOptions, nodeProviderEnv, readMacKeychain } from './env';
+export {
+  cleanCliEnv,
+  INHERITED_SESSION_ENV,
+  type NodeProviderEnvOptions,
+  nodeProviderEnv,
+  readMacKeychain,
+} from './env';
 export { defaultGrokHome, grokProvider } from './grok';
 export { parseGrokAuth } from './grok/auth';
-export { parseGrokBilling } from './grok/billing';
+export { billingConfig, monthlyWindow, weeklyWindow } from './grok/billing';
 export { externalIdFor, localDay } from './lib/util';
 export { defineProviders, getProvider, PROVIDERS } from './registry';
 export type {
+  CliChild,
   CodingAgentProvider,
   DetectedLogin,
   LoginCommand,
+  LoginOptions,
   ProviderEnv,
   ReadOptions,
 } from './types';

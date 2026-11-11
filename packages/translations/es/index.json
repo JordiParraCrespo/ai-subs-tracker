@@ -285,7 +285,9 @@
       "showLess": "Ver menos",
       "planTitle": "{{provider}} indica que {{name}} es {{plan}}",
       "planDetail": "Elegiste {{chosen}}, que fija sus límites y precio.",
-      "planEnd": "según el proveedor"
+      "planEnd": "según el proveedor",
+      "unreadableTitle": "No se puede leer el uso de {{name}}",
+      "unreadableEnd": "sin sincronizar"
     },
     "desktop": {
       "lastSync": "Última sincronización {{when}}",
@@ -463,7 +465,8 @@
       "review": "Revisar",
       "limit": "En el límite",
       "signin": "Vuelve a entrar",
-      "stale": "Desactualizada"
+      "stale": "Desactualizada",
+      "unreadable": "No se puede leer el uso"
     },
     "toolbar": {
       "search": "Buscar cuentas",
@@ -679,8 +682,8 @@
       "description": "Elige la herramienta que tienes contratada.",
       "how": {
         "claude-code": "Inicia sesión en claude.com",
-        "codex": "Inicia sesión con un código en openai.com",
-        "grok": "Inicia sesión con un código en x.ai",
+        "codex": "Inicia sesión en openai.com",
+        "grok": "Inicia sesión en x.ai",
         "zai": "Añádelo a mano: plan, precio y día de cobro",
         "bigmodel": "China continental. Añádelo a mano, como Z.AI"
       },
@@ -723,7 +726,13 @@
         "otherTitle": "¿Tienes otra cuenta abierta?",
         "otherText": "Copia el enlace y ábrelo en una ventana privada, así inicias sesión con la cuenta que quieres añadir y la que usas ahora sigue con la sesión iniciada.",
         "copyLink": "Copiar enlace",
-        "linkCopied": "Enlace copiado"
+        "linkCopied": "Enlace copiado",
+        "browser": {
+          "title": "Inicia sesión en OpenAI",
+          "description": "Codex abre su página de inicio de sesión en tu navegador. Inicia sesión con la cuenta que quieres añadir; la página la devuelve a este ordenador.",
+          "waiting": "Esperando el inicio de sesión en tu navegador",
+          "expires": "El inicio de sesión se detiene a los 15 minutos"
+        }
       },
       "grok": {
         "title": "Introduce este código en xAI",
@@ -736,7 +745,13 @@
         "otherTitle": "¿Has iniciado sesión con otra cuenta?",
         "otherText": "Copia el enlace y ábrelo en una ventana privada, para iniciar sesión con la cuenta que quieres añadir y que la que usas ahora siga con la sesión iniciada.",
         "copyLink": "Copiar enlace",
-        "linkCopied": "Enlace copiado"
+        "linkCopied": "Enlace copiado",
+        "browser": {
+          "title": "Inicia sesión en xAI",
+          "description": "Grok Build abre su página de inicio de sesión en tu navegador. Inicia sesión con la cuenta de X o Grok que quieres añadir.",
+          "waiting": "Esperando el inicio de sesión en tu navegador",
+          "expires": "El inicio de sesión se detiene a los 15 minutos"
+        }
       },
       "desktop": {
         "title": "Añádela desde la app de escritorio",
@@ -760,7 +775,11 @@
         "renewalPlaceholder": "Del 1 al 31, según tu recibo",
         "noKey": "No hace falta clave de API para añadirlo. Leer el uso automáticamente es un paso aparte y opcional en la app de escritorio.",
         "submit": "Añadir suscripción"
-      }
+      },
+      "useCode": "Usar un código en otro dispositivo",
+      "useBrowser": "Iniciar sesión en este ordenador",
+      "otherDeviceText": "¿Inicias sesión desde un móvil u otro ordenador?",
+      "thisComputerText": "¿Tienes un navegador en este ordenador?"
     },
     "search": {
       "group": "Suscripciones"

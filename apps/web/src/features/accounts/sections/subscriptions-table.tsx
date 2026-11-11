@@ -123,9 +123,9 @@ export function SubscriptionsTable({
     {
       key: 'status',
       label: t('accounts.table.status'),
-      render: ({ status }) => (
+      render: ({ status, account }) => (
         <div className="flex">
-          <SubscriptionStatusPill status={status} />
+          <SubscriptionStatusPill status={status} reason={account.latest?.message} />
         </div>
       ),
     },

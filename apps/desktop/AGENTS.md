@@ -24,13 +24,19 @@
 
 - **Never send a provider credential** anywhere but the provider that issued
   it, and never refresh one yourself. The sync carries identity, plan, windows
-  and token counts. The one sanctioned renewal is `renew-login.ts`: for a
-  Claude login read as `auth_stale` (lapsed but renewable), the collector runs
-  the vendor's own CLI (`claude auth status`, stdin closed, timed out, one at a
-  time per folder, backed off after a failure) so Claude Code refreshes its own
-  token — ResetOwl still never calls `oauth/token` or writes a credential file.
-- **Honest user agent**: `resetowl-desktop/<version> (<platform>)`. Never
-  impersonate claude-code or codex.
+  and token counts. Renewal is the vendor's own CLI, never ResetOwl: for a
+  Claude login read as `auth_stale` (lapsed but renewable), `renew-login.ts`
+  runs `claude auth status` (stdin closed, timed out, one at a time per
+  folder, backed off after a failure); Codex's usage is read through
+  `codex app-server` (`packages/usage-providers/src/codex/app-server.ts`),
+  which refreshes its own token to answer. Every CLI ResetOwl starts gets the
+  login shell's PATH and an environment with the inherited login selectors,
+  tokens and Claude session identity removed (`cleanCliEnv`). ResetOwl still
+  never calls `oauth/token` or writes a credential file.
+- **User agents.** ResetOwl's own calls (its API) send
+  `resetowl-desktop/<version> (<platform>)`. Usage requests to the vendors go
+  through Electron's `net.fetch` with the client headers Orca sends — the
+  owner's decision, see the root `AGENTS.md`.
 - **Never log the API token.** It lives in `token-store.ts`, encrypted with
   `safeStorage`, memory-only when that is unavailable.
 - **A usage reader key** (`usage-readers.ts`) is kept only when `safeStorage`

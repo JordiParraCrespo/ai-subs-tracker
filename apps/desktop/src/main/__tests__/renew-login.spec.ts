@@ -79,6 +79,24 @@ describe('runRefresh', () => {
     expect(spawnedEnv.CODEX_HOME).toBeUndefined();
   });
 
+  it("drops an inherited token and another Claude session's identity, as Orca does", async () => {
+    let spawnedEnv: Record<string, string | undefined> = {};
+    await runRefresh(CMD, {
+      env: {
+        PATH: '/usr/bin',
+        CLAUDE_CODE_OAUTH_TOKEN: 'someone-else',
+        ANTHROPIC_API_KEY: 'sk-ant',
+        CLAUDECODE: '1',
+        CLAUDE_CODE_SESSION_ID: 'parent',
+      },
+      spawn: ((cmd: string, args: string[], opts: { env: Record<string, string | undefined> }) => {
+        spawnedEnv = opts.env;
+        return fakeChild((child) => child.emit('exit', 0, null))(cmd, args, opts);
+      }) as never,
+    });
+    expect(spawnedEnv).toEqual({ PATH: '/usr/bin', CLAUDE_CONFIG_DIR: '/h/.claude-work' });
+  });
+
   it('lets a non-default login override an inherited CLAUDE_CONFIG_DIR with its own', async () => {
     let spawnedEnv: Record<string, string | undefined> = {};
     await runRefresh(CMD, {

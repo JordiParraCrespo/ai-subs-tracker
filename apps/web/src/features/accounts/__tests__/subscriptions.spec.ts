@@ -66,6 +66,11 @@ describe('subscriptionStatus', () => {
     expect(subscriptionStatus(acc, paceOf(acc, NOW))).toBe('signin');
   });
 
+  it('never asks for a sign-in when only the reading failed (a rejected request, the network)', () => {
+    const acc = account(reading('error', []));
+    expect(subscriptionStatus(acc, paceOf(acc, NOW))).toBe('unreadable');
+  });
+
   it('reads a healthy login by its pace', () => {
     const acc = account(reading('ok', [weekly]));
     expect(subscriptionStatus(acc, paceOf(acc, NOW))).toBe('active');

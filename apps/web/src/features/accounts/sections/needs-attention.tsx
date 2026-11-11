@@ -66,15 +66,15 @@ export function NeedsAttention() {
               leading={<DsAvatar initials={mark.initials} color={mark.color} size={32} />}
               title={t(`accounts.attention.${kind}Title`, { name: accountTitle(account) })}
               subtitle={
-                kind === 'signin'
-                  ? account.displayName
+                kind === 'signin' || kind === 'unreadable'
+                  ? (account.latest?.message ?? account.displayName)
                   : t('accounts.attention.detail', {
                       left: formatPercent(pace.left),
                       reset: formatResetIn(pace.weeklyResetsAt, now, locale) ?? '—',
                     })
               }
               value={
-                kind === 'signin' || pace.left === null
+                kind === 'signin' || kind === 'unreadable' || pace.left === null
                   ? '—'
                   : formatMoney((pace.left / 100) * weeklyValue, locale)
               }

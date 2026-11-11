@@ -1,15 +1,26 @@
 import { join, resolve, sep } from 'node:path';
-import type { SyncAccount, UsageSnapshot } from '@flama/shared/schemas/accounts';
+import type { LimitWindow, SyncAccount, UsageSnapshot } from '@flama/shared/schemas/accounts';
 import { errorMessage, exists, externalIdFor, snapshot, subdirectories } from '../lib/util';
 import type {
   CodingAgentProvider,
   DetectedLogin,
   LoginCommand,
+  LoginOptions,
   ProviderEnv,
   ReadOptions,
 } from '../types';
-import { type GrokAuth, readGrokAuth } from './auth';
-import { fetchGrokBilling, GrokHttpError, parseGrokBilling } from './billing';
+import { type GrokAuth, isGrokSessionFresh, readGrokAuth } from './auth';
+import {
+  BILLING_CREDITS_URL,
+  BILLING_DEFAULT_URL,
+  billingConfig,
+  billingTier,
+  fetchGrokBilling,
+  GrokHttpError,
+  monthlyWindow,
+  reportsAnyUsageScalar,
+  weeklyWindow,
+} from './billing';
 
 /**
  * Grok Build, xAI's coding agent (`grok`), signed in with an X Subscription
@@ -59,6 +70,13 @@ async function detect(env: ProviderEnv): Promise<DetectedLogin[]> {
   return found;
 }
 
+/**
+ * The plan's usage pool, read as Orca reads it: the credits view first, its
+ * monthly budget when it has no weekly percentage, then the default view for
+ * a unified-billing account's monthly budget. A rejected session is an error,
+ * not a sign-out (only the CLI can say that), and a lapsed one is stale: the
+ * CLI renews it the next time `grok` runs.
+ */
 async function readLimits(
   login: DetectedLogin,
   auth: GrokAuth | null,
@@ -69,46 +87,58 @@ async function readLimits(
   if (!auth) {
     return {
       tier: null,
-      snapshot: snapshot(
-        now,
-        'no_credentials',
-        `No Grok login found in ${login.home}. Run \`${run} login\` and sign in.`,
-      ),
+      snapshot: snapshot(now, 'no_credentials', `Not signed in to Grok — run \`${run} login\`.`),
     };
   }
-  // Grok Build renews its own 7-day session when it runs; ResetOwl does not.
-  if (auth.expiresAt && auth.expiresAt.getTime() <= now.getTime()) {
+  if (!isGrokSessionFresh(auth, now)) {
     return {
       tier: null,
       snapshot: snapshot(
         now,
-        'auth_expired',
-        `The Grok sign-in has lapsed. Run \`${run}\` once to renew it, or \`${run} login\`.`,
+        'auth_stale',
+        `Grok sign-in expired — run \`${run}\` on this computer; sign in if prompted. No chat message is needed.`,
       ),
     };
   }
   try {
-    const billing = parseGrokBilling(
-      await fetchGrokBilling(auth.accessToken, env.fetch, env.userAgent),
-    );
+    const data = await fetchGrokBilling(BILLING_CREDITS_URL, auth, env.fetch);
+    const config = billingConfig(data);
+    if (!config) {
+      return {
+        tier: null,
+        snapshot: snapshot(now, 'ok', 'Grok billing response did not include config.'),
+      };
+    }
+    const tier = billingTier(config, data);
+    const ok = (window: LimitWindow) => ({
+      tier,
+      snapshot: snapshot(now, 'ok', null, [window]),
+    });
+    const weekly = weeklyWindow(config);
+    if (weekly) return ok(weekly);
+    // A credits view may already carry the monthly budget; no second request then.
+    const monthly = monthlyWindow(config);
+    if (monthly) return ok(monthly);
+    const fallbackData = await fetchGrokBilling(BILLING_DEFAULT_URL, auth, env.fetch);
+    const fallback = billingConfig(fallbackData) ?? fallbackData;
+    const fallbackMonthly = monthlyWindow(fallback);
+    if (fallbackMonthly) return ok(fallbackMonthly);
+    // Spend reported without a percentage is unknown usage, not zero.
     return {
-      tier: billing.tier,
+      tier,
       snapshot: snapshot(
         now,
         'ok',
-        billing.windows.length === 0 ? 'Grok reported no usage pool for this account.' : null,
-        billing.windows,
+        reportsAnyUsageScalar(config) || reportsAnyUsageScalar(fallback)
+          ? 'Grok did not report a usage percentage for this account.'
+          : 'Grok billing response did not include credit usage.',
       ),
     };
   } catch (err) {
     if (err instanceof GrokHttpError && (err.status === 401 || err.status === 403)) {
       return {
         tier: null,
-        snapshot: snapshot(
-          now,
-          'auth_expired',
-          `xAI rejected the Grok login. Run \`${run}\` once to renew it, or \`${run} login\`.`,
-        ),
+        snapshot: snapshot(now, 'error', `Grok usage request unauthorized (HTTP ${err.status}).`),
       };
     }
     if (err instanceof GrokHttpError && err.status === 429) {
@@ -121,9 +151,15 @@ async function readLimits(
         ),
       };
     }
+    if (err instanceof GrokHttpError) {
+      return {
+        tier: null,
+        snapshot: snapshot(now, 'error', `Grok usage request failed (HTTP ${err.status}).`),
+      };
+    }
     return {
       tier: null,
-      snapshot: snapshot(now, 'error', `Could not reach xAI (${errorMessage(err)}).`),
+      snapshot: snapshot(now, 'error', `Grok usage request failed: ${errorMessage(err)}`),
     };
   }
 }
@@ -133,7 +169,7 @@ async function read(
   env: ProviderEnv,
   opts: ReadOptions,
 ): Promise<SyncAccount> {
-  const auth = await readGrokAuth(login.home).catch(() => null);
+  const auth = await readGrokAuth(login.home, env.now()).catch(() => null);
   let tier: string | null = null;
   let snap: UsageSnapshot | null = null;
   if (opts.fetchLimits) {
@@ -158,12 +194,15 @@ async function read(
   };
 }
 
-function loginCommand(home: string): LoginCommand {
-  // The device-code flow (RFC 8628): a page and a short code the screens can
-  // show, rather than a callback on a localhost port.
+/**
+ * `grok login` signs in through the browser on this computer by default, as
+ * Orca runs it; the device-code flow (RFC 8628, a page and a short code) is
+ * for finishing the sign-in on another device.
+ */
+function loginCommand(home: string, opts: LoginOptions = {}): LoginCommand {
   return {
     command: 'grok',
-    args: ['login', '--device-auth'],
+    args: opts.deviceCode ? ['login', '--device-auth'] : ['login'],
     env: { GROK_HOME: home },
     linkHosts: ['accounts.x.ai', 'auth.x.ai'],
   };
@@ -171,7 +210,7 @@ function loginCommand(home: string): LoginCommand {
 
 /** Signed in once `auth.json` holds a session that names someone. */
 async function signedInAs(home: string): Promise<string | null> {
-  const auth = await readGrokAuth(home).catch(() => null);
+  const auth = await readGrokAuth(home, new Date()).catch(() => null);
   if (!auth?.userId && !auth?.email) return null;
   return externalIdFor(auth.userId, auth.email, home);
 }
@@ -186,6 +225,7 @@ export const grokProvider: CodingAgentProvider = {
   detect,
   read,
   loginCommand,
+  supportsDeviceCode: true,
   signedInAs,
   launchEnv,
 };

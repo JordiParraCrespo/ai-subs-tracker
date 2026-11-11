@@ -18,7 +18,7 @@ src/
 ├── env.ts             # nodeProviderEnv: the real machine
 ├── lib/util.ts        # fs/JSONL helpers, local days, externalId, snapshot builder, token buckets
 ├── claude-code/       # credentials, usage-api (+ statusline), local-logs, the provider
-├── codex/             # auth (JWT claims), usage-api (wham), sessions (tokens + offline limits), the provider
+├── codex/             # auth (JWT claims), app-server (the CLI's JSON-RPC usage read), usage-api (wham), sessions, the provider
 ├── grok/              # auth (GROK_HOME/auth.json), billing (the CLI chat proxy's usage view), the provider
 ├── zai/               # quota: the opt-in unofficial reader for Z.AI / BigModel Coding Plans (not a provider)
 └── __tests__/         # vitest; fake homes in os.tmpdir(), fake fetch and keychain
@@ -32,19 +32,32 @@ src/
   person's own CLI out. It only *reads* the stored login and decides whether a
   lapsed access token is renewable (a refresh token that has not itself
   expired): a renewable one is `auth_stale`, a signed-out one `auth_expired`.
-  Renewing a renewable login is the desktop collector's job, and it does it by
-  running the vendor's own CLI (`claude auth status`) — described here by
-  `refreshCommand`, run there — so the vendor's CLI refreshes its own token.
+  Renewing a renewable login is the vendor's own CLI's job: the desktop
+  collector runs `claude auth status` (described here by `refreshCommand`),
+  and Codex's usage read starts `codex app-server` through `env.spawnCli`,
+  which refreshes its own token to answer. That probe is the one process this
+  package starts, and only where the environment offers `spawnCli`.
 - **Credentials go only to the provider that issued them**: the Claude token to
   `api.anthropic.com`, the Codex token to `chatgpt.com`, the Grok session to
   `cli-chat-proxy.grok.com`. Never into a
   `SyncAccount`, a log line or an error message.
-- **Honest User-Agent**: `env.userAgent` (e.g. `resetowl-desktop/0.1.0`). Never
-  impersonate Claude Code, Codex or Grok Build, and send none of their client
-  headers (`originator`, `OpenAI-Beta`, `x-grok-client-*`, …). The one header
-  that names a vendor's CLI is Grok's `X-XAI-Token-Auth: xai-grok-cli`: Grok
-  Build's own docs require it to call its chat proxy with an `auth.json`
-  session, and it says what kind of token the bearer is, not who is calling.
+- **Requests and sessions as Orca makes them** (the owner's decision; see
+  the root `AGENTS.md`). Claude: `User-Agent: claude-code/2.1.0`, the Keychain
+  before `.credentials.json` on macOS (account `$USER`, the dir hashed in NFC
+  and through its symlinks), no stored-`expiresAt` pre-check. Codex:
+  `codex app-server` first (`codex/app-server.ts`, one probe per home), then
+  wham/usage with `User-Agent: codex-cli`, `OpenAI-Beta: codex-1`,
+  `originator: Codex Desktop`; a missing `auth.json` in a home that had one
+  is waited for five seconds. Grok: the `auth.x.ai` issuer, a five-minute
+  expiry margin, `X-XAI-Token-Auth: xai-grok-cli` and `x-userid`, no
+  User-Agent of ours, the default billing view as a monthly fallback.
+  `env.userAgent` (`resetowl-desktop/<version>`) is for ResetOwl's own calls
+  (the Z.AI reader).
+- **Only the CLI signs a login out.** A 401 or 403 is `auth_stale` when the
+  login can renew (Claude), an `error` otherwise (Codex's wham/usage, Grok);
+  `auth_expired` needs the CLI's own words (`codex app-server`'s refresh
+  errors, `claude auth status` reporting `loggedIn: false`), a login with no
+  usable refresh token, or a revocation.
 - **`read` never throws** for a provider failure: map it to the snapshot
   status (`ok`, `auth_stale` when a lapsed token is renewable, `auth_expired`
   when it is not, `no_credentials`, `rate_limited` on 429, `error`) with a
@@ -79,6 +92,7 @@ call it), with a key the person pasted into the desktop app:
 - `readZaiQuota` never throws, and its snapshot's source is `unofficial`.
 
 Rules this package follows: [`provider-integrations.md`](../../.agents/rules/provider-integrations.md)
-(one capability, a provider per vendor, an honest client name) and
+(one capability, a provider per vendor; the client-name rule there is set
+aside for these readers by the owner's decision above) and
 [`integrations.md`](../../.agents/rules/integrations.md) (respect the vendor's
 rate limits).

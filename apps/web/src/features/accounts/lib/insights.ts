@@ -14,7 +14,7 @@ export function wastedLastMonthCents(accounts: readonly AccountEntity[]): number
   );
 }
 
-export type AttentionKind = 'signin' | 'plan' | 'expiring' | 'limit' | 'behind';
+export type AttentionKind = 'signin' | 'unreadable' | 'plan' | 'expiring' | 'limit' | 'behind';
 
 export interface AttentionItem {
   account: AccountEntity;
@@ -24,10 +24,11 @@ export interface AttentionItem {
 
 const ORDER: Record<AttentionKind, number> = {
   signin: 0,
-  plan: 1,
-  expiring: 2,
-  behind: 3,
-  limit: 4,
+  unreadable: 1,
+  plan: 2,
+  expiring: 3,
+  behind: 4,
+  limit: 5,
 };
 
 /**
@@ -41,9 +42,10 @@ export function attentionItems(accounts: readonly AccountEntity[], now: Date): A
   for (const account of accounts) {
     const pace = paceOf(account, now);
     const status = account.status;
-    if (status === 'auth_expired' || status === 'no_credentials' || status === 'error') {
+    if (status === 'auth_expired' || status === 'no_credentials') {
       items.push({ account, pace, kind: 'signin' });
-    } else if (pace.status === 'expiring') items.push({ account, pace, kind: 'expiring' });
+    } else if (status === 'error') items.push({ account, pace, kind: 'unreadable' });
+    else if (pace.status === 'expiring') items.push({ account, pace, kind: 'expiring' });
     else if (pace.status === 'behind') items.push({ account, pace, kind: 'behind' });
     else if (pace.status === 'limit') items.push({ account, pace, kind: 'limit' });
     if (account.reportedPlanMismatch) items.push({ account, pace, kind: 'plan' });

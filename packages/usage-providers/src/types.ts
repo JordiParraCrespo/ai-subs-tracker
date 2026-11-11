@@ -12,15 +12,41 @@ export interface ProviderEnv {
   env: Record<string, string | undefined>;
   now(): Date;
   fetch: typeof fetch;
-  /** Honest, e.g. `resetowl-desktop/0.1.0`. Never impersonate claude-code or Codex. */
+  /**
+   * ResetOwl's own name, `resetowl-desktop/<version>`, for the calls that are
+   * ResetOwl's (the Z.AI reader). The coding-agent readers send the client
+   * headers Orca sends instead (see each provider's usage call).
+   */
   userAgent: string;
   /**
    * Where ResetOwl keeps isolated homes for extra accounts:
    * `<managedRoot>/claude-code/<id>`, `<managedRoot>/codex/<id>`.
    */
   managedRoot: string;
-  /** macOS generic-password lookup by service name; null when absent or not on macOS. */
-  readKeychain(service: string): Promise<string | null>;
+  /**
+   * macOS generic-password lookup by service name and, when given, account
+   * (`-a`); null when absent or not on macOS.
+   */
+  readKeychain(service: string, account?: string): Promise<string | null>;
+  /**
+   * Runs a vendor CLI as a short-lived JSON-RPC server (`codex app-server`)
+   * and returns the child; absent where no CLI may run (tests, the browser).
+   * The env given is merged over the machine's, with the CLI on its PATH.
+   */
+  spawnCli?(command: string, args: readonly string[], env: Record<string, string>): CliChild;
+}
+
+/** The parts of a spawned CLI a JSON-RPC exchange needs. */
+export interface CliChild {
+  stdin: {
+    write(data: string): unknown;
+    on(event: 'error', fn: (err: Error) => void): unknown;
+  } | null;
+  stdout: { on(event: 'data', fn: (chunk: Buffer) => void): unknown } | null;
+  stderr: { on(event: 'data', fn: (chunk: Buffer) => void): unknown } | null;
+  on(event: 'error', fn: (err: NodeJS.ErrnoException) => void): unknown;
+  on(event: 'close', fn: (code: number | null, signal: NodeJS.Signals | null) => void): unknown;
+  kill(signal?: NodeJS.Signals): unknown;
 }
 
 /** One login a provider found on this machine. */
@@ -54,6 +80,14 @@ export interface LoginCommand {
   linkHosts?: readonly string[];
 }
 
+export interface LoginOptions {
+  /**
+   * Sign in with a page and a one-time code that can be finished on another
+   * device, instead of the browser on this computer (the default).
+   */
+  deviceCode?: boolean;
+}
+
 export interface ReadOptions {
   /** `YYYY-MM-DD`, a local day: tokens from this day on are counted. */
   sinceDay: string;
@@ -67,8 +101,13 @@ export interface CodingAgentProvider {
   detect(env: ProviderEnv): Promise<DetectedLogin[]>;
   /** Never throws for provider errors: they become the snapshot's status and message. */
   read(login: DetectedLogin, env: ProviderEnv, opts: ReadOptions): Promise<SyncAccount>;
-  /** The command that signs a NEW isolated account into `home`. */
-  loginCommand(home: string): LoginCommand;
+  /**
+   * The command that signs a NEW isolated account into `home`: through the
+   * browser on this computer, or by device code when `opts.deviceCode`.
+   */
+  loginCommand(home: string, opts?: LoginOptions): LoginCommand;
+  /** Whether the provider offers a device-code sign-in for another device. */
+  supportsDeviceCode?: boolean;
   /**
    * Who a login just signed into `home` is, as the `externalId` `read` would
    * give it; null when the folder holds no signed-in account. Run after the
@@ -82,7 +121,8 @@ export interface CodingAgentProvider {
    * The command the collector runs to let the vendor's own CLI renew a lapsed
    * login of its own (Claude Code's `claude auth status`), spending no usage.
    * ResetOwl runs it but never refreshes a token itself. Absent for a provider
-   * whose CLI has no verified usage-free refresh (Codex today).
+   * whose CLI renews another way (Codex renews inside its usage read, through
+   * `codex app-server`) or not on demand (Grok renews when `grok` runs).
    */
   refreshCommand?(login: DetectedLogin): LoginCommand;
 }
