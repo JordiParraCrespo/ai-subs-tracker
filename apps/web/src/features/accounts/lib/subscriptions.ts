@@ -1,5 +1,10 @@
 import type { AccountEntity } from '@flama/frontend-consumer';
-import { type AccountPace, type ProviderId, paceOf } from '@flama/shared/subscriptions';
+import {
+  type AccountPace,
+  currentWindows,
+  type ProviderId,
+  paceOf,
+} from '@flama/shared/subscriptions';
 
 /**
  * The status column: the design's Active, review wash, stale note, the red
@@ -35,10 +40,37 @@ export interface SubscriptionsQuery {
   page?: number;
 }
 
+/** One model's own weekly cap (Claude's "Weekly · Fable"), beside the all-models one. */
+export interface ModelCap {
+  key: string;
+  model: string;
+  used: number;
+}
+
 export interface SubscriptionRow {
   account: AccountEntity;
   pace: AccountPace;
   status: SubscriptionStatus;
+  models: ModelCap[];
+}
+
+/**
+ * The weekly caps a plan puts on single models, still current at `now`. The
+ * model is the provider's own label with its "Weekly · " prefix dropped, so a
+ * new capped model shows without a change here.
+ */
+export function modelCaps(account: AccountEntity, now: Date): ModelCap[] {
+  return currentWindows(account, now).flatMap((window) =>
+    window.kind === 'weekly_model' && window.utilization !== null
+      ? [
+          {
+            key: window.key,
+            model: window.label.replace(/^weekly\s*·\s*/i, '') || window.key,
+            used: window.utilization,
+          },
+        ]
+      : [],
+  );
 }
 
 /** The rows the toolbar asks for, in its order. The list is the person's own, served whole. */
@@ -51,7 +83,12 @@ export function subscriptionRows(
   const rows = accounts
     .map((account) => {
       const pace = paceOf(account, now);
-      return { account, pace, status: subscriptionStatus(account, pace) };
+      return {
+        account,
+        pace,
+        status: subscriptionStatus(account, pace),
+        models: modelCaps(account, now),
+      };
     })
     .filter(({ account, status }) => {
       if (query.provider && account.provider !== query.provider) return false;

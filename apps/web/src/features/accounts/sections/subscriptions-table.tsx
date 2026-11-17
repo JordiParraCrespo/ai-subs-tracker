@@ -6,7 +6,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { SubscriptionStatusPill } from '../components/subscription-status';
 import { UsageCell } from '../components/usage-cell';
-import { formatMoney, formatResetIn } from '../lib/format';
+import { formatMoney, formatPercent, formatResetIn } from '../lib/format';
 import { accountMark, accountTitle } from '../lib/marks';
 import {
   type SubscriptionRow,
@@ -63,17 +63,28 @@ export function SubscriptionsTable({
     {
       key: 'weekly',
       label: t('accounts.table.weekly'),
-      render: ({ account, pace }) => (
-        <UsageCell
-          value={pace.weeklyUsed}
-          sub={
-            !account.isManual
-              ? t('accounts.table.weeklySub')
-              : account.latest
-                ? t('accounts.table.manual')
-                : t('accounts.table.notRecorded')
-          }
-        />
+      render: ({ account, pace, models }) => (
+        <>
+          <UsageCell
+            value={pace.weeklyUsed}
+            sub={
+              !account.isManual
+                ? t('accounts.table.weeklySub')
+                : account.latest
+                  ? t('accounts.table.manual')
+                  : t('accounts.table.notRecorded')
+            }
+          />
+          {models.length > 0 && (
+            <span className="ds-cell-sub">
+              {models
+                .map((cap) =>
+                  t('accounts.table.modelCap', { model: cap.model, used: formatPercent(cap.used) }),
+                )
+                .join(' · ')}
+            </span>
+          )}
+        </>
       ),
     },
     {

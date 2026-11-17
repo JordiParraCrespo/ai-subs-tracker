@@ -390,6 +390,7 @@
       "useAccount": "Use {{name}} in terminals",
       "weekly": "Used this week",
       "weeklySub": "of the weekly limit",
+      "modelCap": "{{model}} {{used}}",
       "sessionSub": "5-hour window",
       "noSession": "weekly only",
       "yourPrice": "your price",

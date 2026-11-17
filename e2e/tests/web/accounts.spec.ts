@@ -66,6 +66,18 @@ test('an account can be renamed and priced', async ({ page }) => {
   await api.dispose();
 });
 
+test('a plan’s weekly cap on one model shows under its weekly bar', async ({ page }) => {
+  const { user, api } = await provisionedUser('modelcap');
+  await syncTwoAccounts(api);
+  await signInAs(page, user);
+
+  // The Claude login reports Fable's own weekly cap beside the all-models one.
+  await page.goto('/accounts');
+  await expect(page.getByText('Fable 18%', { exact: true })).toBeVisible();
+
+  await api.dispose();
+});
+
 test('usage shows tokens by model at API prices', async ({ page }) => {
   const { user, api } = await provisionedUser('usage');
   await syncTwoAccounts(api);
