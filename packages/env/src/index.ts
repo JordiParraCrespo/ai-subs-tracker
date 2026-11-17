@@ -16,6 +16,35 @@ export interface LoadEnvResult {
   applied: string[];
 }
 
+const FILE_SUFFIX = '_FILE';
+
+/**
+ * Resolve `<NAME>_FILE` variables: for each one whose `<NAME>` is unset, read
+ * the file it names and set `<NAME>` to its contents, trailing newline
+ * trimmed. This is the Docker secrets convention (Postgres' own image reads
+ * `POSTGRES_PASSWORD_FILE` the same way), so a secret can be a file mounted
+ * into the container instead of a value in its environment, where
+ * `docker inspect` and every child process would see it. A `<NAME>` that is
+ * already set wins, like any real variable. A `_FILE` naming a file that
+ * cannot be read throws: a missing secret must stop the process, not let it
+ * start on a default.
+ */
+export function resolveFileVariables(env: NodeJS.ProcessEnv = process.env): string[] {
+  const applied: string[] = [];
+  for (const [fileKey, filePath] of Object.entries(env)) {
+    if (!fileKey.endsWith(FILE_SUFFIX) || fileKey.length === FILE_SUFFIX.length || !filePath) {
+      continue;
+    }
+    const key = fileKey.slice(0, -FILE_SUFFIX.length);
+    if (env[key] !== undefined) {
+      continue;
+    }
+    env[key] = fs.readFileSync(filePath, 'utf8').replace(/\r?\n$/, '');
+    applied.push(key);
+  }
+  return applied;
+}
+
 /**
  * Walk up from `startDir` looking for the monorepo root: the first directory
  * containing a `pnpm-workspace.yaml`, or a `package.json` that declares
@@ -60,12 +89,14 @@ export function findWorkspaceRoot(startDir: string = process.cwd()): string | nu
  *    `vercel env pull`, which writes `.env.local`, silently wins over `.env`).
  *
  * There is one `.env`, at the root of the repo; per-package `.env` files are
- * deliberately not looked for. Safe to call more than once.
+ * deliberately not looked for. Then every `<NAME>_FILE` is resolved into
+ * `<NAME>` (`resolveFileVariables`), whether it came from the environment or
+ * a file. Safe to call more than once.
  */
 export function loadEnv(options: LoadEnvOptions = {}): LoadEnvResult {
   const root = findWorkspaceRoot(options.cwd);
   if (root === null) {
-    return { root: null, loaded: [], applied: [] };
+    return { root: null, loaded: [], applied: resolveFileVariables() };
   }
 
   const loaded: string[] = [];
@@ -86,6 +117,7 @@ export function loadEnv(options: LoadEnvOptions = {}): LoadEnvResult {
       applied.push(key);
     }
   }
+  applied.push(...resolveFileVariables());
 
   return { root, loaded, applied };
 }

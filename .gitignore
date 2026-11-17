@@ -74,3 +74,6 @@ e2e/tests/screens/local/
 
 # Astro
 .astro/
+
+# docker/deploy.sh state on the server: the images now running and before
+.deploy/

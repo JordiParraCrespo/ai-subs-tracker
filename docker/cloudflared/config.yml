@@ -1,0 +1,17 @@
+# The tunnel's routes, locally managed: this file, not the Cloudflare
+# dashboard, says what each hostname reaches, so a change is a reviewed diff.
+# cloudflared dials out to Cloudflare; nothing on the server listens on the
+# internet. The tunnel's id is TUNNEL_ID in the server's `.env`, its
+# credentials the `tunnel_credentials` secret (docker/README.md).
+credentials-file: /run/secrets/tunnel_credentials
+no-autoupdate: true
+
+ingress:
+  - hostname: api.resetowl.com
+    service: http://api:3001
+  # flama:begin web
+  - hostname: app.resetowl.com
+    service: http://web:3000
+  # flama:end web
+  # Anything else the tunnel is asked for gets a 404, not a guess.
+  - service: http_status:404
