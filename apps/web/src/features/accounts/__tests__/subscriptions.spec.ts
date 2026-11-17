@@ -3,7 +3,8 @@ import type { LimitWindow, SnapshotStatus } from '@flama/shared/schemas/accounts
 import { paceOf } from '@flama/shared/subscriptions';
 import { describe, expect, it } from 'vitest';
 import { attentionItems } from '../lib/insights';
-import { modelCaps, subscriptionStatus } from '../lib/subscriptions';
+import { modelCaps } from '../lib/provider-group';
+import { subscriptionStatus } from '../lib/subscriptions';
 
 const NOW = new Date('2026-11-07T12:00:00Z');
 
@@ -130,7 +131,7 @@ describe('a hand-tracked plan its vendor reports as another tier', () => {
 
 /**
  * Claude's per-model weekly cap ("Weekly · Fable") is read and stored but was
- * on no screen; the Subscriptions table names it under the weekly bar.
+ * on no screen; the provider's page names it on each account's card.
  */
 describe('modelCaps', () => {
   const fable: LimitWindow = {
@@ -144,7 +145,7 @@ describe('modelCaps', () => {
 
   it('names each model cap by its label, leaving the all-models window out', () => {
     expect(modelCaps(account(reading('ok', [weekly, fable])), NOW)).toEqual([
-      { key: 'seven_day_fable', model: 'Fable', used: 18 },
+      { key: 'seven_day_fable', model: 'Fable', used: 18, resetsAt: '2026-11-10T00:00:00Z' },
     ]);
   });
 

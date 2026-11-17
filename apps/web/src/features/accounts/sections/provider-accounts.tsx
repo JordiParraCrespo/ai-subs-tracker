@@ -90,7 +90,7 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
       </div>
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
-        {group.cards.map(({ account, pace }) => {
+        {group.cards.map(({ account, pace, models }) => {
           const used = pace.weeklyUsed ?? 0;
           const isNext = group.pick?.account.id === account.id;
           return (
@@ -114,6 +114,15 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
                 {account.planName ?? '—'} ·{' '}
                 {t('accounts.group.resets', { at: reset(pace.weeklyResetsAt) })}
               </span>
+              {models.map((cap) => (
+                <span key={cap.key} className="ds-t-sub">
+                  {t('accounts.group.modelCap', {
+                    model: cap.model,
+                    used: formatPercent(cap.used),
+                    at: reset(cap.resetsAt),
+                  })}
+                </span>
+              ))}
               {account.status !== 'ok' && account.latest?.message && (
                 <span className="ds-t-sub" data-testid="reading-message">
                   {account.latest.message}

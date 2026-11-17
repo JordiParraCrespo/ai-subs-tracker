@@ -66,14 +66,19 @@ test('an account can be renamed and priced', async ({ page }) => {
   await api.dispose();
 });
 
-test('a plan’s weekly cap on one model shows under its weekly bar', async ({ page }) => {
+test('a plan’s weekly cap on one model shows on its provider page, not the list', async ({
+  page,
+}) => {
   const { user, api } = await provisionedUser('modelcap');
   await syncTwoAccounts(api);
   await signInAs(page, user);
 
   // The Claude login reports Fable's own weekly cap beside the all-models one.
+  await page.goto('/accounts/claude-code');
+  await expect(page.getByText(/^Fable 18% · resets /)).toBeVisible();
   await page.goto('/accounts');
-  await expect(page.getByText('Fable 18%', { exact: true })).toBeVisible();
+  await expect(page.getByText('Showing 2 of 2 accounts')).toBeVisible();
+  await expect(page.getByText(/Fable 18%/)).toHaveCount(0);
 
   await api.dispose();
 });
