@@ -80,8 +80,36 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+    # Loopback only: the public way in is the `caddy` service below, which
+    # terminates TLS. The port stays published for probes and `curl` on the
+    # host itself.
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
+
+  # TLS in front of the stack: Caddy takes certificates from Let's Encrypt for
+  # the domains in docker/Caddyfile (API_DOMAIN, APP_DOMAIN in the root `.env`)
+  # and proxies to the services above. Ports 80 and 443 must reach this host,
+  # and each domain's DNS must point at it before the first start. Behind it,
+  # set TRUST_PROXY=1 (docker/README.md says why one hop holds for both).
+  caddy:
+    image: caddy:2-alpine
+    restart: always
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      API_DOMAIN: ${API_DOMAIN:?set API_DOMAIN in the root .env (e.g. api.resetowl.com)}
+      # flama:begin web
+      APP_DOMAIN: ${APP_DOMAIN:?set APP_DOMAIN in the root .env (e.g. app.resetowl.com)}
+      # flama:end web
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
 
   # flama:begin web
   web:
@@ -99,7 +127,7 @@ services:
     environment:
       CSP_EXTRA_ORIGINS: ${CSP_EXTRA_ORIGINS:-}
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
   # flama:end web
 
   # flama:plugins services
@@ -107,3 +135,5 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  caddy_data:
+  caddy_config:

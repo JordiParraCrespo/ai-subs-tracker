@@ -1,0 +1,16 @@
+# The public front of docker/docker-compose.prod.yml. Caddy gets and renews a
+# Let's Encrypt certificate for each site below on its own; the domains come
+# from the root `.env` through the compose file.
+
+{$API_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy api:3001
+}
+
+# flama:begin web
+# The web app's nginx serves the screens and proxies /api to the API itself,
+# so the session cookie stays same-origin.
+{$APP_DOMAIN} {
+	reverse_proxy web:3000
+}
+# flama:end web

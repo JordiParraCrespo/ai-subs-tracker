@@ -131,6 +131,40 @@ pnpm --filter @flama/desktop package:dir   # unpacked app only, quicker
 `package` refuses to run until the screens are built; they are copied into
 the app's `resources/renderer`.
 
+### Releasing (macOS, signed and notarized)
+
+`.github/workflows/desktop-release.yml` builds the Mac app for arm64 and
+x64 on a GitHub-hosted Mac, signs it with a **Developer ID Application**
+certificate under the hardened runtime (`signing/entitlements.mac.plist`:
+V8's JIT and nothing else, no App Sandbox, since the collector reads
+`~/.claude` and `~/.codex` and runs the vendors' CLIs), has Apple notarize
+it and staples the ticket. It then attaches the dmg and zip files to the
+GitHub release `desktop-v<version>`.
+
+Once, on GitHub, an environment named `apple` with five secrets:
+
+| Secret | What it is |
+| --- | --- |
+| `MAC_CERTIFICATE_P12_BASE64` | The certificate *and its private key*, exported from Keychain Access as a `.p12`, then `base64 -i cert.p12 \| pbcopy` |
+| `MAC_CERTIFICATE_PASSWORD` | The password chosen at that export |
+| `APPLE_API_KEY_P8` | An App Store Connect API key (Users and Access → Integrations → Team Keys, role Developer): the `.p8` file's text |
+| `APPLE_API_KEY_ID` | That key's ID |
+| `APPLE_API_ISSUER` | The issuer ID above the keys list |
+
+Set them with `gh secret set <NAME> --env apple` so the values never pass
+through a chat or a file in the repository. Then, to release:
+
+```bash
+# bump "version" in apps/desktop/package.json (a changeset does it), merge, then
+git tag desktop-v0.1.0 && git push origin desktop-v0.1.0
+```
+
+Run by hand from the Actions tab, the workflow builds a draft release
+instead. Locally, `package` signs only when a Developer ID is in the
+keychain and notarizes only when the `APPLE_API_*` variables are set.
+Without them it builds an unsigned app, which Gatekeeper blocks on other
+Macs.
+
 ### Name and icon
 
 The app is **ResetOwl** everywhere: `productName` in `package.json` (the name
