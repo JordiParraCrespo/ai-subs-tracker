@@ -7,6 +7,10 @@
     "404": {
       "title": "Page not found",
       "description": "This page does not exist."
+    },
+    "download": {
+      "title": "Download ResetOwl for macOS, Windows and Linux",
+      "description": "Download the free ResetOwl desktop app for macOS, Windows or Linux: limits, the account to use next and usage at API prices for Claude Code and Codex."
     }
   },
   "nav": {
@@ -165,5 +169,59 @@
     "input": "Input",
     "output": "Output",
     "cacheRead": "Cache read"
+  },
+  "download": {
+    "eyebrow": "Free and open source",
+    "title": "Download ResetOwl",
+    "lede": "Install the desktop app. It finds the Claude Code and Codex logins already on your computer, shows what each plan has left and tells you which account to use next.",
+    "platforms": {
+      "title": "Pick your platform.",
+      "lede": "Installers for macOS, Windows and Linux.",
+      "detected": "Detected {os}. Its installer is marked below.",
+      "other": "ResetOwl is a desktop app. Open this page on your computer to download it.",
+      "recommended": "For your computer",
+      "architecture": "Architecture"
+    },
+    "mac": {
+      "name": "macOS",
+      "format": ".dmg · Apple Silicon and Intel",
+      "appleSilicon": "Apple Silicon",
+      "intel": "Intel",
+      "button": "Download for macOS",
+      "note": "Signed and notarized by Apple."
+    },
+    "windows": {
+      "name": "Windows",
+      "format": ".exe installer · 64-bit",
+      "button": "Download for Windows",
+      "note": "Not code-signed yet. If SmartScreen stops it, choose More info, then Run anyway."
+    },
+    "linux": {
+      "name": "Linux",
+      "format": ".AppImage · x86_64",
+      "button": "Download for Linux",
+      "note": "Make the file executable (chmod +x), then run it."
+    },
+    "releases": {
+      "lede": "Looking for an older version or the zip for macOS?",
+      "link": "See every release on GitHub"
+    },
+    "steps": {
+      "eyebrow": "After you download",
+      "title": "Three steps to your first queue",
+      "install": {
+        "title": "Install",
+        "text": "Open the installer and start ResetOwl. It keeps a tray entry saying which account to use next."
+      },
+      "signIn": {
+        "title": "Sign in",
+        "text": "Create a free ResetOwl account in the app. Only limits and token counts reach it: your logins never leave your computer."
+      },
+      "queue": {
+        "title": "Follow the queue",
+        "text": "ResetOwl finds the Claude Code and Codex logins on your computer and puts the account with the most headroom at the top."
+      }
+    },
+    "howLink": "How ResetOwl works"
   }
 }

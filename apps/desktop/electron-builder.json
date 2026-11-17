@@ -15,12 +15,18 @@
     }
   ],
   "npmRebuild": false,
-  "artifactName": "ResetOwl-${version}-${os}-${arch}.${ext}",
+  "artifactName": "ResetOwl-${os}-${arch}.${ext}",
   "icon": "dist/assets/icon.png",
   "mac": {
     "icon": "dist/assets/icon-mac.png",
     "category": "public.app-category.developer-tools",
-    "target": ["dmg", "zip"]
+    "target": [
+      { "target": "dmg", "arch": ["arm64", "x64"] },
+      { "target": "zip", "arch": ["arm64", "x64"] }
+    ],
+    "hardenedRuntime": true,
+    "entitlements": "signing/entitlements.mac.plist",
+    "entitlementsInherit": "signing/entitlements.mac.plist"
   },
   "win": {
     "executableName": "ResetOwl",

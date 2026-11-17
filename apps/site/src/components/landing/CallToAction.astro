@@ -1,11 +1,11 @@
 ---
 import { ArrowRight } from '@lucide/astro';
 
-import { links } from '@/config/site';
 import { useTranslations } from '@/i18n';
-import { currentLocale } from '@/lib/locale';
+import { currentLocale, localePath } from '@/lib/locale';
 
-const t = useTranslations(currentLocale(Astro.currentLocale));
+const locale = currentLocale(Astro.currentLocale);
+const t = useTranslations(locale);
 ---
 
 <section class="ds-container site-cta">
@@ -14,7 +14,7 @@ const t = useTranslations(currentLocale(Astro.currentLocale));
       <h2 class="site-band__title">{t('cta.title')}</h2>
       <span class="site-band__lede">{t('cta.lede')}</span>
     </div>
-    <a href={links.download} class="site-band__cta">
+    <a href={localePath(locale, '/download/')} class="site-band__cta">
       {t('cta.button')}
       <ArrowRight size={16} aria-hidden="true" />
     </a>

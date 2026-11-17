@@ -82,3 +82,6 @@ docker build -f apps/site/Dockerfile --build-arg VITE_SITE_APP_URL=https://app.r
 ```
 
 `dist/` is plain static files, so any static host serves it as well.
+Production is Cloudflare Pages, uploaded by hand for now, with
+`cloudflare/_headers` in place of nginx's headers. The steps are in
+`docker/README.md`.

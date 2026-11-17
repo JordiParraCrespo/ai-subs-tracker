@@ -791,3 +791,73 @@ body {
 .site-related__link:hover {
   background: var(--ds-fill-ghost-hover);
 }
+
+/* ---- Download page ------------------------------------------------------ */
+.site-download__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 48px;
+}
+.site-download__head .site-h2 {
+  max-width: 640px;
+}
+.site-download__detected {
+  max-width: 340px;
+}
+.site-dim {
+  color: var(--ds-text-subtle);
+}
+/* The card for the reader's computer gets `.site-featured`'s brand ring from
+   the page's script; every slot fills its grid row either way. */
+.site-platform-slot {
+  border-radius: var(--ds-radius-2xl);
+}
+.site-platform-slot > .ds-card {
+  height: 100%;
+}
+.site-platform {
+  box-sizing: border-box;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.site-platform__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+}
+.site-platform__badge[hidden] {
+  display: none;
+}
+.site-platform__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.site-platform__name {
+  margin: 0;
+  font: 600 24px/32px var(--ds-font-sans);
+  letter-spacing: var(--ds-tracking-tight);
+}
+.site-platform__actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+/* The actions sit at the bottom of every card, so the download buttons share
+   a line however long the note above them is. */
+.site-platform__note {
+  padding-top: 8px;
+}
+/* A link inside muted prose, drawn as one. */
+.site-link--strong {
+  color: var(--ds-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

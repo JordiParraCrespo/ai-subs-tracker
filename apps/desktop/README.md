@@ -131,6 +131,49 @@ pnpm --filter @flama/desktop package:dir   # unpacked app only, quicker
 `package` refuses to run until the screens are built; they are copied into
 the app's `resources/renderer`.
 
+### Releasing
+
+`.github/workflows/desktop-release.yml` builds every platform on
+GitHub-hosted runners and publishes them as the GitHub release
+`desktop-v<version>`, with a `SHA256SUMS` file:
+
+- **macOS**, arm64 and x64, dmg and zip: signed with a **Developer ID
+  Application** certificate under the hardened runtime
+  (`signing/entitlements.mac.plist`: V8's JIT and nothing else, no App
+  Sandbox, since the collector reads `~/.claude` and `~/.codex` and runs the
+  vendors' CLIs), notarized by Apple, the ticket stapled.
+- **Windows**, x64: the NSIS installer, not code-signed yet.
+- **Linux**, x86_64: the AppImage.
+
+The file names carry no version (`artifactName`:
+`ResetOwl-<os>-<arch>.<ext>`), because the site's download page links to
+`releases/latest/download/<file>`; renaming one breaks that page's link
+(`apps/site/src/config/site.ts`, `installers`).
+
+Once, on GitHub, an environment named `apple` with five secrets:
+
+| Secret | What it is |
+| --- | --- |
+| `MAC_CERTIFICATE_P12_BASE64` | The certificate *and its private key*, exported from Keychain Access as a `.p12`, then `base64 -i cert.p12 \| pbcopy` |
+| `MAC_CERTIFICATE_PASSWORD` | The password chosen at that export |
+| `APPLE_API_KEY_P8` | An App Store Connect API key (Users and Access → Integrations → Team Keys, role Developer): the `.p8` file's text |
+| `APPLE_API_KEY_ID` | That key's ID |
+| `APPLE_API_ISSUER` | The issuer ID above the keys list |
+
+Set them with `gh secret set <NAME> --env apple` so the values never pass
+through a chat or a file in the repository. Then, to release:
+
+```bash
+# bump "version" in apps/desktop/package.json (a changeset does it), merge, then
+git tag desktop-v0.1.0 && git push origin desktop-v0.1.0
+```
+
+Run by hand from the Actions tab, the workflow builds a draft release
+instead. Locally, `package` signs only when a Developer ID is in the
+keychain and notarizes only when the `APPLE_API_*` variables are set.
+Without them it builds an unsigned app, which Gatekeeper blocks on other
+Macs.
+
 ### Name and icon
 
 The app is **ResetOwl** everywhere: `productName` in `package.json` (the name

@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { findWorkspaceRoot, loadEnv } from './index';
+import { findWorkspaceRoot, loadEnv, resolveFileVariables } from './index';
 
 let root: string;
 let touchedKeys: string[];
@@ -111,5 +111,39 @@ describe('loadEnv', () => {
     const result = loadEnv({ cwd: root });
     expect(result.loaded).toEqual([path.join(root, '.env.local')]);
     expect(process.env.FLAMA_ENV_TEST_D).toBe('only-local');
+  });
+});
+
+describe('resolveFileVariables', () => {
+  function secret(content: string): string {
+    const file = path.join(root, 'secret');
+    fs.writeFileSync(file, content);
+    return file;
+  }
+
+  it('sets NAME from the file NAME_FILE names, trailing newline trimmed', () => {
+    const env: NodeJS.ProcessEnv = { FLAMA_SECRET_FILE: secret('s3cret\n') };
+    expect(resolveFileVariables(env)).toEqual(['FLAMA_SECRET']);
+    expect(env.FLAMA_SECRET).toBe('s3cret');
+  });
+
+  it('leaves a NAME that is already set alone', () => {
+    const env: NodeJS.ProcessEnv = { FLAMA_SECRET: 'real', FLAMA_SECRET_FILE: secret('file') };
+    expect(resolveFileVariables(env)).toEqual([]);
+    expect(env.FLAMA_SECRET).toBe('real');
+  });
+
+  it('throws when the file cannot be read, so a missing secret stops the process', () => {
+    const env: NodeJS.ProcessEnv = { FLAMA_SECRET_FILE: path.join(root, 'missing') };
+    expect(() => resolveFileVariables(env)).toThrow();
+  });
+
+  it('runs as part of loadEnv, for a _FILE set in .env', () => {
+    write('.env', `FLAMA_ENV_TEST_F_FILE=${secret('from-file')}\n`, [
+      'FLAMA_ENV_TEST_F_FILE',
+      'FLAMA_ENV_TEST_F',
+    ]);
+    loadEnv({ cwd: root });
+    expect(process.env.FLAMA_ENV_TEST_F).toBe('from-file');
   });
 });

@@ -7,6 +7,10 @@
     "404": {
       "title": "Página no encontrada",
       "description": "Esta página no existe."
+    },
+    "download": {
+      "title": "Descarga ResetOwl para macOS, Windows y Linux",
+      "description": "Descarga gratis la app de escritorio ResetOwl para macOS, Windows o Linux: límites, la cuenta que usar ahora y tu uso a precios de API para Claude Code y Codex."
     }
   },
   "nav": {
@@ -165,5 +169,59 @@
     "input": "Entrada",
     "output": "Salida",
     "cacheRead": "Lectura de caché"
+  },
+  "download": {
+    "eyebrow": "Gratis y de código abierto",
+    "title": "Descarga ResetOwl",
+    "lede": "Instala la app de escritorio. Encuentra las sesiones de Claude Code y Codex que ya tienes en tu ordenador, muestra lo que le queda a cada plan y te dice qué cuenta usar ahora.",
+    "platforms": {
+      "title": "Elige tu plataforma.",
+      "lede": "Instaladores para macOS, Windows y Linux.",
+      "detected": "Hemos detectado {os}. Su instalador está marcado abajo.",
+      "other": "ResetOwl es una app de escritorio. Abre esta página en tu ordenador para descargarla.",
+      "recommended": "Para tu ordenador",
+      "architecture": "Arquitectura"
+    },
+    "mac": {
+      "name": "macOS",
+      "format": ".dmg · Apple Silicon e Intel",
+      "appleSilicon": "Apple Silicon",
+      "intel": "Intel",
+      "button": "Descargar para macOS",
+      "note": "Firmada y notarizada por Apple."
+    },
+    "windows": {
+      "name": "Windows",
+      "format": "Instalador .exe · 64 bits",
+      "button": "Descargar para Windows",
+      "note": "Aún sin firma de código. Si SmartScreen la detiene, elige Más información y luego Ejecutar de todas formas."
+    },
+    "linux": {
+      "name": "Linux",
+      "format": ".AppImage · x86_64",
+      "button": "Descargar para Linux",
+      "note": "Haz el archivo ejecutable (chmod +x) y ábrelo."
+    },
+    "releases": {
+      "lede": "¿Buscas una versión anterior o el zip para macOS?",
+      "link": "Ver todas las versiones en GitHub"
+    },
+    "steps": {
+      "eyebrow": "Después de descargar",
+      "title": "Tres pasos hasta tu primera cola",
+      "install": {
+        "title": "Instala",
+        "text": "Abre el instalador y arranca ResetOwl. Deja un icono en la bandeja que te dice qué cuenta usar ahora."
+      },
+      "signIn": {
+        "title": "Inicia sesión",
+        "text": "Crea una cuenta gratuita de ResetOwl en la app. Solo le llegan límites y recuentos de tokens: tus sesiones nunca salen de tu ordenador."
+      },
+      "queue": {
+        "title": "Sigue la cola",
+        "text": "ResetOwl encuentra las sesiones de Claude Code y Codex de tu ordenador y pone arriba la cuenta con más margen."
+      }
+    },
+    "howLink": "Cómo funciona ResetOwl"
   }
 }

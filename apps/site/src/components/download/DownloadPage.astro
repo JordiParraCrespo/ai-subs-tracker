@@ -1,0 +1,197 @@
+---
+/**
+ * The download page, shared by `/download/` and `/<lang>/download/`: a card
+ * per platform linking to the newest release's installer (`installers`), the
+ * one for the reader's computer marked by a small script, and what to do
+ * after downloading. Without the script every card works; none is marked.
+ */
+import { Check, Download, Laptop, Monitor, Terminal } from '@lucide/astro';
+
+import Breadcrumbs from '@/components/common/Breadcrumbs.astro';
+import ButtonLink from '@/components/common/ButtonLink.astro';
+import { installers, links } from '@/config/site';
+import { useTranslations } from '@/i18n';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { breadcrumbListSchema, softwareApplicationSchema, webPageSchema } from '@/lib/jsonld';
+import { currentLocale, localePath } from '@/lib/locale';
+
+const locale = currentLocale(Astro.currentLocale);
+const t = useTranslations(locale);
+const crumbs = [
+  { name: t('nav.home'), url: localePath(locale, '/') },
+  { name: t('nav.download'), url: localePath(locale, '/download/') },
+];
+const schemas = [
+  breadcrumbListSchema(crumbs),
+  webPageSchema({
+    url: localePath(locale, '/download/'),
+    title: t('seo.download.title'),
+    description: t('seo.download.description'),
+    inLanguage: locale,
+  }),
+  softwareApplicationSchema(locale),
+];
+
+const platforms = [
+  { id: 'mac', Icon: Laptop, href: installers.macArm64 },
+  { id: 'windows', Icon: Monitor, href: installers.windowsX64 },
+  { id: 'linux', Icon: Terminal, href: installers.linuxX64 },
+] as const;
+const steps = ['install', 'signIn', 'queue'] as const;
+---
+
+<BaseLayout title={t('seo.download.title')} description={t('seo.download.description')} schemas={schemas}>
+  <section class="ds-container site-hero">
+    <Breadcrumbs crumbs={crumbs} label={t('guide.breadcrumbs')} />
+    <span class="site-eyebrow">{t('download.eyebrow')}</span>
+    <h1 class="site-hero__title">{t('download.title')}</h1>
+    <p class="site-hero__lede">{t('download.lede')}</p>
+  </section>
+
+  <section class="ds-container site-section" aria-labelledby="platforms">
+    <div class="site-download__head">
+      <h2 id="platforms" class="site-h2">
+        <span class="site-dim">{t('download.platforms.title')}</span>{' '}
+        {t('download.platforms.lede')}
+      </h2>
+      <p
+        class="site-muted m-0 site-download__detected"
+        data-detected
+        data-template={t('download.platforms.detected')}
+        data-other={t('download.platforms.other')}
+      >
+      </p>
+    </div>
+
+    <div class="site-grid">
+      {
+        platforms.map(({ id, Icon, href }) => (
+          <div class="site-platform-slot" data-platform={id}>
+            <article class="ds-card site-platform">
+              <div class="site-platform__top">
+                <span class="ds-disc ds-disc--lg" aria-hidden="true">
+                  <Icon size={22} />
+                </span>
+                <span class="ds-badge ds-badge--md site-platform__badge" data-recommended hidden>
+                  <Check size={12} aria-hidden="true" />
+                  {t('download.platforms.recommended')}
+                </span>
+              </div>
+              <div class="site-platform__body">
+                <h3 class="site-platform__name" data-name>{t(`download.${id}.name`)}</h3>
+                <span class="site-eyebrow">{t(`download.${id}.format`)}</span>
+                <p class="site-muted m-0 site-platform__note">{t(`download.${id}.note`)}</p>
+              </div>
+              <div class="site-platform__actions">
+                {id === 'mac' && (
+                  <div class="ds-seg ds-seg--md ds-seg--block" role="group" aria-label={t('download.platforms.architecture')}>
+                    <button type="button" data-arch="arm64" data-href={installers.macArm64} data-active aria-pressed="true">
+                      {t('download.mac.appleSilicon')}
+                    </button>
+                    <button type="button" data-arch="x64" data-href={installers.macX64} aria-pressed="false">
+                      {t('download.mac.intel')}
+                    </button>
+                  </div>
+                )}
+                <ButtonLink href={href} size="lg" class="ds-btn--block" data-download>
+                  <Download slot="icon" size={18} aria-hidden="true" />
+                  {t(`download.${id}.button`)}
+                </ButtonLink>
+              </div>
+            </article>
+          </div>
+        ))
+      }
+    </div>
+
+    <p class="site-muted m-0">
+      {t('download.releases.lede')}{' '}
+      <a href={links.releases} class="site-link site-link--strong">{t('download.releases.link')} →</a>
+    </p>
+  </section>
+
+  <section class="ds-container site-section">
+    <div class="site-section__head">
+      <span class="site-eyebrow">{t('download.steps.eyebrow')}</span>
+      <h2 class="site-h2">{t('download.steps.title')}</h2>
+    </div>
+    <ol class="site-steps">
+      {
+        steps.map((step, i) => (
+          <li class="site-step">
+            <span class="site-step__n" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <h3 class="site-step__title">{t(`download.steps.${step}.title`)}</h3>
+            <p class="site-muted m-0">{t(`download.steps.${step}.text`)}</p>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="m-0">
+      <a href={`${localePath(locale, '/')}#how`} class="site-link">{t('download.howLink')} →</a>
+    </p>
+  </section>
+</BaseLayout>
+
+<script>
+  type Platform = 'mac' | 'windows' | 'linux';
+  interface UAData {
+    platform?: string;
+    mobile?: boolean;
+    getHighEntropyValues?: (hints: string[]) => Promise<{ architecture?: string }>;
+  }
+  const uaData = (navigator as Navigator & { userAgentData?: UAData }).userAgentData;
+
+  /** The reader's desktop OS, or null on a phone, a tablet or anything unknown. */
+  function detect(): Platform | null {
+    const ua = navigator.userAgent.toLowerCase();
+    const platform = (uaData?.platform ?? navigator.platform ?? '').toLowerCase();
+    if (uaData?.mobile || /iphone|ipad|ipod|android|cros/.test(ua)) return null;
+    // iPadOS asks for desktop pages as a Mac; a touch screen gives it away.
+    if (platform.includes('mac')) return navigator.maxTouchPoints > 1 ? null : 'mac';
+    if (platform.includes('win')) return 'windows';
+    if (platform.includes('linux')) return 'linux';
+    return null;
+  }
+
+  function selectArch(button: HTMLButtonElement) {
+    const card = button.closest<HTMLElement>('[data-platform]');
+    if (!card) return;
+    for (const other of card.querySelectorAll<HTMLButtonElement>('[data-arch]')) {
+      other.toggleAttribute('data-active', other === button);
+      other.setAttribute('aria-pressed', String(other === button));
+    }
+    const link = card.querySelector<HTMLAnchorElement>('[data-download]');
+    if (link && button.dataset.href) link.href = button.dataset.href;
+  }
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-arch]')) {
+    button.addEventListener('click', () => selectArch(button));
+  }
+
+  const detected = detect();
+  const note = document.querySelector<HTMLElement>('[data-detected]');
+  const card = detected && document.querySelector<HTMLElement>(`[data-platform="${detected}"]`);
+  if (card) {
+    card.classList.add('site-featured');
+    card.querySelector('[data-recommended]')?.removeAttribute('hidden');
+    card.querySelector('[data-download]')?.classList.add('ds-btn--primary');
+    const name = card.querySelector('[data-name]')?.textContent?.trim() ?? '';
+    if (note) note.textContent = (note.dataset.template ?? '').replace('{os}', name);
+  } else if (note) {
+    note.textContent = note.dataset.other ?? '';
+  }
+
+  // Chromium tells an Intel Mac from Apple Silicon; Safari and Firefox do not,
+  // and keep the Apple Silicon default.
+  if (detected === 'mac') {
+    uaData
+      ?.getHighEntropyValues?.(['architecture'])
+      .then(({ architecture }) => {
+        const intel = document.querySelector<HTMLButtonElement>('[data-arch="x64"]');
+        if (architecture === 'x86' && intel) selectArch(intel);
+      })
+      .catch(() => {});
+  }
+</script>
