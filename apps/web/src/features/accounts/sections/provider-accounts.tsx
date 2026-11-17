@@ -115,13 +115,23 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
                 {t('accounts.group.resets', { at: reset(pace.weeklyResetsAt) })}
               </span>
               {models.map((cap) => (
-                <span key={cap.key} className="ds-t-sub">
-                  {t('accounts.group.modelCap', {
-                    model: cap.model,
-                    used: formatPercent(cap.used),
-                    at: reset(cap.resetsAt),
-                  })}
-                </span>
+                <div key={cap.key} className="flex flex-col gap-1.5">
+                  <span className="ds-t-sub">
+                    {t('accounts.group.modelCap', {
+                      model: cap.model,
+                      used: formatPercent(cap.used),
+                      at: reset(cap.resetsAt),
+                    })}
+                  </span>
+                  <div className="ds-meter">
+                    <div
+                      className="ds-meter__fill"
+                      data-hot={cap.used >= 90 ? '' : undefined}
+                      // oxlint-disable-next-line no-inline-styles -- the fill is the reading
+                      style={{ width: `${Math.min(100, cap.used)}%` }}
+                    />
+                  </div>
+                </div>
               ))}
               {account.status !== 'ok' && account.latest?.message && (
                 <span className="ds-t-sub" data-testid="reading-message">
