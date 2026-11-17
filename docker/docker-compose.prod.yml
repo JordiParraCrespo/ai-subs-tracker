@@ -100,7 +100,6 @@ services:
     # port is open to the internet whatever the firewall says. The way in is
     # the `cloudflared` service below; on the server itself,
     # `docker compose exec api wget -qO- http://127.0.0.1:3001/api/v1/ready`.
-
   # The only way in from the internet: an outbound tunnel to Cloudflare,
   # which routes api.resetowl.com (and app.resetowl.com) here by
   # docker/cloudflared/config.yml. The server opens no port; administration

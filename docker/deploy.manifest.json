@@ -2,7 +2,11 @@
   "$comment": "What docker/deploy.sh does, in the deploy-api skill's terms (indie-hacker-agents-claude-skills). docker/README.md is the prose.",
   "service": "api",
   "listen_port": 3001,
-  "health": { "liveness": "/api/v1/health", "readiness": "/api/v1/ready", "checked_from": "inside the compose network" },
+  "health": {
+    "liveness": "/api/v1/health",
+    "readiness": "/api/v1/ready",
+    "checked_from": "inside the compose network"
+  },
   "migrate": {
     "up": "node typeorm/cli.js migration:run -d dist/config/data-source.js",
     "down": "irreversible",
