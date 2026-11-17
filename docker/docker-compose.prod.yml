@@ -155,16 +155,16 @@ networks:
   data:
     internal: true
 
-# Files in SECRETS_DIR on the server (/srv/secrets, a root-only directory),
+# Files in /srv/secrets on the server, a directory only root can enter,
 # mounted read-only at /run/secrets/<name>. docker/README.md says how each one
 # is made. None is in `.env`, the image or the repository.
 secrets:
   db_password:
-    file: ${SECRETS_DIR:-/srv/secrets}/db_password
+    file: /srv/secrets/db_password
   better_auth_secret:
-    file: ${SECRETS_DIR:-/srv/secrets}/better_auth_secret
+    file: /srv/secrets/better_auth_secret
   tunnel_credentials:
-    file: ${SECRETS_DIR:-/srv/secrets}/tunnel_credentials.json
+    file: /srv/secrets/tunnel_credentials.json
 
 volumes:
   postgres_data:
