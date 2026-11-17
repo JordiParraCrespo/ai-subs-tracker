@@ -210,6 +210,18 @@ describe('claude-code usage parsing', () => {
     expect(parsed.windows.map((w) => w.kind)).toEqual(['weekly']);
   });
 
+  it('reads a seven_day_fable key as the weekly Fable cap', () => {
+    const parsed = parseClaudeUsage({
+      seven_day_fable: { utilization: 18, resets_at: '2026-11-20T00:00:00Z' },
+      seven_day: { utilization: 25, resets_at: '2026-11-20T00:00:00Z' },
+    });
+    expect(parsed.windows.map((w) => [w.key, w.kind, w.label, w.windowMinutes])).toEqual([
+      ['seven_day', 'weekly', 'Weekly · all models', 10080],
+      ['seven_day_fable', 'weekly_model', 'Weekly · Fable', 10080],
+    ]);
+    expect(parsed.windows[1]?.utilization).toBe(18);
+  });
+
   it('reads model-scoped entries of a limits[] array as weekly_model', () => {
     const parsed = parseClaudeUsage({
       limits: [

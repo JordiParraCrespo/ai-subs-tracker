@@ -69,6 +69,7 @@ describe('apiCostCents', () => {
   it.each([
     ['claude-opus-5-5', 'Claude Opus 5.5'],
     ['claude-fable-5-2', 'Claude Fable 5.2'],
+    ['claude-mythos-5-2', 'Claude Mythos 5.2'],
     ['claude-fable-5-1', 'Claude Fable 5.1'],
     ['claude-mythos-5-1', 'Claude Mythos 5.1'],
     ['claude-sonnet-5-5', 'Claude Sonnet 5.5'],
@@ -104,6 +105,13 @@ describe('apiCostCents', () => {
     // $8 + $40 + $0.20 on Fable 5.2; $10 + $50 + $1 on Fable 5.
     expect(apiCostCents('claude-fable-5-2', tokens)).toBeCloseTo(4820);
     expect(apiCostCents('claude-fable-5', tokens)).toBeCloseTo(6100);
+  });
+
+  it('prices Mythos 5.2 like Fable 5.2, not at Mythos 5 rates', () => {
+    const tokens = { input: 1e6, output: 1e6, cacheRead: 1e6, cacheWrite: 0 };
+    // $8 + $40 + $0.20 on Mythos 5.2; $10 + $50 + $1 on Mythos 5.
+    expect(apiCostCents('claude-mythos-5-2', tokens)).toBeCloseTo(4820);
+    expect(apiCostCents('claude-mythos-5', tokens)).toBeCloseTo(6100);
   });
 
   it('does not guess a price for an unknown model', () => {
