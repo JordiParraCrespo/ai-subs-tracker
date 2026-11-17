@@ -369,14 +369,24 @@ async function main(): Promise<void> {
           home: renewing?.login.home,
           command: (dir) => {
             const cmd = impl.loginCommand(dir, { deviceCode: options.deviceCode === true });
-            // A found login is selected the way a terminal selects it: the
-            // default one with no CLAUDE_CONFIG_DIR / CODEX_HOME / GROK_HOME,
-            // which on macOS would change the Keychain item Claude Code uses.
-            return renewing ? { ...cmd, env: impl.launchEnv(renewing.login) } : cmd;
+            // Claude Code's default login is always `~/.claude`, selected with
+            // no CLAUDE_CONFIG_DIR (setting it would change the macOS Keychain
+            // item). Codex's and Grok's default may be an inherited
+            // CODEX_HOME / GROK_HOME, which cleanCliEnv strips, so they keep
+            // the explicit home the login was found in.
+            return renewing && provider === 'claude-code'
+              ? { ...cmd, env: impl.launchEnv(renewing.login) }
+              : cmd;
           },
           check: (dir) =>
             renewing
-              ? checkRenewedLogin(impl, renewing.login, renewing.account.externalId, providerEnv())
+              ? checkRenewedLogin(
+                  impl,
+                  renewing.login,
+                  renewing.account.externalId,
+                  collector.localAccounts(),
+                  providerEnv(),
+                )
               : checkNewLogin(impl, dir, collector.localAccounts(), providerEnv()),
           onProgress: (progress) => {
             if (win && !win.isDestroyed())

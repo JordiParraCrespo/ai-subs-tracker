@@ -106,16 +106,29 @@ describe('checking a login signed in again', () => {
     const dir = join(home, '.codex');
     const login = { provider: 'codex' as const, home: dir, isDefault: true, managed: false };
     await mkdir(dir, { recursive: true });
-    expect(await checkRenewedLogin(codexProvider, login, 'acct-1', env(home))).toBe(
+    expect(await checkRenewedLogin(codexProvider, login, 'acct-1', [], env(home))).toBe(
       'Codex finished without signing an account in.',
     );
 
     await codexLogin(dir, 'acct-1', 'me@example.com');
-    expect(await checkRenewedLogin(codexProvider, login, 'acct-1', env(home))).toBeNull();
+    expect(await checkRenewedLogin(codexProvider, login, 'acct-1', [], env(home))).toBeNull();
 
     await codexLogin(dir, 'acct-2', 'other@example.com');
-    expect(await checkRenewedLogin(codexProvider, login, 'acct-1', env(home))).toMatch(
+    expect(await checkRenewedLogin(codexProvider, login, 'acct-1', [], env(home))).toMatch(
       /different account/,
+    );
+  });
+
+  it('lets a login that named nobody take the account that signs in, unless already added', async () => {
+    const home = await tempDir();
+    const dir = join(home, '.codex');
+    const login = { provider: 'codex' as const, home: dir, isDefault: true, managed: false };
+    await codexLogin(dir, 'acct-2', 'new@example.com');
+    expect(await checkRenewedLogin(codexProvider, login, 'home:0123', [], env(home))).toBeNull();
+
+    const elsewhere = [known(join(home, 'managed', 'codex', 'x'), 'acct-2', 'new@example.com')];
+    expect(await checkRenewedLogin(codexProvider, login, 'home:0123', elsewhere, env(home))).toBe(
+      'That is new@example.com, already added.',
     );
   });
 });
