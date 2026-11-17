@@ -34,7 +34,7 @@
       "title": "Landing page",
       "summary": "apps/site — the Astro website: home page and SEO guides, on the web design system",
       "identifiers": ["apps/site", "@flama/site", "VITE_SITE_APP_URL"],
-      "paths": ["apps/site", ".github/workflows/deploy-site.yml"]
+      "paths": ["apps/site"]
     },
     "e2e": {
       "title": "End-to-end tests",

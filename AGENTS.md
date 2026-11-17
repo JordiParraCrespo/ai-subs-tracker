@@ -440,10 +440,16 @@ session can use `pnpm exec turbo run dev --filter=!@flama/desktop --concurrency=
 
 ## Deployment
 
-- Docker Compose (`docker/`) for the API, Postgres and Redis
-- Docker images built in CI (GitHub Actions), pushed to GHCR
-- Desktop: `pnpm --filter @flama/desktop package` (electron-builder; signing and
-  notarization are still to be set up)
+- Docker Compose (`docker/`) for the API, Postgres and Redis, on a server
+  that opens no port: a Cloudflare Tunnel carries the public hostnames, and
+  Tailscale the administration. `docker/deploy.sh` deploys on the server and
+  `docker/check-invariants.sh` refuses a compose file that publishes a port,
+  floats an image tag or passes a secret as an environment variable;
+  `docker/README.md` is the runbook
+- Secrets are files in `/srv/secrets`, read through `<NAME>_FILE`
+  (`@flama/env`), never values in `.env`
+- Desktop: `.github/workflows/desktop-release.yml` signs and notarizes the
+  macOS app on a `desktop-v*` tag
 
 ## When modifying code
 

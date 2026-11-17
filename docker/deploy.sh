@@ -21,7 +21,9 @@ cd "$(dirname "$0")/.."
 STATE=.deploy
 mkdir -p "$STATE"
 
-compose() { docker compose --env-file .env -f docker/docker-compose.prod.yml "$@"; }
+# .deploy/current names the images running now, so the compose calls below,
+# and any made by hand (`sh docker/compose.sh ps`), see the same stack.
+compose() { sh docker/compose.sh "$@"; }
 log() { printf '==> %s\n' "$*"; }
 die() { printf 'deploy: %s\n' "$*" >&2; exit 1; }
 
