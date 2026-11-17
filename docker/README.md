@@ -123,6 +123,10 @@ pnpm dlx wrangler@4.156.0 pages deploy apps/site/dist --project-name=resetowl --
 ```
 
 `cloudflare/_headers` carries the headers nginx sets in the Docker image.
+The project was created with
+`wrangler pages project create resetowl --production-branch=main --force`:
+wrangler 4.156 hands a new Pages project to Workers unless told not to.
+Deploys to the existing project need no `--force`.
 <!-- flama:end site -->
 
 ## The macOS app
