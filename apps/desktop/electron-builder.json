@@ -15,7 +15,7 @@
     }
   ],
   "npmRebuild": false,
-  "artifactName": "ResetOwl-${version}-${os}-${arch}.${ext}",
+  "artifactName": "ResetOwl-${os}-${arch}.${ext}",
   "icon": "dist/assets/icon.png",
   "mac": {
     "icon": "dist/assets/icon-mac.png",

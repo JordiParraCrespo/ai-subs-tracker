@@ -12,7 +12,6 @@ import ButtonLink from '@/components/common/ButtonLink.astro';
 import Faq from '@/components/guides/Faq.astro';
 import CallToAction from '@/components/landing/CallToAction.astro';
 import GuideHub from '@/components/landing/GuideHub.astro';
-import { links } from '@/config/site';
 import { useTranslations } from '@/i18n';
 import { type Guide, guideBySlug, guideSlug } from '@/lib/guides';
 import {
@@ -71,7 +70,7 @@ const checked = new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeZone: '
       <h1 class="site-guide__title">{entry.data.heading}</h1>
       <p class="site-hero__lede site-guide__lede">{entry.data.lede}</p>
       <div class="site-guide__actions">
-        <ButtonLink href={links.download} variant="primary" size="md">
+        <ButtonLink href={localePath(locale, '/download/')} variant="primary" size="md">
           <Download slot="icon" size={16} aria-hidden="true" />
           {t('hero.primary')}
         </ButtonLink>

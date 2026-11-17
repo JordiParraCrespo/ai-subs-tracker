@@ -47,7 +47,7 @@ describe('the guides', () => {
 
   it('link only to pages that exist, in their own locale', () => {
     const slugs = new Set(guides(siteConfig.defaultLocale).map((g) => g.slug));
-    const pages = new Set(['', ...slugs, 'legal/privacy', 'legal/terms']);
+    const pages = new Set(['', 'download', ...slugs, 'legal/privacy', 'legal/terms']);
     for (const locale of siteConfig.locales) {
       const prefix = locale === siteConfig.defaultLocale ? '' : `/${locale}`;
       for (const { slug, body } of guides(locale)) {

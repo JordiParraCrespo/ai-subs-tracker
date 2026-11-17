@@ -131,15 +131,24 @@ pnpm --filter @flama/desktop package:dir   # unpacked app only, quicker
 `package` refuses to run until the screens are built; they are copied into
 the app's `resources/renderer`.
 
-### Releasing (macOS, signed and notarized)
+### Releasing
 
-`.github/workflows/desktop-release.yml` builds the Mac app for arm64 and
-x64 on a GitHub-hosted Mac, signs it with a **Developer ID Application**
-certificate under the hardened runtime (`signing/entitlements.mac.plist`:
-V8's JIT and nothing else, no App Sandbox, since the collector reads
-`~/.claude` and `~/.codex` and runs the vendors' CLIs), has Apple notarize
-it and staples the ticket. It then attaches the dmg and zip files to the
-GitHub release `desktop-v<version>`.
+`.github/workflows/desktop-release.yml` builds every platform on
+GitHub-hosted runners and publishes them as the GitHub release
+`desktop-v<version>`, with a `SHA256SUMS` file:
+
+- **macOS**, arm64 and x64, dmg and zip: signed with a **Developer ID
+  Application** certificate under the hardened runtime
+  (`signing/entitlements.mac.plist`: V8's JIT and nothing else, no App
+  Sandbox, since the collector reads `~/.claude` and `~/.codex` and runs the
+  vendors' CLIs), notarized by Apple, the ticket stapled.
+- **Windows**, x64: the NSIS installer, not code-signed yet.
+- **Linux**, x86_64: the AppImage.
+
+The file names carry no version (`artifactName`:
+`ResetOwl-<os>-<arch>.<ext>`), because the site's download page links to
+`releases/latest/download/<file>`; renaming one breaks that page's link
+(`apps/site/src/config/site.ts`, `installers`).
 
 Once, on GitHub, an environment named `apple` with five secrets:
 

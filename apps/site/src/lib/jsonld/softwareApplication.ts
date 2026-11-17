@@ -1,6 +1,7 @@
 import type { SoftwareApplication } from 'schema-dts';
 
-import { links, siteConfig } from '@/config/site';
+import { siteConfig } from '@/config/site';
+import { absolute, localePath } from '@/lib/locale';
 
 import { entityId } from './types';
 
@@ -13,7 +14,7 @@ export function softwareApplicationSchema(locale: string): SoftwareApplication {
     description: siteConfig.description[locale] ?? siteConfig.description[siteConfig.defaultLocale],
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'macOS, Windows, Linux',
-    downloadUrl: links.download,
+    downloadUrl: absolute(localePath(locale, '/download/')),
     license: 'https://opensource.org/licenses/MIT',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     publisher: { '@id': entityId('organization') },

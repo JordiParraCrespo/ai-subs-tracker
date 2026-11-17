@@ -27,7 +27,7 @@ const product = headerNav(locale).slice(0, 2);
       <h2 class="site-footer__heading">{t('footer.product')}</h2>
       <ul class="site-footer__list">
         {product.map((item) => <li><a href={item.href} class="site-link">{t(item.key)}</a></li>)}
-        <li><a href={links.download} class="site-link">{t('nav.download')}</a></li>
+        <li><a href={localePath(locale, '/download/')} class="site-link">{t('nav.download')}</a></li>
         <li><a href={links.signIn} class="site-link">{t('nav.signIn')}</a></li>
       </ul>
     </nav>
@@ -49,7 +49,7 @@ const product = headerNav(locale).slice(0, 2);
       <h2 class="site-footer__heading">{t('footer.project')}</h2>
       <ul class="site-footer__list">
         <li><a href={links.source} class="site-link">{t('footer.source')}</a></li>
-        <li><a href={links.download} class="site-link">{t('footer.releases')}</a></li>
+        <li><a href={links.releases} class="site-link">{t('footer.releases')}</a></li>
         <li><a href={localePath(locale, '/legal/privacy/')} class="site-link">{t('footer.privacy')}</a></li>
         <li><a href={localePath(locale, '/legal/terms/')} class="site-link">{t('footer.terms')}</a></li>
       </ul>

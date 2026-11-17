@@ -50,9 +50,26 @@ export const siteConfig: SiteConfig = {
 /**
  * Where the page's links go. "Sign in" is the web app, which a deployment
  * names in `VITE_SITE_APP_URL` (root `.env.example`); it is read at build time.
+ * "Download" is the site's own page (`/download/`, through `localePath`),
+ * which links to the installers below.
  */
 export const links = {
-  download: `${REPOSITORY}/releases`,
+  releases: `${REPOSITORY}/releases`,
   source: REPOSITORY,
   signIn: import.meta.env.VITE_SITE_APP_URL || 'http://localhost:3000',
+} as const;
+
+/**
+ * The installers of the newest release. GitHub serves
+ * `releases/latest/download/<file>` from whichever release is latest, so these
+ * hold across versions as long as the file names do: they are
+ * `artifactName` in apps/desktop/electron-builder.json, which leaves the
+ * version out for exactly this. AppImage spells x64 `x86_64`.
+ */
+const latest = (file: string) => `${REPOSITORY}/releases/latest/download/${file}`;
+export const installers = {
+  macArm64: latest('ResetOwl-mac-arm64.dmg'),
+  macX64: latest('ResetOwl-mac-x64.dmg'),
+  windowsX64: latest('ResetOwl-win-x64.exe'),
+  linuxX64: latest('ResetOwl-linux-x86_64.AppImage'),
 } as const;

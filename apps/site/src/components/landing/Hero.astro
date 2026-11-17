@@ -2,18 +2,18 @@
 import { Download } from '@lucide/astro';
 
 import ButtonLink from '@/components/common/ButtonLink.astro';
-import { links } from '@/config/site';
 import { useTranslations } from '@/i18n';
-import { currentLocale } from '@/lib/locale';
+import { currentLocale, localePath } from '@/lib/locale';
 
-const t = useTranslations(currentLocale(Astro.currentLocale));
+const locale = currentLocale(Astro.currentLocale);
+const t = useTranslations(locale);
 ---
 
 <section id="top" class="ds-container site-hero">
   <h1 class="site-hero__title">{t('hero.title')}</h1>
   <p class="site-hero__lede">{t('hero.lede')}</p>
   <div class="site-hero__actions">
-    <ButtonLink href={links.download} variant="primary" size="lg">
+    <ButtonLink href={localePath(locale, '/download/')} variant="primary" size="lg">
       <Download slot="icon" size={18} aria-hidden="true" />
       {t('hero.primary')}
     </ButtonLink>
