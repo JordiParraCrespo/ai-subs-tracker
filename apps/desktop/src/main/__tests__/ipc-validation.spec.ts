@@ -59,7 +59,15 @@ describe('IPC argument validation', () => {
     expect(parseAddLoginOptions({})).toEqual({});
     expect(parseAddLoginOptions({ deviceCode: true })).toEqual({ deviceCode: true });
     expect(parseAddLoginOptions({ deviceCode: false })).toEqual({});
-    for (const bad of [{ deviceCode: 'yes' }, [], 'device', 1]) {
+    expect(parseAddLoginOptions({ externalId: 'acct-1' })).toEqual({ externalId: 'acct-1' });
+    for (const bad of [
+      { deviceCode: 'yes' },
+      { externalId: 7 },
+      { externalId: 'x'.repeat(201) },
+      [],
+      'device',
+      1,
+    ]) {
       expect(() => parseAddLoginOptions(bad)).toThrow(IpcArgumentError);
     }
   });

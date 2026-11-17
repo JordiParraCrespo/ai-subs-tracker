@@ -57,7 +57,9 @@ src/
   login can renew (Claude), an `error` otherwise (Codex's wham/usage, Grok);
   `auth_expired` needs the CLI's own words (`codex app-server`'s refresh
   errors, `claude auth status` reporting `loggedIn: false`), a login with no
-  usable refresh token, or a revocation.
+  usable refresh token, or a revocation. A Grok session lapsed for more than a
+  day (`GROK_ABANDONED_MS`) counts as one with nothing to renew it: only the
+  `grok` TUI renews it, and ResetOwl has no command that does.
 - **`read` never throws** for a provider failure: map it to the snapshot
   status (`ok`, `auth_stale` when a lapsed token is renewable, `auth_expired`
   when it is not, `no_credentials`, `rate_limited` on 429, `error`) with a

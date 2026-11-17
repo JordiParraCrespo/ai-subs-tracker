@@ -14,7 +14,14 @@ export function wastedLastMonthCents(accounts: readonly AccountEntity[]): number
   );
 }
 
-export type AttentionKind = 'signin' | 'unreadable' | 'plan' | 'expiring' | 'limit' | 'behind';
+export type AttentionKind =
+  | 'signin'
+  | 'stale'
+  | 'unreadable'
+  | 'plan'
+  | 'expiring'
+  | 'limit'
+  | 'behind';
 
 export interface AttentionItem {
   account: AccountEntity;
@@ -24,15 +31,16 @@ export interface AttentionItem {
 
 const ORDER: Record<AttentionKind, number> = {
   signin: 0,
-  unreadable: 1,
-  plan: 2,
-  expiring: 3,
-  behind: 4,
-  limit: 5,
+  stale: 1,
+  unreadable: 2,
+  plan: 3,
+  expiring: 4,
+  behind: 5,
+  limit: 6,
 };
 
 /**
- * What deserves a look: a login that stopped reporting, a hand-tracked plan
+ * What deserves a look: a login that stopped reporting or is out of date, a hand-tracked plan
  * its vendor reports as another tier, headroom about to expire, an account
  * well behind an even pace, one at its limit. The plan is a second item beside
  * any of the others, since a wrong tier skews every number the pace reads.
@@ -44,6 +52,9 @@ export function attentionItems(accounts: readonly AccountEntity[], now: Date): A
     const status = account.status;
     if (status === 'auth_expired' || status === 'no_credentials') {
       items.push({ account, pace, kind: 'signin' });
+    } else if (status === 'auth_stale') {
+      // Out of date: its CLI renews it on its next run, which may never come.
+      items.push({ account, pace, kind: 'stale' });
     } else if (status === 'error') items.push({ account, pace, kind: 'unreadable' });
     else if (pace.status === 'expiring') items.push({ account, pace, kind: 'expiring' });
     else if (pace.status === 'behind') items.push({ account, pace, kind: 'behind' });

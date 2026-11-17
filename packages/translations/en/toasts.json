@@ -10,5 +10,6 @@
   "subscriptionAdded": "Subscription added",
   "usageRecorded": "Usage recorded",
   "usageReaderOn": "Reading usage from {{name}}",
-  "usageReaderOff": "Automatic reading turned off"
+  "usageReaderOff": "Automatic reading turned off",
+  "signedInAgain": "Signed in again"
 }

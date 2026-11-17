@@ -11,13 +11,18 @@ import { EditAccountDialog } from '../dialogs/edit-account';
 import { ReadUsageDialog } from '../dialogs/read-usage';
 import { RecordUsageDialog } from '../dialogs/record-usage';
 import { RemoveAccountDialog } from '../dialogs/remove-account';
+import { SignInAgainDialog } from '../dialogs/sign-in-again';
 import { useDesktopStatus } from '../hooks/use-desktop-status';
 import { useSwitchAccount } from '../hooks/use-switch-account';
 import { formatPercent } from '../lib/format';
 import { providerGroup } from '../lib/provider-group';
 import { PROVIDER_NAMES } from '../lib/providers';
+import { wantsSignIn } from '../lib/subscriptions';
 
-type Dialog = { kind: 'edit' | 'remove' | 'record' | 'read'; account: AccountEntity } | null;
+type Dialog = {
+  kind: 'edit' | 'remove' | 'record' | 'read' | 'sign-in';
+  account: AccountEntity;
+} | null;
 
 /**
  * The design's shared-accounts page for one provider: the account to pick
@@ -119,6 +124,20 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
                   {account.latest.message}
                 </span>
               )}
+              {wantsSignIn(account) &&
+                desktop?.logins.some(
+                  (l) => l.provider === account.provider && l.externalId === account.externalId,
+                ) && (
+                  <div>
+                    <DsButton
+                      variant="primary"
+                      size="sm"
+                      onClick={() => setDialog({ kind: 'sign-in', account })}
+                    >
+                      {t('accounts.signInAgain.action')}
+                    </DsButton>
+                  </div>
+                )}
               {account.readUnofficially && (
                 <span className="ds-t-sub">
                   {t('accounts.group.readUnofficially', { name: PROVIDER_NAMES[account.provider] })}
@@ -257,6 +276,13 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
       )}
       {dialog?.kind === 'read' && isManualProvider(dialog.account.provider) && (
         <ReadUsageDialog
+          account={dialog.account}
+          provider={dialog.account.provider}
+          onClose={() => setDialog(null)}
+        />
+      )}
+      {dialog?.kind === 'sign-in' && !isManualProvider(dialog.account.provider) && (
+        <SignInAgainDialog
           account={dialog.account}
           provider={dialog.account.provider}
           onClose={() => setDialog(null)}

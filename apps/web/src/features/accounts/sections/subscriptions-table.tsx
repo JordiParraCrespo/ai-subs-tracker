@@ -12,6 +12,7 @@ import {
   type SubscriptionRow,
   type SubscriptionsQuery,
   subscriptionRows,
+  wantsSignIn,
 } from '../lib/subscriptions';
 import { SubscriptionsToolbar } from './subscriptions-toolbar';
 
@@ -124,9 +125,15 @@ export function SubscriptionsTable({
       key: 'status',
       label: t('accounts.table.status'),
       render: ({ status, account }) => (
-        <div className="flex">
-          <SubscriptionStatusPill status={status} reason={account.latest?.message} />
-        </div>
+        <>
+          <div className="flex">
+            <SubscriptionStatusPill status={status} reason={account.latest?.message} />
+          </div>
+          {/* The row opens the account, where its sign-in is offered. */}
+          {wantsSignIn(account) && (
+            <span className="ds-cell-sub">{t('accounts.status.signInHint')}</span>
+          )}
+        </>
       ),
     },
   ];

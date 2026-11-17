@@ -10,5 +10,6 @@
   "subscriptionAdded": "Suscripción añadida",
   "usageRecorded": "Uso registrado",
   "usageReaderOn": "Leyendo el uso desde {{name}}",
-  "usageReaderOff": "Lectura automática desactivada"
+  "usageReaderOff": "Lectura automática desactivada",
+  "signedInAgain": "Sesión iniciada de nuevo"
 }

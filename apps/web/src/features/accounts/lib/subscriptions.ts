@@ -22,6 +22,20 @@ export function subscriptionStatus(account: AccountEntity, pace: AccountPace): S
   return 'active';
 }
 
+/**
+ * Whether signing the login in again would bring it back: one read as out of
+ * date (its CLI has not renewed it) or signed out. A failed request is not
+ * one; signing in again would not help it.
+ */
+export function wantsSignIn(account: AccountEntity): boolean {
+  return (
+    !account.isManual &&
+    (account.status === 'auth_stale' ||
+      account.status === 'auth_expired' ||
+      account.status === 'no_credentials')
+  );
+}
+
 export const STATUS_FILTERS = ['all', 'active', 'review', 'limit'] as const;
 export type StatusFilter = (typeof STATUS_FILTERS)[number];
 export const SORTS = ['cost', 'reset', 'left', 'name'] as const;
