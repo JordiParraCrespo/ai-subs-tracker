@@ -106,6 +106,23 @@ describe('apiCostCents', () => {
     expect(apiCostCents('claude-fable-5', tokens)).toBeCloseTo(6100);
   });
 
+  it.each([
+    ['gpt-6.2-astra', 'GPT-6.2 Astra'],
+    ['gpt-6.2-sol', 'GPT-6.2 Sol'],
+    ['gpt-6.2-sol-codex', 'GPT-6.2 Sol'],
+    ['gpt-6.1-sol-codex', 'GPT-6.1 Sol'],
+    ['gpt-6-astra', 'GPT-6 Astra'],
+  ])('names %s as %s', (model, label) => {
+    expect(priceFor(model)?.label).toBe(label);
+  });
+
+  it('prices GPT-6.2 Astra at its own rate, not at GPT-6 Astra rates', () => {
+    const tokens = { input: 1e6, output: 1e6, cacheRead: 1e6, cacheWrite: 1e6 };
+    // $8 + $40 + $0.40 + $10 on GPT-6.2 Astra; $10 + $50 + $1 + $12.50 on GPT-6 Astra.
+    expect(apiCostCents('gpt-6.2-astra', tokens)).toBeCloseTo(5840);
+    expect(apiCostCents('gpt-6-astra', tokens)).toBeCloseTo(7350);
+  });
+
   it('does not guess a price for an unknown model', () => {
     expect(apiCostCents('mystery-1', { input: 1e6, output: 0, cacheRead: 0, cacheWrite: 0 })).toBe(
       0,

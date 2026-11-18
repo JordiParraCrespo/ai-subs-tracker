@@ -71,7 +71,7 @@ services:
     # that resolves blank overrides the real value from `env_file`.
     #
     # The secrets are files, never values: `@flama/env` reads each `<NAME>_FILE`
-    # into `<NAME>` at startup (and stops the process if the file is missing),
+    # listed in its `SECRET_NAMES` into `<NAME>` at startup (and stops the process if the file is missing),
     # so they stay out of `docker inspect` and the process environment.
     environment:
       NODE_ENV: production
