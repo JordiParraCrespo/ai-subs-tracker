@@ -1,8 +1,9 @@
+import { AppError } from '@flama/backend-core';
 import type { EmailService } from '@flama/backend-email';
 import { I18nService } from '@flama/backend-i18n';
 import en from '@flama/translations/en/index.json';
 import es from '@flama/translations/es/index.json';
-import type { Job } from 'bullmq';
+import { type Job, RateLimitError } from 'bullmq';
 import { describe, expect, it, vi } from 'vitest';
 import type { LocaleResolver } from '../../profile/application/locale.resolver';
 import { EmailJobMapper } from '../email-job.mapper';
@@ -72,5 +73,44 @@ describe('EmailProcessor', () => {
       'new@example.com',
       expect.objectContaining({ locale: 'en', subject: "You're invited to Acme" }),
     );
+  });
+
+  // A rate limit that failed the job instead lost the email: jobs here get one
+  // attempt, so a provider's "not now" became "never".
+  it('holds the queue until a rate-limited provider resets, without failing the job', async () => {
+    const { email, processor } = setup();
+    const rateLimit = vi.fn();
+    Object.assign(processor, { _worker: { rateLimit } });
+    email.sendWelcome.mockRejectedValue(
+      new AppError(
+        { code: 'EMAIL_001', message: 'The email service is rate limiting us', httpStatus: 429 },
+        { extensions: { retryAfterSeconds: 30 } },
+      ),
+    );
+
+    await expect(
+      processor.process({
+        id: 'job-3',
+        name: 'welcome',
+        data: { to: 'a@example.com', name: 'Ana' },
+      } as Job),
+    ).rejects.toBeInstanceOf(RateLimitError);
+    expect(rateLimit).toHaveBeenCalledWith(30_000);
+  });
+
+  it('fails the job on any other send error', async () => {
+    const { email, processor } = setup();
+    const rateLimit = vi.fn();
+    Object.assign(processor, { _worker: { rateLimit } });
+    email.sendWelcome.mockRejectedValue(new Error('Cloudflare refused "Welcome" (HTTP 403)'));
+
+    await expect(
+      processor.process({
+        id: 'job-4',
+        name: 'welcome',
+        data: { to: 'a@example.com', name: 'Ana' },
+      } as Job),
+    ).rejects.toThrow('HTTP 403');
+    expect(rateLimit).not.toHaveBeenCalled();
   });
 });

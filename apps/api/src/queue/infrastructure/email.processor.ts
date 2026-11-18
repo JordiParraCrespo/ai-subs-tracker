@@ -1,9 +1,10 @@
+import { AppError } from '@flama/backend-core';
 import { EmailService } from '@flama/backend-email';
 import { I18nService, type LocalizedFormatter } from '@flama/backend-i18n';
 import { QUEUE_NAMES } from '@flama/shared';
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Inject, Logger } from '@nestjs/common';
-import type { Job } from 'bullmq';
+import { type Job, RateLimitError } from 'bullmq';
 import type { LocaleResolverPort } from '../../profile/application/locale-resolver.port';
 import { LOCALE_RESOLVER } from '../../profile/profile.di-tokens';
 import { EmailJobMapper, type EmailLocaleTarget } from '../email-job.mapper';
@@ -24,7 +25,20 @@ export class EmailProcessor extends WorkerHost {
 
   async process(job: Job): Promise<void> {
     this.logger.log(`Processing email job ${job.id}: ${job.name}`);
+    try {
+      await this.send(job);
+    } catch (error) {
+      const waitMs = retryAfterMs(error);
+      if (waitMs === undefined) throw error;
+      // The provider said "not now": hold the whole queue until it resets and
+      // put this job back without spending an attempt (integrations.md).
+      this.logger.warn({ message: 'Email provider rate limit; holding the queue', waitMs });
+      await this.worker.rateLimit(waitMs);
+      throw new RateLimitError();
+    }
+  }
 
+  private async send(job: Job): Promise<void> {
     switch (job.name) {
       case 'password-reset': {
         const target = this.mapper.toLocaleTarget(job.data);
@@ -72,4 +86,11 @@ export class EmailProcessor extends WorkerHost {
       : await this.locales.resolveForEmailRecipient(target.to);
     return this.i18n.for(resolved.locale, resolved.timeZone);
   }
+}
+
+/** How long a provider's rate-limit refusal (a 429 `AppError`) asks us to wait. */
+function retryAfterMs(error: unknown): number | undefined {
+  if (!(error instanceof AppError) || error.getStatus() !== 429) return undefined;
+  const seconds = error.extensions.retryAfterSeconds;
+  return typeof seconds === 'number' ? seconds * 1000 : 60_000;
 }

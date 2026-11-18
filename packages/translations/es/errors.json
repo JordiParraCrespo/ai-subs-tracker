@@ -13,6 +13,7 @@
     "AUTH_002": "No tienes permiso para hacer eso.",
     "AUTH_CLIENT_004": "Esta cuenta tiene activada la verificación en dos pasos. Inicia sesión desde la página de acceso con tu aplicación de autenticación.",
     "CREDENTIAL_ACCOUNT_NOT_FOUND": "Esa cuenta usa otro método de inicio de sesión.",
+    "EMAIL_001": "El servicio de correo nos ha pedido ir más despacio. Inténtalo de nuevo en un momento.",
     "EMAIL_NOT_VERIFIED": "Verifica tu dirección de correo electrónico antes de iniciar sesión.",
     "FAILED_TO_CREATE_USER": "No se ha podido crear tu cuenta. Inténtalo de nuevo.",
     "GRANT_001": "No se ha encontrado esa concesión de acceso.",

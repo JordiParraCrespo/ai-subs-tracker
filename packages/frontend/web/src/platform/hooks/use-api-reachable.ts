@@ -20,8 +20,12 @@ export function useApiReachable(healthUrl: string) {
     }
     setChecking(true);
     // No `finally`: the React Compiler leaves a function with one uncompiled.
+    // Any answer the API itself gives means it is up, a 429 included: the
+    // probe shares the rate limit with everything else from this address, and
+    // reading "slow down" as "offline" put the whole console behind the
+    // "Can't reach" screen. A 5xx is a proxy that could not reach it.
     const ok = await fetch(healthUrl, { credentials: 'omit', cache: 'no-store' }).then(
-      (response) => response.ok,
+      (response) => response.status < 500,
       () => false,
     );
     setReachable(ok);

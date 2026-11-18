@@ -45,7 +45,7 @@ services:
     # `data` for Postgres and Redis, `edge` for cloudflared and the web app's
     # nginx (and the way out, for email and the like).
     networks: [edge, data]
-    secrets: [db_password, better_auth_secret]
+    secrets: [db_password, better_auth_secret, cloudflare_email_token]
     depends_on:
       postgres:
         condition: service_healthy
@@ -76,6 +76,7 @@ services:
     environment:
       NODE_ENV: production
       BETTER_AUTH_SECRET_FILE: /run/secrets/better_auth_secret
+      CLOUDFLARE_EMAIL_TOKEN_FILE: /run/secrets/cloudflare_email_token
       PORT: 3001
       DB_HOST: postgres
       DB_PORT: 5432
@@ -162,6 +163,8 @@ secrets:
     file: /srv/secrets/db_password
   better_auth_secret:
     file: /srv/secrets/better_auth_secret
+  cloudflare_email_token:
+    file: /srv/secrets/cloudflare_email_token
   tunnel_credentials:
     file: /srv/secrets/tunnel_credentials.json
 
