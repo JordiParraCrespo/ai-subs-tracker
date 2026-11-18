@@ -75,10 +75,12 @@ test('a plan’s weekly cap on one model shows on its provider page, not the lis
 
   // The Claude login reports Fable's own weekly cap beside the all-models one.
   await page.goto('/accounts/claude-code');
-  await expect(page.getByText(/^Fable 18% · resets /)).toBeVisible();
+  await expect(page.getByText('All models', { exact: true })).toBeVisible();
+  await expect(page.getByText('Fable', { exact: true })).toBeVisible();
+  await expect(page.getByText('18% used', { exact: true })).toBeVisible();
   await page.goto('/accounts');
   await expect(page.getByText('Showing 2 of 2 accounts')).toBeVisible();
-  await expect(page.getByText(/Fable 18%/)).toHaveCount(0);
+  await expect(page.getByText('Fable', { exact: true })).toHaveCount(0);
 
   await api.dispose();
 });

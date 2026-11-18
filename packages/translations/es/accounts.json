@@ -228,7 +228,7 @@
     "weeklyHint": "La marca de cada barra es la media. Intenta mantener cada cuenta cerca de ella.",
     "next": "Siguiente",
     "resets": "Se renueva {{at}}",
-    "modelCap": "{{model}} {{used}} · se renueva {{at}}",
+    "allModels": "Todos los modelos",
     "terminals": "Terminales",
     "inUse": "En uso",
     "use": "Usar",
