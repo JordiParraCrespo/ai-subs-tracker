@@ -9,6 +9,7 @@ import { admin, bearer, twoFactor } from 'better-auth/plugins';
 import { adminAc, defaultAc, userAc } from 'better-auth/plugins/admin/access';
 import { Pool } from 'pg';
 import { orUndefined } from '../../config/env';
+import { browserLinkFor } from './email-link.util';
 import { emailQueue, enqueueEmailBestEffort } from './email-queue.util';
 import { accountLinking, socialProviders } from './oauth-providers.config';
 
@@ -174,7 +175,7 @@ export const auth = betterAuth({
       await emailQueue.add('password-reset', {
         to: user.email,
         userId: user.id,
-        url,
+        url: browserLinkFor(url, frontendUrl),
       });
     },
   },
@@ -185,7 +186,7 @@ export const auth = betterAuth({
       await emailQueue.add('email-verification', {
         to: user.email,
         userId: user.id,
-        url,
+        url: browserLinkFor(url, frontendUrl),
       });
     },
   },
