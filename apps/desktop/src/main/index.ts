@@ -13,7 +13,15 @@ import {
   parseClaudeStatusline,
   readZaiQuota,
 } from '@flama/usage-providers';
-import { app, type BrowserWindow, ipcMain, net, safeStorage, shell } from 'electron';
+import {
+  app,
+  type BrowserWindow,
+  ipcMain,
+  autoUpdater as nativeAutoUpdater,
+  net,
+  safeStorage,
+  shell,
+} from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { type LoginHandle, loginShellPath, startLogin, syncAfterLogin } from './add-login';
 import { postReading, postSync, type SyncedAccount } from './api-client';
@@ -152,14 +160,25 @@ function createUpdateEngine(): UpdateEngine {
   engine.requestHeaders = { 'User-Agent': config.userAgent };
   const line = (m: unknown) => log(`updater: ${m instanceof Error ? m.message : String(m)}`);
   engine.logger = { info: line, warn: line, error: line, debug: () => undefined };
+  let installOnQuit = engine.autoInstallOnAppQuit;
   return {
     supported: engine.isUpdaterActive(),
     async check() {
       await engine.checkForUpdates();
     },
-    // Silent on Windows (no installer wizard), and ResetOwl starts again after.
-    install: () => engine.quitAndInstall(true, true),
+    install({ relaunch, wired }) {
+      // macOS: with the property off, quitAndInstall hands a download that was
+      // never given to Squirrel over itself (and waits for it); with it on, it
+      // assumes the hand-off happened and would wait forever. Windows and
+      // Linux ignore it here. Read synchronously, so it is restored at once.
+      if (!wired) engine.autoInstallOnAppQuit = false;
+      engine.autoRunAppAfterInstall = relaunch;
+      // Silent on Windows (no installer wizard).
+      engine.quitAndInstall(true, relaunch);
+      engine.autoInstallOnAppQuit = installOnQuit;
+    },
     setInstallOnQuit(on) {
+      installOnQuit = on;
       engine.autoInstallOnAppQuit = on;
     },
   };
@@ -352,14 +371,22 @@ async function main(): Promise<void> {
     );
   }
 
-  /** Quits into the downloaded version, past the window's hide-on-close. */
+  /**
+   * Restarts into the downloaded version. Nothing is stopped here: the
+   * install quits the app only once it has worked (electron-updater emits
+   * `before-quit-for-update`, then quits), and `before-quit` stops the rest.
+   * A failed install leaves everything running and reports an error.
+   */
+  let quittingForUpdate = false;
+  if (config.mode === 'app') {
+    nativeAutoUpdater.on('before-quit-for-update', () => {
+      quittingForUpdate = true;
+      // Past the window's hide-on-close, which would otherwise hold the quit.
+      quitting = true;
+    });
+  }
   const installUpdate = () => {
-    if (updater.current().phase !== 'ready') return;
-    quitting = true;
-    collector.stop();
-    login?.cancel();
-    void liveServer?.close();
-    updater.install();
+    updater.install(true);
   };
 
   const claudeHomes = () =>
@@ -540,7 +567,18 @@ async function main(): Promise<void> {
 
   app.on('second-instance', showWindow);
   app.on('activate', showWindow);
-  app.on('before-quit', () => {
+  app.on('before-quit', (event) => {
+    if (!quittingForUpdate && updater.needsInstallOnQuit()) {
+      // Install on quit, turned on after the download finished: install it
+      // ourselves (without starting it again), then quit. If the install
+      // fails, quit anyway after a moment rather than stay open.
+      event.preventDefault();
+      quittingForUpdate = true;
+      quitting = true;
+      updater.install(false);
+      setTimeout(() => app.quit(), 10_000).unref();
+      return;
+    }
     quitting = true;
     collector.stop();
     updater.stop();

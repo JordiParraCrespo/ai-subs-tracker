@@ -143,7 +143,29 @@ describe('Updater', () => {
     expect(updater.install()).toBe(false);
     updater.handle({ type: 'downloaded', version: '0.3.0' });
     expect(updater.install()).toBe(true);
-    expect(engine.install).toHaveBeenCalledTimes(1);
+    expect(engine.install).toHaveBeenCalledWith({ relaunch: true, wired: true });
+  });
+
+  it('installs on quit itself when the switch was turned on after the download', async () => {
+    const { updater, engine } = setup({ prefs: { installOnQuit: false } });
+    await updater.start();
+    updater.handle({ type: 'downloaded', version: '0.3.0' });
+    // Off: quitting leaves the download for later.
+    expect(updater.needsInstallOnQuit()).toBe(false);
+    await updater.setInstallOnQuit(true);
+    // electron-updater was not prepared for it at download time, so the quit installs.
+    expect(updater.needsInstallOnQuit()).toBe(true);
+    updater.install(false);
+    expect(engine.install).toHaveBeenCalledWith({ relaunch: false, wired: false });
+  });
+
+  it('leaves the quit to electron-updater when the download finished with the switch on', async () => {
+    const { updater } = setup();
+    await updater.start();
+    updater.handle({ type: 'downloaded', version: '0.3.0' });
+    expect(updater.needsInstallOnQuit()).toBe(false);
+    await updater.setInstallOnQuit(false);
+    expect(updater.needsInstallOnQuit()).toBe(false);
   });
 
   it('keeps the choice to install on quit, and hands it to the engine', async () => {

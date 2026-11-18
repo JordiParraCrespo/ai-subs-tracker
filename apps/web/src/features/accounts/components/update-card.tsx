@@ -82,8 +82,9 @@ export function UpdateCard({
       {view === 'downloading' && <Progress value={state.percent ?? 0} aria-label={copy.title} />}
       {view === 'ready' && (
         <div className="flex flex-wrap justify-end gap-2">
+          {/* "On quit" only when quitting will install it; otherwise it just waits. */}
           <Button variant="outline" size="sm" onClick={onClose}>
-            {t('accounts.updates.onQuit')}
+            {state.installOnQuit ? t('accounts.updates.onQuit') : t('accounts.updates.later')}
           </Button>
           <Button size="sm" onClick={onInstall}>
             {t('accounts.updates.restartNow')}

@@ -558,6 +558,7 @@
     "readyTitle": "ResetOwl {{version}} está lista",
     "readyBody": "ResetOwl se cierra y se vuelve a abrir con la nueva versión. Tus cuentas y ajustes se quedan como están.",
     "onQuit": "Al salir",
+    "later": "Más tarde",
     "restartNow": "Reiniciar ahora",
     "downloadingTitle": "Descargando {{version}}",
     "downloadingBody": "Puedes cerrar esto; la descarga sigue.",

@@ -827,6 +827,7 @@
       "readyTitle": "ResetOwl {{version}} is ready",
       "readyBody": "ResetOwl closes and opens again on the new version. Your accounts and settings stay as they are.",
       "onQuit": "On quit",
+      "later": "Later",
       "restartNow": "Restart now",
       "downloadingTitle": "Downloading {{version}}",
       "downloadingBody": "You can close this; the download carries on.",

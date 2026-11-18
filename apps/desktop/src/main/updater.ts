@@ -23,8 +23,14 @@ export interface UpdateEngine {
   readonly supported: boolean;
   /** Looks for a newer release; progress arrives through `Updater.handle`. */
   check(): Promise<void>;
-  /** Quits and starts the downloaded version. */
-  install(): void;
+  /**
+   * Quits into the downloaded version, starting it again when `relaunch`.
+   * `wired` says whether the download finished with install-on-quit on:
+   * electron-updater prepares the quit-time install (Windows and Linux) and
+   * hands the file to Squirrel (macOS) only then, so an install of a download
+   * that was not wired has to do that hand-off itself.
+   */
+  install(opts: { relaunch: boolean; wired: boolean }): void;
   setInstallOnQuit(on: boolean): void;
 }
 
@@ -77,6 +83,8 @@ export class Updater {
   private prefs: UpdatePrefs = { ...DEFAULT_PREFS };
   private timer: unknown = null;
   private started = false;
+  /** Whether the ready download finished with install-on-quit on (see `UpdateEngine.install`). */
+  private wired = false;
 
   constructor(
     private readonly deps: {
@@ -146,12 +154,21 @@ export class Updater {
     return this.state;
   }
 
-  /** Quits into the downloaded version; false when none is ready. */
-  install(): boolean {
+  /** Quits into the downloaded version, by default starting it again; false when none is ready. */
+  install(relaunch = true): boolean {
     if (this.state.phase !== 'ready') return false;
-    this.deps.log(`restarting into ${this.state.version}`);
-    this.deps.engine.install();
+    this.deps.log(`${relaunch ? 'restarting' : 'quitting'} into ${this.state.version}`);
+    this.deps.engine.install({ relaunch, wired: this.wired });
     return true;
+  }
+
+  /**
+   * True when quitting should install the ready version but electron-updater
+   * will not do it alone: the download finished while install-on-quit was off
+   * and the person turned it on since. The quit then goes through `install`.
+   */
+  needsInstallOnQuit(): boolean {
+    return this.state.phase === 'ready' && this.prefs.installOnQuit && !this.wired;
   }
 
   async setInstallOnQuit(on: boolean): Promise<UpdateState> {
@@ -200,6 +217,7 @@ export class Updater {
         return;
       case 'downloaded': {
         const newer = event.version !== this.state.version;
+        this.wired = this.prefs.installOnQuit;
         this.set({
           phase: 'ready',
           version: event.version,
