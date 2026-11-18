@@ -4,6 +4,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { DesktopSettings } from '@/features/accounts/sections/desktop-settings';
 import { ProfileCard } from '@/features/profile/sections/profile-card';
 import { SecurityCard } from '@/features/profile/sections/security-card';
+import { AppVersion } from '@/features/user-settings/sections/app-version';
 import { AppearanceCard } from '@/features/user-settings/sections/appearance-card';
 import { LanguageCard } from '@/features/user-settings/sections/language-card';
 import { SettingsHead } from '@/features/user-settings/sections/settings-head';
@@ -71,6 +72,7 @@ function SettingsPage() {
         {SECTIONS.map(({ key, Card }) => (
           <Card key={key} />
         ))}
+        <AppVersion />
       </div>
     </>
   );
