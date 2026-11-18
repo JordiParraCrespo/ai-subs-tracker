@@ -205,7 +205,7 @@ describe('grok read', () => {
 
   it('says to run grok once when the session has lapsed, without asking xAI', async () => {
     const { home, login } = await grokHome({
-      'https://auth.x.ai': { ...SESSION, expires_at: '2026-11-01T00:00:00Z' },
+      'https://auth.x.ai': { ...SESSION, expires_at: '2026-11-02T06:00:00Z' },
     });
     const { fn, calls } = fakeFetch(BILLING);
     const account = await grokProvider.read(login, testEnv(home, { fetch: fn }), opts);
@@ -213,6 +213,21 @@ describe('grok read', () => {
     // Stale, not signed out: the CLI renews it, so the screens never ask for a sign-in.
     expect(account.snapshot).toMatchObject({ status: 'auth_stale' });
     expect(account.snapshot?.message).toContain('`grok`');
+  });
+
+  // Regression (#42): a session nobody renewed stayed "Out of date" for good,
+  // with nothing on the screens to sign it in again.
+  it('asks for a sign-in once the session has been lapsed for more than a day', async () => {
+    const { home, login } = await grokHome({
+      'https://auth.x.ai::cli': { ...SESSION, expires_at: '2026-11-01T11:00:00Z' },
+    });
+    const { fn, calls } = fakeFetch(BILLING);
+    const account = await grokProvider.read(login, testEnv(home, { fetch: fn }), opts);
+    expect(calls).toHaveLength(0);
+    expect(account.snapshot).toMatchObject({ status: 'auth_expired' });
+    expect(account.snapshot?.message).toContain('`grok login`');
+    // Identity still reads, so the account keeps its row and its history.
+    expect(account).toMatchObject({ email: 'dev@example.com' });
   });
 
   it('asks the default billing view for a monthly budget the credits view lacks', async () => {

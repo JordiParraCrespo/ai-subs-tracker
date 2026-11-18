@@ -8,7 +8,8 @@ import { useTranslation } from 'react-i18next';
 const NOTHING_YET: LoginProgress = { link: null, codeLink: null, code: null, deadline: null };
 
 /**
- * One add-account sign-in through the desktop app: starts the provider's CLI
+ * One add-account sign-in through the desktop app (or, with `externalId`, an
+ * account found on this machine signed in again in its own folder): starts the provider's CLI
  * login (through the browser, or by a code for another device), follows what it
  * gives (its links, a device code, its deadline), types a pasted code
  * into it, and stops it when the person goes back or closes the dialog.
@@ -27,6 +28,8 @@ export function useAddLogin({ onAdded, onFailed }: { onAdded: () => void; onFail
   // and must not close the dialog or toast over the next one.
   const generation = useRef(0);
   const active = useRef(false);
+  /** The account being signed in again, kept when the sign-in switches mode. */
+  const renewing = useRef<string | undefined>(undefined);
 
   // The desktop app pushes what the CLI printed; listen while the dialog is open.
   useEffect(() => desktopBridge?.accounts.onLoginProgress(setProgress), []);
@@ -49,13 +52,14 @@ export function useAddLogin({ onAdded, onFailed }: { onAdded: () => void; onFail
     setFailure(null);
     setRunning(provider);
     setDeviceCode(options.deviceCode === true);
+    renewing.current = options.externalId;
     const result = await bridge.accounts.addLogin(provider, options);
     if (mine !== generation.current) return;
     active.current = false;
     setRunning(null);
     setSubmitting(false);
     if (result.ok) {
-      toast.success(t('toasts.accountAdded'));
+      toast.success(t(options.externalId ? 'toasts.signedInAgain' : 'toasts.accountAdded'));
       onAdded();
     } else {
       // Said on the screen the person returns to, where it can be re-read.
@@ -83,7 +87,7 @@ export function useAddLogin({ onAdded, onFailed }: { onAdded: () => void; onFail
    */
   const switchMode = () => {
     if (!running) return;
-    void start(running, { deviceCode: !deviceCode });
+    void start(running, { deviceCode: !deviceCode, externalId: renewing.current });
   };
 
   return {

@@ -1,5 +1,10 @@
 import { resolve } from 'node:path';
-import { type CodingAgentProvider, localDay, type ProviderEnv } from '@flama/usage-providers';
+import {
+  type CodingAgentProvider,
+  type DetectedLogin,
+  localDay,
+  type ProviderEnv,
+} from '@flama/usage-providers';
 import type { LocalAccount } from './local-logins';
 
 /**
@@ -42,4 +47,37 @@ export async function checkNewLogin(
     return `That is ${email}, a seat${where} that ResetOwl cannot yet keep apart from ${theirs}, already added.`;
   }
   return `That is ${email ?? theirs ?? `this ${provider.displayName} account`}, already added.`;
+}
+
+/**
+ * Checks a login signed in again (`addLogin` with an external id): read the
+ * way the collector reads it, from disk only, it must now name the account the
+ * person asked to renew (or, for a login that named nobody, any new account). Another account there means the browser was signed
+ * in to someone else; the folder holds that one now, and the next collection
+ * shows it.
+ */
+export async function checkRenewedLogin(
+  provider: CodingAgentProvider,
+  login: DetectedLogin,
+  externalId: string,
+  known: readonly LocalAccount[],
+  env: ProviderEnv,
+): Promise<string | null> {
+  // A login that named nobody (an id made from its folder's path, as for a
+  // home with sessions but no credentials) is bound to no account yet: any
+  // account may sign in there, unless it is already on this machine.
+  if (externalId.startsWith('home:')) {
+    return checkNewLogin(provider, login.home, known, env);
+  }
+  const account = await provider
+    .read(login, env, { sinceDay: localDay(env.now()), fetchLimits: false })
+    .catch(() => null);
+  // An id made from the folder's path names nobody: nothing is signed in there.
+  if (!account || account.externalId.startsWith('home:')) {
+    return `${provider.displayName} finished without signing an account in.`;
+  }
+  if (account.externalId !== externalId) {
+    return `${provider.displayName} signed in a different account than the one being renewed. Sign in again with the account this login belongs to.`;
+  }
+  return null;
 }

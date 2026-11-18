@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { codexProvider, type ProviderEnv } from '@flama/usage-providers';
 import { describe, expect, it } from 'vitest';
 import type { LocalAccount } from '../local-logins';
-import { checkNewLogin } from '../verify-login';
+import { checkNewLogin, checkRenewedLogin } from '../verify-login';
 import { tempDir } from './helpers';
 
 function jwt(payload: Record<string, unknown>): string {
@@ -94,6 +94,41 @@ describe('checking a new sign-in', () => {
     await mkdir(fresh, { recursive: true });
     expect(await checkNewLogin(codexProvider, fresh, [], env(home))).toBe(
       'Codex finished without signing an account in.',
+    );
+  });
+});
+
+describe('checking a login signed in again', () => {
+  // Regression (#42): a stale or signed-out login had no way back from the
+  // screens; signing it in again must land on the same account, in its folder.
+  it('keeps the account it was asked to renew, and refuses another or none', async () => {
+    const home = await tempDir();
+    const dir = join(home, '.codex');
+    const login = { provider: 'codex' as const, home: dir, isDefault: true, managed: false };
+    await mkdir(dir, { recursive: true });
+    expect(await checkRenewedLogin(codexProvider, login, 'acct-1', [], env(home))).toBe(
+      'Codex finished without signing an account in.',
+    );
+
+    await codexLogin(dir, 'acct-1', 'me@example.com');
+    expect(await checkRenewedLogin(codexProvider, login, 'acct-1', [], env(home))).toBeNull();
+
+    await codexLogin(dir, 'acct-2', 'other@example.com');
+    expect(await checkRenewedLogin(codexProvider, login, 'acct-1', [], env(home))).toMatch(
+      /different account/,
+    );
+  });
+
+  it('lets a login that named nobody take the account that signs in, unless already added', async () => {
+    const home = await tempDir();
+    const dir = join(home, '.codex');
+    const login = { provider: 'codex' as const, home: dir, isDefault: true, managed: false };
+    await codexLogin(dir, 'acct-2', 'new@example.com');
+    expect(await checkRenewedLogin(codexProvider, login, 'home:0123', [], env(home))).toBeNull();
+
+    const elsewhere = [known(join(home, 'managed', 'codex', 'x'), 'acct-2', 'new@example.com')];
+    expect(await checkRenewedLogin(codexProvider, login, 'home:0123', elsewhere, env(home))).toBe(
+      'That is new@example.com, already added.',
     );
   });
 });

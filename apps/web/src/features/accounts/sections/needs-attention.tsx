@@ -60,13 +60,20 @@ export function NeedsAttention() {
             </Link>
           );
         }
+        // A login to fix opens its account, where it can be signed in again.
+        const broken = kind === 'signin' || kind === 'stale' || kind === 'unreadable';
         return (
-          <Link key={`${kind}-${account.id}`} to="/tokenmaxx" className="contents">
+          <Link
+            key={`${kind}-${account.id}`}
+            to={broken ? '/accounts/$provider' : '/tokenmaxx'}
+            params={broken ? { provider: account.provider } : undefined}
+            className="contents"
+          >
             <DsCardRow
               leading={<DsAvatar initials={mark.initials} color={mark.color} size={32} />}
               title={t(`accounts.attention.${kind}Title`, { name: accountTitle(account) })}
               subtitle={
-                kind === 'signin' || kind === 'unreadable'
+                broken
                   ? (account.latest?.message ?? account.displayName)
                   : t('accounts.attention.detail', {
                       left: formatPercent(pace.left),
@@ -74,7 +81,7 @@ export function NeedsAttention() {
                     })
               }
               value={
-                kind === 'signin' || kind === 'unreadable' || pace.left === null
+                broken || pace.left === null
                   ? '—'
                   : formatMoney((pace.left / 100) * weeklyValue, locale)
               }

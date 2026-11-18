@@ -6,6 +6,8 @@
     "detail": "{{left}} left · resets {{reset}}",
     "signinTitle": "Sign in again to {{name}}",
     "signinEnd": "not syncing",
+    "staleTitle": "{{name}} is out of date",
+    "staleEnd": "not renewed",
     "expiringTitle": "Use {{name}} before it resets",
     "expiringEnd": "left before reset",
     "behindTitle": "{{name}} is underused",
@@ -197,7 +199,8 @@
     "limit": "At limit",
     "signin": "Sign in again",
     "stale": "Out of date",
-    "unreadable": "Can't read usage"
+    "unreadable": "Can't read usage",
+    "signInHint": "Open to sign in again"
   },
   "toolbar": {
     "search": "Search accounts",
@@ -542,5 +545,11 @@
     "turnOn": "Turn on",
     "replace": "Replace key",
     "turnOff": "Turn off"
+  },
+  "signInAgain": {
+    "action": "Sign in again",
+    "title": "Sign in again to {{name}}",
+    "description": "Runs {{provider}}’s own sign-in for this account on this computer. The account keeps its history, and terminals that use it keep using it.",
+    "submit": "Sign in"
   }
 }

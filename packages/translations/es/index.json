@@ -275,6 +275,8 @@
       "detail": "Queda {{left}} · se renueva {{reset}}",
       "signinTitle": "Vuelve a iniciar sesión en {{name}}",
       "signinEnd": "sin sincronizar",
+      "staleTitle": "{{name}} está desactualizada",
+      "staleEnd": "sin renovar",
       "expiringTitle": "Usa {{name}} antes de que se renueve",
       "expiringEnd": "quedan antes de renovar",
       "behindTitle": "{{name}} se está usando poco",
@@ -466,7 +468,8 @@
       "limit": "En el límite",
       "signin": "Vuelve a entrar",
       "stale": "Desactualizada",
-      "unreadable": "No se puede leer el uso"
+      "unreadable": "No se puede leer el uso",
+      "signInHint": "Ábrela para volver a iniciar sesión"
     },
     "toolbar": {
       "search": "Buscar cuentas",
@@ -811,6 +814,12 @@
       "turnOn": "Activar",
       "replace": "Cambiar clave",
       "turnOff": "Desactivar"
+    },
+    "signInAgain": {
+      "action": "Volver a iniciar sesión",
+      "title": "Vuelve a iniciar sesión en {{name}}",
+      "description": "Ejecuta el inicio de sesión de {{provider}} para esta cuenta en este ordenador. La cuenta conserva su historial y los terminales que la usan la siguen usando.",
+      "submit": "Iniciar sesión"
     }
   },
   "home": {
@@ -1516,7 +1525,8 @@
     "subscriptionAdded": "Suscripción añadida",
     "usageRecorded": "Uso registrado",
     "usageReaderOn": "Leyendo el uso desde {{name}}",
-    "usageReaderOff": "Lectura automática desactivada"
+    "usageReaderOff": "Lectura automática desactivada",
+    "signedInAgain": "Sesión iniciada de nuevo"
   },
   "emails": {
     "common": {

@@ -254,6 +254,29 @@ describe('a Claude sign-in that finishes in a private window', () => {
     expect(await readdir(join(root, 'claude-code'))).toEqual([]);
   });
 
+  it('signs an existing login in again in its own folder, and never removes it', async () => {
+    const root = await tempDir();
+    const existing = await tempDir();
+    let spawnedEnv: Record<string, string | undefined> = {};
+    const spawn = (...args: unknown[]) => {
+      spawnedEnv = (args[2] as { env: Record<string, string | undefined> }).env;
+      return fakeChild((c) => c.emit('exit', 1, null))(...args);
+    };
+    const result = await addLogin({
+      managedRoot: root,
+      provider: 'grok',
+      home: existing,
+      command: () => ({ command: 'grok', args: ['login'], env: {} }),
+      env: {},
+      spawn: spawn as never,
+    });
+    expect(result.ok).toBe(false);
+    // The person's own folder stays, and nothing new was made beside it.
+    expect((await stat(existing)).isDirectory()).toBe(true);
+    expect(await readdir(root)).toEqual([]);
+    expect(spawnedEnv.GROK_HOME).toBeUndefined();
+  });
+
   it('stops at a denied authorization instead of waiting out the timer', async () => {
     const root = await tempDir();
     let killed = false;

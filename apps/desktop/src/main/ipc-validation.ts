@@ -47,11 +47,15 @@ export function parseAddLoginOptions(value: unknown): AddLoginOptions {
   if (typeof value !== 'object' || Array.isArray(value)) {
     throw new IpcArgumentError('Invalid sign-in options.');
   }
-  const deviceCode = (value as { deviceCode?: unknown }).deviceCode;
+  const { deviceCode, externalId } = value as { deviceCode?: unknown; externalId?: unknown };
   if (deviceCode !== undefined && typeof deviceCode !== 'boolean') {
     throw new IpcArgumentError('Invalid sign-in options.');
   }
-  return deviceCode ? { deviceCode: true } : {};
+  const options: AddLoginOptions = deviceCode ? { deviceCode: true } : {};
+  if (externalId !== undefined) {
+    options.externalId = parseBoundedString(externalId, MAX_ID_LENGTH, 'account id');
+  }
+  return options;
 }
 
 /** A hand-tracked provider whose usage can be read with a key (Z.AI, BigModel). */

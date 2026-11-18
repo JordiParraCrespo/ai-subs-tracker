@@ -58,6 +58,20 @@ export function isGrokSessionFresh(auth: Pick<GrokAuth, 'expiresAt'>, now: Date)
 }
 
 /**
+ * How long a session may stay lapsed before it reads as signed out. Under it
+ * the account is stale (the next `grok` run renews the session); past it
+ * nobody has run `grok`, and ResetOwl has no command of its own that renews a
+ * Grok login, so the account asks to be signed in again.
+ */
+export const GROK_ABANDONED_MS = 24 * 60 * 60_000;
+
+/** Whether the session lapsed more than `GROK_ABANDONED_MS` ago. */
+export function isGrokSessionAbandoned(auth: Pick<GrokAuth, 'expiresAt'>, now: Date): boolean {
+  if (!auth.expiresAt) return false;
+  return now.getTime() - auth.expiresAt.getTime() > GROK_ABANDONED_MS;
+}
+
+/**
  * The session to read with: the first fresh default-issuer entry, else the
  * first lapsed one (the CLI renews it on its next run), else, only when the
  * file names no default issuer at all, the first alternate issuer's. Null for

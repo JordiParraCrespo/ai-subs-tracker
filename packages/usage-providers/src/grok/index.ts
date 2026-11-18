@@ -9,7 +9,7 @@ import type {
   ProviderEnv,
   ReadOptions,
 } from '../types';
-import { type GrokAuth, isGrokSessionFresh, readGrokAuth } from './auth';
+import { type GrokAuth, isGrokSessionAbandoned, isGrokSessionFresh, readGrokAuth } from './auth';
 import {
   BILLING_CREDITS_URL,
   BILLING_DEFAULT_URL,
@@ -75,7 +75,8 @@ async function detect(env: ProviderEnv): Promise<DetectedLogin[]> {
  * monthly budget when it has no weekly percentage, then the default view for
  * a unified-billing account's monthly budget. A rejected session is an error,
  * not a sign-out (only the CLI can say that), and a lapsed one is stale: the
- * CLI renews it the next time `grok` runs.
+ * CLI renews it the next time `grok` runs. A session lapsed for longer than
+ * `GROK_ABANDONED_MS` is expired: no `grok` run has come to renew it.
  */
 async function readLimits(
   login: DetectedLogin,
@@ -88,6 +89,19 @@ async function readLimits(
     return {
       tier: null,
       snapshot: snapshot(now, 'no_credentials', `Not signed in to Grok — run \`${run} login\`.`),
+    };
+  }
+  if (isGrokSessionAbandoned(auth, now)) {
+    // Nothing ResetOwl can run renews a Grok session (`grok usage` does not,
+    // and Grok Build has no headless status command), so one lapsed this long
+    // has no renewal coming: the person signs in again.
+    return {
+      tier: null,
+      snapshot: snapshot(
+        now,
+        'auth_expired',
+        `Grok sign-in expired — sign in again, or run \`${run} login\` on this computer.`,
+      ),
     };
   }
   if (!isGrokSessionFresh(auth, now)) {

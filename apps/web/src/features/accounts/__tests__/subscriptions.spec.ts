@@ -4,7 +4,7 @@ import { paceOf } from '@flama/shared/subscriptions';
 import { describe, expect, it } from 'vitest';
 import { attentionItems } from '../lib/insights';
 import { modelCaps } from '../lib/provider-group';
-import { subscriptionStatus } from '../lib/subscriptions';
+import { subscriptionStatus, wantsSignIn } from '../lib/subscriptions';
 
 const NOW = new Date('2026-11-07T12:00:00Z');
 
@@ -126,6 +126,28 @@ describe('a hand-tracked plan its vendor reports as another tier', () => {
     const acc = zaiAccount('zai-max', 'max');
     expect(subscriptionStatus(acc, paceOf(acc, NOW))).toBe('active');
     expect(attentionItems([acc], NOW)).toEqual([]);
+  });
+});
+
+// Regression (#42): an out-of-date login (a Grok Build session nobody renewed)
+// showed "Out of date" with nothing to do about it and no place in Needs attention.
+describe('a login to sign in again', () => {
+  it('is offered for an out-of-date or signed-out login, never for a failed reading', () => {
+    expect(wantsSignIn(account(reading('auth_stale', [weekly])))).toBe(true);
+    expect(wantsSignIn(account(reading('auth_expired', [])))).toBe(true);
+    expect(wantsSignIn(account(reading('no_credentials', [])))).toBe(true);
+    expect(wantsSignIn(account(reading('error', [])))).toBe(false);
+    expect(wantsSignIn(account(reading('ok', [weekly])))).toBe(false);
+    expect(wantsSignIn(account(null))).toBe(false);
+  });
+
+  it('puts an out-of-date login in Needs attention, after a signed-out one', () => {
+    const stale = account(reading('auth_stale', [weekly]));
+    const gone = account(reading('auth_expired', []));
+    expect(attentionItems([stale, gone], NOW).map((item) => item.kind)).toEqual([
+      'signin',
+      'stale',
+    ]);
   });
 });
 

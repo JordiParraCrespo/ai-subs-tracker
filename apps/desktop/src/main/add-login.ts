@@ -166,6 +166,12 @@ export function loginShellPath(
 export interface AddLoginDeps {
   managedRoot: string;
   provider: string;
+  /**
+   * An existing login's folder, to sign its account in again there. It is
+   * the person's own and is never created or removed here; without it a new
+   * folder is made under `managedRoot` and removed if the sign-in fails.
+   */
+  home?: string;
   command: (home: string) => LoginCommand;
   /**
    * Run after the CLI exits 0: why the folder does not hold a new account
@@ -212,8 +218,9 @@ export function startLogin(deps: AddLoginDeps): LoginHandle {
   let cancelled = false;
   let pending: string | null = null;
   const result = (async () => {
-    const home = join(deps.managedRoot, deps.provider, randomBytes(6).toString('hex'));
-    await mkdir(home, { recursive: true, mode: 0o700 });
+    const existing = deps.home !== undefined;
+    const home = deps.home ?? join(deps.managedRoot, deps.provider, randomBytes(6).toString('hex'));
+    if (!existing) await mkdir(home, { recursive: true, mode: 0o700 });
     const cmd = deps.command(home);
     const doSpawn = deps.spawn ?? spawn;
     const timeoutMs = deps.timeoutMs ?? LOGIN_TIMEOUT_MS;
@@ -353,8 +360,9 @@ export function startLogin(deps: AddLoginDeps): LoginHandle {
       if (reason) outcome = { ok: false, message: reason };
     }
     if (!outcome.ok) {
-      // The folder is ours and minutes old; a failed sign-in leaves nothing to keep.
-      await rm(home, { recursive: true, force: true }).catch(() => undefined);
+      // A new folder is ours and minutes old; a failed sign-in leaves nothing
+      // to keep. An existing login's folder is never removed.
+      if (!existing) await rm(home, { recursive: true, force: true }).catch(() => undefined);
       deps.log?.(`add login (${deps.provider}) failed: ${outcome.message}`);
     }
     return outcome;

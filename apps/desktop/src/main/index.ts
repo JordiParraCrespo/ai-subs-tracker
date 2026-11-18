@@ -41,7 +41,7 @@ import {
 import { createTokenStore } from './token-store';
 import { createTray, type TrayController } from './tray';
 import { createReaderKeyStore, UsageReaders } from './usage-readers';
-import { checkNewLogin } from './verify-login';
+import { checkNewLogin, checkRenewedLogin } from './verify-login';
 import { createMainWindow, registerAppScheme, rendererRoot, serveRenderer } from './window';
 
 /**
@@ -343,6 +343,19 @@ async function main(): Promise<void> {
       async addLogin(provider, options) {
         const impl = getProvider(provider);
         if (!impl) return { ok: false, message: 'Unknown provider.' };
+        // Signing a found account in again: its folder must be one the
+        // collector read, never a path the renderer named.
+        const renewing = options.externalId
+          ? collector
+              .localAccounts()
+              .find(
+                (l) =>
+                  l.account.provider === provider && l.account.externalId === options.externalId,
+              )
+          : undefined;
+        if (options.externalId && !renewing) {
+          return { ok: false, message: 'That account is not signed in on this computer.' };
+        }
         // One login at a time: a second "Add" stops the first, whose folder
         // is then removed like any sign-in that did not finish.
         login?.cancel();
@@ -353,8 +366,28 @@ async function main(): Promise<void> {
         const handle = startLogin({
           managedRoot,
           provider,
-          command: (dir) => impl.loginCommand(dir, { deviceCode: options.deviceCode === true }),
-          check: (dir) => checkNewLogin(impl, dir, collector.localAccounts(), providerEnv()),
+          home: renewing?.login.home,
+          command: (dir) => {
+            const cmd = impl.loginCommand(dir, { deviceCode: options.deviceCode === true });
+            // Claude Code's default login is always `~/.claude`, selected with
+            // no CLAUDE_CONFIG_DIR (setting it would change the macOS Keychain
+            // item). Codex's and Grok's default may be an inherited
+            // CODEX_HOME / GROK_HOME, which cleanCliEnv strips, so they keep
+            // the explicit home the login was found in.
+            return renewing && provider === 'claude-code'
+              ? { ...cmd, env: impl.launchEnv(renewing.login) }
+              : cmd;
+          },
+          check: (dir) =>
+            renewing
+              ? checkRenewedLogin(
+                  impl,
+                  renewing.login,
+                  renewing.account.externalId,
+                  collector.localAccounts(),
+                  providerEnv(),
+                )
+              : checkNewLogin(impl, dir, collector.localAccounts(), providerEnv()),
           onProgress: (progress) => {
             if (win && !win.isDestroyed())
               win.webContents.send(DESKTOP_CHANNELS.accountsLoginProgress, progress);

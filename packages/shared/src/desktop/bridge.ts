@@ -73,6 +73,12 @@ export interface AddLoginOptions {
    * (Codex and Grok Build); otherwise through the browser on this computer.
    */
   deviceCode?: boolean;
+  /**
+   * Signs this account (a login the collector found, by its external id) in
+   * again, in the folder it already lives in, instead of adding a new one:
+   * for a login read as stale or signed out that its CLI did not renew.
+   */
+  externalId?: string;
 }
 
 export interface AddLoginResult {
@@ -150,7 +156,8 @@ export interface DesktopBridge {
   accounts: {
     /**
      * Signs a new account into its own folder by running the provider's CLI
-     * login; resolves when the CLI exits. One login runs at a time.
+     * login (or, with `externalId`, a found account again in its folder);
+     * resolves when the CLI exits. One login runs at a time.
      */
     addLogin(provider: LocalProviderId, options?: AddLoginOptions): Promise<AddLoginResult>;
     /** What the running login gave so far: its links, Codex's code, its deadline. */
