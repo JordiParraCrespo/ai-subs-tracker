@@ -24,7 +24,11 @@ COPY --from=deps /app ./
 COPY . .
 RUN pnpm --filter @flama/web... build
 
-FROM nginx:alpine AS runner
+# Pinned by digest (the tag beside it is for the reader): `nginx:alpine` floats,
+# and 1.31.9 is the first with the fix for CVE-2026-123007 and the rest of the
+# November 2026 HTTP/2 advisories. Update it with
+# `docker buildx imagetools inspect nginx:<version>-alpine`.
+FROM nginx:1.31.9-alpine@sha256:90b6bd2aec278b16b98221d64deb1d6d35d164567f507ab0716e6053878315aa AS runner
 COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
 # Precompress every text asset once, at level 9, so `gzip_static` can serve a
 # ready-made .gz instead of compressing the same bytes on every request. woff2

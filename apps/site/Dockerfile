@@ -21,7 +21,11 @@ ARG VITE_SITE_APP_URL=""
 ENV VITE_SITE_APP_URL=$VITE_SITE_APP_URL
 RUN pnpm --filter @flama/site... build
 
-FROM nginx:alpine AS runner
+# Pinned by digest (the tag beside it is for the reader): `nginx:alpine` floats,
+# and 1.31.9 is the first with the fix for CVE-2026-123007 and the rest of the
+# November 2026 HTTP/2 advisories. Update it with
+# `docker buildx imagetools inspect nginx:<version>-alpine`.
+FROM nginx:1.31.9-alpine@sha256:90b6bd2aec278b16b98221d64deb1d6d35d164567f507ab0716e6053878315aa AS runner
 COPY --from=builder /app/apps/site/dist /usr/share/nginx/html
 # Precompress text assets once, so `gzip_static` serves them ready-made.
 RUN find /usr/share/nginx/html -type f \
