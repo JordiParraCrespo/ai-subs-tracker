@@ -17,6 +17,10 @@ updates:
       interval: monthly
     commit-message:
       prefix: ci
+    # changesets/action v2 needs @changesets/cli v3; release.yml says why.
+    ignore:
+      - dependency-name: changesets/action
+        update-types: ["version-update:semver-major"]
 
   # The pnpm workspace is one lockfile at the root, so one entry covers every
   # app and package.
