@@ -23,10 +23,13 @@ concurrency:
 permissions:
   contents: read
 
+# Every job runs on GitHub-hosted `ubuntu-latest`: the repository is public,
+# so those minutes are free, and a self-hosted runner on a public repository
+# would run any fork's pull request on our own machine.
 jobs:
   check:
     name: Check
-    runs-on: gha-vm
+    runs-on: ubuntu-latest
     if: github.event.pull_request.draft != true
     outputs:
       scope: ${{ steps.scope.outputs.scope }}
@@ -164,7 +167,7 @@ jobs:
 
   test-integration:
     name: Integration Tests
-    runs-on: gha-vm
+    runs-on: ubuntu-latest
     needs: check
     # apps/api is the only package with an integration suite, and Turborepo's
     # affected list already includes it whenever one of its dependencies moved.
@@ -185,16 +188,16 @@ jobs:
   # flama:begin e2e
   test-e2e:
     name: End-to-End Tests (API)
-    runs-on: gha-vm
+    runs-on: ubuntu-latest
     needs: check
     # The suite drives the API over HTTP and depends on nothing else in the
     # workspace, so it runs when the API (or one of its dependencies, which
     # the affected list folds into it) or the suite itself changed.
     if: contains(needs.check.outputs.packages, '"@flama/api"') || contains(needs.check.outputs.packages, '"@flama/e2e"')
     # The same Postgres and Redis `pnpm docker:up` starts locally, as service
-    # containers: this runner has the Docker daemon but not the `docker
-    # compose` plugin, and the ports and credentials below are the ones
-    # docker/docker-compose.dev.yml and .env.example already agree on.
+    # containers, so the job owns its whole stack; the ports and credentials
+    # below are the ones docker/docker-compose.dev.yml and .env.example
+    # already agree on.
     services:
       postgres:
         image: postgres:18-alpine
@@ -281,7 +284,7 @@ jobs:
 
   build-images:
     name: Build Docker Images
-    runs-on: gha-vm
+    runs-on: ubuntu-latest
     needs:
       - check
       - test-integration
@@ -339,7 +342,7 @@ jobs:
   # run that did nothing.
   ci:
     name: CI
-    runs-on: gha-vm
+    runs-on: ubuntu-latest
     if: always() && github.event.pull_request.draft != true
     needs:
       - check

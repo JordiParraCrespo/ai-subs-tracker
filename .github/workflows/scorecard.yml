@@ -26,8 +26,7 @@ jobs:
       id-token: write
     steps:
       # Records every outbound call the job makes; audit only, it blocks
-      # nothing. GitHub-hosted runners only, which is why the gha-vm jobs in
-      # ci.yml do not carry it.
+      # nothing. It runs on GitHub-hosted runners only.
       - uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
         with:
           egress-policy: audit
