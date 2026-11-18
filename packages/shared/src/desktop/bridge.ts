@@ -126,6 +126,46 @@ export interface LiveFeedTarget {
   available: boolean;
 }
 
+/**
+ * Where the app's own updater stands. `unsupported` is a build that cannot
+ * replace itself (a development run, a Linux install that is not the
+ * AppImage): the screens point to the download page instead.
+ */
+export type UpdatePhase =
+  | 'unsupported'
+  | 'idle'
+  | 'checking'
+  | 'up_to_date'
+  | 'downloading'
+  | 'ready'
+  | 'error';
+
+export interface UpdateState {
+  phase: UpdatePhase;
+  /** The version running now. */
+  currentVersion: string;
+  /** The newer version found, downloading or downloaded; null when there is none. */
+  version: string | null;
+  /** 0–100 while downloading, null otherwise. */
+  percent: number | null;
+  /** When the last check finished, ISO 8601. */
+  checkedAt: string | null;
+  /** Failed checks or downloads in a row; a quiet background failure stays at 1. */
+  failures: number;
+  /**
+   * True when the person started this check (Settings, the tray, "Try
+   * again"): the screens then show a download in progress, which a
+   * background check keeps quiet.
+   */
+  manual: boolean;
+  /** Install a downloaded update when ResetOwl quits. On by default. */
+  installOnQuit: boolean;
+  /** The bottom card was closed; it stays closed until a newer version or the next launch. */
+  dismissed: boolean;
+  /** The version this one replaced, on the first launch after an update. */
+  updatedFrom: string | null;
+}
+
 export interface DesktopBridge {
   version: string;
   platform: string;
@@ -192,8 +232,30 @@ export interface DesktopBridge {
     install(home: string): Promise<LiveFeedTarget[]>;
     uninstall(home: string): Promise<LiveFeedTarget[]>;
   };
+  updates: {
+    state(): Promise<UpdateState>;
+    onState(listener: (state: UpdateState) => void): () => void;
+    /** Looks for a newer version now and downloads it; the screens show each step. */
+    check(): Promise<UpdateState>;
+    /** Quits and restarts into the downloaded version. Does nothing until one is ready. */
+    install(): Promise<void>;
+    setInstallOnQuit(on: boolean): Promise<UpdateState>;
+    /** Closes the bottom card until a newer version is found or ResetOwl starts again. */
+    dismiss(): Promise<UpdateState>;
+  };
   openExternal(url: string): Promise<void>;
 }
+
+/** The desktop app's releases, one per version, tagged `desktop-v<version>`. */
+export const DESKTOP_RELEASES_URL = 'https://github.com/JordiParraCrespo/ai-subs-tracker/releases';
+
+/** The release notes of one desktop version. */
+export function desktopReleaseNotesUrl(version: string): string {
+  return `${DESKTOP_RELEASES_URL}/tag/desktop-v${encodeURIComponent(version)}`;
+}
+
+/** The site's download page, for a build that cannot update itself. */
+export const DESKTOP_DOWNLOAD_URL = 'https://resetowl.com/download/';
 
 /**
  * The origin the desktop app serves its screens from (`app://resetowl/`). The
@@ -230,4 +292,10 @@ export const DESKTOP_CHANNELS = {
   liveFeedUninstall: 'resetowl:live-feed:uninstall',
   openExternal: 'resetowl:open-external',
   setLocale: 'resetowl:locale:set',
+  updatesState: 'resetowl:updates:state',
+  updatesChanged: 'resetowl:updates:changed',
+  updatesCheck: 'resetowl:updates:check',
+  updatesInstall: 'resetowl:updates:install',
+  updatesInstallOnQuit: 'resetowl:updates:install-on-quit',
+  updatesDismiss: 'resetowl:updates:dismiss',
 } as const;

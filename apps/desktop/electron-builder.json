@@ -53,5 +53,9 @@
       }
     }
   },
-  "publish": null
+  "publish": {
+    "provider": "generic",
+    "url": "https://github.com/JordiParraCrespo/ai-subs-tracker/releases/latest/download",
+    "channel": "latest"
+  }
 }

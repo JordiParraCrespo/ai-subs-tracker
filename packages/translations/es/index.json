@@ -823,6 +823,43 @@
       "title": "Vuelve a iniciar sesión en {{name}}",
       "description": "Ejecuta el inicio de sesión de {{provider}} para esta cuenta en este ordenador. La cuenta conserva su historial y los terminales que la usan la siguen usando.",
       "submit": "Iniciar sesión"
+    },
+    "updates": {
+      "close": "Cerrar",
+      "versionChange": "{{from}} → {{to}}",
+      "readyTitle": "ResetOwl {{version}} está lista",
+      "readyBody": "ResetOwl se cierra y se vuelve a abrir con la nueva versión. Tus cuentas y ajustes se quedan como están.",
+      "onQuit": "Al salir",
+      "later": "Más tarde",
+      "restartNow": "Reiniciar ahora",
+      "downloadingTitle": "Descargando {{version}}",
+      "downloadingBody": "Puedes cerrar esto; la descarga sigue.",
+      "failedTitle": "No se pudo descargar {{version}}",
+      "failedBody": "Revisa la conexión y vuelve a intentarlo, o descarga el instalador desde la página de descargas.",
+      "tryAgain": "Reintentar",
+      "downloadPage": "Página de descargas",
+      "updatedTitle": "Actualizada a {{version}}",
+      "updatedBody": "Tenías la {{from}}.",
+      "whatsNew": "Ver novedades",
+      "title": "Actualizaciones",
+      "description": "ResetOwl busca una versión nueva al abrirse y cada seis horas, y la descarga en segundo plano.",
+      "status": {
+        "idle": "Aún sin comprobar",
+        "checking": "Buscando actualizaciones…",
+        "up_to_date": "Al día",
+        "downloading": "Descargando {{version}} · {{percent}} %",
+        "ready": "{{version}} lista para instalar",
+        "error": "La última comprobación falló",
+        "unsupported": "Esta copia no puede actualizarse sola"
+      },
+      "current": "Versión {{version}}",
+      "checked": "Comprobado {{when}}",
+      "checkedJustNow": "Comprobado ahora mismo",
+      "unsupportedDescription": "Las versiones de desarrollo, y las instalaciones de Linux que no son la AppImage, reciben las versiones nuevas desde la página de descargas.",
+      "installOnQuit": "Instalar las actualizaciones al salir",
+      "installOnQuitDescription": "Una versión descargada se instala la próxima vez que se cierre ResetOwl. Desactivado, espera a que elijas Reiniciar ahora.",
+      "check": "Buscar actualizaciones",
+      "releaseNotes": "Notas de la versión"
     }
   },
   "home": {
@@ -972,7 +1009,8 @@
       "useNextTooltip": "ResetOwl: usa {{name}} a continuación (queda un {{left}} % de la semana)",
       "refresh": "Actualizar ahora",
       "open": "Abrir ResetOwl",
-      "quit": "Salir"
+      "quit": "Salir",
+      "restartToUpdate": "Reiniciar para actualizar a {{version}}"
     }
   },
   "extension": {

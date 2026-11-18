@@ -34,7 +34,8 @@ terminal follow the account marked active.
   | `shell-integration.ts` | the `claude` / `codex` shell functions and the rc-file install |
   | `add-login.ts` | "Add subscription": runs the provider's CLI login into a folder of its own, reports the link and code it prints, types a pasted code into it |
   | `live-feed.ts` | the opt-in Claude Code status-line feed |
-  | `tray-model.ts`, `tray.ts` | "Use next: … — x% left", Refresh, Open, Quit |
+  | `tray-model.ts`, `tray.ts` | "Use next: … — x% left", Refresh, Open, "Restart to update" once a version is downloaded, Quit |
+  | `updater.ts` | the app's own updates over `electron-updater`: a check 20 s after launch and every 6 h, downloaded in the background, installed on quit (the person's switch, in `userData/updates.json`) or at once; remembers the version that last ran, so the first launch after an update says so once |
   | `locale.ts` | the tray's language: the system's at first, then whatever the screens show (`setLocale`); copy in `packages/translations/{locale}/desktop.json` |
   | `ipc.ts`, `ipc-validation.ts` | one handler per channel, arguments parsed, sender checked |
   | `index.ts` | wiring, `--collect-once`, `--smoke` |
@@ -54,7 +55,9 @@ terminal follow the account marked active.
 The contract is `packages/shared/src/desktop/bridge.ts` (`@flama/shared/desktop`):
 the `DesktopBridge` type and `DESKTOP_CHANNELS`, the IPC channel names. Every
 invoke channel has a handler in `ipc.ts`; `collectorChanged` is pushed from
-main whenever the `CollectorStatus` changes. A handler refuses any sender
+main whenever the `CollectorStatus` changes, and `updatesChanged` whenever the
+updater's `UpdateState` does (the screens' bottom card and Settings › Updates
+read it). A handler refuses any sender
 that is not the app's window on the renderer's origin, and parses its
 arguments first (provider ∈ `PROVIDER_IDS`, bounded strings, absolute folders,
 http(s)-only URLs).
@@ -144,6 +147,14 @@ GitHub-hosted runners and publishes them as the GitHub release
   vendors' CLIs), notarized by Apple, the ticket stapled.
 - **Windows**, x64: the NSIS installer, not code-signed yet.
 - **Linux**, x86_64: the AppImage.
+
+Each platform also uploads its update feed (`latest.yml`, `latest-mac.yml`,
+`latest-linux.yml`) and blockmaps. An installed app reads the feed from
+`releases/latest/download/` (`publish` in `electron-builder.json`, baked into
+the package as `app-update.yml`), so a draft is never offered; macOS updates
+from the signed zip, Windows from the installer, Linux only as the AppImage.
+A development run, or a Linux install that is not the AppImage, cannot update
+itself and Settings sends the person to the download page.
 
 The file names carry no version (`artifactName`:
 `ResetOwl-<os>-<arch>.<ext>`), because the site's download page links to

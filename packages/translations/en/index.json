@@ -823,6 +823,43 @@
       "title": "Sign in again to {{name}}",
       "description": "Runs {{provider}}’s own sign-in for this account on this computer. The account keeps its history, and terminals that use it keep using it.",
       "submit": "Sign in"
+    },
+    "updates": {
+      "close": "Close",
+      "versionChange": "{{from}} → {{to}}",
+      "readyTitle": "ResetOwl {{version}} is ready",
+      "readyBody": "ResetOwl closes and opens again on the new version. Your accounts and settings stay as they are.",
+      "onQuit": "On quit",
+      "later": "Later",
+      "restartNow": "Restart now",
+      "downloadingTitle": "Downloading {{version}}",
+      "downloadingBody": "You can close this; the download carries on.",
+      "failedTitle": "Couldn't download {{version}}",
+      "failedBody": "Check your connection and try again, or get the installer from the download page.",
+      "tryAgain": "Try again",
+      "downloadPage": "Download page",
+      "updatedTitle": "Updated to {{version}}",
+      "updatedBody": "You were on {{from}}.",
+      "whatsNew": "See what's new",
+      "title": "Updates",
+      "description": "ResetOwl looks for a new version when it starts and every six hours, and downloads it in the background.",
+      "status": {
+        "idle": "Not checked yet",
+        "checking": "Checking for updates…",
+        "up_to_date": "Up to date",
+        "downloading": "Downloading {{version}} · {{percent}}%",
+        "ready": "{{version}} is ready to install",
+        "error": "The last check didn't work",
+        "unsupported": "This copy can't update itself"
+      },
+      "current": "Version {{version}}",
+      "checked": "Checked {{when}}",
+      "checkedJustNow": "Checked just now",
+      "unsupportedDescription": "Development builds, and Linux installs other than the AppImage, get new versions from the download page.",
+      "installOnQuit": "Install updates when I quit",
+      "installOnQuitDescription": "A downloaded version installs the next time ResetOwl closes. Turned off, it waits until you choose Restart now.",
+      "check": "Check for updates",
+      "releaseNotes": "Release notes"
     }
   },
   "home": {
@@ -972,7 +1009,8 @@
       "useNextTooltip": "ResetOwl: use {{name}} next ({{left}}% of the week left)",
       "refresh": "Refresh now",
       "open": "Open ResetOwl",
-      "quit": "Quit"
+      "quit": "Quit",
+      "restartToUpdate": "Restart to update to {{version}}"
     }
   },
   "extension": {

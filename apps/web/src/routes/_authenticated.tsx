@@ -11,6 +11,7 @@ import { createFileRoute, Outlet } from '@tanstack/react-router';
 import type { ComponentType, ReactNode } from 'react';
 import { AccountSearchResults } from '@/features/accounts/sections/account-search-results';
 import { DesktopSync } from '@/features/accounts/sections/desktop-sync';
+import { DesktopUpdateCard } from '@/features/accounts/sections/desktop-update-card';
 // flama:begin organizations
 // flama:end organizations
 import { apiBaseUrl } from '@/lib/auth-client';
@@ -59,6 +60,7 @@ function AuthenticatedShell() {
       ) : (
         <OfflineScreen onRetry={() => void api.retry()} retrying={api.checking} />
       )}
+      <DesktopUpdateCard />
     </AppShell>
   );
   const open = GATES.reduceRight<(workspace?: ShellWorkspace) => ReactNode>(

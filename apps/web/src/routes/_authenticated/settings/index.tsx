@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 // flama:begin organizations
 // flama:end organizations
 import { DesktopSettings } from '@/features/accounts/sections/desktop-settings';
+import { DesktopUpdates } from '@/features/accounts/sections/desktop-updates';
 import { ProfileCard } from '@/features/profile/sections/profile-card';
 import { SecurityCard } from '@/features/profile/sections/security-card';
 import { AppearanceCard } from '@/features/user-settings/sections/appearance-card';
@@ -22,6 +23,7 @@ const SECTIONS = [
   { key: 'language', Card: LanguageCard },
   { key: 'appearance', Card: AppearanceCard },
   { key: 'desktop', Card: DesktopSettings },
+  { key: 'updates', Card: DesktopUpdates },
 ] as const;
 
 type SectionKey = (typeof SECTIONS)[number]['key'];
@@ -40,6 +42,7 @@ const PANES: readonly SectionKey[] = [
   'language',
   'appearance',
   'desktop',
+  'updates',
 ];
 
 /**

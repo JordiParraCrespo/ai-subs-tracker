@@ -6,6 +6,7 @@ import {
   DESKTOP_CHANNELS,
   type LiveFeedTarget,
   type ShellIntegration,
+  type UpdateState,
 } from '@flama/shared/desktop';
 import type { LocalProviderId, ManualProviderId } from '@flama/shared/subscriptions';
 import type { IpcMainInvokeEvent } from 'electron';
@@ -15,6 +16,7 @@ import {
   parseAccountId,
   parseAddLoginOptions,
   parseApiKey,
+  parseBoolean,
   parseBoundedString,
   parseExternalUrl,
   parseHome,
@@ -29,8 +31,8 @@ import type { Locale } from './locale';
 /**
  * One `ipcMain.handle` per invoke channel of `DESKTOP_CHANNELS`, each parsing
  * its arguments before anything runs and refusing a sender that is not the
- * app's own renderer. `collectorChanged` and `accountsLoginProgress` are
- * main → renderer only.
+ * app's own renderer. `collectorChanged`, `accountsLoginProgress` and
+ * `updatesChanged` are main → renderer only.
  */
 
 export interface DesktopServices {
@@ -55,6 +57,11 @@ export interface DesktopServices {
   liveFeedUninstall(home: string): Promise<LiveFeedTarget[]>;
   openExternal(url: string): Promise<void>;
   setLocale(locale: Locale): void;
+  updatesState(): UpdateState;
+  updatesCheck(): Promise<UpdateState>;
+  updatesInstall(): void;
+  updatesSetInstallOnQuit(on: boolean): Promise<UpdateState>;
+  updatesDismiss(): UpdateState;
 }
 
 type Handler = (...args: unknown[]) => unknown;
@@ -90,6 +97,12 @@ export function ipcHandlers(services: DesktopServices): Record<string, Handler> 
     [DESKTOP_CHANNELS.liveFeedUninstall]: (home) => services.liveFeedUninstall(parseHome(home)),
     [DESKTOP_CHANNELS.openExternal]: (url) => services.openExternal(parseExternalUrl(url)),
     [DESKTOP_CHANNELS.setLocale]: (locale) => services.setLocale(parseLocale(locale)),
+    [DESKTOP_CHANNELS.updatesState]: () => services.updatesState(),
+    [DESKTOP_CHANNELS.updatesCheck]: () => services.updatesCheck(),
+    [DESKTOP_CHANNELS.updatesInstall]: () => services.updatesInstall(),
+    [DESKTOP_CHANNELS.updatesInstallOnQuit]: (on) =>
+      services.updatesSetInstallOnQuit(parseBoolean(on, 'switch')),
+    [DESKTOP_CHANNELS.updatesDismiss]: () => services.updatesDismiss(),
   };
 }
 

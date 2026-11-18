@@ -10,6 +10,8 @@ export interface TrayController {
   update(accounts: readonly SyncedAccount[] | null): void;
   /** Redraws the tray in `locale` (the language the screens show). */
   setLocale(locale: Locale): void;
+  /** Offers "Restart to update" while `version` is downloaded; null takes it away. */
+  setUpdate(version: string | null): void;
   destroy(): void;
 }
 
@@ -18,6 +20,7 @@ export function createTray(opts: {
   locale: Locale;
   onRefresh(): void;
   onOpen(): void;
+  onInstallUpdate(): void;
   onQuit(): void;
 }): TrayController {
   const file =
@@ -28,6 +31,7 @@ export function createTray(opts: {
   if (process.platform === 'darwin') image.setTemplateImage(true);
   const tray = new Tray(image);
   let last: readonly SyncedAccount[] | null = null;
+  let update: string | null = null;
   let t = trayTranslator(opts.locale);
 
   const render = () => {
@@ -40,6 +44,9 @@ export function createTray(opts: {
         { type: 'separator' },
         { label: t('refresh'), click: opts.onRefresh },
         { label: t('open'), click: opts.onOpen },
+        ...(update
+          ? [{ label: t('restartToUpdate', { version: update }), click: opts.onInstallUpdate }]
+          : []),
         { type: 'separator' },
         { label: t('quit'), click: opts.onQuit },
       ]),
@@ -57,6 +64,11 @@ export function createTray(opts: {
     },
     setLocale(locale) {
       t = trayTranslator(locale);
+      render();
+    },
+    setUpdate(version) {
+      if (version === update) return;
+      update = version;
       render();
     },
     destroy() {
