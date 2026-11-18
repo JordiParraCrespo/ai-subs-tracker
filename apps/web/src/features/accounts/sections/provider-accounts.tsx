@@ -7,6 +7,7 @@ import { useNow } from '@flama/react-hooks';
 import { isManualProvider, type ProviderId } from '@flama/shared/subscriptions';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LimitRow } from '../components/limit-row';
 import { EditAccountDialog } from '../dialogs/edit-account';
 import { ReadUsageDialog } from '../dialogs/read-usage';
 import { RecordUsageDialog } from '../dialogs/record-usage';
@@ -95,30 +96,37 @@ export function ProviderAccounts({ provider }: { provider: ProviderId }) {
       </div>
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
-        {group.cards.map(({ account, pace }) => {
-          const used = pace.weeklyUsed ?? 0;
+        {group.cards.map(({ account, pace, models }) => {
           const isNext = group.pick?.account.id === account.id;
           return (
             <DsCard key={account.id} className="flex flex-col gap-3.5 p-5">
               <div className="flex items-center justify-between gap-2">
-                <span className="ds-label-strong truncate">{account.displayName}</span>
+                <div className="flex min-w-0 items-baseline gap-2">
+                  <span className="ds-label-strong truncate">{account.displayName}</span>
+                  {account.planName && (
+                    <span className="ds-t-sub truncate">{account.planName}</span>
+                  )}
+                </div>
                 {isNext && <DsStatusBadge>{t('accounts.group.next')}</DsStatusBadge>}
               </div>
-              <span className="ds-title-lg">{formatPercent(pace.weeklyUsed)}</span>
-              <div className="ds-meter">
-                <div
-                  className="ds-meter__fill"
-                  data-hot={used >= 90 ? '' : undefined}
-                  // oxlint-disable-next-line no-inline-styles -- the fill is the reading
-                  style={{ width: `${Math.min(100, used)}%` }}
+              <div className="flex flex-col gap-5 py-1">
+                <LimitRow
+                  label={t('accounts.group.allModels')}
+                  sub={t('accounts.group.resets', { at: reset(pace.weeklyResetsAt) })}
+                  used={pace.weeklyUsed}
+                  usedLabel={t('accounts.group.used', { used: formatPercent(pace.weeklyUsed) })}
+                  mark={avgLeft}
                 />
-                {/* oxlint-disable-next-line no-inline-styles -- the average is data */}
-                <div className="ds-meter__mark" style={{ left: avgLeft }} />
+                {models.map((cap) => (
+                  <LimitRow
+                    key={cap.key}
+                    label={cap.model}
+                    sub={t('accounts.group.resets', { at: reset(cap.resetsAt) })}
+                    used={cap.used}
+                    usedLabel={t('accounts.group.used', { used: formatPercent(cap.used) })}
+                  />
+                ))}
               </div>
-              <span className="ds-t-sub">
-                {account.planName ?? '—'} ·{' '}
-                {t('accounts.group.resets', { at: reset(pace.weeklyResetsAt) })}
-              </span>
               {account.status !== 'ok' && account.latest?.message && (
                 <span className="ds-t-sub" data-testid="reading-message">
                   {account.latest.message}

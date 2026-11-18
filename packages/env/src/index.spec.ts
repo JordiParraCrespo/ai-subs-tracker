@@ -123,19 +123,19 @@ describe('resolveFileVariables', () => {
 
   it('sets NAME from the file NAME_FILE names, trailing newline trimmed', () => {
     const env: NodeJS.ProcessEnv = { FLAMA_SECRET_FILE: secret('s3cret\n') };
-    expect(resolveFileVariables(env)).toEqual(['FLAMA_SECRET']);
+    expect(resolveFileVariables(env, ['FLAMA_SECRET'])).toEqual(['FLAMA_SECRET']);
     expect(env.FLAMA_SECRET).toBe('s3cret');
   });
 
   it('leaves a NAME that is already set alone', () => {
     const env: NodeJS.ProcessEnv = { FLAMA_SECRET: 'real', FLAMA_SECRET_FILE: secret('file') };
-    expect(resolveFileVariables(env)).toEqual([]);
+    expect(resolveFileVariables(env, ['FLAMA_SECRET'])).toEqual([]);
     expect(env.FLAMA_SECRET).toBe('real');
   });
 
   it('throws when the file cannot be read, so a missing secret stops the process', () => {
     const env: NodeJS.ProcessEnv = { FLAMA_SECRET_FILE: path.join(root, 'missing') };
-    expect(() => resolveFileVariables(env)).toThrow();
+    expect(() => resolveFileVariables(env, ['FLAMA_SECRET'])).toThrow();
   });
 
   it('runs as part of loadEnv, for a _FILE set in .env', () => {
@@ -143,7 +143,24 @@ describe('resolveFileVariables', () => {
       'FLAMA_ENV_TEST_F_FILE',
       'FLAMA_ENV_TEST_F',
     ]);
-    loadEnv({ cwd: root });
+    loadEnv({ cwd: root, secrets: ['FLAMA_ENV_TEST_F'] });
     expect(process.env.FLAMA_ENV_TEST_F).toBe('from-file');
+  });
+
+  // The machine's own _FILE variables (CLAUDE_CODE_ARTIFACT_MULTI_FILE=1, a
+  // PIP_CONFIG_FILE naming no file) once stopped every process that loaded env.
+  it('reads only the secrets it is given, never another _FILE', () => {
+    const env: NodeJS.ProcessEnv = {
+      SOME_TOOL_MULTI_FILE: '1',
+      PIP_CONFIG_FILE: path.join(root, 'missing'),
+    };
+    expect(resolveFileVariables(env)).toEqual([]);
+    expect(env.SOME_TOOL_MULTI).toBeUndefined();
+  });
+
+  it('reads the documented secrets by default', () => {
+    const env: NodeJS.ProcessEnv = { DB_PASSWORD_FILE: secret('pg\n') };
+    expect(resolveFileVariables(env)).toEqual(['DB_PASSWORD']);
+    expect(env.DB_PASSWORD).toBe('pg');
   });
 });

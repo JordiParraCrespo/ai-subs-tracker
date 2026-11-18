@@ -500,6 +500,7 @@
       "weeklyHint": "The marker on each bar is the average. Aim to keep every account near it.",
       "next": "Next",
       "resets": "Resets {{at}}",
+      "allModels": "All models",
       "terminals": "Terminals",
       "inUse": "In use",
       "use": "Use",

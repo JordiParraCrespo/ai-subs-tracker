@@ -9,10 +9,12 @@
  * matters where one pattern is a prefix of another. Every model Claude Code
  * offers has a rule of its own, so none is shown or priced as its family.
  *
- * Sources (checked 2026-11-10): Anthropic's model table; OpenAI's published
+ * Sources (checked 2026-11-17): Anthropic's model table; OpenAI's published
  * rates as reported by pricing trackers (openai.com/api/pricing blocks
- * automated reads). Cache writes default to 1.25x input where the vendor
- * states no separate rate.
+ * automated reads), GPT-6.2 Astra and Sol from their 2026-11-17 launch.
+ * Cache writes default to 1.25x input where the vendor states no separate
+ * rate. Per-request surcharges (GPT-6.2 Astra bills prompts over 272K input
+ * tokens at a higher rate) are not modelled: usage arrives as daily totals.
  */
 export interface ModelPrice {
   /** Substring of the model id this rule matches. */
@@ -43,6 +45,7 @@ const openai = (
 
 export const MODEL_PRICES: readonly ModelPrice[] = [
   anthropic('fable-5-2', 'Claude Fable 5.2', 8, 40, 0.2),
+  anthropic('mythos-5-2', 'Claude Mythos 5.2', 8, 40, 0.2),
   anthropic('fable-5-1', 'Claude Fable 5.1', 10, 50, 0.25),
   anthropic('mythos-5-1', 'Claude Mythos 5.1', 10, 50, 0.25),
   anthropic('mythos', 'Claude Mythos 5', 10, 50),
@@ -62,6 +65,8 @@ export const MODEL_PRICES: readonly ModelPrice[] = [
   anthropic('sonnet-4', 'Claude Sonnet 4', 3, 15),
   anthropic('haiku-5-5', 'Claude Haiku 5.5', 0.1, 0.5, 0.01),
   anthropic('haiku-4-5', 'Claude Haiku 4.5', 1, 5),
+  openai('6.2-astra', 'GPT-6.2 Astra', 8, 40, 0.4, 10),
+  openai('6.2-sol', 'GPT-6.2 Sol', 2, 10, 0.1, 2.5),
   openai('astra', 'GPT-6 Astra', 10, 50, 1, 12.5),
   openai('terra', 'GPT-6.1 Terra', 1, 5, 0.05, 1.25),
   openai('sol', 'GPT-6.1 Sol', 2, 10, 0.1, 2.5),
