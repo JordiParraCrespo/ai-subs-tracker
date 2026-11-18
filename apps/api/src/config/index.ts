@@ -1,4 +1,5 @@
 import { appConfig } from './app.config';
+import { cloudflareEmailConfig } from './cloudflare-email.config';
 import { databaseConfig } from './database.config';
 import { emailConfig } from './email.config';
 import { healthConfig } from './health.config';
@@ -16,6 +17,7 @@ export const configs = [
   redisConfig,
   healthConfig,
   emailConfig,
+  cloudflareEmailConfig,
   storageConfig,
   // flama:plugins api-config
 ];

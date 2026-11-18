@@ -29,6 +29,7 @@ const FILE_SUFFIX = '_FILE';
  */
 export const SECRET_NAMES: readonly string[] = [
   'BETTER_AUTH_SECRET',
+  'CLOUDFLARE_EMAIL_TOKEN',
   'DB_PASSWORD',
   'METRICS_TOKEN',
   'REDIS_PASSWORD',

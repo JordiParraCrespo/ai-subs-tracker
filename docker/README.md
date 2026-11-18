@@ -78,9 +78,18 @@ These are done for `resetowl`; they are here for a new server.
    TRUST_PROXY=1
    AUTH_RATE_LIMIT_ENABLED=true
    TWO_FACTOR_ISSUER=ResetOwl
-   EMAIL_PROVIDER=console
+   EMAIL_PROVIDER=cloudflare
+   EMAIL_FROM=ResetOwl <noreply@resetowl.com>
+   CLOUDFLARE_ACCOUNT_ID=<the Cloudflare account id>
    TUNNEL_ID=<the tunnel's id>
    ```
+5. Email. Cloudflare Email Sending needs the account on Workers Paid and the
+   domain onboarded (`wrangler email sending enable resetowl.com`, which adds
+   its SPF and DKIM records). Create an account API token whose only
+   permission is sending email, and write it to
+   `/srv/secrets/cloudflare_email_token` (mode 444). The compose file mounts
+   it whatever `EMAIL_PROVIDER` says, so the file must exist; with
+   `EMAIL_PROVIDER=console` it may be empty.
 
 ### Each deploy
 

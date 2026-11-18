@@ -1,6 +1,7 @@
 import { ConsoleEmailService, type EmailDrivers } from '@flama/backend-email';
 import { registerAs } from '@nestjs/config';
 import { z } from 'zod';
+import { CloudflareEmailService } from './cloudflare-email.service';
 import { parseEnv } from './env';
 // flama:plugins email-driver-imports
 
@@ -12,6 +13,8 @@ import { parseEnv } from './env';
  */
 export const emailDrivers = {
   console: ConsoleEmailService,
+  // Cloudflare Email Sending; reads the `cloudflareEmail` section.
+  cloudflare: CloudflareEmailService,
   // flama:plugins email-drivers
 } satisfies EmailDrivers;
 

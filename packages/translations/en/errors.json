@@ -13,6 +13,7 @@
     "AUTH_002": "You do not have permission to do that.",
     "AUTH_CLIENT_004": "This account has two-factor authentication on. Sign in from the login page with your authenticator app.",
     "CREDENTIAL_ACCOUNT_NOT_FOUND": "That account uses a different sign-in method.",
+    "EMAIL_001": "The email service asked us to slow down. Try again in a moment.",
     "EMAIL_NOT_VERIFIED": "Verify your email address before signing in.",
     "FAILED_TO_CREATE_USER": "Your account could not be created. Please try again.",
     "GRANT_001": "That access grant could not be found.",
