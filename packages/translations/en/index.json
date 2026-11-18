@@ -377,8 +377,7 @@
       "shellNotInstalled": "Not installed",
       "shellTitle": "Terminal integration",
       "title": "This computer",
-      "description": "How ResetOwl works with the coding tools on this machine. Each change is opt-in and can be undone.",
-      "versionTitle": "Version"
+      "description": "How ResetOwl works with the coding tools on this machine. Each change is opt-in and can be undone."
     },
     "table": {
       "account": "Account",

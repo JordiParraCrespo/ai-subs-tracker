@@ -180,11 +180,7 @@ test('the desktop app finds the logins on disk, syncs them, and switches the ter
     // Settings show which version of the app this is.
     const version = await app.evaluate(({ app }) => app.getVersion());
     await page.goto('app://resetowl/settings');
-    await expect(
-      page
-        .locator('[data-slot="section-row"]')
-        .filter({ has: page.getByText('ResetOwl', { exact: true }) }),
-    ).toContainText(version);
+    await expect(page.getByTestId('app-version')).toHaveText(`ResetOwl ${version}`);
 
     // The sign-in starts a collection; the API holds what it sent.
     let accounts: SyncedAccount[] = [];
