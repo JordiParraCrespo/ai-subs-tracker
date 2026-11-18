@@ -1,7 +1,7 @@
 import { Heading, Section, Text } from '@react-email/components';
 import type * as React from 'react';
 import type { WelcomeEmailParams } from '../email.service';
-import { bodyText, Divider, EmailLayout, fontFamily, heading } from './email-layout';
+import { bodyText, Divider, EmailLayout, fontFamily, heading, palette } from './email-layout';
 
 export function WelcomeEmail(params: WelcomeEmailParams) {
   return (
@@ -38,10 +38,10 @@ const eyebrow: React.CSSProperties = {
   display: 'inline-block',
   margin: 0,
   padding: '5px 12px',
-  backgroundColor: '#EAF2FE',
-  border: '1px solid #D3E4FC',
+  backgroundColor: palette.lavenderWash,
+  border: `1px solid ${palette.lavenderSoft}`,
   borderRadius: '999px',
-  color: '#2F80F6',
+  color: palette.brandDeep,
   fontFamily,
   fontSize: '12px',
   fontWeight: 500,
@@ -49,6 +49,6 @@ const eyebrow: React.CSSProperties = {
   lineHeight: '16px',
 };
 
-const greeting: React.CSSProperties = { ...bodyText, margin: '0 0 8px', color: '#292929' };
+const greeting: React.CSSProperties = { ...bodyText, margin: '0 0 8px', color: palette.ink };
 const supportText: React.CSSProperties = { ...bodyText, margin: '0 0 12px', fontSize: '13px' };
-const signoff: React.CSSProperties = { ...bodyText, color: '#9E9E9E', fontSize: '13px' };
+const signoff: React.CSSProperties = { ...bodyText, color: palette.inkMuted, fontSize: '13px' };

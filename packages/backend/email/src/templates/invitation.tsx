@@ -9,6 +9,7 @@ import {
   fontFamily,
   heading,
   mutedText,
+  palette,
   primaryButton,
 } from './email-layout';
 
@@ -93,7 +94,7 @@ const closingSection: React.CSSProperties = { padding: '20px 40px 36px' };
 
 const inviterCard: React.CSSProperties = {
   width: '100%',
-  border: '1px solid #E6E4E0',
+  border: `1px solid ${palette.rule}`,
   borderRadius: '12px',
 };
 
@@ -103,7 +104,7 @@ const avatar: React.CSSProperties = {
   width: '38px',
   height: '38px',
   margin: 0,
-  backgroundColor: '#7A5CFF',
+  backgroundColor: palette.brand,
   borderRadius: '19px',
   color: '#FFFFFF',
   fontFamily,
@@ -116,7 +117,7 @@ const avatar: React.CSSProperties = {
 const inviterCopyCell: React.CSSProperties = { padding: '14px 14px 14px 0' };
 const inviterLine: React.CSSProperties = {
   margin: 0,
-  color: '#292929',
+  color: palette.ink,
   fontFamily,
   fontSize: '14px',
   fontWeight: 500,
@@ -125,7 +126,7 @@ const inviterLine: React.CSSProperties = {
 };
 const roleLine: React.CSSProperties = {
   margin: '2px 0 0',
-  color: '#9E9E9E',
+  color: palette.inkMuted,
   fontFamily,
   fontSize: '12px',
   letterSpacing: '-0.15px',
@@ -133,7 +134,7 @@ const roleLine: React.CSSProperties = {
 };
 const benefitsTitle: React.CSSProperties = {
   margin: '0 0 12px',
-  color: '#292929',
+  color: palette.ink,
   fontFamily,
   fontSize: '13px',
   fontWeight: 500,
@@ -143,14 +144,14 @@ const benefitsTitle: React.CSSProperties = {
 const benefitRow: React.CSSProperties = { width: '100%', marginBottom: '8px' };
 const checkCell: React.CSSProperties = {
   width: '26px',
-  color: '#1F9D57',
+  color: palette.brand,
   fontFamily,
   fontSize: '14px',
   lineHeight: '21px',
   verticalAlign: 'top',
 };
 const benefitText: React.CSSProperties = {
-  color: '#5D5D5D',
+  color: palette.inkSecondary,
   fontFamily,
   fontSize: '14px',
   letterSpacing: '-0.15px',

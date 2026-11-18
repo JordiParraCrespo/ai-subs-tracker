@@ -9,6 +9,7 @@ import {
   fontFamily,
   heading,
   mutedText,
+  palette,
   primaryButton,
 } from './email-layout';
 
@@ -62,10 +63,10 @@ const closingSection: React.CSSProperties = { padding: '20px 40px 36px' };
 const emailBox: React.CSSProperties = {
   margin: 0,
   padding: '11px 14px',
-  backgroundColor: '#F1F0EE',
-  border: '1px solid #E6E4E0',
+  backgroundColor: palette.lavenderWash,
+  border: `1px solid ${palette.lavenderSoft}`,
   borderRadius: '8px',
-  color: '#292929',
+  color: palette.brandInk,
   fontFamily,
   fontSize: '13px',
   letterSpacing: '-0.15px',
