@@ -1,14 +1,14 @@
 {
   "common": {
-    "brandName": "Flama",
-    "footer": "Recibes este correo porque tienes una cuenta en Flama.",
+    "brandName": "ResetOwl",
+    "footer": "Recibes este correo porque tienes una cuenta en ResetOwl.",
     "pasteLink": "O pega este enlace en tu navegador:"
   },
   "passwordReset": {
     "subject": "Restablece tu contraseña",
-    "preview": "Restablece tu contraseña de Flama; el enlace funciona una vez y caduca pronto.",
+    "preview": "Restablece tu contraseña de ResetOwl; el enlace funciona una vez y caduca pronto.",
     "heading": "Restablece tu contraseña",
-    "body": "Hemos recibido una solicitud para restablecer la contraseña de tu cuenta. Elige una nueva y podrás volver a tu espacio de trabajo.",
+    "body": "Hemos recibido una solicitud para restablecer la contraseña de tu cuenta. Elige una nueva y podrás volver a seguir los límites de Claude Code y Codex.",
     "action": "Restablecer contraseña",
     "helper": "Este enlace solo puede usarse una vez y caduca pronto. Si ya ha caducado, solicita otro desde la pantalla de inicio de sesión.",
     "closing": "¿No lo has solicitado? Ignora este correo; tu contraseña seguirá siendo la misma.",
@@ -16,7 +16,7 @@
   },
   "emailVerification": {
     "subject": "Verifica tu correo",
-    "preview": "Verifica tu dirección de correo de Flama para terminar de configurar tu cuenta.",
+    "preview": "Verifica tu dirección de correo de ResetOwl para terminar de configurar tu cuenta.",
     "heading": "Verifica tu correo",
     "body": "Confirma esta dirección para terminar de configurar tu cuenta y mantenerla segura.",
     "action": "Verificar correo",
@@ -25,14 +25,14 @@
     "footerNote": "Este es un correo de seguridad, por eso siempre lo recibirás."
   },
   "welcome": {
-    "subject": "Te damos la bienvenida a Flama",
-    "preview": "Tu cuenta de Flama está lista.",
+    "subject": "Te damos la bienvenida a ResetOwl",
+    "preview": "Tu cuenta de ResetOwl está lista.",
     "eyebrow": "Cuenta lista",
-    "heading": "Te damos la bienvenida a Flama",
+    "heading": "Te damos la bienvenida a ResetOwl",
     "greeting": "Hola, {{name}}:",
-    "body": "Tu cuenta se ha creado correctamente. Nos alegra tenerte a bordo.",
+    "body": "Tu cuenta se ha creado correctamente. Añade tus suscripciones de Claude Code y Codex y ResetOwl te mostrará lo que le queda a cada plan y cuál usar a continuación.",
     "support": "Si tienes alguna pregunta, responde a este correo y nuestro equipo te ayudará.",
-    "signoff": "— El equipo de Flama"
+    "signoff": "— El equipo de ResetOwl"
   },
   "invitation": {
     "subject": "Te han invitado a {{organizationName}}",
