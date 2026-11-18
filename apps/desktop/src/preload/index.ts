@@ -3,6 +3,7 @@ import {
   DESKTOP_CHANNELS,
   type DesktopBridge,
   type LoginProgress,
+  type UpdateState,
 } from '@flama/shared/desktop';
 import { contextBridge, type IpcRendererEvent, ipcRenderer } from 'electron';
 
@@ -95,6 +96,18 @@ const bridge: DesktopBridge = {
     targets: () => invoke(DESKTOP_CHANNELS.liveFeedTargets),
     install: (home) => invoke(DESKTOP_CHANNELS.liveFeedInstall, home),
     uninstall: (home) => invoke(DESKTOP_CHANNELS.liveFeedUninstall, home),
+  },
+  updates: {
+    state: () => invoke(DESKTOP_CHANNELS.updatesState),
+    onState(listener) {
+      const handler = (_event: IpcRendererEvent, state: UpdateState) => listener(state);
+      ipcRenderer.on(DESKTOP_CHANNELS.updatesChanged, handler);
+      return () => ipcRenderer.removeListener(DESKTOP_CHANNELS.updatesChanged, handler);
+    },
+    check: () => invoke(DESKTOP_CHANNELS.updatesCheck),
+    install: () => invoke(DESKTOP_CHANNELS.updatesInstall),
+    setInstallOnQuit: (on) => invoke(DESKTOP_CHANNELS.updatesInstallOnQuit, on),
+    dismiss: () => invoke(DESKTOP_CHANNELS.updatesDismiss),
   },
   openExternal: (url) => invoke(DESKTOP_CHANNELS.openExternal, url),
 };

@@ -14,6 +14,7 @@ import {
   readZaiQuota,
 } from '@flama/usage-providers';
 import { app, type BrowserWindow, ipcMain, net, safeStorage, shell } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import { type LoginHandle, loginShellPath, startLogin, syncAfterLogin } from './add-login';
 import { postReading, postSync, type SyncedAccount } from './api-client';
 import { Collector, type Timers } from './collector';
@@ -40,13 +41,14 @@ import {
 } from './shell-integration';
 import { createTokenStore } from './token-store';
 import { createTray, type TrayController } from './tray';
+import { createUpdatePrefsStore, type UpdateEngine, Updater } from './updater';
 import { createReaderKeyStore, UsageReaders } from './usage-readers';
 import { checkNewLogin, checkRenewedLogin } from './verify-login';
 import { createMainWindow, registerAppScheme, rendererRoot, serveRenderer } from './window';
 
 /**
  * The main process: wires the modules beside this file to Electron. Three
- * modes: the app (window, tray, collector, live feed), `--collect-once`
+ * modes: the app (window, tray, collector, live feed, updater), `--collect-once`
  * (print the sync payload and exit) and `--smoke` (load the window, print
  * `SMOKE_OK <title>`, exit).
  */
@@ -136,6 +138,31 @@ async function collectOnce(): Promise<void> {
     log(`collect-once failed: ${err instanceof Error ? err.message : String(err)}`);
     app.exit(1);
   }
+}
+
+/**
+ * `electron-updater` as `updater.ts` needs it: the release feed is
+ * `publish` in electron-builder.json (baked into the package as
+ * app-update.yml), requests name ResetOwl, and its log joins ours.
+ */
+function createUpdateEngine(): UpdateEngine {
+  const engine = autoUpdater;
+  engine.autoDownload = true;
+  engine.allowPrerelease = false;
+  engine.requestHeaders = { 'User-Agent': config.userAgent };
+  const line = (m: unknown) => log(`updater: ${m instanceof Error ? m.message : String(m)}`);
+  engine.logger = { info: line, warn: line, error: line, debug: () => undefined };
+  return {
+    supported: engine.isUpdaterActive(),
+    async check() {
+      await engine.checkForUpdates();
+    },
+    // Silent on Windows (no installer wizard), and ResetOwl starts again after.
+    install: () => engine.quitAndInstall(true, true),
+    setInstallOnQuit(on) {
+      engine.autoInstallOnAppQuit = on;
+    },
+  };
 }
 
 async function main(): Promise<void> {
@@ -282,6 +309,58 @@ async function main(): Promise<void> {
     },
     log,
   });
+
+  const sendUpdateState = (state: ReturnType<Updater['current']>) => {
+    if (win && !win.isDestroyed()) win.webContents.send(DESKTOP_CHANNELS.updatesChanged, state);
+    tray?.setUpdate(state.phase === 'ready' ? state.version : null);
+  };
+  // No updater in the smoke run: it would reach the release feed.
+  const updater = new Updater({
+    engine:
+      config.mode === 'app'
+        ? createUpdateEngine()
+        : {
+            supported: false,
+            check: async () => undefined,
+            install: () => undefined,
+            setInstallOnQuit: () => undefined,
+          },
+    prefs: createUpdatePrefsStore({
+      file: join(userData, 'updates.json'),
+      fs: { readFile, writeFile },
+    }),
+    currentVersion: app.getVersion(),
+    timers,
+    now: () => new Date(),
+    onState: sendUpdateState,
+    log,
+  });
+  if (config.mode === 'app') {
+    autoUpdater.on('checking-for-update', () => updater.handle({ type: 'checking' }));
+    autoUpdater.on('update-available', (info) =>
+      updater.handle({ type: 'available', version: info.version }),
+    );
+    autoUpdater.on('update-not-available', () => updater.handle({ type: 'not-available' }));
+    autoUpdater.on('download-progress', (progress) =>
+      updater.handle({ type: 'progress', percent: progress.percent }),
+    );
+    autoUpdater.on('update-downloaded', (info) =>
+      updater.handle({ type: 'downloaded', version: info.version }),
+    );
+    autoUpdater.on('error', (err) =>
+      updater.handle({ type: 'error', message: err instanceof Error ? err.message : String(err) }),
+    );
+  }
+
+  /** Quits into the downloaded version, past the window's hide-on-close. */
+  const installUpdate = () => {
+    if (updater.current().phase !== 'ready') return;
+    quitting = true;
+    collector.stop();
+    login?.cancel();
+    void liveServer?.close();
+    updater.install();
+  };
 
   const claudeHomes = () =>
     collector
@@ -440,6 +519,11 @@ async function main(): Promise<void> {
         shownLocale = locale;
         tray?.setLocale(locale);
       },
+      updatesState: () => updater.current(),
+      updatesCheck: () => updater.check(),
+      updatesInstall: installUpdate,
+      updatesSetInstallOnQuit: (on) => updater.setInstallOnQuit(on),
+      updatesDismiss: () => updater.dismiss(),
     },
     {
       rendererOrigin: config.rendererOrigin,
@@ -459,6 +543,7 @@ async function main(): Promise<void> {
   app.on('before-quit', () => {
     quitting = true;
     collector.stop();
+    updater.stop();
     // The CLI runs in a process group of its own, which a quit would not end.
     login?.cancel();
     void liveServer?.close();
@@ -473,6 +558,7 @@ async function main(): Promise<void> {
       locale: shownLocale,
       onRefresh: () => void collector.refresh(),
       onOpen: showWindow,
+      onInstallUpdate: installUpdate,
       onQuit: () => app.quit(),
     });
   } catch (err) {
@@ -498,6 +584,7 @@ async function main(): Promise<void> {
   // The first read waits for the login shell's PATH, so `codex app-server`
   // can run from it; the lookup gives up after five seconds.
   void cliEnv().then(() => collector.start());
+  void updater.start();
 }
 
 function runSmoke(win: BrowserWindow): void {

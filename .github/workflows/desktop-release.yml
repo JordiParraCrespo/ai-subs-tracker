@@ -11,6 +11,11 @@ name: Desktop release
 #   Windows  NSIS installer, x64 (not code-signed yet)
 #   Linux    AppImage, x86_64
 #
+# Each platform also uploads its update feed (`latest.yml`, `latest-mac.yml`,
+# `latest-linux.yml`) and the blockmaps. The installed app reads the feed from
+# the same `releases/latest/download/` (`publish` in electron-builder.json),
+# so it only ever sees a published release, never the draft.
+#
 # Runs on a tag `desktop-v<version>` matching apps/desktop/package.json, or by
 # hand, which leaves the release a draft. The release is created as a draft,
 # each platform uploads to it, and only then is it published with a
@@ -147,7 +152,8 @@ jobs:
         run: |
           shopt -s nullglob
           files=(apps/desktop/release/*.dmg apps/desktop/release/*.zip \
-                 apps/desktop/release/*.exe apps/desktop/release/*.AppImage)
+                 apps/desktop/release/*.exe apps/desktop/release/*.AppImage \
+                 apps/desktop/release/*.blockmap apps/desktop/release/latest*.yml)
           [ ${#files[@]} -gt 0 ] || { echo "nothing was packaged" >&2; exit 1; }
           gh release upload "$TAG" "${files[@]}" --clobber
 

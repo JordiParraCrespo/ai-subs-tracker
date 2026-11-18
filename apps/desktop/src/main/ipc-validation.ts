@@ -89,6 +89,12 @@ export function parseBoundedString(value: unknown, max: number, what = 'value'):
   return value;
 }
 
+/** A switch's new position: a boolean, nothing else. */
+export function parseBoolean(value: unknown, what = 'value'): boolean {
+  if (typeof value !== 'boolean') throw new IpcArgumentError(`Invalid ${what}.`);
+  return value;
+}
+
 export function parseToken(value: unknown): string | null {
   if (value === null || value === undefined || value === '') return null;
   const token = parseBoundedString(value, MAX_TOKEN_LENGTH, 'token');

@@ -219,6 +219,13 @@ test('the desktop app finds the logins on disk, syncs them, and switches the ter
         readFile(join(home, '.resetowl', 'active', 'claude-code'), 'utf8').catch(() => null),
       )
       .toBe(expected);
+
+    // Settings shows the app's own updater. This build is unpackaged, so it
+    // cannot replace itself and says where new versions come from instead.
+    await page.goto('app://resetowl/settings?section=updates');
+    const updates = page.locator('#updates');
+    await expect(updates.getByText("This copy can't update itself")).toBeVisible();
+    await expect(updates.getByRole('button', { name: 'Download page' })).toBeVisible();
   } finally {
     await app.close();
     await api.dispose();

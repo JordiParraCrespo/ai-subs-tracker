@@ -42,6 +42,11 @@ function services(): DesktopServices {
     liveFeedUninstall: vi.fn(async () => []),
     openExternal: vi.fn(async () => undefined),
     setLocale: vi.fn(),
+    updatesState: vi.fn(),
+    updatesCheck: vi.fn(),
+    updatesInstall: vi.fn(),
+    updatesSetInstallOnQuit: vi.fn(),
+    updatesDismiss: vi.fn(),
   };
 }
 
@@ -156,11 +161,13 @@ describe('language from the screens', () => {
 });
 
 describe('IPC handlers', () => {
-  it('has a handler for every invoke channel (all but the two change events)', () => {
-    const channels = Object.values(DESKTOP_CHANNELS).filter(
-      (c) =>
-        c !== DESKTOP_CHANNELS.collectorChanged && c !== DESKTOP_CHANNELS.accountsLoginProgress,
-    );
+  it('has a handler for every invoke channel (all but the three change events)', () => {
+    const events: string[] = [
+      DESKTOP_CHANNELS.collectorChanged,
+      DESKTOP_CHANNELS.accountsLoginProgress,
+      DESKTOP_CHANNELS.updatesChanged,
+    ];
+    const channels = Object.values(DESKTOP_CHANNELS).filter((c) => !events.includes(c));
     expect(Object.keys(ipcHandlers(services())).sort()).toEqual([...channels].sort());
   });
 
@@ -174,6 +181,12 @@ describe('IPC handlers', () => {
     expect(s.activate).toHaveBeenCalledWith('codex', 'acc-1');
     expect(() => h[DESKTOP_CHANNELS.openExternal]?.('file:///etc/passwd')).toThrow();
     expect(s.openExternal).not.toHaveBeenCalled();
+    for (const bad of ['true', 1, null, undefined]) {
+      expect(() => h[DESKTOP_CHANNELS.updatesInstallOnQuit]?.(bad)).toThrow(IpcArgumentError);
+    }
+    expect(s.updatesSetInstallOnQuit).not.toHaveBeenCalled();
+    await h[DESKTOP_CHANNELS.updatesInstallOnQuit]?.(false);
+    expect(s.updatesSetInstallOnQuit).toHaveBeenCalledWith(false);
   });
 
   it('refuses a sender that is not the app window or not the renderer origin', async () => {
