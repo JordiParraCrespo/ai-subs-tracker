@@ -177,6 +177,11 @@ test('the desktop app finds the logins on disk, syncs them, and switches the ter
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 30_000 });
 
+    // Settings show which version of the app this is.
+    const version = await app.evaluate(({ app }) => app.getVersion());
+    await page.goto('app://resetowl/settings');
+    await expect(page.getByTestId('app-version')).toHaveText(`ResetOwl ${version}`);
+
     // The sign-in starts a collection; the API holds what it sent.
     let accounts: SyncedAccount[] = [];
     await expect
