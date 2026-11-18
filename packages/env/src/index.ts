@@ -5,6 +5,8 @@ import { parse } from 'dotenv';
 export interface LoadEnvOptions {
   /** Directory to start the workspace-root search from. Defaults to `process.cwd()`. */
   cwd?: string;
+  /** The names that may be read from a `<NAME>_FILE`. Defaults to `SECRET_NAMES`. */
+  secrets?: readonly string[];
 }
 
 export interface LoadEnvResult {
@@ -19,7 +21,25 @@ export interface LoadEnvResult {
 const FILE_SUFFIX = '_FILE';
 
 /**
- * Resolve `<NAME>_FILE` variables: for each one whose `<NAME>` is unset, read
+ * The variables that may arrive as a file: the secrets `.env.example`
+ * documents. Only these are read from a `<NAME>_FILE`, because the machine
+ * sets `_FILE` variables of its own (`PIP_CONFIG_FILE`, `SSL_CERT_FILE`,
+ * `CLAUDE_CODE_ARTIFACT_MULTI_FILE=1`) that are not ours to read and must not
+ * stop the process. A new secret gets a line here.
+ */
+export const SECRET_NAMES: readonly string[] = [
+  'BETTER_AUTH_SECRET',
+  'DB_PASSWORD',
+  'METRICS_TOKEN',
+  'REDIS_PASSWORD',
+  'SEED_ADMIN_PASSWORD',
+  'SEED_SUPERADMIN_PASSWORD',
+  'SEED_USER_PASSWORD',
+];
+
+/**
+ * Resolve `<NAME>_FILE` variables: for each secret in `names` whose `<NAME>`
+ * is unset and whose `<NAME>_FILE` is set, read
  * the file it names and set `<NAME>` to its contents, trailing newline
  * trimmed. This is the Docker secrets convention (Postgres' own image reads
  * `POSTGRES_PASSWORD_FILE` the same way), so a secret can be a file mounted
@@ -29,14 +49,14 @@ const FILE_SUFFIX = '_FILE';
  * cannot be read throws: a missing secret must stop the process, not let it
  * start on a default.
  */
-export function resolveFileVariables(env: NodeJS.ProcessEnv = process.env): string[] {
+export function resolveFileVariables(
+  env: NodeJS.ProcessEnv = process.env,
+  names: readonly string[] = SECRET_NAMES,
+): string[] {
   const applied: string[] = [];
-  for (const [fileKey, filePath] of Object.entries(env)) {
-    if (!fileKey.endsWith(FILE_SUFFIX) || fileKey.length === FILE_SUFFIX.length || !filePath) {
-      continue;
-    }
-    const key = fileKey.slice(0, -FILE_SUFFIX.length);
-    if (env[key] !== undefined) {
+  for (const key of names) {
+    const filePath = env[`${key}${FILE_SUFFIX}`];
+    if (!filePath || env[key] !== undefined) {
       continue;
     }
     env[key] = fs.readFileSync(filePath, 'utf8').replace(/\r?\n$/, '');
@@ -96,7 +116,7 @@ export function findWorkspaceRoot(startDir: string = process.cwd()): string | nu
 export function loadEnv(options: LoadEnvOptions = {}): LoadEnvResult {
   const root = findWorkspaceRoot(options.cwd);
   if (root === null) {
-    return { root: null, loaded: [], applied: resolveFileVariables() };
+    return { root: null, loaded: [], applied: resolveFileVariables(process.env, options.secrets) };
   }
 
   const loaded: string[] = [];
@@ -117,7 +137,7 @@ export function loadEnv(options: LoadEnvOptions = {}): LoadEnvResult {
       applied.push(key);
     }
   }
-  applied.push(...resolveFileVariables());
+  applied.push(...resolveFileVariables(process.env, options.secrets));
 
   return { root, loaded, applied };
 }

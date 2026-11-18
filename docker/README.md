@@ -34,7 +34,8 @@ refuses to deploy one that breaks its rules:
 - Postgres and Redis are on `data`, a network with no route out;
 - no secret is an environment variable. The secrets are files in
   `/srv/secrets` (a directory only root can enter), mounted at
-  `/run/secrets`; `@flama/env` reads each `<NAME>_FILE` into `<NAME>`.
+  `/run/secrets`; `@flama/env` reads each `<NAME>_FILE` into `<NAME>`, for
+  the secrets in its `SECRET_NAMES` (a new secret gets a line there).
 
 ### Once, by hand
 
