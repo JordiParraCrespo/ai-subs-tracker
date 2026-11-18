@@ -108,7 +108,12 @@
     "shellNotInstalled": "Not installed",
     "shellTitle": "Terminal integration",
     "title": "This computer",
-    "description": "How ResetOwl works with the coding tools on this machine. Each change is opt-in and can be undone."
+    "description": "How ResetOwl works with the coding tools on this machine. Each change is opt-in and can be undone.",
+    "versionsTitle": "Versions",
+    "versionsDescription": "What this copy of ResetOwl runs on, and the coding tools it found on this computer.",
+    "versionsScreens": "Screens",
+    "versionsOs": "Operating system",
+    "versionsMissing": "Not installed"
   },
   "table": {
     "account": "Account",

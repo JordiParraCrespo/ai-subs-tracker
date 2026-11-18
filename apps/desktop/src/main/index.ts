@@ -9,6 +9,7 @@ import {
   type DetectedLogin,
   getProvider,
   nodeProviderEnv,
+  PROVIDERS,
   type ProviderEnv,
   parseClaudeStatusline,
   readZaiQuota,
@@ -42,6 +43,7 @@ import { createTokenStore } from './token-store';
 import { createTray, type TrayController } from './tray';
 import { createReaderKeyStore, UsageReaders } from './usage-readers';
 import { checkNewLogin, checkRenewedLogin } from './verify-login';
+import { collectVersions, osLabel, readCliVersion } from './versions';
 import { createMainWindow, registerAppScheme, rendererRoot, serveRenderer } from './window';
 
 /**
@@ -434,6 +436,16 @@ async function main(): Promise<void> {
         return liveTargets();
       },
       openExternal: (url) => shell.openExternal(url),
+      async versions() {
+        const env = await cliEnv();
+        return collectVersions({
+          app: config.version,
+          runtime: process.versions,
+          os: osLabel(process.platform, process.getSystemVersion(), process.arch),
+          clis: PROVIDERS.map((p) => ({ provider: p.id, command: p.loginCommand('').command })),
+          readVersion: (command) => readCliVersion(command, { env }),
+        });
+      },
       setLocale(locale) {
         if (config.mode === 'smoke') log(`screens show: ${locale}`);
         if (locale === shownLocale) return;

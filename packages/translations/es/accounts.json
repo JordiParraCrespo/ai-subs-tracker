@@ -108,7 +108,12 @@
     "shellNotInstalled": "No instalado",
     "shellTitle": "Integración con la terminal",
     "title": "Este ordenador",
-    "description": "Cómo trabaja ResetOwl con las herramientas de programación de este equipo. Cada cambio es opcional y reversible."
+    "description": "Cómo trabaja ResetOwl con las herramientas de programación de este equipo. Cada cambio es opcional y reversible.",
+    "versionsTitle": "Versiones",
+    "versionsDescription": "Sobre qué funciona esta copia de ResetOwl y las herramientas de programación que ha encontrado en este ordenador.",
+    "versionsScreens": "Pantallas",
+    "versionsOs": "Sistema operativo",
+    "versionsMissing": "No instalado"
   },
   "table": {
     "account": "Cuenta",

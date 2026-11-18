@@ -319,3 +319,58 @@ test('adds a Claude Code account through the add-subscription modal, by pasted c
     await api.dispose();
   }
 });
+
+test('settings list the versions of the app, its runtime and each vendor CLI', async () => {
+  test.setTimeout(120_000);
+  const { api, user } = await provisionedUser('desktopversions');
+  // No logins: the collector starts no CLI, only the versions list does.
+  const home = await mkdtemp(join(tmpdir(), 'resetowl-desktop-e2e-'));
+  const bin = join(home, 'bin');
+  // Claude Code and Codex print their versions as they do; Grok Build is not installed.
+  for (const [name, line] of [
+    ['claude', '2.1.0 (Claude Code)'],
+    ['codex', 'codex-cli 0.46.0'],
+  ]) {
+    await write(join(bin, name), `#!/bin/sh\n[ "$1" = "--version" ] && echo "${line}"\n`);
+    await chmod(join(bin, name), 0o755);
+  }
+
+  const app = await electron.launch({
+    executablePath: electronPath,
+    args: [DESKTOP, '--no-sandbox', '--proxy-server=http://127.0.0.1:9'],
+    env: {
+      ...process.env,
+      HOME: home,
+      SHELL: '',
+      // Only the fake CLIs and the system's own tools: never one installed here.
+      PATH: `${bin}:/usr/bin:/bin`,
+      XDG_CONFIG_HOME: join(home, '.config'),
+      CLAUDE_CONFIG_DIR: '',
+      CODEX_HOME: '',
+      RESETOWL_API_URL: API_URL,
+    },
+  });
+  try {
+    const page = await app.firstWindow();
+    await page.fill('#email', user.email);
+    await page.fill('#password', user.password);
+    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+    await expect(page).toHaveURL(/\/dashboard/, { timeout: 30_000 });
+
+    await page.goto('app://resetowl/settings');
+    const row = (name: string) =>
+      page
+        .locator('[data-slot="section-row"]')
+        .filter({ has: page.getByText(name, { exact: true }) });
+    const electronVersion = await app.evaluate(() => process.versions.electron);
+    await expect(row('Electron')).toContainText(electronVersion);
+    await expect(row('Node.js')).toContainText(/\d+\.\d+\.\d+/);
+    await expect(row('Operating system')).toContainText(/Linux|macOS|Windows/);
+    await expect(row('Claude Code')).toContainText('2.1.0');
+    await expect(row('Codex')).toContainText('0.46.0');
+    await expect(row('Grok Build')).toContainText('Not installed');
+  } finally {
+    await app.close();
+    await api.dispose();
+  }
+});

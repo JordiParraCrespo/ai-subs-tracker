@@ -4,6 +4,7 @@ import {
   type CollectorStatus,
   type ConnectUsageReaderResult,
   DESKTOP_CHANNELS,
+  type DesktopVersions,
   type LiveFeedTarget,
   type ShellIntegration,
 } from '@flama/shared/desktop';
@@ -55,6 +56,7 @@ export interface DesktopServices {
   liveFeedUninstall(home: string): Promise<LiveFeedTarget[]>;
   openExternal(url: string): Promise<void>;
   setLocale(locale: Locale): void;
+  versions(): Promise<DesktopVersions>;
 }
 
 type Handler = (...args: unknown[]) => unknown;
@@ -90,6 +92,7 @@ export function ipcHandlers(services: DesktopServices): Record<string, Handler> 
     [DESKTOP_CHANNELS.liveFeedUninstall]: (home) => services.liveFeedUninstall(parseHome(home)),
     [DESKTOP_CHANNELS.openExternal]: (url) => services.openExternal(parseExternalUrl(url)),
     [DESKTOP_CHANNELS.setLocale]: (locale) => services.setLocale(parseLocale(locale)),
+    [DESKTOP_CHANNELS.versions]: () => services.versions(),
   };
 }
 
