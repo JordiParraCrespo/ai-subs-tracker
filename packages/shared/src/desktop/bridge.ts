@@ -126,29 +126,6 @@ export interface LiveFeedTarget {
   available: boolean;
 }
 
-/** A coding agent's CLI on this machine and the version it reports. */
-export interface CliVersion {
-  provider: LocalProviderId;
-  /** The command ResetOwl runs, e.g. `claude`. */
-  command: string;
-  /** What `<command> --version` printed; null when it is not installed or did not answer. */
-  version: string | null;
-}
-
-/** What this desktop app is built on and what it works with on this machine. */
-export interface DesktopVersions {
-  /** ResetOwl's own version. */
-  app: string;
-  electron: string;
-  chrome: string;
-  node: string;
-  v8: string;
-  /** The operating system, e.g. `macOS 15.1 (arm64)`. */
-  os: string;
-  /** One per local provider, in the registry's order. */
-  clis: CliVersion[];
-}
-
 export interface DesktopBridge {
   version: string;
   platform: string;
@@ -215,8 +192,6 @@ export interface DesktopBridge {
     install(home: string): Promise<LiveFeedTarget[]>;
     uninstall(home: string): Promise<LiveFeedTarget[]>;
   };
-  /** The app's, its runtime's, the OS's and each vendor CLI's versions. */
-  versions(): Promise<DesktopVersions>;
   openExternal(url: string): Promise<void>;
 }
 
@@ -255,5 +230,4 @@ export const DESKTOP_CHANNELS = {
   liveFeedUninstall: 'resetowl:live-feed:uninstall',
   openExternal: 'resetowl:open-external',
   setLocale: 'resetowl:locale:set',
-  versions: 'resetowl:app:versions',
 } as const;

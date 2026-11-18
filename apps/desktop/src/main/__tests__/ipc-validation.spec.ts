@@ -42,7 +42,6 @@ function services(): DesktopServices {
     liveFeedUninstall: vi.fn(async () => []),
     openExternal: vi.fn(async () => undefined),
     setLocale: vi.fn(),
-    versions: vi.fn(),
   };
 }
 

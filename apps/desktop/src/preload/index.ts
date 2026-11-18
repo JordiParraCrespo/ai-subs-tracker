@@ -96,7 +96,6 @@ const bridge: DesktopBridge = {
     install: (home) => invoke(DESKTOP_CHANNELS.liveFeedInstall, home),
     uninstall: (home) => invoke(DESKTOP_CHANNELS.liveFeedUninstall, home),
   },
-  versions: () => invoke(DESKTOP_CHANNELS.versions),
   openExternal: (url) => invoke(DESKTOP_CHANNELS.openExternal, url),
 };
 

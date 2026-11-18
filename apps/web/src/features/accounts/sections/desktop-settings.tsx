@@ -11,7 +11,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useDesktopSetup } from '../hooks/use-desktop-setup';
 import { DesktopStatus } from './desktop-status';
-import { DesktopVersions } from './desktop-versions';
+import { DesktopVersion } from './desktop-version';
 
 /**
  * Settings that act on this computer. In a browser it says where they live
@@ -106,7 +106,7 @@ export function DesktopSettings() {
         ))}
       </SectionCard>
 
-      <DesktopVersions />
+      <DesktopVersion />
     </DsSettingsCard>
   );
 }
