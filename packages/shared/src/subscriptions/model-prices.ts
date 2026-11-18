@@ -45,6 +45,7 @@ const openai = (
 
 export const MODEL_PRICES: readonly ModelPrice[] = [
   anthropic('fable-5-2', 'Claude Fable 5.2', 8, 40, 0.2),
+  anthropic('mythos-5-2', 'Claude Mythos 5.2', 8, 40, 0.2),
   anthropic('fable-5-1', 'Claude Fable 5.1', 10, 50, 0.25),
   anthropic('mythos-5-1', 'Claude Mythos 5.1', 10, 50, 0.25),
   anthropic('mythos', 'Claude Mythos 5', 10, 50),
