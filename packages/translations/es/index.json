@@ -178,7 +178,7 @@
       "successMessage": "Si existe una cuenta con ese correo, recibirás un enlace para restablecer tu contraseña en breve.",
       "backToSignIn": "Volver a iniciar sesión",
       "error": "Algo salió mal",
-      "sentMessage": "Enviamos un enlace a <address>{{email}}</address>. Caduca en 30 minutos.",
+      "sentMessage": "Si <address>{{email}}</address> tiene una cuenta en ResetOwl, le enviamos un enlace. Caduca en 30 minutos.",
       "didntGet": "¿No te ha llegado?",
       "resend": "Reenviar enlace",
       "resent": "Enlace reenviado"
