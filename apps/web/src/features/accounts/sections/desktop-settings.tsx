@@ -59,16 +59,16 @@ export function DesktopSettings() {
         {t('accounts.settings.shellTitle')}
       </GroupHeading>
       <SectionCard className="mb-8">
-        <SectionRow>
-          <RowMeta
-            name={
-              setup.shell?.installed
-                ? t('accounts.settings.shellInstalled', { file: setup.shell.rcFile ?? '' })
-                : t('accounts.settings.shellNotInstalled')
-            }
-            description={
-              setup.shell?.snippet ? (
-                <Collapsible>
+        <Collapsible>
+          <SectionRow>
+            <RowMeta
+              name={
+                setup.shell?.installed
+                  ? t('accounts.settings.shellInstalled', { file: setup.shell.rcFile ?? '' })
+                  : t('accounts.settings.shellNotInstalled')
+              }
+              description={
+                setup.shell?.snippet ? (
                   <CollapsibleTrigger className="group mt-1 inline-flex items-center gap-1 text-xs text-ink-600 hover:text-ink-900">
                     <span className="group-data-[panel-open]:hidden">
                       {t('accounts.settings.shellShowCode')}
@@ -78,26 +78,26 @@ export function DesktopSettings() {
                     </span>
                     <ChevronDown className="size-3.5 transition-transform group-data-[panel-open]:rotate-180" />
                   </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <pre className="mt-2 max-h-72 overflow-auto rounded-lg border border-border-subtle bg-surface-sunken p-3 font-mono text-xs text-ink-600">
-                      {setup.shell.snippet}
-                    </pre>
-                  </CollapsibleContent>
-                </Collapsible>
-              ) : undefined
-            }
-          />
-          <RowControl>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={!setup.shell?.rcFile || setup.shell.installed}
-              onClick={() => void setup.installShell()}
-            >
-              {t('accounts.settings.shellInstall')}
-            </Button>
-          </RowControl>
-        </SectionRow>
+                ) : undefined
+              }
+            />
+            <RowControl>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={!setup.shell?.rcFile || setup.shell.installed}
+                onClick={() => void setup.installShell()}
+              >
+                {t('accounts.settings.shellInstall')}
+              </Button>
+            </RowControl>
+          </SectionRow>
+          <CollapsibleContent className="px-[18px] pb-4">
+            <pre className="max-h-80 overflow-auto rounded-lg border border-border-subtle bg-surface-sunken p-3 font-mono text-xs leading-relaxed text-ink-600">
+              {setup.shell?.snippet}
+            </pre>
+          </CollapsibleContent>
+        </Collapsible>
       </SectionCard>
 
       <GroupHeading description={t('accounts.settings.liveDescription')}>
