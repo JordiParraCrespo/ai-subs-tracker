@@ -103,9 +103,11 @@
     "liveTitle": "Límites en directo de Claude Code",
     "liveToggle": "Límites en directo para {{home}}",
     "shellDescription": "Hace que claude, codex y grok en tu terminal usen la cuenta que esté activada.",
+    "shellHideCode": "Ocultar el código",
     "shellInstall": "Añadir a mi shell",
     "shellInstalled": "Instalado en {{file}}",
     "shellNotInstalled": "No instalado",
+    "shellShowCode": "Ver el código que añade",
     "shellTitle": "Integración con la terminal",
     "title": "Este ordenador",
     "description": "Cómo trabaja ResetOwl con las herramientas de programación de este equipo. Cada cambio es opcional y reversible."

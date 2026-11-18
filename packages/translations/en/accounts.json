@@ -103,9 +103,11 @@
     "liveTitle": "Live limits from Claude Code",
     "liveToggle": "Live limits for {{home}}",
     "shellDescription": "Makes claude, codex and grok in your terminal use whichever account is switched on.",
+    "shellHideCode": "Hide the code",
     "shellInstall": "Add to my shell",
     "shellInstalled": "Installed in {{file}}",
     "shellNotInstalled": "Not installed",
+    "shellShowCode": "Show the code it adds",
     "shellTitle": "Terminal integration",
     "title": "This computer",
     "description": "How ResetOwl works with the coding tools on this machine. Each change is opt-in and can be undone."

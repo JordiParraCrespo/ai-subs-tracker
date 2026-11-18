@@ -1,5 +1,12 @@
-import { Button, DsSettingsCard, Switch } from '@flama/design-system-web';
-import { Laptop } from '@flama/design-system-web/icons';
+import {
+  Button,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  DsSettingsCard,
+  Switch,
+} from '@flama/design-system-web';
+import { ChevronDown, Laptop } from '@flama/design-system-web/icons';
 import {
   desktopBridge as desktop,
   GroupHeading,
@@ -52,30 +59,45 @@ export function DesktopSettings() {
         {t('accounts.settings.shellTitle')}
       </GroupHeading>
       <SectionCard className="mb-8">
-        <SectionRow>
-          <RowMeta
-            name={
-              setup.shell?.installed
-                ? t('accounts.settings.shellInstalled', { file: setup.shell.rcFile ?? '' })
-                : t('accounts.settings.shellNotInstalled')
-            }
-            description={
-              <code className="mt-2 block font-mono text-xs break-all whitespace-pre-wrap text-ink-600">
-                {setup.shell?.snippet}
-              </code>
-            }
-          />
-          <RowControl>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={!setup.shell?.rcFile || setup.shell.installed}
-              onClick={() => void setup.installShell()}
-            >
-              {t('accounts.settings.shellInstall')}
-            </Button>
-          </RowControl>
-        </SectionRow>
+        <Collapsible>
+          <SectionRow>
+            <RowMeta
+              name={
+                setup.shell?.installed
+                  ? t('accounts.settings.shellInstalled', { file: setup.shell.rcFile ?? '' })
+                  : t('accounts.settings.shellNotInstalled')
+              }
+              description={
+                setup.shell?.snippet ? (
+                  <CollapsibleTrigger className="group mt-1 inline-flex items-center gap-1 text-xs text-ink-600 hover:text-ink-900">
+                    <span className="group-data-[panel-open]:hidden">
+                      {t('accounts.settings.shellShowCode')}
+                    </span>
+                    <span className="hidden group-data-[panel-open]:inline">
+                      {t('accounts.settings.shellHideCode')}
+                    </span>
+                    <ChevronDown className="size-3.5 transition-transform group-data-[panel-open]:rotate-180" />
+                  </CollapsibleTrigger>
+                ) : undefined
+              }
+            />
+            <RowControl>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={!setup.shell?.rcFile || setup.shell.installed}
+                onClick={() => void setup.installShell()}
+              >
+                {t('accounts.settings.shellInstall')}
+              </Button>
+            </RowControl>
+          </SectionRow>
+          <CollapsibleContent className="px-[18px] pb-4">
+            <pre className="max-h-80 overflow-auto rounded-lg border border-border-subtle bg-surface-sunken p-3 font-mono text-xs leading-relaxed text-ink-600">
+              {setup.shell?.snippet}
+            </pre>
+          </CollapsibleContent>
+        </Collapsible>
       </SectionCard>
 
       <GroupHeading description={t('accounts.settings.liveDescription')}>
