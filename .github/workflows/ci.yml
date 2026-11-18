@@ -229,6 +229,10 @@ jobs:
     env:
       API_URL: http://localhost:3001
       WEB_URL: http://localhost:3000
+      # The suite's mailbox (e2e/support/mail.ts): the log "Start the API"
+      # writes below. Unset, it reads `.stack/api.log`, which only the local
+      # stack writes, and every emailed-link test times out.
+      API_LOG: /tmp/api.log
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
