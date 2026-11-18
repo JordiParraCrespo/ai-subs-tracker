@@ -23,7 +23,10 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Create Release Pull Request
-        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v1
+        # v1, not v2: action v2 runs only with @changesets/cli v3, and this
+        # repository is on cli v2. Move both together (dependabot.yml holds the
+        # action at v1 until then).
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         with:
           commit: "chore: release packages"
           title: "chore: release packages"
