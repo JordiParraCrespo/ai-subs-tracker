@@ -67,6 +67,8 @@ export function SubscriptionsTable({
       render: ({ account, pace }) => (
         <UsageCell
           value={pace.weeklyUsed}
+          mark={pace.onPaceMark}
+          markLabel={t('accounts.tm.paceMark')}
           sub={
             !account.isManual
               ? t('accounts.table.weeklySub')
