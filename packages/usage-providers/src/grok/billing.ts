@@ -19,7 +19,6 @@ import { isRecord, type JsonRecord, num, str, toIso } from '../lib/util';
 export const GROK_PROXY_BASE = 'https://cli-chat-proxy.grok.com/v1';
 export const BILLING_CREDITS_URL = `${GROK_PROXY_BASE}/billing?format=credits`;
 export const BILLING_DEFAULT_URL = `${GROK_PROXY_BASE}/billing`;
-export const SETTINGS_URL = `${GROK_PROXY_BASE}/settings`;
 export const BILLING_TIMEOUT_MS = 10_000;
 export const GROK_CLI_AUTH_HEADER = 'xai-grok-cli';
 
@@ -173,11 +172,7 @@ export function billingConfig(data: JsonRecord): JsonRecord | null {
   return FLAT_BILLING_FIELDS.some((field) => data[field] !== undefined) ? data : null;
 }
 
-/**
- * The tier as the proxy names it (`supergrok`, `supergrok_heavy`, …), when
- * the billing view carries one. The views captured from Grok CLI 1.0.89
- * (2026-11) carry none; `settingsTier` is where the tier is then.
- */
+/** The tier as the proxy names it (`supergrok`, `supergrok_heavy`, …). */
 export function billingTier(config: JsonRecord, data: JsonRecord): string | null {
   return (
     str(config.subscriptionTier)?.trim() ??
@@ -185,25 +180,4 @@ export function billingTier(config: JsonRecord, data: JsonRecord): string | null
     str(data.subscription_tier) ??
     null
   );
-}
-
-/**
- * The plan's display name (`SuperGrok Plus`) from `GET <proxy>/settings`, the
- * CLI's own remote-settings call (`subscription_tier_display`). Not a
- * documented API: it is what Grok Build itself asks on start, with the same
- * session and headers as the billing view, read the way Orca reads xAI. Only
- * asked when the billing view names no tier, and anything that goes wrong
- * (a rejection, a timeout, a response without the key) is "tier unknown",
- * never a failed reading. Nothing but the name is kept from the response.
- */
-export async function settingsTier(
-  session: GrokSession,
-  fetchImpl: typeof fetch,
-): Promise<string | null> {
-  try {
-    const data = await fetchGrokBilling(SETTINGS_URL, session, fetchImpl);
-    return str(data.subscription_tier_display);
-  } catch {
-    return null;
-  }
 }

@@ -40,7 +40,6 @@ const BILLING = {
 };
 
 const CREDITS_URL = 'https://cli-chat-proxy.grok.com/v1/billing?format=credits';
-const SETTINGS_URL = 'https://cli-chat-proxy.grok.com/v1/settings';
 
 /** `/billing?format=credits` as xAI answered it to Grok CLI 1.0.89 (2026-11-19): no tier. */
 const CAPTURED_CREDITS = {
@@ -77,13 +76,6 @@ const CAPTURED_DEFAULT = {
       },
     ],
   },
-};
-
-/** `/settings`, trimmed to the keys that matter (the real one has ~130). */
-const CAPTURED_SETTINGS = {
-  enable_telemetry: true,
-  subscription_tier_display: 'SuperGrok Plus',
-  subscription_watch_interval_secs: 60,
 };
 
 describe('grok detect', () => {
@@ -308,23 +300,17 @@ describe('grok read', () => {
     ]);
   });
 
-  it('reads the tier from the CLI settings when the billing view names none', async () => {
+  // Regression: xAI's billing views name no tier for a unified X Subscription
+  // account, so the reading is ok with no plan; Renewals then asks for its
+  // day and the person picks the tier. Nothing else is asked of xAI.
+  it('reads the captured credits view: the weekly pool, no tier, no renewal day', async () => {
     const { home, login } = await grokHome();
-    const { fn, calls } = routedFetch({
-      [CREDITS_URL]: { body: CAPTURED_CREDITS },
-      [SETTINGS_URL]: { body: CAPTURED_SETTINGS },
-    });
+    const { fn, calls } = routedFetch({ [CREDITS_URL]: { body: CAPTURED_CREDITS } });
     const account = await grokProvider.read(login, testEnv(home, { fetch: fn }), opts);
-    expect(calls.map((c) => c.url)).toEqual([CREDITS_URL, SETTINGS_URL]);
-    // The settings call carries the same session and headers, and nothing of ResetOwl's.
-    expect(calls[1]?.headers).toMatchObject({
-      Authorization: 'Bearer grok-session',
-      'X-XAI-Token-Auth': 'xai-grok-cli',
-      'x-userid': 'user-1',
-    });
-    expect(calls[1]?.headers).not.toHaveProperty('User-Agent');
-    expect(account.reportedPlan).toBe('SuperGrok Plus');
-    expect(resolvePlan('grok', account.reportedPlan)?.id).toBe('grok-supergrok-plus');
+    expect(calls.map((c) => c.url)).toEqual([CREDITS_URL]);
+    expect(account.reportedPlan).toBeNull();
+    expect(account.reportedRenewal).toBeNull();
+    expect(account.snapshot).toMatchObject({ status: 'ok', message: null });
     expect(account.snapshot?.windows).toEqual([
       {
         key: 'weekly',
@@ -335,48 +321,6 @@ describe('grok read', () => {
         windowMinutes: 10080,
       },
     ]);
-    // Nothing in the responses is a billing date.
-    expect(account.reportedRenewal).toBeNull();
-    expect(JSON.stringify(account)).not.toContain('enable_telemetry');
-  });
-
-  it('leaves the tier unknown, and the reading ok, when the settings lack it or fail', async () => {
-    const { home, login } = await grokHome();
-    const cases: Array<{ body: unknown; status?: number }> = [
-      { body: { enable_telemetry: true, subscription_watch_interval_secs: 60 } },
-      { body: {}, status: 401 },
-      { body: {}, status: 500 },
-    ];
-    for (const settings of cases) {
-      const { fn } = routedFetch({
-        [CREDITS_URL]: { body: CAPTURED_CREDITS },
-        [SETTINGS_URL]: settings,
-      });
-      const account = await grokProvider.read(login, testEnv(home, { fetch: fn }), opts);
-      expect(account.reportedPlan).toBeNull();
-      expect(account.snapshot).toMatchObject({ status: 'ok', message: null });
-      expect(account.snapshot?.windows[0]?.utilization).toBe(21);
-    }
-    // A network failure on the settings call alone is no failed reading either.
-    const flaky = (async (url: string | URL | Request) => {
-      if (String(url) === SETTINGS_URL) throw new Error('socket hang up');
-      return new Response(JSON.stringify(CAPTURED_CREDITS), { status: 200 });
-    }) as typeof fetch;
-    const account = await grokProvider.read(login, testEnv(home, { fetch: flaky }), opts);
-    expect(account).toMatchObject({ reportedPlan: null, snapshot: { status: 'ok' } });
-  });
-
-  it('never asks the settings when the reading failed or the billing view named the tier', async () => {
-    const { home, login } = await grokHome();
-    const rejected = routedFetch({
-      [CREDITS_URL]: { body: {}, status: 401 },
-      [SETTINGS_URL]: { body: CAPTURED_SETTINGS },
-    });
-    await grokProvider.read(login, testEnv(home, { fetch: rejected.fn }), opts);
-    expect(rejected.calls.map((c) => c.url)).toEqual([CREDITS_URL]);
-    const named = fakeFetch(BILLING);
-    await grokProvider.read(login, testEnv(home, { fetch: named.fn }), opts);
-    expect(named.calls.map((c) => c.url)).toEqual([CREDITS_URL]);
   });
 
   it('reports a rejected session as an error, never as a sign-out', async () => {

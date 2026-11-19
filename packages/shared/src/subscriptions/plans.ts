@@ -11,10 +11,9 @@
  * Sources: claude.com/pricing and learn.chatgpt.com/docs/pricing, checked
  * 2026-11-02; docs.z.ai/devpack/overview and docs.z.ai/devpack/faq, checked
  * 2026-11-04; docs.bigmodel.cn/cn/coding-plan/overview, checked 2026-11-05;
- * xAI's X Subscription (launched 2026-10-12): x.ai/pricing, which answers
- * only a browser that runs its script, checked 2026-11-19 (Plus $8, Premium
- * $30, Super $100, Ultra $200). The SuperGrok plans it replaced are not on
- * it any more — confirm against the page when touching them.
+ * xAI's X Subscription (launched 2026-10-12): x.ai/pricing refuses automated
+ * reads, so the tiers are as several published summaries of it agree,
+ * checked 2026-11-07 — confirm against the page when touching them.
  */
 
 /** Providers the desktop collector reads on the machine and a terminal can switch between. */
@@ -267,10 +266,9 @@ export const PLANS: readonly PlanDefinition[] = [
   },
   // xAI — The X Subscription, x.ai/pricing. One weekly pool shared by Grok,
   // Grok Build and Cursor, sized as a multiple of Plus; xAI publishes no
-  // absolute counts. Grok Build reports the tier as a slug or, through the
-  // CLI settings, as its display name (`SuperGrok Plus`). SuperGrok, its
-  // Plus, Lite and Heavy are the plans it replaced for new customers, which
-  // keep renewing for those who have them.
+  // absolute counts. Grok Build's billing view reports the tier as a slug;
+  // SuperGrok and SuperGrok Heavy are the plans it replaced for new
+  // customers, which keep renewing for those who have them.
   {
     id: 'grok-free',
     provider: 'grok',
@@ -324,53 +322,12 @@ export const PLANS: readonly PlanDefinition[] = [
     aliases: ['supergrok', 'super grok', 'super_grok'],
   },
   {
-    // The CLI settings name it `SuperGrok Plus`, the binary `supergrok_plus`.
-    // Neither x.ai/pricing nor grok.com/plans lists it any more (checked
-    // 2026-11-19), so it has no published price: the account carries what
-    // it pays.
-    id: 'grok-supergrok-plus',
-    provider: 'grok',
-    name: 'SuperGrok Plus',
-    monthlyPriceCents: null,
-    windows: 'weekly',
-    aliases: ['supergrok plus', 'supergrok_plus', 'super grok plus'],
-  },
-  {
-    // The entry tier before the X Subscription (`supergrok_lite`). No xAI
-    // page publishes its price (checked 2026-11-19), so it has none here.
-    id: 'grok-supergrok-lite',
-    provider: 'grok',
-    name: 'SuperGrok Lite',
-    monthlyPriceCents: null,
-    windows: 'weekly',
-    aliases: ['supergrok lite', 'supergrok_lite', 'super grok lite'],
-  },
-  {
     id: 'grok-supergrok-heavy',
     provider: 'grok',
     name: 'SuperGrok Heavy',
     monthlyPriceCents: 30000,
     windows: 'weekly',
     aliases: ['supergrok heavy', 'supergrok_heavy', 'heavy'],
-  },
-  // X Premium and Premium+ are X's own subscriptions, which include Grok.
-  // They are sold by X, not on x.ai/pricing, and their price varies by
-  // country and platform, so an account carries the price it pays.
-  {
-    id: 'grok-x-premium',
-    provider: 'grok',
-    name: 'X Premium',
-    monthlyPriceCents: null,
-    windows: 'weekly',
-    aliases: ['x premium', 'x_premium'],
-  },
-  {
-    id: 'grok-x-premium-plus',
-    provider: 'grok',
-    name: 'X Premium+',
-    monthlyPriceCents: null,
-    windows: 'weekly',
-    aliases: ['x premium+', 'x_premium_plus', 'x premium plus'],
   },
   // Z.AI — docs.z.ai/devpack/overview. Credits per window are documented for
   // every tier; the 5-hour credits return 5 hours after they are spent and the

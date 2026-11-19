@@ -19,7 +19,6 @@ import {
   GrokHttpError,
   monthlyWindow,
   reportsAnyUsageScalar,
-  settingsTier,
   weeklyWindow,
 } from './billing';
 
@@ -72,23 +71,6 @@ async function detect(env: ProviderEnv): Promise<DetectedLogin[]> {
 }
 
 /**
- * The reading, and the plan's tier: the billing view's when it names one,
- * else the CLI settings' display name, asked only once the session has just
- * proved good on the billing view.
- */
-async function readLimits(
-  login: DetectedLogin,
-  auth: GrokAuth | null,
-  env: ProviderEnv,
-): Promise<{ snapshot: UsageSnapshot; tier: string | null }> {
-  const limits = await readBilling(login, auth, env);
-  if (auth && limits.snapshot.status === 'ok' && !limits.tier) {
-    return { ...limits, tier: await settingsTier(auth, env.fetch) };
-  }
-  return limits;
-}
-
-/**
  * The plan's usage pool, read as Orca reads it: the credits view first, its
  * monthly budget when it has no weekly percentage, then the default view for
  * a unified-billing account's monthly budget. A rejected session is an error,
@@ -96,7 +78,7 @@ async function readLimits(
  * CLI renews it the next time `grok` runs. A session lapsed for longer than
  * `GROK_ABANDONED_MS` is expired: no `grok` run has come to renew it.
  */
-async function readBilling(
+async function readLimits(
   login: DetectedLogin,
   auth: GrokAuth | null,
   env: ProviderEnv,
@@ -222,9 +204,6 @@ async function read(
     location: login.home.slice(0, 300),
     snapshot: snap,
     dailyTokens: [],
-    // Nothing xAI answers names the billing date: the monthly view's period
-    // is the calendar month and the weekly one the usage pool's, so the
-    // person sets the day on Renewals.
     reportedRenewal: null,
   };
 }

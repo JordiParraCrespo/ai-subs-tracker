@@ -57,16 +57,16 @@ describe('unscheduled', () => {
   });
 
   it('lists a known plan with no published price until the person says what they pay', () => {
-    // SuperGrok Plus, the production account's plan, has no published price.
-    const plus = account({ id: 'plus', planId: 'grok-supergrok-plus', priceCents: 0 });
-    const unpriced = account({ id: 'x', planId: 'grok-x-premium', priceCents: 0 });
+    // Z.AI Pro is a catalog plan with no published price.
+    const unpriced = account({ id: 'x', provider: 'zai', planId: 'zai-pro', priceCents: 0 });
     const setFree = account({
       id: 'set',
-      planId: 'grok-x-premium',
+      provider: 'zai',
+      planId: 'zai-pro',
       priceCents: 0,
       priceOverridden: true,
     });
-    expect(unscheduled([plus, unpriced, setFree]).map((a) => a.id)).toEqual(['plus', 'x']);
+    expect(unscheduled([unpriced, setFree]).map((a) => a.id)).toEqual(['x']);
   });
 
   it('leaves out an account that has a day: the calendar shows it', () => {
