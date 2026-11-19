@@ -1,4 +1,5 @@
 import type { AccountEntity } from '@flama/frontend-consumer';
+import { findPlan } from '@flama/shared/subscriptions';
 
 /**
  * When each plan bills, from its day of the month: the one its owner set, else
@@ -84,9 +85,26 @@ export function upcomingRenewals(
     .sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 
-/** Paid plans with no renewal day, set or reported: off the calendar until someone sets one. */
+/**
+ * Whether the account's price is not known: no plan was recognised, or its
+ * plan has no published price and the person has not said what they pay.
+ * Its price reads as 0 then, which is not the same as a free plan.
+ */
+const priceUnknown = (account: AccountEntity) =>
+  account.planId === null ||
+  (!account.priceOverridden && findPlan(account.planId)?.monthlyPriceCents === null);
+
+/**
+ * Plans with no renewal day, set or reported, that may bill: paid ones, and
+ * ones whose plan or price is unknown. Off the calendar until someone sets a
+ * day, so they ask for one here instead of vanishing. A known free plan has
+ * nothing to renew.
+ */
 export const unscheduled = (accounts: readonly AccountEntity[]) =>
-  accounts.filter((account) => account.renewalDay === null && account.monthlyPriceCents > 0);
+  accounts.filter(
+    (account) =>
+      account.renewalDay === null && (account.monthlyPriceCents > 0 || priceUnknown(account)),
+  );
 
 /** `2026-11` ↔ year and month, for the URL. */
 export const MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;

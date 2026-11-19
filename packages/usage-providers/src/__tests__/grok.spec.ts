@@ -5,7 +5,7 @@ import { resolvePlan } from '@flama/shared/subscriptions';
 import { describe, expect, it } from 'vitest';
 import { grokProvider } from '../grok';
 import { parseGrokAuth } from '../grok/auth';
-import { billingConfig, monthlyWindow, weeklyWindow } from '../grok/billing';
+import { billingConfig, billingTier, monthlyWindow, weeklyWindow } from '../grok/billing';
 import type { DetectedLogin } from '../types';
 import { type FetchCall, fakeFetch, NOW, SINCE, tempHome, testEnv, writeJson } from './helpers';
 
@@ -36,6 +36,45 @@ const BILLING = {
       start: '2026-10-30T00:00:00Z',
       end: '2026-11-06T00:00:00Z',
     },
+  },
+};
+
+const CREDITS_URL = 'https://cli-chat-proxy.grok.com/v1/billing?format=credits';
+
+/** `/billing?format=credits` as xAI answered it to Grok CLI 1.0.89 (2026-11-19): no tier. */
+const CAPTURED_CREDITS = {
+  config: {
+    currentPeriod: {
+      type: 'USAGE_PERIOD_TYPE_WEEKLY',
+      start: '2026-11-15T16:53:55.022+00:00',
+      end: '2026-11-22T16:53:55.022+00:00',
+    },
+    creditUsagePercent: 21,
+    productUsage: [{ product: 'GrokTasks', usagePercent: 21 }],
+    isUnifiedBillingUser: true,
+    prepaidBalance: { val: 0 },
+    topUpMethod: 'TOP_UP_METHOD_SAVED_PAYMENT_METHOD',
+    billingPeriodStart: '2026-11-15T16:53:55.022+00:00',
+    billingPeriodEnd: '2026-11-22T16:53:55.022+00:00',
+  },
+};
+
+/** `/billing` from the same capture: the calendar month, no tier. */
+const CAPTURED_DEFAULT = {
+  config: {
+    monthlyLimit: { val: 0 },
+    used: { val: 0 },
+    onDemandCap: { val: 0 },
+    billingPeriodStart: '2026-11-01T00:00:00+00:00',
+    billingPeriodEnd: '2026-12-01T00:00:00+00:00',
+    history: [
+      {
+        billingCycle: { year: 2026, month: 10 },
+        includedUsed: { val: 0 },
+        onDemandUsed: { val: 0 },
+        totalUsed: { val: 0 },
+      },
+    ],
   },
 };
 
@@ -171,6 +210,16 @@ describe('grok billing parsing', () => {
     expect(weeklyWindow({ ...config, used: { val: 0 } })).toBeNull();
   });
 
+  it('finds no tier in either billing view xAI answers today', () => {
+    for (const data of [CAPTURED_CREDITS, CAPTURED_DEFAULT]) {
+      const config = billingConfig(data);
+      expect(config && billingTier(config, data)).toBeNull();
+    }
+    // The default view's zero budget is no monthly window.
+    const fallback = billingConfig(CAPTURED_DEFAULT);
+    expect(fallback && monthlyWindow(fallback)).toBeNull();
+  });
+
   it('finds no config in a response with none', () => {
     expect(billingConfig({ other: 1 })).toBeNull();
   });
@@ -248,6 +297,29 @@ describe('grok read', () => {
     expect(account.reportedPlan).toBe('supergrok');
     expect(account.snapshot?.windows.map((w) => [w.kind, w.utilization])).toEqual([
       ['monthly', 40],
+    ]);
+  });
+
+  // Regression: xAI's billing views name no tier for a unified X Subscription
+  // account, so the reading is ok with no plan; Renewals then asks for its
+  // day and the person picks the tier. Nothing else is asked of xAI.
+  it('reads the captured credits view: the weekly pool, no tier, no renewal day', async () => {
+    const { home, login } = await grokHome();
+    const { fn, calls } = routedFetch({ [CREDITS_URL]: { body: CAPTURED_CREDITS } });
+    const account = await grokProvider.read(login, testEnv(home, { fetch: fn }), opts);
+    expect(calls.map((c) => c.url)).toEqual([CREDITS_URL]);
+    expect(account.reportedPlan).toBeNull();
+    expect(account.reportedRenewal).toBeNull();
+    expect(account.snapshot).toMatchObject({ status: 'ok', message: null });
+    expect(account.snapshot?.windows).toEqual([
+      {
+        key: 'weekly',
+        kind: 'weekly',
+        label: 'Weekly',
+        utilization: 21,
+        resetsAt: '2026-11-22T16:53:55.022Z',
+        windowMinutes: 10080,
+      },
     ]);
   });
 
