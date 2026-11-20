@@ -365,6 +365,7 @@ export function renewGrokSession(
     if (afterAcp) return { kind: 'renewed', auth: afterAcp };
 
     const dir = await mkdtemp(join(tmpdir(), 'resetowl-grok-'));
+    let taskFailure: string | null = null;
     try {
       const promptFile = join(dir, 'text-task-prompt.txt');
       await writeFile(promptFile, GROK_RENEW_PROMPT);
@@ -375,13 +376,14 @@ export function renewGrokSession(
         return { kind: 'unavailable', message: err instanceof Error ? err.message : String(err) };
       }
       const ran = await awaitGrokTask(task, timeouts);
-      if (!ran.ok) return { kind: 'failed', message: ran.message };
+      if (!ran.ok) taskFailure = ran.message;
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
+    // The CLI renews before its model request, so a prompt that then fails or
+    // times out may still have left a fresh session behind.
     const afterTask = await freshAuth(home, env.now());
-    return afterTask
-      ? { kind: 'renewed', auth: afterTask }
-      : { kind: 'failed', message: 'Grok ran but its session is still expired.' };
+    if (afterTask) return { kind: 'renewed', auth: afterTask };
+    return { kind: 'failed', message: taskFailure ?? 'Grok ran but its session is still expired.' };
   });
 }

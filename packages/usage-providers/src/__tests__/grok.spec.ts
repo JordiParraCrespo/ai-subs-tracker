@@ -439,6 +439,20 @@ describe('grok renewal, run as Orca runs Grok with no window', () => {
     expect(grok.calls[1]?.env).toEqual({ GROK_HOME: dir, GROK_STORAGE_MODE: 'local' });
   });
 
+  it('keeps a session the CLI renewed even when its prompt then fails', async () => {
+    const { home, dir, login } = await grokHome({ 'https://auth.x.ai': LAPSED });
+    const grok = fakeGrok({
+      onTask: () => writeJson(join(dir, 'auth.json'), { 'https://auth.x.ai': RENEWED }),
+      taskExit: 1,
+    });
+    const account = await grokProvider.read(
+      login,
+      testEnv(home, { fetch: fakeFetch(BILLING).fn, spawnCli: grok.spawnCli }),
+      opts,
+    );
+    expect(account.snapshot).toMatchObject({ status: 'ok' });
+  });
+
   it('asks for a sign-in when the CLI has no saved login to renew', async () => {
     const { home, login } = await grokHome({
       'https://auth.x.ai': { ...SESSION, expires_at: '2026-11-02T06:00:00Z' },
