@@ -34,9 +34,13 @@ src/
   expired): a renewable one is `auth_stale`, a signed-out one `auth_expired`.
   Renewing a renewable login is the vendor's own CLI's job: the desktop
   collector runs `claude auth status` (described here by `refreshCommand`),
-  and Codex's usage read starts `codex app-server` through `env.spawnCli`,
-  which refreshes its own token to answer. That probe is the one process this
-  package starts, and only where the environment offers `spawnCli`.
+  Codex's usage read starts `codex app-server` through `env.spawnCli`,
+  which refreshes its own token to answer, and Grok's read of a lapsed
+  session starts Grok Build as Orca runs it with no window (`grok/renew.ts`:
+  ACP `authenticate` with `cached_token`, then, only if that left the session
+  lapsed, Orca's headless read-only prompt). Those are the processes this
+  package starts, one per home at a time, and only where the environment
+  offers `spawnCli`.
 - **Credentials go only to the provider that issued them**: the Claude token to
   `api.anthropic.com`, the Codex token to `chatgpt.com`, the Grok session to
   `cli-chat-proxy.grok.com`. Never into a
@@ -57,9 +61,10 @@ src/
   login can renew (Claude), an `error` otherwise (Codex's wham/usage, Grok);
   `auth_expired` needs the CLI's own words (`codex app-server`'s refresh
   errors, `claude auth status` reporting `loggedIn: false`), a login with no
-  usable refresh token, or a revocation. A Grok session lapsed for more than a
-  day (`GROK_ABANDONED_MS`) counts as one with nothing to renew it: only the
-  `grok` TUI renews it, and ResetOwl has no command that does.
+  usable refresh token, or a revocation. For Grok the CLI's word is its ACP
+  server offering no `cached_token` sign-in. Where Grok Build cannot run or
+  fails, a session lapsed for more than a day (`GROK_ABANDONED_MS`) counts as
+  one with nothing to renew it.
 - **`read` never throws** for a provider failure: map it to the snapshot
   status (`ok`, `auth_stale` when a lapsed token is renewable, `auth_expired`
   when it is not, `no_credentials`, `rate_limited` on 429, `error`) with a

@@ -8,8 +8,8 @@ import { isRecord, readJson, str } from '../lib/util';
  * `{ key, user_id, email, team_id, expires_at, oidc_client_id, ... }` where
  * `key` is the session token.
  *
- * Read only: the session is the CLI's to renew (`grok` refreshes it on use),
- * so ResetOwl never rewrites the file. Which entry is read follows Orca's
+ * Read only: the session is the CLI's to renew (`grok` refreshes it on use,
+ * and `renew.ts` runs it to do so), so ResetOwl never rewrites the file. Which entry is read follows Orca's
  * reader, which works against xAI today: the default xAI OAuth issuer wins,
  * and an alternate issuer is a fallback only when the file has no default
  * entry at all.
@@ -58,10 +58,10 @@ export function isGrokSessionFresh(auth: Pick<GrokAuth, 'expiresAt'>, now: Date)
 }
 
 /**
- * How long a session may stay lapsed before it reads as signed out. Under it
+ * How long a session may stay lapsed before it reads as signed out when Grok
+ * Build could not be run to renew it (not installed, or it failed). Under it
  * the account is stale (the next `grok` run renews the session); past it
- * nobody has run `grok`, and ResetOwl has no command of its own that renews a
- * Grok login, so the account asks to be signed in again.
+ * nothing has renewed it, so the account asks to be signed in again.
  */
 export const GROK_ABANDONED_MS = 24 * 60 * 60_000;
 
