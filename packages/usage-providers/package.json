@@ -1,6 +1,6 @@
 {
   "name": "@flama/usage-providers",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Reads coding-agent logins on this machine (Claude Code, Codex) into ResetOwl's account sync contract.",
   "main": "./dist/index.js",
