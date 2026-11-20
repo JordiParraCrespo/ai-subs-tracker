@@ -1,5 +1,321 @@
 # @flama/shared
 
+## 1.0.0
+
+### Major Changes
+
+- 4ea785b: The admin REST façade (`/v1/admin/users`, its scope group, schemas and error copy) leaves the starter for the `admin-api` plugin, which `admin-web` and `admin-mobile` pull back in; Better Auth's `admin` plugin stays.
+- 4ea785b: Personal API tokens leave the starter; the API keeps the scope machinery behind a `SCOPED_CREDENTIAL` port, and `@flama/shared` derives its flag exports from whatever catalog it declares, now none.
+- 4ea785b: Stripe billing leaves the starter for the `billing` plugin, and the `leads`
+  example is removed.
+
+  - `@flama/api` no longer ships `BillingModule`, its migrations, the `stripe`
+    config or the `stripe` dependency, and no longer ships `LeadsModule`.
+    `pnpm plugin:add billing` puts billing back, then
+    `pnpm generate:api-client`.
+  - `@flama/shared` drops the `billing` and `leads` scope resources and
+    permission groups, the `stripe_billing` capability, the `Billing` subject,
+    the `/billing/subscriptions` endpoint policy and the billing and lead schemas.
+  - `@flama/api-client` drops the billing and leads endpoints and models. Its
+    legacy models now take `Scope`, `ScopeResource` and `ClientCapabilities` from
+    `@flama/shared` instead of spelling them out. `openapi-ts` reads
+    `apps/api/openapi.json` from the right path again, so `src/generated` is
+    regenerated.
+  - `@flama/translations` drops the `BILLING_*` and `LEAD_*` error copy; the
+    plugin carries the billing copy.
+  - `@flama/web`'s permission picker gives a resource without an icon of its own
+    a generic key icon, so a plugin's scope group renders without an edit here.
+
+- 4ea785b: Every dependency moves to its latest release, majors included: Expo SDK 58
+  (React Native 0.88, React 19.3), NestJS 12, TypeORM 1, Zod 4, bullmq 6,
+  ioredis 6, CASL 7, nestjs-zod 5, nestjs-pino 5, react-native-gesture-handler 3,
+  better-auth 1.7. Versions on the mobile side are the ones SDK 58 lists, so
+  `expo install --check` is clean.
+
+  What a consumer has to move with:
+
+  - **Zod 4.** The schemas in `@flama/shared` are Zod 4 schemas, and
+    `createZodErrorMap` returns a Zod 4 error map (`core.$ZodErrorMap`), passed
+    as `error`, not `errorMap`. The kits' `zod` peer is `^4`.
+  - **NestJS 12** in every backend package, and `typeorm` `^1` as
+    `@flama/backend-authz`'s peer.
+  - **nestjs-zod 5** has no `patchNestJsSwagger`: the API runs the document
+    through `cleanupOpenApiDoc` instead. The document now carries each schema's
+    bounds and defaults, and Zod 4's `uuid()` is the RFC check, so a lookalike id
+    such as `11111111-1111-1111-1111-111111111111` no longer passes.
+  - **CommonJS packages resolve `node16`.** CASL 7 publishes its types only
+    through `exports`, which the deprecated `node` resolution never read.
+  - **React Native 0.88** types its strict API by default; the mobile tsconfigs
+    select the legacy types with `react-native-legacy-deep-imports`, which
+    NativeWind's `className` augmentation still targets.
+
+  `@flama/shared` gains a `flama-source` export condition pointing at its
+  TypeScript source. `apps/web` resolves it, because a CommonJS `require('zod')`
+  pulls in all of Zod 4, every locale included, beside the copy the frontend
+  packages import as ESM: 94KB gzipped on first load.
+
+- 4ea785b: Feature flags leave the starter; an app loads an optional kernel module by passing it to `FlamaApp.create({ modules })`.
+- 4ea785b: Google and GitHub sign-in leave the starter, so the apps, the kits, the API and the capabilities it reports name no social provider.
+- 4ea785b: Enforce conditional User permissions against the loaded record before reading
+  or updating it. Listing the global user directory now requires `manage User`.
+  The shared `canAccess()` helper performs the instance-level check.
+
+  Preserve the default role's existing restrictions: it has no platform User
+  grants, and self-service edits go through `/profile`. The existing
+  `TightenDefaultUserRole` migration already removes unconditional User grants;
+  no earlier scoping migration is introduced, as that would cause those grants
+  to survive the later tightening migration. Explicit conditional grants remain
+  supported, and profile update schemas continue to exclude `role`.
+
+  Non-admin callers that previously listed users with only `read User` now
+  receive 403; organization-scoped member endpoints cover tenant directories.
+
+### Minor Changes
+
+- 4ea785b: Add the authorization kernel: a feature module declares one resource object and
+  gets tenant isolation, team scoping, row-level SQL filtering, a role-builder
+  entry and a credential scope without writing an authorization check.
+
+  Also closes two defects in the existing system: `PoliciesGuard` allowed any
+  authenticated caller through a route that declared no policy, and roles were
+  global (`role.name` was unique table-wide), so two tenants could not both define
+  a `manager` role.
+
+- 4ea785b: Capability registry: a missing optional key disables a feature instead of
+  booting with a `'not-set'` sentinel.
+
+  - `@flama/shared` exports `DEPLOYMENT_CAPABILITIES` / `DeploymentCapabilities`
+    — the catalog of optional features a deployment may or may not have
+    (`google_oauth`, `github_oauth`, `stripe_billing`, `s3_storage`,
+    `email_delivery`), plus the `CLIENT_CAPABILITIES` wire subset.
+  - `@flama/backend-core` gains a `CapabilitiesService` registry: the app
+    resolves its capability set from config once at boot, logs it at startup,
+    and every consumer asks the registry instead of comparing raw config against
+    sentinel values.
+  - The API's OAuth config keys are now genuinely optional
+    (`z.string().optional()`) rather than defaulting to `'not-set'`; blank or
+    whitespace-only env vars normalize to `undefined` across the optional
+    OAuth/Stripe/S3/email keys. The client-facing subset of the resolved set
+    (`CLIENT_CAPABILITIES`: the OAuth providers and `stripe_billing`) is served
+    at `GET /health/capabilities` (exempt from scope checks, like other
+    anonymous reads); server-internal capabilities stay in the startup log.
+  - `@flama/api-client` picks up the generated `HealthApi.deploymentCapabilities()`.
+  - `@flama/frontend-core` adds a `capabilities` module and a
+    `useDeploymentCapabilities()` hook; the web login page uses it to render
+    only configured social providers, and to name the env vars to set when none
+    are (only after a successful read — an unreachable API or a failed refetch
+    with retained stale data is not a missing configuration).
+
+- 69128f7: Stop idle Claude Code accounts turning into "Sign in again" after a few hours. An account nobody runs Claude in still has a valid login — only its short-lived access token lapses — so ResetOwl now lets Claude Code's own CLI renew it instead of reporting it signed out.
+
+  `packages/usage-providers` (pure, read-only) no longer decides expiry from the stored timestamp alone: a lapsed access token whose refresh token is still good reads as the new `auth_stale` status, and only a login that cannot be renewed (no refresh token, its expiry passed, or the vendor rejected it) is `auth_expired` → "Sign in again". The provider also describes a `refreshCommand` (`claude auth status`), built from its existing `launchEnv`/`loginCommand`.
+
+  The desktop collector (`renew-login.ts`) runs that command for a login read as `auth_stale` — stdin closed, timed out, at most one per folder at a time, backed off after a failure — so Claude Code refreshes its own access token and rewrites its credential file, then reads the login again. The default `~/.claude` is run with no `CLAUDE_CONFIG_DIR`, so the macOS Keychain item is the one a terminal would use (that Keychain write is verified only in code review here, not on Linux). ResetOwl still never calls `oauth/token` and never writes a credential itself.
+
+  While a login is renewable-but-stale (e.g. the CLI is not installed), the API keeps showing its last good reading instead of empty bars: `GET /v1/accounts` carries forward the windows from the most recent snapshot that had them, dropping any whose reset has passed, and the screens mark the account `Stale` rather than "Sign in again".
+
+  Follow-up to the Codex reported-billing-day and GLM unofficial-reader work; Codex is left unchanged pending verification that a Codex command renews its own token without spending usage (issue #9's open question).
+
+- 0fbe635: Put Codex plans on the Renewals calendar without asking. The Codex reader takes the end of the paid period from the `id_token` in `auth.json` (`chatgpt_subscription_active_until`, an undocumented claim, read locally with no new request) and syncs only its day of the month, in the machine's local time, with when ChatGPT last checked the subscription (`reportedRenewal` on `POST /v1/accounts/sync`, optional so older collectors still sync). The token is reissued only when Codex refreshes its login, so the date itself can be a period or more behind; the day a plan bills does not move. The API keeps it beside the person's own day (`reportedRenewalDay`, `renewalCheckedAt`): `renewalDay` is the person's, else the reported one, and `renewalDayOverridden` says which. The edit form leaves the field empty for a reported day and shows it as the placeholder, so clearing an override falls back to the login, and Next 30 days says where a reported day came from. Claude Code reports no billing day and keeps "Set day".
+- 47d4885: The desktop app updates itself. It looks for a new release shortly after it
+  starts and every six hours, downloads it in the background and installs it
+  when the app quits. A card in the bottom corner offers "Restart now" once a
+  version is ready, reports a download that failed, and after an update says
+  which version it replaced. Settings › Updates shows the version and the last
+  check, checks on demand, and turns installing on quit off. The tray offers
+  "Restart to update". Builds that cannot replace themselves (a development
+  run, a Linux install other than the AppImage) point to the download page.
+- 67d26cb: The desktop app speaks the person's language. The screens start from the
+  operating system's preferred languages (the bridge's new `systemLocales`)
+  when nothing was picked on the device, and report what they show through
+  `setLocale`, so the tray menu, tooltip and headline read the same. Tray copy
+  lives in the new `desktop` translation area (English and Spanish).
+- 4ea785b: Hold the frontend to its architecture, and move what both platforms need into
+  the kernel.
+
+  `@flama/frontend-core` gains `./format` (the `Intl` date helpers, moved from
+  the web kit), `useLocale`, `useAbilityState`/`useAbility` (moved from the web
+  kit's shell), `useRespondToConsent` with an optional
+  `IAuthClient.respondToConsent`, `HookMutationOptions`, `personInitials` and
+  `UserEntity.initials`. `usersKeys.list()` appends its params only when a facet
+  is set. The web kit re-exports what moved, so `@flama/frontend-web` callers
+  keep their imports.
+
+  `@flama/frontend-consumer` gains `slugify`, `toCreateOrganizationDto` and
+  `useAcceptInvitationAsNewcomer`; its mutation hooks type `options` as
+  `HookMutationOptions`, so a caller can no longer pass a `mutationFn`.
+
+  `@flama/frontend-web` gains `SectionNav` and `PasswordChecklist`; `i18n`
+  becomes a middle concern. `@flama/frontend-mobile` gains `SignOutButton`,
+  `ScreenErrorFallback` takes an optional title, message and retrying state, and
+  `newPasswordSchema` moves to `@flama/shared/schemas/auth` (removed from the
+  mobile kit's exports); `config` becomes a middle concern.
+
+- ef55a1e: Read a GLM Coding Plan's usage automatically, opt-in, and track BigModel plans. `bigmodel` joins `zai` as a manual provider, with its Lite, Pro and Max plans (no published price: the account carries the one paid, in US dollars). In the desktop app, a Z.AI or BigModel account can turn on an unofficial usage reader: the person's Coding Plan key, encrypted with `safeStorage`, reads `/api/monitor/usage/quota/limit` on the vendor's own site (undocumented; the endpoint the vendor's usage plugin calls) and the desktop sends the 5-hour, weekly and monthly MCP windows to the new `POST /v1/accounts/:id/readings`, never the key. Readings carry the source `unofficial`, the screens say so, and they lapse like hand-typed ones; recording by hand stays the fallback.
+- 5028983: Track Grok Build (xAI) logins: the desktop collector reads `~/.grok` (or
+  `$GROK_HOME`) and the weekly usage pool from Grok Build's billing view, Add
+  subscription signs a new account in with `grok login --device-auth`, the shell
+  snippet switches `grok` between accounts, and the X Subscription tiers (plus
+  SuperGrok and SuperGrok Heavy) are in the plan catalog.
+- 4ea785b: The API's capability table is the one list of deployment capabilities, and `@flama/shared` keeps only the client-facing `CLIENT_CAPABILITIES`.
+- 4ea785b: Adopt React Hook Form across `apps/web` and `apps/mobile`.
+
+  Every auth form on both platforms now runs through `useForm`, validated against
+  the Zod schemas in `@flama/shared` via `@hookform/resolvers`. Web forms were
+  uncontrolled `FormData` reads leaning on native browser validation, and mobile
+  screens held one `useState` per field and reported the first Zod failure in an
+  `Alert`. Both now surface per-field errors inline, next to the input that caused
+  them, and no longer submit until the whole form parses.
+
+  `@flama/frontend-core` gains a `/validation` entrypoint exporting
+  `createZodErrorMap`, and `@flama/frontend-web` and `@flama/frontend-mobile`
+  each ship the `useZodResolver` hook that wires it into React Hook Form.
+  The shared schemas carry English messages because the API validates against the
+  same objects, so the map re-derives the message from the Zod issue code and
+  resolves it against a `validation.*` translation key. Each app passes its own
+  `t`, which keeps the messages localised without duplicating the schemas.
+  `TranslateFn` is deliberately narrow — a `t` typed over the full catalog is
+  assignable to it, so a missing key is a compile error rather than a raw key
+  rendered to the user.
+
+  The auth schemas in `@flama/shared` no longer hardcode their failure messages.
+  Zod short-circuits any error map when a check states its own message, so
+  `z.string().email('Invalid email address')` pinned every consumer to English. The
+  shapes are unchanged, and nothing outside the two frontends read those strings —
+  the API authenticates through Better Auth rather than these schemas.
+
+  `@flama/shared` also adds a `./schemas/auth` export. `apps/web` could not import
+  the schemas from the package root: that pulls in the scope catalog and CASL,
+  neither of which belongs in the browser bundle. The narrow subpath depends on
+  nothing but Zod. Because workspace `dist` folders sit outside `node_modules`,
+  `apps/web/vite.config.ts` now points the CommonJS interop plugin and
+  `optimizeDeps` at it — without that, Rollup cannot see the named exports.
+
+  `@flama/translations` adds the `validation.*` messages the error map resolves
+  (`required`, `email`, `minLength`, `maxLength`, `minItems`, `maxItems`) plus
+  `apiTokens.permissionsRequired`, in both English and Spanish.
+
+- 4ea785b: Serve every API error as an RFC 7807 problem document.
+
+  `AllExceptionsFilter` now answers with `application/problem+json` and the
+  standard members — `type`, `title`, `status`, `detail`, `instance` — plus the
+  `code`, `correlationId`, `timestamp` and `invalidParams` extensions, instead of
+  the ad-hoc `{ statusCode, code, message }` body.
+
+  - **Title vs detail.** `AppError` takes a second argument: `detail` (specific to
+    one occurrence) and `extensions` (extra members). The catalog message stays
+    the stable problem `title`, so handlers no longer interpolate request data
+    into it — `TOKEN_002` and `TOKEN_005` now report the offending scopes in
+    `detail` and as `ungrantableScopes` / `missingScopes`.
+  - **Validation failures** list every rejected field in `invalidParams`.
+  - **Domain exceptions** from `@flama/backend-ddd` carry an `httpStatus`, so a
+    `NotFoundException` surfaces as 404 rather than a blanket 500.
+  - **5xx responses** no longer echo the underlying message; the correlation id
+    ties the response to the logged stack trace.
+  - `type` URIs point at the new error reference (`https://flama.dev/errors`),
+    configurable per deployment with `ERROR_TYPE_BASE_URL`.
+
+  The `ProblemDetails` wire type lives in `@flama/shared`, replacing the unused
+  `ApiErrorResponse`. The CLI and MCP clients
+  read problem documents (still understanding the old body shape),
+  `@flama/frontend-core` exposes `toAppError` and the `@MapApiError` method decorator so screens can show
+  the server's `detail` and per-field errors, and `ApiProblemResponse` puts the
+  schema in the OpenAPI document and the generated client.
+
+- 4ea785b: Add server-evaluated feature flags, wired into the API, web and mobile.
+
+  Flags are declared in code, targeted in the database, evaluated on the server
+  and read on every client from one endpoint — the shape Stripe and Revolut
+  describe for their own.
+
+  - **`@flama/shared`** gains `feature-flags/`: the `FEATURE_FLAGS` catalog
+    (every flag the code may read, with its kind, owner, safe default and — for
+    temporary flags — expiry), the pure evaluator (ordered rules, segments,
+    semver targeting on the app build, deterministic MurmurHash3 percentage
+    splits bucketed by organization), and the Zod schemas for targeting writes.
+    `@flama/shared/feature-flags/catalog` is a Zod-free subpath for the web
+    bundle. A `flags` scope group and a `FeatureFlag` subject join the catalogs.
+  - **`@flama/api`** gains a `feature-flags` module. Every replica holds all
+    targeting in memory and evaluates without I/O, polling a cheap fingerprint
+    to stay in sync and keeping its last good snapshot through a database blip.
+    `GET /v1/feature-flags` serves the caller's evaluated client flags (signed
+    out too); the control-plane endpoints under `/v1/feature-flags/admin`,
+    `/segments` and `/changes` edit targeting, pull kill switches, manage
+    segments, explain an evaluation and read the audit trail, which every change
+    lands on through the outbox. `@RequireFlag('key')` gates a route on a flag,
+    and token creation is now behind the `api_token_creation` kill switch. New
+    error codes `FLAG_001`–`FLAG_007`. Migration `AddFeatureFlags`.
+  - **`@flama/frontend-core`**: a `feature-flags` kernel module and
+    `useFeatureFlag` / `useFeatureFlagValue` / `useFeatureFlags`, typed by the
+    catalog, reading the API rather than PostHog. Flags are prefetched as soon as
+    the session is known, persisted with the query cache, and an `experiment`
+    flag records a `feature_flag_exposed` event. `FlamaApp.create` takes
+    `featureFlags: { platform, appVersion }`.
+
+    **Breaking:** feature flags leave the analytics port. `IAnalyticsClient` no
+    longer has `getFeatureFlags` / `onFeatureFlags`, `AnalyticsService` no longer
+    serves flags, `analyticsKeys.flags` is gone, and `isFlagEnabled` moved to the
+    `feature-flags` module. `useFeatureFlag(key)` keeps its name but now takes a
+    catalog key and reads the server's answer.
+
+  - **`@flama/frontend-web` / `@flama/frontend-mobile`**: the PostHog adapters
+    drop their flag methods and switch PostHog's own flag loading off. The mobile
+    query client now follows `AppState`, so `refetchOnWindowFocus` works on a
+    phone and a pulled kill switch lands when the app returns to the foreground.
+    The unused `featureFlags` section of the mobile remote config is removed:
+    remote config is for tunables, not flags.
+  - **`@flama/web` / `@flama/mobile`** report their platform and build, and the
+    web API-tokens screen reads `api_token_creation`.
+
+  `pnpm check:flags` (in CI) fails on a temporary flag past its expiry date and
+  on a flag the catalog declares but no code reads.
+
+- e33f950: Subtrack's first version: the `accounts` API (sync, list, edit, activate, archive, usage by model and day), the Claude Code and Codex readers in `@flama/usage-providers`, the Overview, Accounts, Tokenmaxx and Usage screens on the ported dashboard design system, and the Electron desktop app that collects local logins and syncs them.
+- 4ea785b: Name the config package after what it holds, and put the endpoint policies next
+  to CASL.
+
+  `@flama/config` is now `@flama/tsconfig`, in `packages/tsconfig/`. "Config" said
+  nothing — the repo has seven other things that answer to it (`src/config/` in
+  the API, `ShellConfig`, `vite.config.ts`, the root `.env`) — while the package
+  holds tsconfig presets and the two build-time helpers that travel with them
+  (`vite-chunks.mjs`, `depcruise/*.cjs`). Every `extends`, devDependency,
+  Dockerfile `COPY` and doc reference moved with it; nothing else changed.
+
+  `@flama/shared` no longer exports `./navigation`. `SCREENS` paired a web route
+  (`/team`, `/api-tokens`) with the endpoint behind it and the rules that endpoint
+  demands. The endpoint half is a real contract and stays, as `ENDPOINT_POLICIES`
+  in `@flama/shared/permissions` — keyed by the path Nest mounts the handler at,
+  which is what `apps/api/src/auth/__tests__/endpoint-policies.spec.ts` (renamed
+  from `screen-policies.spec.ts`) pins the controllers to.
+
+  The route half is deleted rather than rehoused. Those five paths are not routes
+  any app mounts: `apps/web` serves `/dashboard`, `/settings` and
+  `/settings/api-tokens`, `apps/admin-web` serves `/users` and `/roles`, and
+  neither read the catalog — both nav files write their rows out by hand. A list
+  of one product's leftover URLs does not earn a home in the platform kit both
+  Vite apps compile. The rule that survives is smaller and is now what the docs
+  say: a gated nav row takes `policies: ENDPOINT_POLICIES['/tokens']` where the
+  row is declared, never a literal rule list, and the route string stays in the
+  app that mounts it.
+
+  The catalog also carries its own invariants now. `ENDPOINT_POLICIES` is typed
+  `Record<string, readonly [EndpointPolicy, ...EndpointPolicy[]]>`, so an empty
+  rule list and a misspelled member are both compile errors — which is what the
+  package-local spec was asserting at runtime, so it is gone. `HANDLERS` in the
+  API test is a `Record<GuardedEndpoint, …>`, so a new catalog entry fails to
+  compile until a handler is named for it. Nothing casts.
+
+  `permissions/index.ts` became a barrel over `abilities.ts` (a verbatim move of
+  the old file) and `endpoint-policies.ts`.
+
+- 4ea785b: Two-factor authentication: Better Auth's `twoFactor` plugin (an authenticator app plus single-use backup codes), optional per user. The `AddTwoFactor` migration adds `user."twoFactorEnabled"` and the `twoFactor` table, and the profile reports the enrolment and whether the account has a password sign-in (`hasPassword`, computed from Better Auth's `account` table); an account made through a social provider is not offered two-factor, which only guards password sign-in. A password sign-in on an account with it on rejects with `TwoFactorRequiredError`, which the web and mobile login screens answer with a code step (`TwoFactorChallengeForm` in each kit, `useVerifyTwoFactor`). The web profile sets it up behind the switch that was read-only, with a QR code, and turns it off or replaces the backup codes. `IAuthClient` gains `verifyTwoFactor`, `enableTwoFactor`, `confirmTwoFactor`, `disableTwoFactor` and `generateBackupCodes`, so every app's client implements them. `TWO_FACTOR_ISSUER` names the account in authenticator apps.
+- deed06d: Track a Z.AI Coding Plan by hand. `zai` joins the providers as the first manual one: its Lite, Pro and Max plans (credits per window from Z.AI's docs; only Lite's $18 price is published, so Pro and Max take the price paid), `POST /v1/accounts` to add one and `POST /v1/accounts/:id/usage` to record its 5-hour and weekly usage. The desktop collector, sync and terminal switching stay Claude Code and Codex only. A `Select` inside a dialog now opens above it.
+
+### Patch Changes
+
+- 773192b: Every model Claude Code offers gets its own row in the API price list: Opus 4.8, 4.7, 4.6 and 4.5, Opus 4.1, Sonnet 4.6 and 4.5, and Mythos 5.1 and 5. Before, they fell through to their family's catch-all rule, so usage on Opus 4.8 was listed as "Claude Opus 4". Opus 4 and 4.1 are now priced at their own $15/$75.
+- e0c087f: Claude Fable 5.2 gets its own row in the API price list at $8/$40 per million tokens (cache reads $0.20). Before, it matched the Fable catch-all and was listed and priced as Claude Fable 5 ($10/$50).
+
 ## 0.2.0
 
 ### Minor Changes
