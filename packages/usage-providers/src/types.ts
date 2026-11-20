@@ -121,8 +121,8 @@ export interface CodingAgentProvider {
    * The command the collector runs to let the vendor's own CLI renew a lapsed
    * login of its own (Claude Code's `claude auth status`), spending no usage.
    * ResetOwl runs it but never refreshes a token itself. Absent for a provider
-   * whose CLI renews another way (Codex renews inside its usage read, through
-   * `codex app-server`) or not on demand (Grok renews when `grok` runs).
+   * whose CLI renews another way: inside its usage read (Codex through
+   * `codex app-server`, Grok through `grok agent stdio`, see `grok/renew.ts`).
    */
   refreshCommand?(login: DetectedLogin): LoginCommand;
 }

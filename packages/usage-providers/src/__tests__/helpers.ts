@@ -173,3 +173,97 @@ export function fakeAppServer(
   };
   return { spawnCli, calls };
 }
+
+/** What a fake `grok` does when ResetOwl starts it to renew a session. */
+export interface FakeGrok {
+  /** The sign-in methods `initialize` offers; `cached_token` means a saved login. */
+  authMethods?: string[];
+  /** `_meta.defaultAuthMethodId` in the `initialize` answer. */
+  defaultAuthMethodId?: string | null;
+  /** Runs when `authenticate` is asked, as the real CLI may rewrite `auth.json`. */
+  onAuthenticate?: () => Promise<void>;
+  /** Runs during the headless prompt; its exit code is `taskExit` (0 by default). */
+  onTask?: (promptFile: string) => Promise<void>;
+  taskExit?: number;
+  enoent?: boolean;
+}
+
+/**
+ * A `spawnCli` that plays Grok Build: `grok agent stdio` speaks ACP
+ * (`initialize`, `authenticate`), any other invocation is the headless task.
+ */
+export function fakeGrok(behaviour: FakeGrok = {}) {
+  const calls: SpawnCall[] = [];
+  const rpc: { method: string; params: unknown }[] = [];
+  const spawnCli: NonNullable<ProviderEnv['spawnCli']> = (command, args, env) => {
+    calls.push({ command, args, env });
+    const child = new EventEmitter() as EventEmitter & CliChild;
+    const stdout = new EventEmitter();
+    const stderr = new EventEmitter();
+    let closed = false;
+    const close = (code: number | null, signal: NodeJS.Signals | null = null) =>
+      queueMicrotask(() => {
+        if (closed) return;
+        closed = true;
+        child.emit('close', code, signal);
+      });
+    const say = (message: unknown) =>
+      queueMicrotask(() => stdout.emit('data', Buffer.from(`${JSON.stringify(message)}\n`)));
+    Object.assign(child, {
+      stdout,
+      stderr,
+      kill: (signal: NodeJS.Signals = 'SIGTERM') => {
+        close(null, signal);
+        return true;
+      },
+      stdin: {
+        on: () => undefined,
+        write(data: string) {
+          for (const line of data.split('\n').filter(Boolean)) {
+            const msg = JSON.parse(line) as { id?: number; method?: string; params?: unknown };
+            if (!msg.method) continue;
+            rpc.push({ method: msg.method, params: msg.params });
+            if (msg.method === 'initialize') {
+              const methods = behaviour.authMethods ?? ['cached_token', 'grok.com'];
+              say({
+                jsonrpc: '2.0',
+                id: msg.id,
+                result: {
+                  protocolVersion: 1,
+                  authMethods: methods.map((id) => ({ id, name: id })),
+                  _meta: {
+                    defaultAuthMethodId:
+                      behaviour.defaultAuthMethodId === undefined
+                        ? methods.includes('cached_token')
+                          ? 'cached_token'
+                          : null
+                        : behaviour.defaultAuthMethodId,
+                  },
+                },
+              });
+            }
+            if (msg.method === 'authenticate') {
+              const id = msg.id;
+              void (behaviour.onAuthenticate?.() ?? Promise.resolve()).then(() =>
+                say({ jsonrpc: '2.0', id, result: {} }),
+              );
+            }
+          }
+          return true;
+        },
+      },
+    });
+    if (behaviour.enoent) {
+      queueMicrotask(() =>
+        child.emit('error', Object.assign(new Error('spawn grok ENOENT'), { code: 'ENOENT' })),
+      );
+    } else if (!args.includes('agent')) {
+      const promptFile = args[args.indexOf('--prompt-file') + 1] ?? '';
+      void (behaviour.onTask?.(promptFile) ?? Promise.resolve()).then(() =>
+        close(behaviour.taskExit ?? 0),
+      );
+    }
+    return child;
+  };
+  return { spawnCli, calls, rpc };
+}

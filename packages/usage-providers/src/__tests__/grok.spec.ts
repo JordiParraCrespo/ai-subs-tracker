@@ -1,4 +1,4 @@
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { syncAccountSchema } from '@flama/shared/schemas/accounts';
 import { resolvePlan } from '@flama/shared/subscriptions';
@@ -6,8 +6,18 @@ import { describe, expect, it } from 'vitest';
 import { grokProvider } from '../grok';
 import { parseGrokAuth } from '../grok/auth';
 import { billingConfig, billingTier, monthlyWindow, weeklyWindow } from '../grok/billing';
+import { GROK_ACP_ARGS, GROK_RENEW_PROMPT } from '../grok/renew';
 import type { DetectedLogin } from '../types';
-import { type FetchCall, fakeFetch, NOW, SINCE, tempHome, testEnv, writeJson } from './helpers';
+import {
+  type FetchCall,
+  fakeFetch,
+  fakeGrok,
+  NOW,
+  SINCE,
+  tempHome,
+  testEnv,
+  writeJson,
+} from './helpers';
 
 const opts = { sinceDay: SINCE, fetchLimits: true };
 
@@ -371,5 +381,134 @@ describe('grok read', () => {
     expect(await grokProvider.signedInAs(dir)).toBe('user-1');
     expect(grokProvider.launchEnv(login)).toEqual({});
     expect(grokProvider.launchEnv({ ...login, isDefault: false })).toEqual({ GROK_HOME: dir });
+  });
+});
+
+describe('grok renewal, run as Orca runs Grok with no window', () => {
+  /** Lapsed for a day and a half: what used to ask for a sign-in every day. */
+  const LAPSED = { ...SESSION, expires_at: '2026-11-01T00:00:00Z' };
+  const RENEWED = { ...SESSION, key: 'grok-renewed', expires_at: '2026-11-03T12:00:00Z' };
+
+  // Regression: a Grok session lapsed for more than a day read as "sign in
+  // again" every morning, although Grok Build could renew it on its own.
+  it('lets the CLI renew a lapsed session over ACP, then reads usage with the new one', async () => {
+    const { home, dir, login } = await grokHome({ 'https://auth.x.ai': LAPSED });
+    const grok = fakeGrok({
+      onAuthenticate: () => writeJson(join(dir, 'auth.json'), { 'https://auth.x.ai': RENEWED }),
+    });
+    const { fn, calls } = fakeFetch(BILLING);
+    const account = await grokProvider.read(
+      login,
+      testEnv(home, { fetch: fn, spawnCli: grok.spawnCli }),
+      opts,
+    );
+    expect(account.snapshot).toMatchObject({ status: 'ok' });
+    expect(calls[0]?.headers.Authorization).toBe('Bearer grok-renewed');
+    // Orca's ACP launch, pointed at this login, and only the saved sign-in.
+    expect(grok.calls).toEqual([
+      {
+        command: 'grok',
+        args: GROK_ACP_ARGS,
+        env: { GROK_HOME: dir, GROK_STORAGE_MODE: 'local' },
+      },
+    ]);
+    expect(grok.rpc.map((r) => r.method)).toEqual(['initialize', 'authenticate']);
+    expect(grok.rpc[1]?.params).toEqual({ methodId: 'cached_token' });
+  });
+
+  it("runs Orca's headless prompt when signing in alone leaves the session lapsed", async () => {
+    const { home, dir, login } = await grokHome({ 'https://auth.x.ai': LAPSED });
+    let prompt = '';
+    const grok = fakeGrok({
+      onTask: async (file) => {
+        prompt = await readFile(file, 'utf8');
+        await writeJson(join(dir, 'auth.json'), { 'https://auth.x.ai': RENEWED });
+      },
+    });
+    const account = await grokProvider.read(
+      login,
+      testEnv(home, { fetch: fakeFetch(BILLING).fn, spawnCli: grok.spawnCli }),
+      opts,
+    );
+    expect(account.snapshot).toMatchObject({ status: 'ok' });
+    expect(prompt).toBe(GROK_RENEW_PROMPT);
+    const task = grok.calls[1]?.args ?? [];
+    expect(task).toEqual(
+      expect.arrayContaining(['--tools', 'Read,Grep,Glob', '--deny', 'Bash,Edit,Write']),
+    );
+    expect(grok.calls[1]?.env).toEqual({ GROK_HOME: dir, GROK_STORAGE_MODE: 'local' });
+  });
+
+  it('keeps a session the CLI renewed even when its prompt then fails', async () => {
+    const { home, dir, login } = await grokHome({ 'https://auth.x.ai': LAPSED });
+    const grok = fakeGrok({
+      onTask: () => writeJson(join(dir, 'auth.json'), { 'https://auth.x.ai': RENEWED }),
+      taskExit: 1,
+    });
+    const account = await grokProvider.read(
+      login,
+      testEnv(home, { fetch: fakeFetch(BILLING).fn, spawnCli: grok.spawnCli }),
+      opts,
+    );
+    expect(account.snapshot).toMatchObject({ status: 'ok' });
+  });
+
+  it('asks for a sign-in when the CLI has no saved login to renew', async () => {
+    const { home, login } = await grokHome({
+      'https://auth.x.ai': { ...SESSION, expires_at: '2026-11-02T06:00:00Z' },
+    });
+    const grok = fakeGrok({ authMethods: ['grok.com'] });
+    const { fn, calls } = fakeFetch(BILLING);
+    const account = await grokProvider.read(
+      login,
+      testEnv(home, { fetch: fn, spawnCli: grok.spawnCli }),
+      opts,
+    );
+    expect(calls).toHaveLength(0);
+    expect(account.snapshot).toMatchObject({ status: 'auth_expired' });
+    expect(account.snapshot?.message).toContain('`grok login`');
+    expect(grok.rpc.map((r) => r.method)).toEqual(['initialize']);
+  });
+
+  it('never signs in with another login than auth.json', async () => {
+    const { home, login } = await grokHome({
+      'https://auth.x.ai': { ...SESSION, expires_at: '2026-11-02T06:00:00Z' },
+    });
+    const grok = fakeGrok({
+      authMethods: ['cached_token', 'xai.api_key'],
+      defaultAuthMethodId: 'xai.api_key',
+    });
+    const account = await grokProvider.read(
+      login,
+      testEnv(home, { fetch: fakeFetch(BILLING).fn, spawnCli: grok.spawnCli }),
+      opts,
+    );
+    expect(grok.rpc.map((r) => r.method)).toEqual(['initialize']);
+    // Not renewed, not signed out: the stale reading stays.
+    expect(account.snapshot).toMatchObject({ status: 'auth_stale' });
+  });
+
+  it('keeps the stale reading when grok is not installed', async () => {
+    const { home, login } = await grokHome({
+      'https://auth.x.ai': { ...SESSION, expires_at: '2026-11-02T06:00:00Z' },
+    });
+    const grok = fakeGrok({ enoent: true });
+    const account = await grokProvider.read(
+      login,
+      testEnv(home, { fetch: fakeFetch(BILLING).fn, spawnCli: grok.spawnCli }),
+      opts,
+    );
+    expect(account.snapshot).toMatchObject({ status: 'auth_stale' });
+  });
+
+  it('starts no CLI for a fresh session', async () => {
+    const { home, login } = await grokHome();
+    const grok = fakeGrok();
+    await grokProvider.read(
+      login,
+      testEnv(home, { fetch: fakeFetch(BILLING).fn, spawnCli: grok.spawnCli }),
+      opts,
+    );
+    expect(grok.calls).toHaveLength(0);
   });
 });

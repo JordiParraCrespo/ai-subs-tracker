@@ -21,6 +21,7 @@ import {
   reportsAnyUsageScalar,
   weeklyWindow,
 } from './billing';
+import { renewGrokSession } from './renew';
 
 /**
  * Grok Build, xAI's coding agent (`grok`), signed in with an X Subscription
@@ -74,27 +75,47 @@ async function detect(env: ProviderEnv): Promise<DetectedLogin[]> {
  * The plan's usage pool, read as Orca reads it: the credits view first, its
  * monthly budget when it has no weekly percentage, then the default view for
  * a unified-billing account's monthly budget. A rejected session is an error,
- * not a sign-out (only the CLI can say that), and a lapsed one is stale: the
- * CLI renews it the next time `grok` runs. A session lapsed for longer than
- * `GROK_ABANDONED_MS` is expired: no `grok` run has come to renew it.
+ * not a sign-out (only the CLI can say that). A lapsed session is renewed by
+ * Grok Build itself, run the way Orca runs it with no window (`renew.ts`);
+ * the CLI saying it has no saved login is the one sign-out. Where the CLI
+ * cannot run, a lapsed session is stale (the next `grok` run renews it), and
+ * one lapsed for longer than `GROK_ABANDONED_MS` is expired.
  */
 async function readLimits(
   login: DetectedLogin,
-  auth: GrokAuth | null,
+  stored: GrokAuth | null,
   env: ProviderEnv,
 ): Promise<{ snapshot: UsageSnapshot; tier: string | null }> {
-  const now = env.now();
+  let auth = stored;
   const run = grokCommand(login);
   if (!auth) {
     return {
       tier: null,
-      snapshot: snapshot(now, 'no_credentials', `Not signed in to Grok — run \`${run} login\`.`),
+      snapshot: snapshot(
+        env.now(),
+        'no_credentials',
+        `Not signed in to Grok — run \`${run} login\`.`,
+      ),
     };
   }
+  if (!isGrokSessionFresh(auth, env.now())) {
+    const renewal = await renewGrokSession(login.home, env);
+    if (renewal.kind === 'renewed') auth = renewal.auth;
+    if (renewal.kind === 'signed_out') {
+      return {
+        tier: null,
+        snapshot: snapshot(
+          env.now(),
+          'auth_expired',
+          `Grok has no saved sign-in — sign in again, or run \`${run} login\` on this computer.`,
+        ),
+      };
+    }
+  }
+  const now = env.now();
   if (isGrokSessionAbandoned(auth, now)) {
-    // Nothing ResetOwl can run renews a Grok session (`grok usage` does not,
-    // and Grok Build has no headless status command), so one lapsed this long
-    // has no renewal coming: the person signs in again.
+    // The CLI could not renew it here (not installed, or it failed), and no
+    // `grok` run has renewed it for a day: the person signs in again.
     return {
       tier: null,
       snapshot: snapshot(

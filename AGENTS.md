@@ -19,9 +19,11 @@ billing are available as Flama plugins (see [Plugins](#plugins)).
   pastes for an unofficial reader included): Claude Code's refresh tokens
   rotate, so calling `oauth/token` here would sign the CLI out. The vendor's
   own CLI may renew its own login — the desktop collector runs
-  `claude auth status` for a lapsed-but-renewable Claude login, and Codex's
-  usage is read through `codex app-server`, so Claude Code and Codex (not
-  ResetOwl) refresh the token and rewrite their credential files.
+  `claude auth status` for a lapsed-but-renewable Claude login, Codex's
+  usage is read through `codex app-server`, and a lapsed Grok session is
+  renewed by running Grok Build as Orca does with no window (`grok agent
+  stdio`, then a headless prompt if needed), so Claude Code, Codex and Grok
+  Build (not ResetOwl) refresh the token and rewrite their credential files.
   Only identity, limit windows and token counts reach the API
   (`packages/shared/src/schemas/accounts.schema.ts`).
 - **Read usage the way Orca does.** The owner's decision (November 2026):
